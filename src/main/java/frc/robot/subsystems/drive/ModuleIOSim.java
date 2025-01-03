@@ -31,9 +31,7 @@ public class ModuleIOSim implements ModuleIO {
 
   // TODO play around with stdDev values
   private DCMotorSim driveSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(driveGearbox, 0.025, driveMotorReduction), driveGearbox);
-  private DCMotorSim turnSim = new DCMotorSim(
-    LinearSystemId.createDCMotorSystem(turnGearbox, 0.004, turnMotorReduction),
-    turnGearbox);
+  private DCMotorSim turnSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(turnGearbox, 0.004, turnMotorReduction), turnGearbox);
 
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;
