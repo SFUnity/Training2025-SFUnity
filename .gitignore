@@ -158,6 +158,13 @@ gradle-app.setting
 .settings/
 bin/
 
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # IntelliJ
 *.iml
 *.ipr
@@ -185,3 +192,6 @@ compile_commands.json
 
 # Eclipse generated file for annotation processors
 .factorypath
+
+# Version file
+src/main/java/frc/robot/constants/BuildConstants.java
