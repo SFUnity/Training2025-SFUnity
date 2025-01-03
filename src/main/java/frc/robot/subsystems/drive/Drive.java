@@ -43,7 +43,6 @@ import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
-
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -91,9 +90,12 @@ public class Drive extends SubsystemBase {
   private final LoggedTunableNumber rkPAuto = new LoggedTunableNumber("Drive/Choreo/rkP", 15);
   private final LoggedTunableNumber rkDAuto = new LoggedTunableNumber("Drive/Choreo/rkD", 0);
 
-  private final PIDController xAutoController = new PIDController(xkPAuto.get(), 0.0, xkDAuto.get());
-  private final PIDController yAutoController = new PIDController(ykPAuto.get(), 0.0, ykDAuto.get());
-  private final PIDController headingAutoController = new PIDController(rkPAuto.get(), 0.0, rkDAuto.get());
+  private final PIDController xAutoController =
+      new PIDController(xkPAuto.get(), 0.0, xkDAuto.get());
+  private final PIDController yAutoController =
+      new PIDController(ykPAuto.get(), 0.0, ykDAuto.get());
+  private final PIDController headingAutoController =
+      new PIDController(rkPAuto.get(), 0.0, rkDAuto.get());
 
   // Subsystem stuff
   private final GyroIO gyroIO;
@@ -666,8 +668,7 @@ public class Drive extends SubsystemBase {
             xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, pose.getRotation());
 
     Logger.recordOutput(
-        "Drive/Choreo/Target Pose",
-        new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
+        "Drive/Choreo/Target Pose", new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
     Logger.recordOutput("Drive/Choreo/Target Speeds", out);
 
     runVelocity(out);
@@ -675,10 +676,19 @@ public class Drive extends SubsystemBase {
 
   private void updateAutoTunables() {
     LoggedTunableNumber.ifChanged(
-        hashCode(), () -> xAutoController.setPID(xkPAuto.get(), 0, xkDAuto.get()), xkPAuto, xkDAuto);
+        hashCode(),
+        () -> xAutoController.setPID(xkPAuto.get(), 0, xkDAuto.get()),
+        xkPAuto,
+        xkDAuto);
     LoggedTunableNumber.ifChanged(
-        hashCode(), () -> yAutoController.setPID(ykPAuto.get(), 0, ykDAuto.get()), ykPAuto, ykDAuto);
+        hashCode(),
+        () -> yAutoController.setPID(ykPAuto.get(), 0, ykDAuto.get()),
+        ykPAuto,
+        ykDAuto);
     LoggedTunableNumber.ifChanged(
-        hashCode(), () -> headingAutoController.setPID(rkPAuto.get(), 0, rkDAuto.get()), rkPAuto, rkDAuto);
+        hashCode(),
+        () -> headingAutoController.setPID(rkPAuto.get(), 0, rkDAuto.get()),
+        rkPAuto,
+        rkDAuto);
   }
 }

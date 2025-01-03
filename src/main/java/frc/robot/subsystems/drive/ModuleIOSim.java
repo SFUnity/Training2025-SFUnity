@@ -13,11 +13,12 @@
 
 package frc.robot.subsystems.drive;
 
+import static frc.robot.subsystems.drive.DriveConstants.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import static frc.robot.subsystems.drive.DriveConstants.*;
 
 /**
  * Physics sim implementation of module IO.
@@ -30,8 +31,13 @@ public class ModuleIOSim implements ModuleIO {
   private static final double LOOP_PERIOD_SECS = 0.02;
 
   // TODO play around with stdDev values
-  private DCMotorSim driveSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(driveGearbox, 0.025, driveMotorReduction), driveGearbox);
-  private DCMotorSim turnSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(turnGearbox, 0.004, turnMotorReduction), turnGearbox);
+  private DCMotorSim driveSim =
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(driveGearbox, 0.025, driveMotorReduction),
+          driveGearbox);
+  private DCMotorSim turnSim =
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(turnGearbox, 0.004, turnMotorReduction), turnGearbox);
 
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;

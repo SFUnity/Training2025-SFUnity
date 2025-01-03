@@ -24,13 +24,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -122,12 +122,8 @@ public class ModuleIOMixed implements ModuleIO {
     setDriveBrakeMode(true);
 
     SparkMaxConfig turnConfig = new SparkMaxConfig();
-    turnConfig
-        .inverted(isTurnMotorInverted)
-        .smartCurrentLimit(60);
-    turnConfig.encoder
-        .quadratureMeasurementPeriod(10)
-        .quadratureAverageDepth(2);
+    turnConfig.inverted(isTurnMotorInverted).smartCurrentLimit(60);
+    turnConfig.encoder.quadratureMeasurementPeriod(10).quadratureAverageDepth(2);
     configureTurnSMax(turnConfig);
     turnRelativeEncoder = turnSparkMax.getEncoder();
     turnRelativeEncoder.setPosition(0.0);
