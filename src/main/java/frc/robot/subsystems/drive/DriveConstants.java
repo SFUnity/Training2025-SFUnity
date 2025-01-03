@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Constants;
@@ -22,6 +23,12 @@ public final class DriveConstants {
   public static final double MAX_ANGULAR_VELOCITY =
       MAX_LINEAR_VELOCITY / DRIVE_BASE_RADIUS; // 6328 uses 12 rad/s (we're at ~10)
   public static final double MAX_ANGULAR_ACCELERATION = MAX_LINEAR_ACCELERATION / DRIVE_BASE_RADIUS;
+
+  public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
+  public static final double driveMotorReduction = 6.75;
+
+  public static final DCMotor turnGearbox = DCMotor.getNEO(1);
+  public static final double turnMotorReduction = 150.0 / 7.0;
 
   /** Returns an array of module translations. */
   public static final Translation2d[] moduleTranslations =
