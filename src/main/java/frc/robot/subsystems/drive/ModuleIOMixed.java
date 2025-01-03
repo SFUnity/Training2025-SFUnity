@@ -24,12 +24,17 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -45,16 +50,16 @@ import edu.wpi.first.math.util.Units;
  */
 public class ModuleIOMixed implements ModuleIO {
   private final TalonFX driveTalon;
-  private final CANSparkMax turnSparkMax;
+  private final SparkMax turnSparkMax;
   private final RelativeEncoder turnRelativeEncoder;
   private final CANcoder cancoder;
 
-  private final StatusSignal<Double> drivePosition;
-  private final StatusSignal<Double> driveVelocity;
-  private final StatusSignal<Double> driveAppliedVolts;
-  private final StatusSignal<Double> driveCurrent;
+  private final StatusSignal<Angle> drivePosition;
+  private final StatusSignal<AngularVelocity> driveVelocity;
+  private final StatusSignal<Voltage> driveAppliedVolts;
+  private final StatusSignal<Current> driveCurrent;
 
-  private final StatusSignal<Double> turnAbsolutePosition;
+  private final StatusSignal<Angle> turnAbsolutePosition;
 
   private final double DRIVE_GEAR_RATIO = 6.12244897959;
   private final double TURN_GEAR_RATIO = 150.0 / 7.0;
@@ -68,7 +73,7 @@ public class ModuleIOMixed implements ModuleIO {
     switch (index) {
       case 0:
         driveTalon = new TalonFX(0);
-        turnSparkMax = new CANSparkMax(0, MotorType.kBrushless);
+        turnSparkMax = new SparkMax(0, MotorType.kBrushless);
         cancoder = new CANcoder(0);
         absoluteEncoderOffseRot = 0.0; // MUST BE CALIBRATED
         isDriveMotorInverted = true;
@@ -77,7 +82,7 @@ public class ModuleIOMixed implements ModuleIO {
         break;
       case 1:
         driveTalon = new TalonFX(1);
-        turnSparkMax = new CANSparkMax(1, MotorType.kBrushless);
+        turnSparkMax = new SparkMax(1, MotorType.kBrushless);
         cancoder = new CANcoder(1);
         absoluteEncoderOffseRot = 0.0; // MUST BE CALIBRATED
         isDriveMotorInverted = true;
@@ -86,7 +91,7 @@ public class ModuleIOMixed implements ModuleIO {
         break;
       case 2:
         driveTalon = new TalonFX(2);
-        turnSparkMax = new CANSparkMax(2, MotorType.kBrushless);
+        turnSparkMax = new SparkMax(2, MotorType.kBrushless);
         cancoder = new CANcoder(2);
         absoluteEncoderOffseRot = 0.0; // MUST BE CALIBRATED
         isDriveMotorInverted = true;
@@ -95,7 +100,7 @@ public class ModuleIOMixed implements ModuleIO {
         break;
       case 3:
         driveTalon = new TalonFX(3);
-        turnSparkMax = new CANSparkMax(3, MotorType.kBrushless);
+        turnSparkMax = new SparkMax(3, MotorType.kBrushless);
         cancoder = new CANcoder(3);
         absoluteEncoderOffseRot = 0.0; // MUST BE CALIBRATED
         isDriveMotorInverted = true;
