@@ -26,14 +26,16 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 
 /**
@@ -111,37 +113,33 @@ public class ModuleIOMixed implements ModuleIO {
         throw new RuntimeException("Invalid module index");
     }
 
-    var driveConfig = new TalonFXConfiguration();
-    driveConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
+    TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+    driveConfig.CurrentLimits.SupplyCurrentLimit = 50.0;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    driveConfig.CurrentLimits.StatorCurrentLimit = 120.0;
+    driveConfig.CurrentLimits.StatorCurrentLimit = 80.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
-    turnSparkMax.restoreFactoryDefaults();
-    turnSparkMax.setCANTimeout(250);
+    SparkMaxConfig turnConfig = new SparkMaxConfig();
+    turnConfig
+        .inverted(isTurnMotorInverted)
+        .smartCurrentLimit(60);
+    turnConfig.encoder
+        .quadratureMeasurementPeriod(10)
+        .quadratureAverageDepth(2);
+    configureTurnSMax(turnConfig);
     turnRelativeEncoder = turnSparkMax.getEncoder();
-    turnSparkMax.setInverted(isTurnMotorInverted);
-    turnSparkMax.setSmartCurrentLimit(30);
-    turnSparkMax.setSecondaryCurrentLimit(80, 1);
-    turnSparkMax.enableVoltageCompensation(12.0);
-
     turnRelativeEncoder.setPosition(0.0);
-    turnRelativeEncoder.setMeasurementPeriod(10);
-    turnRelativeEncoder.setAverageDepth(2);
-
-    turnSparkMax.setCANTimeout(0);
-    turnSparkMax.burnFlash();
 
     cancoder.getConfigurator().apply(new CANcoderConfiguration());
-    var config = new CANcoderConfiguration();
-    config.MagnetSensor.SensorDirection =
+    CANcoderConfiguration encConfig = new CANcoderConfiguration();
+    encConfig.MagnetSensor.SensorDirection =
         isCancoderInverted
             ? SensorDirectionValue.CounterClockwise_Positive
             : SensorDirectionValue.Clockwise_Positive;
-    config.MagnetSensor.MagnetOffset = absoluteEncoderOffseRot;
-    cancoder.getConfigurator().apply(config);
+    encConfig.MagnetSensor.MagnetOffset = absoluteEncoderOffseRot;
+    cancoder.getConfigurator().apply(encConfig);
 
     drivePosition = driveTalon.getPosition();
     driveVelocity = driveTalon.getVelocity();
@@ -204,6 +202,12 @@ public class ModuleIOMixed implements ModuleIO {
 
   @Override
   public void setTurnBrakeMode(boolean enable) {
-    turnSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+    configureTurnSMax(config);
+  }
+
+  private void configureTurnSMax(SparkMaxConfig config) {
+    turnSparkMax.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 }
