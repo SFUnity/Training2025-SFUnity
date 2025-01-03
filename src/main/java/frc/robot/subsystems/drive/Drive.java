@@ -15,8 +15,10 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import choreo.trajectory.SwerveSample;
 import choreo.util.AllianceFlipUtil;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,13 +43,14 @@ import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
+
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /** For controlling and reading data from the physical drive */
 public class Drive extends SubsystemBase {
-  // Commands stuff
+  // Commands
   private static final double DEADBAND = 0.05;
   private DriveCommandsConfig config;
 
@@ -77,8 +80,20 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber(
           "Drive/Commands/Theta/maxAcceleration", DriveConstants.MAX_ANGULAR_ACCELERATION * 0.8);
 
+  // Autos
   private final ProfiledPIDController thetaController;
   private final ProfiledPIDController linearController;
+
+  private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 15);
+  private final LoggedTunableNumber xkDAuto = new LoggedTunableNumber("Drive/Choreo/xkD", 0);
+  private final LoggedTunableNumber ykPAuto = new LoggedTunableNumber("Drive/Choreo/ykP", 15);
+  private final LoggedTunableNumber ykDAuto = new LoggedTunableNumber("Drive/Choreo/ykD", 0);
+  private final LoggedTunableNumber rkPAuto = new LoggedTunableNumber("Drive/Choreo/rkP", 15);
+  private final LoggedTunableNumber rkDAuto = new LoggedTunableNumber("Drive/Choreo/rkD", 0);
+
+  private final PIDController xAutoController = new PIDController(xkPAuto.get(), 0.0, xkDAuto.get());
+  private final PIDController yAutoController = new PIDController(ykPAuto.get(), 0.0, ykDAuto.get());
+  private final PIDController headingAutoController = new PIDController(rkPAuto.get(), 0.0, rkDAuto.get());
 
   // Subsystem stuff
   private final GyroIO gyroIO;
@@ -148,6 +163,8 @@ public class Drive extends SubsystemBase {
             thetakP.get(), 0, thetakD.get(), new TrapezoidProfile.Constraints(0.0, 0.0));
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
     thetaController.setTolerance(Units.degreesToRadians(thetaToleranceDeg.get()));
+
+    headingAutoController.enableContinuousInput(-Math.PI, Math.PI);
 
     updateConstraints();
     updateModuleTunables();
@@ -628,5 +645,40 @@ public class Drive extends SubsystemBase {
         run(() -> stop()).withTimeout(1),
         run(run2).withTimeout(1),
         run(() -> stop()).withTimeout(1));
+  }
+
+  // Autos
+  public void followTrajectory(SwerveSample sample) {
+    updateAutoTunables();
+    Pose2d pose = poseManager.getPose();
+
+    double xFF = sample.vx;
+    double yFF = sample.vy;
+    double rotationFF = sample.omega;
+
+    double xFeedback = xAutoController.calculate(pose.getX(), sample.x);
+    double yFeedback = yAutoController.calculate(pose.getY(), sample.y);
+    double rotationFeedback =
+        headingAutoController.calculate(pose.getRotation().getRadians(), sample.heading);
+
+    ChassisSpeeds out =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, pose.getRotation());
+
+    Logger.recordOutput(
+        "Drive/Choreo/Target Pose",
+        new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
+    Logger.recordOutput("Drive/Choreo/Target Speeds", out);
+
+    runVelocity(out);
+  }
+
+  private void updateAutoTunables() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(), () -> xAutoController.setPID(xkPAuto.get(), 0, xkDAuto.get()), xkPAuto, xkDAuto);
+    LoggedTunableNumber.ifChanged(
+        hashCode(), () -> yAutoController.setPID(ykPAuto.get(), 0, ykDAuto.get()), ykPAuto, ykDAuto);
+    LoggedTunableNumber.ifChanged(
+        hashCode(), () -> headingAutoController.setPID(rkPAuto.get(), 0, rkDAuto.get()), rkPAuto, rkDAuto);
   }
 }
