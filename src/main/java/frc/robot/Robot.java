@@ -281,9 +281,6 @@ public class Robot extends LoggedRobot {
     driverDisconnected.set(isControllerConnected(driver));
     operatorDisconnected.set(isControllerConnected(operator));
 
-    // Update AutoChooser
-    autos.updateAutoChooser();
-
     // Check CAN status
     var canStatus = RobotController.getCANStatus();
     if (canStatus.transmitErrorCount > 0 || canStatus.receiveErrorCount > 0) {
