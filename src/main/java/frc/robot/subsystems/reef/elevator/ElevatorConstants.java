@@ -5,6 +5,10 @@ public class ElevatorConstants {
   public static final double maxElevatorSpeed = 0;
   public static final double maxElevatorAcceleration = 0;
 
+  public static final double profileP = 0;
+  public static final double profileI = 0;
+  public static final double profileD = 0;
+
   public static final double desiredHeightL1 = 0;
   public static final double desiredHeightL2 = 0;
   public static final double desiredHeightL3 = 0;

@@ -1,16 +1,20 @@
 package frc.robot.subsystems.reef.elevator;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
-  private final TrapezoidProfile profile =
-      new TrapezoidProfile(
+  private final ProfiledPIDController profile =
+      new ProfiledPIDController(
+          ElevatorConstants.profileP,
+          ElevatorConstants.profileI,
+          ElevatorConstants.profileD,
           new TrapezoidProfile.Constraints(
               ElevatorConstants.maxElevatorSpeed, ElevatorConstants.maxElevatorAcceleration));
   private TrapezoidProfile.State goal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
+  private double setpoint = 0;
 
   private final ElevatorIO io;
   // private final PoseManager poseManager;
@@ -29,7 +33,7 @@ public class Elevator extends SubsystemBase {
   public void calculateDesiredAngle(double kP) {
     goal = new TrapezoidProfile.State(kP, 0);
 
-    setpoint = profile.calculate(kP, setpoint, goal);
+    setpoint = profile.calculate(inputs.positionRots, goal);
   }
 
   public void runElevator() {
