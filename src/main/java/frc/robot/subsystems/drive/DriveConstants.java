@@ -7,7 +7,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.constants.Constants;
+import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
