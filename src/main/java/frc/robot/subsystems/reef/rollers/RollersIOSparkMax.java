@@ -1,5 +1,5 @@
 package frc.robot.subsystems.reef.rollers;
 
-public interface RollersIOSparkMax implements RollersIO{
+public class RollersIOSparkMax implements RollersIO{
 
 }
