@@ -12,15 +12,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
  * value not in dashboard.
  */
-public class LoggedTunableNumber implements DoubleSupplier {
-  private static final String tableKey = "/Shuffleboard/Tunables";
+public class LoggedTunableNumber {
+  private static final String tableKey = "/SmartDashboard/TunableNumbers";
 
   private final String key;
   private boolean hasDefault = false;
@@ -114,10 +113,5 @@ public class LoggedTunableNumber implements DoubleSupplier {
   /** Runs action if any of the tunableNumbers have changed */
   public static void ifChanged(int id, Runnable action, LoggedTunableNumber... tunableNumbers) {
     ifChanged(id, values -> action.run(), tunableNumbers);
-  }
-
-  @Override
-  public double getAsDouble() {
-    return get();
   }
 }
