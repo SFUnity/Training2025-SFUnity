@@ -62,7 +62,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     LimelightHelpers.setPipelineIndex(name, Pipelines.getIndexFor(pipelineEnum));
   }
 
-  //function crops the limelight window to only include the apriltags the robot can see
+  // function crops the limelight window to only include the apriltags the robot can see
   private void dynamicCropping() {
     double[] tcornxy = LimelightHelpers.getLimelightNTDoubleArray(name, "tcornxy");
     if (tcornxy.length == 0) {
