@@ -1,5 +1,5 @@
 package frc.robot.subsystems.ground;
 
-public interface GroundIOSparkMax implements GroundIO{
+public class GroundIOSparkMax implements GroundIO{
 
 }
