@@ -1,5 +1,3 @@
 package frc.robot.subsystems.ground;
 
-public class GroundConstants {
-
-}
+public class GroundConstants {}

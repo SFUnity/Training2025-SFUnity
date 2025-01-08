@@ -1,5 +1,3 @@
 package frc.robot.subsystems.reef.rollers;
 
-public class RollersIOSim {
-
-}
+public class RollersIOSim {}
