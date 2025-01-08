@@ -17,6 +17,7 @@ public class Elevator extends SubsystemBase {
   private double setpoint = 0;
 
   private final ElevatorIO io;
+  //TODO: Impliment or remove poisemanager
   // private final PoseManager poseManager;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
