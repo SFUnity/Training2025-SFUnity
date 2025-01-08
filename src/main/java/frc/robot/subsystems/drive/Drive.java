@@ -30,6 +30,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,7 +40,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.leds.Leds;
-import frc.robot.util.Alert;
 import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
@@ -119,7 +120,7 @@ public class Drive extends SubsystemBase {
   private static final double BREAK_MODE_DELAY_SEC = 10.0;
 
   // Alerts
-  private final Alert gyroDisconnected = new Alert("Gyro disconnected!", Alert.AlertType.WARNING);
+  private final Alert gyroDisconnected = new Alert("Gyro disconnected!", AlertType.kWarning);
 
   public Drive(
       GyroIO gyroIO,
