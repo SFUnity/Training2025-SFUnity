@@ -7,7 +7,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-
+import frc.robot.util.PoseManager;
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
 
