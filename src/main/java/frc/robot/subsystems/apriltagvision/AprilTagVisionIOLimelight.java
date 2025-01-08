@@ -1,9 +1,10 @@
 package frc.robot.subsystems.apriltagvision;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
-import frc.robot.util.Alert;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PoseManager;
 
@@ -22,7 +23,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
     LimelightHelpers.setLEDMode_PipelineControl(name);
 
-    disconnectedAlert = new Alert("No data from: " + name, Alert.AlertType.ERROR);
+    disconnectedAlert = new Alert("No data from: " + name, AlertType.kError);
 
     resetCropping();
   }

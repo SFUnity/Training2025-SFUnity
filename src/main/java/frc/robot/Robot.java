@@ -16,6 +16,8 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -23,8 +25,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.constants.BuildConstants;
-import frc.robot.constants.Constants;
+import frc.robot.constantsGlobal.BuildConstants;
+import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.apriltagvision.AprilTagVision;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIO;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIOLimelight;
@@ -36,8 +38,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.leds.Leds;
-import frc.robot.util.Alert;
-import frc.robot.util.Alert.AlertType;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -71,11 +71,11 @@ public class Robot extends LoggedRobot {
   private final Timer canErrorTimer = new Timer();
 
   private final Alert canErrorAlert =
-      new Alert("CAN errors detected, robot may not be controllable.", AlertType.ERROR);
+      new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
   private final Alert lowBatteryAlert =
       new Alert(
           "Battery voltage is very low, consider turning off the robot or replacing the battery.",
-          AlertType.WARNING);
+          AlertType.kWarning);
 
   // Subsystems
   private final Drive drive;
@@ -89,9 +89,9 @@ public class Robot extends LoggedRobot {
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
   private final Alert driverDisconnected =
-      new Alert("Driver controller disconnected (port 0).", AlertType.WARNING);
+      new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
   private final Alert operatorDisconnected =
-      new Alert("Operator controller disconnected (port 1).", AlertType.WARNING);
+      new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
 
   public boolean slowMode = false;
   private final LoggedTunableNumber slowDriveMultiplier =
@@ -218,7 +218,7 @@ public class Robot extends LoggedRobot {
 
     // Alerts for constants
     if (Constants.tuningMode) {
-      new Alert("Tuning mode enabled", AlertType.INFO).set(true);
+      new Alert("Tuning mode enabled", AlertType.kInfo).set(true);
     }
 
     DriverStation.silenceJoystickConnectionWarning(true);
