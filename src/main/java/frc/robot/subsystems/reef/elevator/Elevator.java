@@ -32,7 +32,7 @@ public class Elevator extends SubsystemBase {
 
   public void calculateDesiredAngle(double kP) {
     goal = new TrapezoidProfile.State(kP, 0);
-
+    //TODO: is setpoint needed?
     setpoint = profile.calculate(inputs.positionRots, goal);
   }
 
