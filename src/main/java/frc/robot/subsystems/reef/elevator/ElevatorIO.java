@@ -1,5 +1,6 @@
 package frc.robot.subsystems.reef.elevator;
 
-public interface ElevatorIO {
+import org.littletonrobotics.junction.AutoLog;
+public interface ElevatorIO{
 
 }
