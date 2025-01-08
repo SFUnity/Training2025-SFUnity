@@ -36,10 +36,11 @@ public class ElevatorIOSparkMax implements ElevatorIO{
      }
 
      @Override
-    public void setHeight(){
-      pid.setReference(goal.position, ControlType.kPosition);
+    public void setHeight(double desiredHeight){
+      pid.setReference(desiredHeight, ControlType.kPosition);
     }
 
+    @Override
     public void calculateDesiredAngle(double kP){
       goal = new TrapezoidProfile.State(kP, 0);
 
