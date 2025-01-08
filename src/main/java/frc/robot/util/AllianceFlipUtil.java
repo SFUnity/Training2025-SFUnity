@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constantsGlobal.FieldConstants;
 
 /** Utility functions for flipping from the blue to red alliance. */
-public class AllianceFlipUtil6328 {
+public class AllianceFlipUtil {
   /** Flips an x coordinate to the correct side of the field based on the current alliance color. */
   public static double apply(double xCoordinate) {
     if (shouldFlip()) {
