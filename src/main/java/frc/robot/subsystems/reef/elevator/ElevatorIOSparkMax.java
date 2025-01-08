@@ -7,7 +7,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import frc.robot.util.PoseManager;
+
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
 
@@ -17,7 +17,13 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   public ElevatorIOSparkMax() {}
 
   @Override
-  public void updateInputs(ElevatorIOInputs inputs) {}
+  public void updateInputs(ElevatorIOInputs inputs) {
+    inputs.positionRots = encoder.getPosition();
+    inputs.velocityRotsPerSec = encoder.getVelocity();
+    inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
+    inputs.currentAmps =
+        new double[] {elevatorMotor.getOutputCurrent(), elevatorMotor.getOutputCurrent()};
+  }
 
   @Override
   public void setHeight(double desiredHeight) {
