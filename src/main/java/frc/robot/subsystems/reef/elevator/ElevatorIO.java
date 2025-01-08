@@ -15,7 +15,7 @@ public interface ElevatorIO {
 
   public default void setHeight(double desiredHeight) {}
 
-  public default void calculateDesiredAngle(double kP) {}
+  public default void stop() {}
 }
 
 // Calculate
