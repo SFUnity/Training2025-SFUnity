@@ -7,12 +7,10 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
 
-  
   private final RelativeEncoder encoder = elevatorMotor.getEncoder();
   private final SparkClosedLoopController pid = elevatorMotor.getClosedLoopController();
 
@@ -27,9 +25,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   }
 
   @Override
-  public void stop(){
+  public void stop() {
     elevatorMotor.stopMotor();
   }
-
- 
 }
