@@ -12,12 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
 
-  private final TrapezoidProfile profile =
-      new TrapezoidProfile(
-          new TrapezoidProfile.Constraints(
-              ElevatorConstants.maxElevatorSpeed, ElevatorConstants.maxElevatorAcceleration));
-  private TrapezoidProfile.State goal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
+  
   private final RelativeEncoder encoder = elevatorMotor.getEncoder();
   private final SparkClosedLoopController pid = elevatorMotor.getClosedLoopController();
 
@@ -32,9 +27,9 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   }
 
   @Override
-  public void calculateDesiredAngle(double kP) {
-    goal = new TrapezoidProfile.State(kP, 0);
-
-    setpoint = profile.calculate(kP, setpoint, goal);
+  public void stop(){
+    elevatorMotor.stopMotor();
   }
+
+ 
 }
