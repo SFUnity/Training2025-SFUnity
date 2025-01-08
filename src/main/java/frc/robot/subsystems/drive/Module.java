@@ -17,7 +17,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import frc.robot.util.Alert;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
@@ -43,11 +45,11 @@ public class Module {
     this.index = index;
 
     driveMotorDisconnected =
-        new Alert(moduleNames[index] + " drive motor disconnected!", Alert.AlertType.WARNING);
+        new Alert(moduleNames[index] + " drive motor disconnected!", AlertType.kWarning);
     turnMotorDisconnected =
-        new Alert(moduleNames[index] + " turn motor disconnected!", Alert.AlertType.WARNING);
+        new Alert(moduleNames[index] + " turn motor disconnected!", AlertType.kWarning);
     cancoderDisconnected =
-        new Alert(moduleNames[index] + " cancoder disconnected!", Alert.AlertType.WARNING);
+        new Alert(moduleNames[index] + " cancoder disconnected!", AlertType.kWarning);
 
     setBrakeMode(true);
   }
