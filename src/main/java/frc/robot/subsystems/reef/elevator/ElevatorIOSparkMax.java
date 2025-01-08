@@ -1,6 +1,7 @@
 package frc.robot.subsystems.reef.elevator;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -11,6 +12,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 
 import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
 
@@ -25,6 +27,24 @@ public class ElevatorIOSparkMax implements ElevatorIO{
     private final SparkClosedLoopController pid = elevatorMotor.getClosedLoopController();
     public ElevatorIOSparkMax() {
         
+
+    }
+
+    @Override
+    public void updateInputs(ElevatorIOInputs inputs){
+
+     }
+
+     @Override
+    public void setHeight(){
+      pid.setReference(goal.position, ControlType.kPosition);
+    }
+
+    public void calculateDesiredAngle(double kP){
+      goal = new TrapezoidProfile.State(kP, 0);
+
+      setpoint = profile.calculate(kP, setpoint, goal);
+
 
     }
 }
