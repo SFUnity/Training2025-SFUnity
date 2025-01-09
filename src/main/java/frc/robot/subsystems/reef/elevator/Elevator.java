@@ -1,23 +1,27 @@
 package frc.robot.subsystems.reef.elevator;
 
+import static edu.wpi.first.units.Units.Rotation;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
-  private final ProfiledPIDController profile =
+  private final ProfiledPIDController pid =
       new ProfiledPIDController(
-          ElevatorConstants.profileP,
-          ElevatorConstants.profileI,
-          ElevatorConstants.profileD,
+          ElevatorConstants.kP,
+          ElevatorConstants.kI,
+          ElevatorConstants.kD,
           new TrapezoidProfile.Constraints(
               ElevatorConstants.maxElevatorSpeed, ElevatorConstants.maxElevatorAcceleration));
-  private TrapezoidProfile.State goal = new TrapezoidProfile.State();
-  private double setpoint = 0;
+  private final ElevatorFeedforward ffController =
+      new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
+  ;
 
   private final ElevatorIO io;
-  //TODO: Impliment or remove poisemanager
+  // TODO: Impliment or remove poisemanager
   // private final PoseManager poseManager;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -31,14 +35,14 @@ public class Elevator extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
-  public void calculateDesiredAngle(double kP) {
-    goal = new TrapezoidProfile.State(kP, 0);
-    // TODO: is setpoint needed?
-    setpoint = profile.calculate(inputs.positionRots, goal);
+  public void calculateDesiredPosition(double desiredPosition) {
+    pid.setGoal(desiredPosition);
   }
 
   public void runElevator() {
-    io.setHeight(goal.position);
+    io.runVolts(
+        pid.calculate(inputs.position.in(Rotation))
+            + ffController.calculate(inputs.velocityRotsPerSec));
   }
 
   public void stop() {
@@ -47,12 +51,12 @@ public class Elevator extends SubsystemBase {
 
   public Command L1() {
     return run(() -> {
-          calculateDesiredAngle(ElevatorConstants.desiredHeightL1);
+          calculateDesiredPosition(ElevatorConstants.desiredHeightL1);
           runElevator();
         })
         .finallyDo(
             () -> {
-              calculateDesiredAngle(ElevatorConstants.desiredHeightBottom);
+              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
               runElevator();
             })
         .withName("readyL1");
