@@ -1,6 +1,6 @@
 package frc.robot.subsystems.reef.elevator;
 
-import static edu.wpi.first.units.Units.Rotation;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -41,8 +41,8 @@ public class Elevator extends SubsystemBase {
 
   public void runElevator() {
     io.runVolts(
-        pid.calculate(inputs.position.in(Rotation))
-            + ffController.calculate(inputs.velocityRotsPerSec));
+        pid.calculate(inputs.position.in(Meters))
+            + ffController.calculate(inputs.velocityMetersPerSec));
   }
 
   public void stop() {
