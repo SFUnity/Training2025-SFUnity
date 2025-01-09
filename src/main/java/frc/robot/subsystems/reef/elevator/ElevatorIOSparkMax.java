@@ -2,7 +2,7 @@ package frc.robot.subsystems.reef.elevator;
 
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
-import edu.wpi.first.units.measure.Angle;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -18,7 +18,11 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.position = Meters.of(encoder.getPosition());
-    inputs.velocityMetersPerSec = (encoder.getVelocity()/ElevatorConstants.gearRatio * (2 * Math.PI *ElevatorConstants.wheelRadius))/60;
+    inputs.velocityMetersPerSec =
+        (encoder.getVelocity()
+                / ElevatorConstants.gearRatio
+                * (2 * Math.PI * ElevatorConstants.wheelRadius))
+            / 60;
     inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
     inputs.currentAmps =
         new double[] {elevatorMotor.getOutputCurrent(), elevatorMotor.getOutputCurrent()};

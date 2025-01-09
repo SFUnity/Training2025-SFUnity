@@ -1,8 +1,6 @@
 package frc.robot.subsystems.reef.elevator;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -20,7 +18,7 @@ public interface ElevatorIO {
 
   public default void stop() {}
 
-  public default void getEncoder() {}
+
 }
 
 // Calculate
