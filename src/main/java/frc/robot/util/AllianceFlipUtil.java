@@ -13,23 +13,32 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.constantsGlobal.FieldConstants;
+import choreo.util.ChoreoAllianceFlipUtil;
 
 /** Utility functions for flipping from the blue to red alliance. */
 public class AllianceFlipUtil {
   /** Flips an x coordinate to the correct side of the field based on the current alliance color. */
-  public static double apply(double xCoordinate) {
+  public static double applyX(double xCoordinate) {
     if (shouldFlip()) {
-      return FieldConstants.fieldLength - xCoordinate;
+      return ChoreoAllianceFlipUtil.flipX(xCoordinate);
     } else {
       return xCoordinate;
+    }
+  }
+
+  /** Flips an y coordinate to the correct side of the field based on the current alliance color. */
+  public static double applyY(double yCoordinate) {
+    if (shouldFlip()) {
+      return ChoreoAllianceFlipUtil.flipY(yCoordinate);
+    } else {
+      return yCoordinate;
     }
   }
 
   /** Flips a translation to the correct side of the field based on the current alliance color. */
   public static Translation2d apply(Translation2d translation) {
     if (shouldFlip()) {
-      return new Translation2d(apply(translation.getX()), translation.getY());
+      return ChoreoAllianceFlipUtil.flip(translation);
     } else {
       return translation;
     }
@@ -56,8 +65,7 @@ public class AllianceFlipUtil {
 
   public static Translation3d apply(Translation3d translation3d) {
     if (shouldFlip()) {
-      return new Translation3d(
-          apply(translation3d.getX()), translation3d.getY(), translation3d.getZ());
+      return ChoreoAllianceFlipUtil.flip(translation3d);
     } else {
       return translation3d;
     }
