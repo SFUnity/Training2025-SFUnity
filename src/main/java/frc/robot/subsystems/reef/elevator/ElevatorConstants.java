@@ -14,4 +14,10 @@ public class ElevatorConstants {
   public static final double desiredHeightL3 = 0;
   public static final double desiredHeightL4 = 0;
   public static final double desiredHeightBottom = 0;
+
+
+  public static final double carrageMass = 1;
+  public static final double minHeight = 0;
+  public static final double maxHeight = 2; 
+
 }
