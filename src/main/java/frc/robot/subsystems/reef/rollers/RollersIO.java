@@ -15,5 +15,9 @@ public interface RollersIO {
 
   public default void runVolts(double volts) {}
 
+  public default void runMotorStraight() {}
+
+  public default void reverseMotor() {}
+
   public default void stop() {}
 }

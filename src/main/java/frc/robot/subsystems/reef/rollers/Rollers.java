@@ -17,12 +17,8 @@ public class Rollers extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
-  private void runIntakingRollers() {
-    io.runVolts(RollersConstants.rollersIntakingSpeed);
-  }
-
-  private void runPlaceRollers() {
-    io.runVolts(RollersConstants.rollersPlaceSpeed);
+  private void runRollers(double volts) {
+    io.runVolts(volts);
   }
 
   private void stopRollers() {
@@ -31,16 +27,26 @@ public class Rollers extends SubsystemBase {
 
   public Command placeCoral() {
     return run(() -> {
-          runPlaceRollers();
+          io.runMotorStraight();
+          runRollers(RollersConstants.rollersPlaceSpeed);
         })
         .withName("placeCoralRollers");
   }
 
   public Command intakeCoral() {
     return run(() -> {
-          runIntakingRollers();
+          io.runMotorStraight();
+          runRollers(RollersConstants.rollersIntakingSpeed);
         })
         .withName("intakeCoralRollers");
+  }
+
+  public Command scoreCoral() {
+    return run(() -> {
+          io.reverseMotor();
+          runRollers(RollersConstants.rollersIntakingSpeed);
+        })
+        .withName("scoreCoral");
   }
   // TODO: add "until when 2m distance sensor gets set up"
 }
