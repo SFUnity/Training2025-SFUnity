@@ -2,14 +2,13 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import choreo.auto.AutoFactory.AutoBindings;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.util.AllianceFlipUtil6328;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -36,17 +35,16 @@ public class Autos {
             drive::followTrajectory,
             true,
             drive,
-            new AutoBindings(),
             (Trajectory<SwerveSample> traj, Boolean bool) -> {
               Logger.recordOutput(
                   "Drive/Choreo/Active Traj",
-                  (AllianceFlipUtil6328.shouldFlip() ? traj.flipped() : traj).getPoses());
+                  (AllianceFlipUtil.shouldFlip() ? traj.flipped() : traj).getPoses());
               Logger.recordOutput(
                   "Drive/Choreo/Current Traj End Pose",
-                  traj.getFinalPose(AllianceFlipUtil6328.shouldFlip()).get());
+                  traj.getFinalPose(AllianceFlipUtil.shouldFlip()).get());
               Logger.recordOutput(
                   "Drive/Choreo/Current Traj Start Pose",
-                  traj.getInitialPose(AllianceFlipUtil6328.shouldFlip()).get());
+                  traj.getInitialPose(AllianceFlipUtil.shouldFlip()).get());
             });
 
     chooser = new AutoChooser();
