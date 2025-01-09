@@ -1,11 +1,12 @@
 package frc.robot.subsystems.reef.elevator;
 
+import edu.wpi.first.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
-    public double positionRots;
+    public Angle position;
     public double velocityRotsPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
@@ -13,9 +14,11 @@ public interface ElevatorIO {
 
   public default void updateInputs(ElevatorIOInputs inputs) {}
 
-  public default void setHeight(double desiredHeight) {}
+  public default void runVolts(double volts) {}
 
   public default void stop() {}
+
+  public default void getEncoder() {}
 }
 
 // Calculate
