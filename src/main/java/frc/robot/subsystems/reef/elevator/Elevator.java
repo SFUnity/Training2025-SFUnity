@@ -49,18 +49,13 @@ public class Elevator extends SubsystemBase {
   public void stop() {
     io.stop();
   }
-  //TODO: fix desired height
-  public boolean atDesiredHeight(double desiredHeight){
-    if(!Util.equalsWithTolerance(inputs.position.in(Meters), desiredHeight, 0.15)){
+  // TODO: fix desired height
+  public boolean atDesiredHeight(double desiredHeight) {
+    if (!Util.equalsWithTolerance(inputs.position.in(Meters), desiredHeight, 0.15)) {
       return true;
-    }
-    else{
+    } else {
       return false;
     }
-    
-    
-    
-    
   }
 
   public Command l1() {
@@ -75,6 +70,7 @@ public class Elevator extends SubsystemBase {
             })
         .withName("readyL1");
   }
+
   public Command l2() {
     return run(() -> {
           calculateDesiredPosition(ElevatorConstants.desiredHeightL2);
@@ -86,8 +82,8 @@ public class Elevator extends SubsystemBase {
               runElevator();
             })
         .withName("readyL2");
-        
   }
+
   public Command l3() {
     return run(() -> {
           calculateDesiredPosition(ElevatorConstants.desiredHeightL3);
@@ -100,6 +96,7 @@ public class Elevator extends SubsystemBase {
             })
         .withName("readyL3");
   }
+
   public Command lowAlgae() {
     return run(() -> {
           calculateDesiredPosition(ElevatorConstants.desiredHeightLowAlgae);
@@ -112,6 +109,7 @@ public class Elevator extends SubsystemBase {
             })
         .withName("readyLowAlgae");
   }
+
   public Command highAlgae() {
     return run(() -> {
           calculateDesiredPosition(ElevatorConstants.desiredHeightHighAlgae);
@@ -124,6 +122,7 @@ public class Elevator extends SubsystemBase {
             })
         .withName("readyHighAlgae");
   }
+
   public Command processor() {
     return run(() -> {
           calculateDesiredPosition(ElevatorConstants.desiredHeightProcessor);
@@ -137,16 +136,16 @@ public class Elevator extends SubsystemBase {
         .withName("readyProcessor");
   }
 
-  public Command source(){
+  public Command source() {
     return run(() -> {
-      calculateDesiredPosition(ElevatorConstants.desiredHeightSource);
-      runElevator();
-    })
-    .finallyDo(
-        () -> {
-          calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+          calculateDesiredPosition(ElevatorConstants.desiredHeightSource);
           runElevator();
         })
-    .withName("readySource");
+        .finallyDo(
+            () -> {
+              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+              runElevator();
+            })
+        .withName("readySource");
   }
 }
