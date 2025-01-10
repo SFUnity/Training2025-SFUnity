@@ -8,7 +8,7 @@ public interface RollersIO {
     public double positionRots;
     public double velocityRotsPerSec = 0.0;
     public double appliedVolts = 0.0;
-    public double[] currentAmps = new double[] {};
+    public double currentAmps = 0.0;
   }
 
   public default void updateInputs(RollersIOInputs inputs) {}

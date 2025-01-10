@@ -18,8 +18,7 @@ public class RollersIOSparkMax implements RollersIO {
     inputs.positionRots = encoder.getPosition();
     inputs.velocityRotsPerSec = encoder.getVelocity();
     inputs.appliedVolts = rollerMotor.getAppliedOutput() * rollerMotor.getBusVoltage();
-    inputs.currentAmps =
-        new double[] {rollerMotor.getOutputCurrent(), rollerMotor.getOutputCurrent()};
+    inputs.currentAmps = rollerMotor.getOutputCurrent();
   }
 
   @Override
