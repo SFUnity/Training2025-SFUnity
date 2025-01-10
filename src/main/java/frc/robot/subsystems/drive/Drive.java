@@ -16,7 +16,6 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
-import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -24,7 +23,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -32,18 +30,15 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.util.LoggedTunableNumber;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -301,9 +296,10 @@ public class Drive extends SubsystemBase {
   public void updateModuleTunables() {
     LoggedTunableNumber.ifChanged(
         hashCode(),
-        () -> {for (var module : modules) module.setDrivePIDF(driveKp.get(), driveKd.get(),
-        driveKs.get(),
-        driveKv.get());},
+        () -> {
+          for (var module : modules)
+            module.setDrivePIDF(driveKp.get(), driveKd.get(), driveKs.get(), driveKv.get());
+        },
         driveKp,
         driveKd,
         driveKs,
@@ -311,7 +307,9 @@ public class Drive extends SubsystemBase {
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
-        () -> {for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());},
+        () -> {
+          for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());
+        },
         turnKp,
         turnKd);
   }

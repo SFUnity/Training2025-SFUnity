@@ -14,17 +14,14 @@
 package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
-import static frc.robot.util.SparkUtil.*;
 import static frc.robot.util.PhoenixUtil.*;
+import static frc.robot.util.SparkUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -34,19 +31,14 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkMax;
-
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -54,8 +46,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.util.LoggedTunableNumber;
-
 import java.util.Queue;
 
 /**
@@ -105,7 +95,7 @@ public class ModuleIOMixed implements ModuleIO {
           case 3 -> backRightZeroRotation;
           default -> new Rotation2d();
         };
-        driveTalon =
+    driveTalon =
         new TalonFX(
             switch (module) {
               case 0 -> frontLeftDriveCanId;
@@ -125,13 +115,16 @@ public class ModuleIOMixed implements ModuleIO {
               default -> 0;
             },
             MotorType.kBrushless);
-    cancoder = new CANcoder(switch (module) {
-        case 0 -> frontLeftTurnEncoderCanId;
-        case 1 -> frontRightTurnEncoderCanId;
-        case 2 -> backLeftTurnEncoderCanId;
-        case 3 -> backRightTurnEncoderCanId;
-        default -> 0;
-      }, DriveConstants.CANBusName);
+    cancoder =
+        new CANcoder(
+            switch (module) {
+              case 0 -> frontLeftTurnEncoderCanId;
+              case 1 -> frontRightTurnEncoderCanId;
+              case 2 -> backLeftTurnEncoderCanId;
+              case 3 -> backRightTurnEncoderCanId;
+              default -> 0;
+            },
+            DriveConstants.CANBusName);
     turnEncoder = turnSpark.getEncoder();
     turnController = turnSpark.getClosedLoopController();
 
@@ -204,8 +197,7 @@ public class ModuleIOMixed implements ModuleIO {
     turnCurrent = turnTalon.getStatorCurrent();
 
     // Configure periodic frames
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        odometryFrequency, drivePosition, turnPosition);
+    BaseStatusSignal.setUpdateFrequencyForAll(odometryFrequency, drivePosition, turnPosition);
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
         driveVelocity,
@@ -307,14 +299,14 @@ public class ModuleIOMixed implements ModuleIO {
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
   }
 
-    @Override
-    public void setTurnPIDF(double turnkP, double turnkD) {
-        SparkMaxConfig turnConfig = new SparkMaxConfig();
-        turnConfig.closedLoop.pidf(turnkP, 0, turnkD, 0);
-        tryUntilOk(
-            turnSpark,
+  @Override
+  public void setTurnPIDF(double turnkP, double turnkD) {
+    SparkMaxConfig turnConfig = new SparkMaxConfig();
+    turnConfig.closedLoop.pidf(turnkP, 0, turnkD, 0);
+    tryUntilOk(
+        turnSpark,
         () ->
-        turnSpark.configure(
-            turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-    }
+            turnSpark.configure(
+                turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+  }
 }

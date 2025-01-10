@@ -33,9 +33,7 @@ public class Module {
   private final Alert turnEncoderDisconnectedAlert;
   private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
-  public Module(
-      ModuleIO io,
-      int index) {
+  public Module(ModuleIO io, int index) {
     this.io = io;
     this.index = index;
     driveDisconnectedAlert =
