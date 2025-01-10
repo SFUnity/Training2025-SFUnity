@@ -32,7 +32,6 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.velocityMetersPerSec = sim.getVelocityMetersPerSecond();
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
-
   }
 
   @Override
@@ -42,7 +41,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void stop(){
+  public void stop() {
     runVolts(0);
   }
 }

@@ -23,57 +23,65 @@ public class Reef extends VirtualSubsystem {
     this.elevator = elevator;
   }
 
-  public void periodic() {
+  public void periodic() {}
 
-  }
-
-  public boolean atDesiredHeight(double desiredHeight){
+  public boolean atDesiredHeight(double desiredHeight) {
     return elevator.atDesiredHeight(desiredHeight);
   }
-  public Command setCoralIntake(){
+
+  public Command setCoralIntake() {
     return elevator
-    .source()
-    .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightSource)))
-    .andThen(rollers.placeCoralAndDealgify());
+        .source()
+        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightSource)))
+        .andThen(rollers.placeCoralAndDealgify())
+        .withName("intakeCoral");
   }
 
-  public Command setScoreL1(){
+  public Command setScoreL1() {
     return elevator
-    .source()
-    .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL1)))
-    .andThen(rollers.placeCoralAndDealgify());
-  }
-  public Command setScoreL2(){
-    return elevator
-    .source()
-    .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL2)))
-    .andThen(rollers.placeCoralAndDealgify());
-  }
-  public Command setScoreL3(){
-    return elevator
-    .source()
-    .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL3)))
-    .andThen(rollers.placeCoralAndDealgify());
-  }
-  public Command setDealgaeLow(){
-    return elevator
-    .source()
-    .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightLowAlgae)))
-    .andThen(rollers.placeCoralAndDealgify());
-  }
-  public Command setDealgaeHigh(){
-    return elevator
-    .source()
-    .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightHighAlgae)))
-    .andThen(rollers.placeCoralAndDealgify());
+        .source()
+        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL1)))
+        .andThen(rollers.placeCoralAndDealgify())
+        .withName("scoreL1");
   }
 
-  public Command setScoreProcessor(){
+  public Command setScoreL2() {
     return elevator
-    .source()
-    .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightProcessor)))
-    .andThen(rollers.scoreProcessor());
+        .source()
+        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL2)))
+        .andThen(rollers.placeCoralAndDealgify())
+        .withName("scoreL2");
   }
 
+  public Command setScoreL3() {
+    return elevator
+        .source()
+        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL3)))
+        .andThen(rollers.placeCoralAndDealgify())
+        .withName("scoreL3");
+  }
 
+  public Command setDealgaeLow() {
+    return elevator
+        .source()
+        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightLowAlgae)))
+        .andThen(rollers.placeCoralAndDealgify())
+        .withName("dealgaefyLow");
+  }
+
+  public Command setDealgaeHigh() {
+    return elevator
+        .source()
+        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightHighAlgae)))
+        .andThen(rollers.placeCoralAndDealgify())
+        .withName("dealgaefyHigh");
+  }
+
+  public Command setScoreProcessor() {
+    return elevator
+        .source()
+        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightProcessor)))
+        .andThen(rollers.scoreProcessor())
+        .withName("");
+  }
 }

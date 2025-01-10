@@ -17,8 +17,6 @@ public interface ElevatorIO {
   public default void runVolts(double volts) {}
 
   public default void stop() {}
-
-
 }
 
 // Calculate
