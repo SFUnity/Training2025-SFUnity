@@ -48,8 +48,16 @@ public class Elevator extends SubsystemBase {
   public void stop() {
     io.stop();
   }
+  //TODO: fix desired height
+  public boolean atDesiredHeight(double desiredHeight){
+    if(inputs.position.in(Meters) == desiredHeight){
+      return true;
+    }
+    return false;
+    
+  }
 
-  public Command L1() {
+  public Command l1() {
     return run(() -> {
           calculateDesiredPosition(ElevatorConstants.desiredHeightL1);
           runElevator();
@@ -60,5 +68,79 @@ public class Elevator extends SubsystemBase {
               runElevator();
             })
         .withName("readyL1");
+  }
+  public Command l2() {
+    return run(() -> {
+          calculateDesiredPosition(ElevatorConstants.desiredHeightL2);
+          runElevator();
+        })
+        .finallyDo(
+            () -> {
+              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+              runElevator();
+            })
+        .withName("readyL2");
+        
+  }
+  public Command l3() {
+    return run(() -> {
+          calculateDesiredPosition(ElevatorConstants.desiredHeightL3);
+          runElevator();
+        })
+        .finallyDo(
+            () -> {
+              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+              runElevator();
+            })
+        .withName("readyL3");
+  }
+  public Command lowAlgae() {
+    return run(() -> {
+          calculateDesiredPosition(ElevatorConstants.desiredHeightLowAlgae);
+          runElevator();
+        })
+        .finallyDo(
+            () -> {
+              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+              runElevator();
+            })
+        .withName("readyLowAlgae");
+  }
+  public Command highAlgae() {
+    return run(() -> {
+          calculateDesiredPosition(ElevatorConstants.desiredHeightHighAlgae);
+          runElevator();
+        })
+        .finallyDo(
+            () -> {
+              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+              runElevator();
+            })
+        .withName("readyHighAlgae");
+  }
+  public Command processor() {
+    return run(() -> {
+          calculateDesiredPosition(ElevatorConstants.desiredHeightProcessor);
+          runElevator();
+        })
+        .finallyDo(
+            () -> {
+              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+              runElevator();
+            })
+        .withName("readyProcessor");
+  }
+
+  public Command source(){
+    return run(() -> {
+      calculateDesiredPosition(ElevatorConstants.desiredHeightSource);
+      runElevator();
+    })
+    .finallyDo(
+        () -> {
+          calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+          runElevator();
+        })
+    .withName("readySource");
   }
 }

@@ -25,7 +25,7 @@ public class Rollers extends SubsystemBase {
     io.stop();
   }
 
-  public Command placeCoral() {
+  public Command placeCoralAndDealgify() {
     return run(() -> {
           io.runMotorStraight();
           runRollers(RollersConstants.rollersPlaceSpeed);
@@ -41,12 +41,12 @@ public class Rollers extends SubsystemBase {
         .withName("intakeCoralRollers");
   }
 
-  public Command scoreCoral() {
+  public Command scoreProcessor() {
     return run(() -> {
           io.reverseMotor();
           runRollers(RollersConstants.rollersIntakingSpeed);
         })
-        .withName("scoreCoral");
+        .withName("scoreProcessor");
   }
   // TODO: add "until when 2m distance sensor gets set up"
 }
