@@ -514,7 +514,12 @@ public class Drive extends SubsystemBase {
 
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
-    Rotation2d linearDirection = new Rotation2d(x, y);
+    Rotation2d linearDirection;
+    if (Math.hypot(x, y) < 1e-6) {
+      linearDirection = new Rotation2d();
+    } else {
+      linearDirection = new Rotation2d(x, y);
+    }
 
     // Square values and scale to max velocity
     linearMagnitude = linearMagnitude * linearMagnitude;
