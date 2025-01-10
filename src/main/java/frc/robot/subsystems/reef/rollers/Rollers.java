@@ -44,7 +44,7 @@ public class Rollers extends SubsystemBase {
         || filteredStatorCurrent <= -2);
   }
 
-  public Command placeCoral() {
+  public Command placeCoralAndHighAlgae() {
     return run(() -> {
           io.runMotorStraight();
           runRollers(RollersConstants.rollersPlaceSpeed);
@@ -52,7 +52,7 @@ public class Rollers extends SubsystemBase {
         .withName("placeCoralRollers");
   }
 
-  public Command deAlgaefy() {
+  public Command lowDeAlgaefy() {
     return run(() -> {
           io.runMotorStraight();
           runRollers(RollersConstants.rollersDealgifyingSpeed);
@@ -63,7 +63,7 @@ public class Rollers extends SubsystemBase {
                 () -> {
                   stopRollers();
                 }))
-        .withName("intakeCoralRollers");
+        .withName("deAlgaefy");
   }
 
   public Command intakeCoral() {
