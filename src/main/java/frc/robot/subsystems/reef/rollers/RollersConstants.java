@@ -7,6 +7,10 @@ public class RollersConstants {
   public static final double rollersPlaceSpeed = 0;
   public static final double rollersDealgifyingSpeed = 0;
   public static final double rollersProcessorSpeed = 0;
-  public static final double velocityThreshold = 0;
-  public static final double currentThreshold = 0;
+
+  public static final double coralVelocityThreshold = 0;
+  public static final double coralCurrentThreshold = 0;
+
+  public static final double algaeVelocityThreshold = 0;
+  public static final double algaeCurrentThreshold = 0;
 }
