@@ -7,13 +7,12 @@
 
 package frc.robot.util;
 
+import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import choreo.util.ChoreoAllianceFlipUtil;
+import edu.wpi.first.units.measure.Angle;
 
 /** Utility functions for flipping from the blue to red alliance. */
 public class AllianceFlipUtil {
@@ -47,17 +46,25 @@ public class AllianceFlipUtil {
   /** Flips a rotation based on the current alliance color. */
   public static Rotation2d apply(Rotation2d rotation) {
     if (shouldFlip()) {
-      rotation.plus(new Rotation2d(Math.PI));
-      return new Rotation2d(-rotation.getCos(), rotation.getSin());
+      return ChoreoAllianceFlipUtil.flip(rotation);
     } else {
       return rotation;
+    }
+  }
+
+  /** Flips an angle based on the current alliance color. */
+  public static Angle apply(Angle angle) {
+    if (shouldFlip()) {
+      return ChoreoAllianceFlipUtil.flip(new Rotation2d(angle)).getMeasure();
+    } else {
+      return angle;
     }
   }
 
   /** Flips a pose to the correct side of the field based on the current alliance color. */
   public static Pose2d apply(Pose2d pose) {
     if (shouldFlip()) {
-      return new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()));
+      return ChoreoAllianceFlipUtil.flip(pose);
     } else {
       return pose;
     }
@@ -72,7 +79,6 @@ public class AllianceFlipUtil {
   }
 
   public static boolean shouldFlip() {
-    return DriverStation.getAlliance().isPresent()
-        && DriverStation.getAlliance().get() == Alliance.Red;
+    return ChoreoAllianceFlipUtil.shouldFlip();
   }
 }
