@@ -33,7 +33,7 @@ public class Reef extends VirtualSubsystem {
     return elevator
         .source()
         .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightSource)))
-        .andThen(rollers.placeCoralAndDealgify())
+        .andThen(rollers.intakeCoral())
         .withName("intakeCoral");
   }
 
@@ -41,7 +41,7 @@ public class Reef extends VirtualSubsystem {
     return elevator
         .source()
         .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL1)))
-        .andThen(rollers.placeCoralAndDealgify())
+        .andThen(rollers.placeCoral())
         .withName("scoreL1");
   }
 
@@ -49,7 +49,7 @@ public class Reef extends VirtualSubsystem {
     return elevator
         .source()
         .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL2)))
-        .andThen(rollers.placeCoralAndDealgify())
+        .andThen(rollers.placeCoral())
         .withName("scoreL2");
   }
 
@@ -57,7 +57,7 @@ public class Reef extends VirtualSubsystem {
     return elevator
         .source()
         .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL3)))
-        .andThen(rollers.placeCoralAndDealgify())
+        .andThen(rollers.placeCoral())
         .withName("scoreL3");
   }
 
@@ -65,7 +65,7 @@ public class Reef extends VirtualSubsystem {
     return elevator
         .source()
         .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightLowAlgae)))
-        .andThen(rollers.placeCoralAndDealgify())
+        .andThen(rollers.placeCoral())
         .withName("dealgaefyLow");
   }
 
@@ -73,7 +73,7 @@ public class Reef extends VirtualSubsystem {
     return elevator
         .source()
         .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightHighAlgae)))
-        .andThen(rollers.placeCoralAndDealgify())
+        .andThen(rollers.placeCoral())
         .withName("dealgaefyHigh");
   }
 

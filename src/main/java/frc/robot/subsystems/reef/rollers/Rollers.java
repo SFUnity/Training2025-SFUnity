@@ -9,6 +9,7 @@ public class Rollers extends SubsystemBase {
   private final RollersIOInputsAutoLogged inputs;
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
+
   public Rollers(RollersIO io, RollersIOInputsAutoLogged inputs) {
     this.io = io;
     this.inputs = inputs;
@@ -27,16 +28,23 @@ public class Rollers extends SubsystemBase {
     io.stop();
   }
 
-
   public boolean coralHeld() {
     double filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
     double filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
-    return (filteredVelocity <= RollersConstants.velocityThreshold
-        && (filteredStatorCurrent >= RollersConstants.currentThreshold) || filteredStatorCurrent <= -2);
+    return (filteredVelocity <= RollersConstants.coralVelocityThreshold
+            && (filteredStatorCurrent >= RollersConstants.coralCurrentThreshold)
+        || filteredStatorCurrent <= -2);
   }
 
+  public boolean algaeHeld() {
+    double filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
+    double filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
+    return (filteredVelocity <= RollersConstants.algaeVelocityThreshold
+            && (filteredStatorCurrent >= RollersConstants.algaeCurrentThreshold)
+        || filteredStatorCurrent <= -2);
+  }
 
-  public Command placeCoralAndDealgify() {
+  public Command placeCoral() {
     return run(() -> {
           io.runMotorStraight();
           runRollers(RollersConstants.rollersPlaceSpeed);
@@ -44,16 +52,32 @@ public class Rollers extends SubsystemBase {
         .withName("placeCoralRollers");
   }
 
+  public Command deAlgaefy() {
+    return run(() -> {
+          io.runMotorStraight();
+          runRollers(RollersConstants.rollersDealgifyingSpeed);
+        })
+        .until(() -> algaeHeld())
+        .andThen(
+            run(
+                () -> {
+                  stopRollers();
+                }))
+        .withName("intakeCoralRollers");
+  }
+
   public Command intakeCoral() {
     return run(() -> {
           io.runMotorStraight();
           runRollers(RollersConstants.rollersIntakingSpeed);
-
         })
         .until(() -> coralHeld())
-        .andThen(run(() -> {stopRollers();}))
+        .andThen(
+            run(
+                () -> {
+                  stopRollers();
+                }))
         .withName("intakeCoralRollers");
-        
   }
 
   public Command scoreProcessor() {
