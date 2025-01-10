@@ -42,6 +42,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
+import frc.robot.util.LoggedTunableNumber;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -294,5 +296,23 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  public void updateModuleTunables() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () ->
+            DriveConstants.driveFeedback.setPID(
+                DriveConstants.drivekP.get(), 0, DriveConstants.drivekD.get()),
+        drivekP,
+        drivekD);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () ->
+            DriveConstants.turnFeedback.setPID(
+                DriveConstants.turnkP.get(), 0, DriveConstants.turnkD.get()),
+        turnkP,
+        turnkD);
   }
 }

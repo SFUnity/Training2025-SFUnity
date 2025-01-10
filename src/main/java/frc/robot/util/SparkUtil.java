@@ -49,7 +49,9 @@ public class SparkUtil {
   }
 
   /** Attempts to run the command until no error is produced. */
-  public static void tryUntilOk(SparkBase spark, int maxAttempts, Supplier<REVLibError> command) {
+  public static void tryUntilOk(SparkBase spark, Supplier<REVLibError> command) {
+    int maxAttempts = 5;
+
     for (int i = 0; i < maxAttempts; i++) {
       var error = command.get();
       if (error == REVLibError.kOk) {

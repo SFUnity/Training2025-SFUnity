@@ -15,9 +15,7 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
 import static frc.robot.util.SparkUtil.*;
-import static frc.robot.util.SparkUtil.tryUntilOk;
 import static frc.robot.util.PhoenixUtil.*;
-import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -40,9 +38,13 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -52,6 +54,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.util.LoggedTunableNumber;
+
 import java.util.Queue;
 
 /**
@@ -128,9 +132,11 @@ public class ModuleIOMixed implements ModuleIO {
         case 3 -> backRightTurnEncoderCanId;
         default -> 0;
       }, DriveConstants.CANBusName);
+    turnEncoder = turnSpark.getEncoder();
+    turnController = turnSpark.getClosedLoopController();
 
     // Configure drive motor
-    var driveConfig = constants.DriveMotorInitialConfigs;
+    TalonFXConfiguration driveConfig = new TalonFXConfiguration();
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Slot0 = constants.DriveMotorGains;
     driveConfig.Feedback.SensorToMechanismRatio = constants.DriveMotorGearRatio;
@@ -290,4 +296,25 @@ public class ModuleIOMixed implements ModuleIO {
               rotation.getRotations());
         });
   }
+
+  @Override
+  public void setDrivePIDF(double drivekP, double drivekD, double drivekS, double drivekV) {
+    var driveConfig = new TalonFXConfiguration();
+    driveConfig.Slot0.kP = drivekP;
+    driveConfig.Slot0.kD = kD;
+    driveConfig.Slot0.kS = kS;
+    driveConfig.Slot0.kV = kV;
+    tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
+  }
+
+    @Override
+    public void setTurnPIDF(double turnkP, double turnkD, double turnkS, double turnkV) {
+        SparkMaxConfig turnConfig = new SparkMaxConfig();
+        turnConfig.closedLoop.pidf(turnkP, 0, turnkD, 0);
+        tryUntilOk(
+            turnSpark,
+        () ->
+        turnSpark.configure(
+            turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+    }
 }

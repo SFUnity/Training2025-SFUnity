@@ -52,4 +52,10 @@ public interface ModuleIO {
 
   /** Run the turn motor to the specified rotation. */
   public default void setTurnPosition(Rotation2d rotation) {}
+
+  /** Set PID & ff gains for drive motor */
+  public default void setDrivePIDF(double drivekP, double drivekD, double drivekS, double drivekV) {}
+
+  /** Set PID & ff gains for turn motor */
+  public default void setTurnPIDF(double turnkP, double turnkD, double turnkS, double turnkV) {}
 }
