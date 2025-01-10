@@ -51,6 +51,11 @@ public class DriveConstants {
   public static final int frontRightTurnCanId = 6;
   public static final int backRightTurnCanId = 8;
 
+  public static final int frontLeftTurnEncoderCanId = 2;
+  public static final int backLeftTurnEncoderCanId = 4;
+  public static final int frontRightTurnEncoderCanId = 6;
+  public static final int backRightTurnEncoderCanId = 8;
+
   public static final String CANBusName = "rio";
 
   // Drive motor configuration

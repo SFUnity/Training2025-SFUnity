@@ -15,7 +15,9 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
 import static frc.robot.util.SparkUtil.*;
+import static frc.robot.util.SparkUtil.tryUntilOk;
 import static frc.robot.util.PhoenixUtil.*;
+import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -35,6 +37,14 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -51,26 +61,18 @@ import java.util.Queue;
  * <p>Device configuration and other behaviors not exposed by TunerConstants can be customized here.
  */
 public class ModuleIOMixed implements ModuleIO {
-  private final SwerveModuleConstants<
-          TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-      constants;
+  private final Rotation2d zeroRotation;
 
   // Hardware objects
   private final TalonFX driveTalon;
-  private final TalonFX turnTalon;
+  private final SparkBase turnSpark;
   private final CANcoder cancoder;
+  private final RelativeEncoder turnEncoder;
 
   // Voltage control requests
   private final VoltageOut voltageRequest = new VoltageOut(0);
-  private final PositionVoltage positionVoltageRequest = new PositionVoltage(0.0);
+  private final SparkClosedLoopController turnController;
   private final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0);
-
-  // Torque-current control requests
-  private final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0);
-  private final PositionTorqueCurrentFOC positionTorqueCurrentRequest =
-      new PositionTorqueCurrentFOC(0.0);
-  private final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest =
-      new VelocityTorqueCurrentFOC(0.0);
 
   // Timestamp inputs from Phoenix thread
   private final Queue<Double> timestampQueue;
@@ -83,25 +85,49 @@ public class ModuleIOMixed implements ModuleIO {
   private final StatusSignal<Current> driveCurrent;
 
   // Inputs from turn motor
-  private final StatusSignal<Angle> turnAbsolutePosition;
-  private final StatusSignal<Angle> turnPosition;
   private final Queue<Double> turnPositionQueue;
-  private final StatusSignal<AngularVelocity> turnVelocity;
-  private final StatusSignal<Voltage> turnAppliedVolts;
-  private final StatusSignal<Current> turnCurrent;
 
   // Connection debouncers
   private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
   private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
   private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
-  public ModuleIOMixed(
-      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-          constants) {
-    this.constants = constants;
-    driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.CANBusName);
-    turnTalon = new TalonFX(constants.SteerMotorId, DriveConstants.CANBusName);
-    cancoder = new CANcoder(constants.EncoderId, DriveConstants.CANBusName);
+  public ModuleIOMixed(int module) {
+    zeroRotation =
+        switch (module) {
+          case 0 -> frontLeftZeroRotation;
+          case 1 -> frontRightZeroRotation;
+          case 2 -> backLeftZeroRotation;
+          case 3 -> backRightZeroRotation;
+          default -> new Rotation2d();
+        };
+        driveTalon =
+        new TalonFX(
+            switch (module) {
+              case 0 -> frontLeftDriveCanId;
+              case 1 -> frontRightDriveCanId;
+              case 2 -> backLeftDriveCanId;
+              case 3 -> backRightDriveCanId;
+              default -> 0;
+            },
+            DriveConstants.CANBusName);
+    turnSpark =
+        new SparkMax(
+            switch (module) {
+              case 0 -> frontLeftTurnCanId;
+              case 1 -> frontRightTurnCanId;
+              case 2 -> backLeftTurnCanId;
+              case 3 -> backRightTurnCanId;
+              default -> 0;
+            },
+            MotorType.kBrushless);
+    cancoder = new CANcoder(switch (module) {
+        case 0 -> frontLeftTurnEncoderCanId;
+        case 1 -> frontRightTurnEncoderCanId;
+        case 2 -> backLeftTurnEncoderCanId;
+        case 3 -> backRightTurnEncoderCanId;
+        default -> 0;
+      }, DriveConstants.CANBusName);
 
     // Configure drive motor
     var driveConfig = constants.DriveMotorInitialConfigs;
