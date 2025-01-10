@@ -1,12 +1,14 @@
 package frc.robot.subsystems.reef.rollers;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Rollers extends SubsystemBase {
   private final RollersIO io;
   private final RollersIOInputsAutoLogged inputs;
-
+  private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
+  private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
   public Rollers(RollersIO io, RollersIOInputsAutoLogged inputs) {
     this.io = io;
     this.inputs = inputs;
@@ -25,6 +27,15 @@ public class Rollers extends SubsystemBase {
     io.stop();
   }
 
+
+  public boolean coralHeld() {
+    double filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
+    double filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
+    return (filteredVelocity <= RollersConstants.velocityThreshold
+        && (filteredStatorCurrent >= RollersConstants.currentThreshold) || filteredStatorCurrent <= -2);
+  }
+
+
   public Command placeCoralAndDealgify() {
     return run(() -> {
           io.runMotorStraight();
@@ -37,8 +48,12 @@ public class Rollers extends SubsystemBase {
     return run(() -> {
           io.runMotorStraight();
           runRollers(RollersConstants.rollersIntakingSpeed);
+
         })
+        .until(() -> coralHeld())
+        .andThen(run(() -> {stopRollers();}))
         .withName("intakeCoralRollers");
+        
   }
 
   public Command scoreProcessor() {
