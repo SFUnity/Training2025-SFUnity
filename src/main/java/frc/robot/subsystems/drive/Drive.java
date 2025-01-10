@@ -301,18 +301,18 @@ public class Drive extends SubsystemBase {
   public void updateModuleTunables() {
     LoggedTunableNumber.ifChanged(
         hashCode(),
-        () ->
-            DriveConstants.driveFeedback.setPID(
-                DriveConstants.drivekP.get(), 0, DriveConstants.drivekD.get()),
-        drivekP,
-        drivekD);
+        () -> {for (var module : modules) module.setDrivePIDF(driveKp.get(), driveKd.get(),
+        driveKs.get(),
+        driveKv.get());},
+        driveKp,
+        driveKd,
+        driveKs,
+        driveKv);
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
-        () ->
-            DriveConstants.turnFeedback.setPID(
-                DriveConstants.turnkP.get(), 0, DriveConstants.turnkD.get()),
-        turnkP,
-        turnkD);
+        () -> {for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());},
+        turnKp,
+        turnKd);
   }
 }

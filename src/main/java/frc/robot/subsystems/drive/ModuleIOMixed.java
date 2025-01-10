@@ -301,14 +301,14 @@ public class ModuleIOMixed implements ModuleIO {
   public void setDrivePIDF(double drivekP, double drivekD, double drivekS, double drivekV) {
     var driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0.kP = drivekP;
-    driveConfig.Slot0.kD = kD;
-    driveConfig.Slot0.kS = kS;
-    driveConfig.Slot0.kV = kV;
+    driveConfig.Slot0.kD = drivekD;
+    driveConfig.Slot0.kS = drivekS;
+    driveConfig.Slot0.kV = drivekV;
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
   }
 
     @Override
-    public void setTurnPIDF(double turnkP, double turnkD, double turnkS, double turnkV) {
+    public void setTurnPIDF(double turnkP, double turnkD) {
         SparkMaxConfig turnConfig = new SparkMaxConfig();
         turnConfig.closedLoop.pidf(turnkP, 0, turnkD, 0);
         tryUntilOk(

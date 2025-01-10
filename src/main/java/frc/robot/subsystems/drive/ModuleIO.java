@@ -57,5 +57,5 @@ public interface ModuleIO {
   public default void setDrivePIDF(double drivekP, double drivekD, double drivekS, double drivekV) {}
 
   /** Set PID & ff gains for turn motor */
-  public default void setTurnPIDF(double turnkP, double turnkD, double turnkS, double turnkV) {}
+  public default void setTurnPIDF(double turnkP, double turnkD) {}
 }

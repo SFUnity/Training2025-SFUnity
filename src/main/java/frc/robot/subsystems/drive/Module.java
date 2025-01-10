@@ -137,4 +137,12 @@ public class Module {
   public double getFFCharacterizationVelocity() {
     return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
   }
+
+  public void setDrivePIDF(double drivekP, double drivekD, double drivekS, double drivekV) {
+    io.setDrivePIDF(drivekP, drivekD, drivekS, drivekV);
+  }
+
+  public void setTurnPIDF(double turnkP, double turnkD) {
+    io.setTurnPIDF(turnkP, turnkD);
+  }
 }
