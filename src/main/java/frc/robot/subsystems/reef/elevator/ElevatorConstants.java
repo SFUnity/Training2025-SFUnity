@@ -1,5 +1,7 @@
 package frc.robot.subsystems.reef.elevator;
 
+import edu.wpi.first.math.geometry.Translation2d;
+
 public class ElevatorConstants {
   public static final int elevatorMotorID = 0;
   public static final double maxElevatorSpeed = 0;
@@ -29,4 +31,8 @@ public class ElevatorConstants {
 
   public static final double gearRatio = 0;
   public static final double wheelRadius = 0;
+
+  public static final double elevatorMinLength = 0;
+
+  public static final Translation2d elevatorOrigin = new Translation2d(0, 0);
 }
