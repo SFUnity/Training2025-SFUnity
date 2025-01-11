@@ -69,10 +69,10 @@ public class AprilTagVision extends VirtualSubsystem {
     // Scale trust based on max velocity
     ChassisSpeeds velo = GeomUtil.toChassisSpeeds(poseManager.robotVelocity());
     if (new Translation2d(velo.vxMetersPerSecond, velo.vyMetersPerSecond).getNorm()
-        > DriveConstants.MAX_LINEAR_VELOCITY / 2.0) {
+        > DriveConstants.maxSpeedMetersPerSec / 2.0) {
       trust *= 2.0;
     }
-    if (velo.omegaRadiansPerSecond > DriveConstants.MAX_ANGULAR_VELOCITY / 3.0) {
+    if (velo.omegaRadiansPerSecond > DriveConstants.maxAngularSpeedRadiansPerSec / 3.0) {
       trust *= 2.0;
     }
 
