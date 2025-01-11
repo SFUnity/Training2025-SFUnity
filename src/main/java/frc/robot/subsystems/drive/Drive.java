@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constantsGlobal.Constants;
@@ -169,11 +170,24 @@ public class Drive extends SubsystemBase {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+    setModuleSetpoints(setpointStates);
+    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+  }
+
+  private void setAllModuleSetpointsToSame(double speed, Rotation2d angle) {
+    var moduleStates = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      moduleStates[i] = new SwerveModuleState(speed, angle);
+    }
+    setModuleSetpoints(moduleStates);
+    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", new ChassisSpeeds());
+  }
+
+  private void setModuleSetpoints(SwerveModuleState[] setpointStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -274,6 +288,34 @@ public class Drive extends SubsystemBase {
         },
         turnKp,
         turnKd);
+  }
+
+  // Tuning Commands
+  private static final LoggedTunableNumber tuningDriveSpeed =
+      new LoggedTunableNumber("Drive/ModuleTunables/driveSpeedForTuning", 1);
+  private static final LoggedTunableNumber tuningTurnDelta =
+      new LoggedTunableNumber("Drive/ModuleTunables/turnDeltaForTuning", 90);
+
+  public Command tuneModuleDrive() {
+    return tuningCmdTemplate(
+            () -> setAllModuleSetpointsToSame(tuningDriveSpeed.get(), new Rotation2d()),
+            () -> setAllModuleSetpointsToSame(-tuningDriveSpeed.get(), new Rotation2d()))
+        .withName("tuneModuleDrive");
+  }
+
+  public Command tuneModuleTurn() {
+    return tuningCmdTemplate(
+            () -> setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(0)),
+            () -> setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
+        .withName("tuneModuleTurn");
+  }
+
+  private Command tuningCmdTemplate(Runnable run1, Runnable run2) {
+    return Commands.repeatingSequence(
+        run(run1).withTimeout(1),
+        run(() -> stop()).withTimeout(1),
+        run(run2).withTimeout(1),
+        run(() -> stop()).withTimeout(1));
   }
 
   // Autos
