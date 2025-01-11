@@ -20,6 +20,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,6 +48,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import choreo.trajectory.SwerveSample;
+
 public class Drive extends SubsystemBase {
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -69,6 +72,21 @@ public class Drive extends SubsystemBase {
 
       private final PoseManager poseManager;
   private final OldPoseManager oldPoseManager;
+
+  // Autos
+  private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 15);
+  private final LoggedTunableNumber xkDAuto = new LoggedTunableNumber("Drive/Choreo/xkD", 0);
+  private final LoggedTunableNumber ykPAuto = new LoggedTunableNumber("Drive/Choreo/ykP", 15);
+  private final LoggedTunableNumber ykDAuto = new LoggedTunableNumber("Drive/Choreo/ykD", 0);
+  private final LoggedTunableNumber rkPAuto = new LoggedTunableNumber("Drive/Choreo/rkP", 15);
+  private final LoggedTunableNumber rkDAuto = new LoggedTunableNumber("Drive/Choreo/rkD", 0);
+
+  private final PIDController xAutoController =
+      new PIDController(xkPAuto.get(), 0.0, xkDAuto.get());
+  private final PIDController yAutoController =
+      new PIDController(ykPAuto.get(), 0.0, ykDAuto.get());
+  private final PIDController headingAutoController =
+      new PIDController(rkPAuto.get(), 0.0, rkDAuto.get());
 
   public Drive(
       GyroIO gyroIO,
@@ -311,5 +329,48 @@ public class Drive extends SubsystemBase {
         },
         turnKp,
         turnKd);
+  }
+
+  // Autos
+  public void followTrajectory(SwerveSample sample) {
+    updateAutoTunables();
+    Pose2d pose = poseManager.getPose();
+
+    double xFF = sample.vx;
+    double yFF = sample.vy;
+    double rotationFF = sample.omega;
+
+    double xFeedback = xAutoController.calculate(pose.getX(), sample.x);
+    double yFeedback = yAutoController.calculate(pose.getY(), sample.y);
+    double rotationFeedback =
+        headingAutoController.calculate(pose.getRotation().getRadians(), sample.heading);
+
+    ChassisSpeeds out =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, pose.getRotation());
+
+    Logger.recordOutput(
+        "Drive/Choreo/Target Pose", new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
+    Logger.recordOutput("Drive/Choreo/Target Speeds", out);
+
+    runVelocity(out);
+  }
+
+  private void updateAutoTunables() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> xAutoController.setPID(xkPAuto.get(), 0, xkDAuto.get()),
+        xkPAuto,
+        xkDAuto);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> yAutoController.setPID(ykPAuto.get(), 0, ykDAuto.get()),
+        ykPAuto,
+        ykDAuto);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> headingAutoController.setPID(rkPAuto.get(), 0, rkDAuto.get()),
+        rkPAuto,
+        rkDAuto);
   }
 }
