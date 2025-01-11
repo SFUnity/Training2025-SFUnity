@@ -11,10 +11,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.subsystems.drive.DriveConstants;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class PoseManager {
@@ -35,7 +33,8 @@ public class PoseManager {
 
   public PoseManager() {}
 
-  public void addOdometryMeasurementWithTimestamps(double currentTime, SwerveModulePosition[] modulePositions) {
+  public void addOdometryMeasurementWithTimestamps(
+      double currentTime, SwerveModulePosition[] modulePositions) {
     lastModulePositions = modulePositions;
     poseEstimator.updateWithTime(currentTime, rawGyroRotation, modulePositions);
   }

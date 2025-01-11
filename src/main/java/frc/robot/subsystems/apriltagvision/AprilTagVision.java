@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagVision extends VirtualSubsystem {
   private final AprilTagVisionIO io;
   private final AprilTagVisionIOInputsAutoLogged inputs = new AprilTagVisionIOInputsAutoLogged();
-  private final PoseManager poseManager; 
+  private final PoseManager poseManager;
 
   public AprilTagVision(AprilTagVisionIO io, PoseManager poseManager) {
     this.io = io;

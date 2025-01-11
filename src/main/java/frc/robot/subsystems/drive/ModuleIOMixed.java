@@ -44,7 +44,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -213,16 +212,13 @@ public class ModuleIOMixed implements ModuleIO {
 
     // Create turn status signals
     turnAbsolutePosition = cancoder.getAbsolutePosition();
-    turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turnEncoder::getPosition);
+    turnPositionQueue =
+        PhoenixOdometryThread.getInstance().registerSignal(turnEncoder::getPosition);
 
     // Configure periodic frames
     BaseStatusSignal.setUpdateFrequencyForAll(odometryFrequency, drivePosition);
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
-        driveVelocity,
-        driveAppliedVolts,
-        driveCurrent,
-        turnAbsolutePosition);
+        50.0, driveVelocity, driveAppliedVolts, driveCurrent, turnAbsolutePosition);
     ParentDevice.optimizeBusUtilizationForAll(driveTalon, cancoder);
   }
 
