@@ -42,13 +42,11 @@ public class ModuleIOSim implements ModuleIO {
     // Create drive and turn sim models
     driveSim =
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                driveGearbox, 0.025, driveMotorReduction),
+            LinearSystemId.createDCMotorSystem(driveGearbox, 0.025, driveMotorReduction),
             driveGearbox);
     turnSim =
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                turnGearbox, 0.004, turnMotorReduction),
+            LinearSystemId.createDCMotorSystem(turnGearbox, 0.004, turnMotorReduction),
             turnGearbox);
 
     // Enable wrapping for turn PID
@@ -113,7 +111,8 @@ public class ModuleIOSim implements ModuleIO {
   @Override
   public void setDriveVelocity(double velocityRadPerSec) {
     driveClosedLoop = true;
-    driveFFVolts = driveKv.get() * Math.signum(velocityRadPerSec) + driveKv.get() * velocityRadPerSec;
+    driveFFVolts =
+        driveKv.get() * Math.signum(velocityRadPerSec) + driveKv.get() * velocityRadPerSec;
     driveController.setSetpoint(velocityRadPerSec);
   }
 
