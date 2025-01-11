@@ -40,7 +40,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.util.LoggedTunableNumber;
-import frc.robot.util.OldPoseManager;
 import frc.robot.util.PoseManager;
 
 import java.util.concurrent.locks.Lock;
@@ -61,7 +60,6 @@ public class Drive extends SubsystemBase {
       private Rotation2d rawGyroRotation = new Rotation2d();
 
   private final PoseManager poseManager;
-  private final OldPoseManager oldPoseManager;
 
   // Autos
   private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 15);
@@ -84,15 +82,13 @@ public class Drive extends SubsystemBase {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-      PoseManager poseManager,
-      OldPoseManager oldPoseManager) {
+      PoseManager poseManager) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0);
     modules[1] = new Module(frModuleIO, 1);
     modules[2] = new Module(blModuleIO, 2);
     modules[3] = new Module(brModuleIO, 3);
     this.poseManager = poseManager;
-    this.oldPoseManager = oldPoseManager;
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);

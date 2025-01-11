@@ -39,7 +39,6 @@ import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
-import frc.robot.util.OldPoseManager;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -84,7 +83,6 @@ public class Robot extends LoggedRobot {
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
-  private final OldPoseManager oldPoseManager = new OldPoseManager();
   private final Autos autos;
 
   // Controllers + driving
@@ -181,7 +179,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         aprilTagVision =
-            new AprilTagVision(new AprilTagVisionIOLimelight("limelight"), poseManager, oldPoseManager);
+            new AprilTagVision(new AprilTagVisionIOLimelight("limelight"), poseManager);
         break;
 
       case SIM:
@@ -195,7 +193,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager, oldPoseManager);
+        aprilTagVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
 
       default:
@@ -209,7 +207,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager, oldPoseManager);
+        aprilTagVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
     }
 

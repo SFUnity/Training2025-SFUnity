@@ -16,7 +16,6 @@ import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.GeomUtil;
-import frc.robot.util.OldPoseManager;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
 import frc.robot.util.VirtualSubsystem;
@@ -26,19 +25,17 @@ public class AprilTagVision extends VirtualSubsystem {
   private final AprilTagVisionIO io;
   private final AprilTagVisionIOInputsAutoLogged inputs = new AprilTagVisionIOInputsAutoLogged();
   private final PoseManager poseManager; 
-  private final OldPoseManager oldPoseManager;
 
-  public AprilTagVision(AprilTagVisionIO io, PoseManager poseManager, OldPoseManager oldPoseManager) {
+  public AprilTagVision(AprilTagVisionIO io, PoseManager poseManager) {
     this.io = io;
     this.poseManager = poseManager;
-    this.oldPoseManager = oldPoseManager;
     // TODO pipelines are the setting configured in the limelight software. download the correct
     // pipelines and add them to the code
     io.setPipeline(Pipelines.BLUE_SPEAKER);
   }
 
   public void periodic() {
-    io.updateInputs(inputs, poseManager, oldPoseManager);
+    io.updateInputs(inputs, poseManager);
     Logger.processInputs("AprilTagVision", inputs);
 
     Leds.getInstance().tagsDetected = inputs.tagCount > 0;
@@ -93,6 +90,5 @@ public class AprilTagVision extends VirtualSubsystem {
 
     // Add result because all checks passed
     poseManager.addVisionMeasurement(estimatedPose, inputs.timestamp, stdDevs);
-    oldPoseManager.addVisionMeasurement(estimatedPose, inputs.timestamp, stdDevs);
   }
 }
