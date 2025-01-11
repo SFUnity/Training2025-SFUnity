@@ -31,7 +31,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -137,16 +136,19 @@ public class ModuleIOMixed implements ModuleIO {
     // Configure drive motor
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    driveConfig.Slot0 = new Slot0Configs().withKP(driveKp.get()).withKD(driveKd.get()).withKS(driveKs.get()).withKV(driveKv.get());
+    driveConfig.Slot0 =
+        new Slot0Configs()
+            .withKP(driveKp.get())
+            .withKD(driveKd.get())
+            .withKS(driveKs.get())
+            .withKV(driveKv.get());
     driveConfig.Feedback.SensorToMechanismRatio = driveMotorReduction;
     driveConfig.CurrentLimits.SupplyCurrentLimit = driveMotorSupplyCurrentLimit;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.CurrentLimits.StatorCurrentLimit = driveMotorStatorCurrentLimit;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.MotorOutput.Inverted =
-        driveInverted
-            ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
+        driveInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
     tryUntilOk(5, () -> driveTalon.setPosition(0.0, 0.25));
 
@@ -182,13 +184,14 @@ public class ModuleIOMixed implements ModuleIO {
         () ->
             turnSpark.configure(
                 turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-                tryUntilOk(turnSpark, () -> turnEncoder.setPosition(cancoder.getPosition().getValue().in(Radians)));
+    tryUntilOk(
+        turnSpark, () -> turnEncoder.setPosition(cancoder.getPosition().getValue().in(Radians)));
 
     // Configure CANCoder
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
     cancoderConfig.MagnetSensor.MagnetOffset = zeroRotation.getRotations();
     cancoderConfig.MagnetSensor.SensorDirection =
-    turnEncoderInverted
+        turnEncoderInverted
             ? SensorDirectionValue.Clockwise_Positive
             : SensorDirectionValue.CounterClockwise_Positive;
     cancoder.getConfigurator().apply(cancoderConfig);
