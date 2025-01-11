@@ -1,7 +1,19 @@
+// Copyright 2021-2025 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+
 package frc.robot.subsystems.drive;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -11,36 +23,122 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
-/** All Constants Measured in Meters and Radians (m/s, m/s^2, rad/s, rad/s^2) */
-public final class DriveConstants {
-  public static final double MAX_LINEAR_VELOCITY = Units.feetToMeters(14.5); // 6328 uses 15 ft/s
-  public static final double MAX_LINEAR_ACCELERATION =
+public class DriveConstants {
+  public static final double maxSpeedMetersPerSec = 4.8;
+  public static final double maxAccelerationMetersPerSec =
       Units.feetToMeters(75.0); // This is what 6328
-  public static final double TRACK_WIDTH_X = Units.inchesToMeters(22.75); // Check when copying
-  public static final double TRACK_WIDTH_Y = Units.inchesToMeters(22.75);
-  public static final double DRIVE_BASE_RADIUS =
-      Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
-  public static final double MAX_ANGULAR_VELOCITY =
-      MAX_LINEAR_VELOCITY / DRIVE_BASE_RADIUS; // 6328 uses 12 rad/s (we're at ~10)
-  public static final double MAX_ANGULAR_ACCELERATION = MAX_LINEAR_ACCELERATION / DRIVE_BASE_RADIUS;
-
-  public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
-  public static final double driveMotorReduction = 6.75;
-
-  public static final DCMotor turnGearbox = DCMotor.getNEO(1);
-  public static final double turnMotorReduction = 150.0 / 7.0;
-
-  /** Returns an array of module translations. */
+  public static final double odometryFrequency = 100.0; // Hz
+  public static final double trackWidth = Units.inchesToMeters(26.5);
+  public static final double wheelBase = Units.inchesToMeters(26.5);
+  public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
+  public static final double maxAngularSpeedRadiansPerSec = maxSpeedMetersPerSec / driveBaseRadius;
+  public static final double maxAngularAccelerationRadiansPerSec =
+      maxAccelerationMetersPerSec / driveBaseRadius;
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
-        new Translation2d(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-        new Translation2d(TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0),
-        new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-        new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0)
+        new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
+        new Translation2d(trackWidth / 2.0, -wheelBase / 2.0),
+        new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
+        new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
       };
-
   public static final SwerveDriveKinematics kinematics =
       new SwerveDriveKinematics(moduleTranslations);
+
+  // Zeroed rotation values for each module, see setup instructions
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.0);
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.0);
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.0);
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
+
+  // Device CAN IDs
+  public static final int pigeonCanId = 9;
+
+  public static final int frontLeftDriveCanId = 1;
+  public static final int backLeftDriveCanId = 3;
+  public static final int frontRightDriveCanId = 5;
+  public static final int backRightDriveCanId = 7;
+
+  public static final int frontLeftTurnCanId = 2;
+  public static final int backLeftTurnCanId = 4;
+  public static final int frontRightTurnCanId = 6;
+  public static final int backRightTurnCanId = 8;
+
+  public static final int frontLeftTurnEncoderCanId = 2;
+  public static final int backLeftTurnEncoderCanId = 4;
+  public static final int frontRightTurnEncoderCanId = 6;
+  public static final int backRightTurnEncoderCanId = 8;
+
+  public static final String CANBusName = "rio";
+
+  // Drive motor configuration
+  public static final boolean driveInverted = false;
+  public static final int driveMotorSupplyCurrentLimit = 50;
+  public static final int driveMotorStatorCurrentLimit = 80;
+  public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
+  public static final double driveMotorReduction =
+      (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
+  public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
+
+  // Drive encoder configuration
+  public static final double driveEncoderPositionFactor =
+      2 * Math.PI / driveMotorReduction; // Rotor Rotations -> Wheel Radians
+  public static final double driveEncoderVelocityFactor =
+      (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
+
+  // Drive PID configuration
+  public static final LoggedTunableNumber driveKp;
+  public static final LoggedTunableNumber driveKd;
+  public static final LoggedTunableNumber driveKs;
+  public static final LoggedTunableNumber driveKv;
+
+  static {
+    switch (Constants.currentMode) {
+      default:
+        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.0);
+        driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
+        driveKs = new LoggedTunableNumber("Drive/ModuleTunables/driveKs", 0.0);
+        driveKv = new LoggedTunableNumber("Drive/ModuleTunables/driveKv", 0.1);
+        break;
+      case SIM:
+        driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.05);
+        driveKd = new LoggedTunableNumber("Drive/SimModuleTunables/driveKd", 0.0);
+        driveKs = new LoggedTunableNumber("Drive/SimModuleTunables/driveKs", 0.0);
+        driveKv = new LoggedTunableNumber("Drive/SimModuleTunables/driveKv", 0.0789);
+        break;
+    }
+  }
+
+  // Turn motor configuration
+  public static final boolean turnInverted = false;
+  public static final int turnMotorCurrentLimit = 60;
+  public static final double turnMotorReduction = 9424.0 / 203.0;
+  public static final DCMotor turnGearbox = DCMotor.getNEO(1);
+
+  // Turn encoder configuration
+  public static final boolean turnEncoderInverted = true;
+  public static final double turnEncoderPositionFactor =
+      2 * Math.PI / turnMotorReduction; // Rotations -> Radians
+  public static final double turnEncoderVelocityFactor =
+      (2 * Math.PI) / 60.0 / turnMotorReduction; // RPM -> Rad/Sec
+
+  // Turn PID configuration
+  public static final LoggedTunableNumber turnKp;
+  public static final LoggedTunableNumber turnKd;
+  public static final double turnPIDMinInput = 0; // Radians
+  public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
+
+  static {
+    switch (Constants.currentMode) {
+      default:
+        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnkP", 2.0);
+        turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnkD", 0.0);
+        break;
+      case SIM:
+        turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnkP", 8.0);
+        turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnkD", 0.0);
+        break;
+    }
+  }
 
   /**
    * Drive Command Config
@@ -91,41 +189,5 @@ public final class DriveConstants {
     public boolean povRightPressed() {
       return controller.povRight().getAsBoolean();
     }
-  }
-
-  // Module Constants
-  public static final LoggedTunableNumber drivekP;
-  public static final LoggedTunableNumber drivekD;
-  public static final LoggedTunableNumber turnkP;
-  public static final LoggedTunableNumber turnkD;
-
-  public static final SimpleMotorFeedforward driveFeedforward;
-  public static final PIDController driveFeedback;
-  public static final PIDController turnFeedback;
-
-  static {
-    // Switch constants based on mode (the physics simulator is treated as a
-    // separate robot with different tuning)
-    switch (Constants.currentMode) {
-      default:
-        driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
-        drivekP = new LoggedTunableNumber("Drive/ModuleTunables/drivekP", 0.11);
-        drivekD = new LoggedTunableNumber("Drive/ModuleTunables/drivekD", 0.0);
-        turnkP = new LoggedTunableNumber("Drive/ModuleTunables/turnkP", 0.25);
-        turnkD = new LoggedTunableNumber("Drive/ModuleTunables/turnkD", 0.0);
-        break;
-      case SIM:
-        driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
-        drivekP = new LoggedTunableNumber("Drive/ModuleTunables/drivekP", 0.25); // tuned
-        drivekD = new LoggedTunableNumber("Drive/ModuleTunables/drivekD", 0.0); // tuned
-        turnkP = new LoggedTunableNumber("Drive/ModuleTunables/turnkP", 15); // tuned
-        turnkD = new LoggedTunableNumber("Drive/ModuleTunables/turnkD", 0.0); // tuned
-        break;
-    }
-
-    driveFeedback = new PIDController(drivekP.get(), 0.0, drivekD.get());
-    turnFeedback = new PIDController(turnkP.get(), 0.0, turnkD.get());
-
-    turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
   }
 }
