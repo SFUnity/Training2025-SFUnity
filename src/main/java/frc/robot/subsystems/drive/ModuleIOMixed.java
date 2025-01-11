@@ -63,7 +63,11 @@ import java.util.function.DoubleSupplier;
  * <p>Device configuration and other behaviors not exposed by TunerConstants can be customized here.
  */
 public class ModuleIOMixed implements ModuleIO {
+  // Module specific constants
   private final Rotation2d zeroRotation;
+  private final boolean driveInverted;
+  private final boolean turnInverted;
+  private final boolean turnEncoderInverted;
 
   // Hardware objects
   private final TalonFX driveTalon;
@@ -104,6 +108,27 @@ public class ModuleIOMixed implements ModuleIO {
           case 3 -> backRightZeroRotation;
           default -> new Rotation2d();
         };
+    driveInverted = switch (module) {
+      case 0 -> frontLeftDriveInverted;
+      case 1 -> frontRightDriveInverted;
+      case 2 -> backLeftDriveInverted;
+      case 3 -> backRightDriveInverted;
+      default -> false;
+    };
+    turnInverted = switch (module) {
+      case 0 -> frontLeftTurnInverted;
+      case 1 -> frontRightTurnInverted;
+      case 2 -> backLeftTurnInverted;
+      case 3 -> backRightTurnInverted;
+      default -> false;
+    };
+    turnEncoderInverted = switch (module) {
+      case 0 -> frontLeftTurnEncoderInverted;
+      case 1 -> frontRightTurnEncoderInverted;
+      case 2 -> backLeftTurnEncoderInverted;
+      case 3 -> backRightTurnEncoderInverted;
+      default -> false;
+    };
     driveTalon =
         new TalonFX(
             switch (module) {

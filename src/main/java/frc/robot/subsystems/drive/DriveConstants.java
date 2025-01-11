@@ -50,6 +50,22 @@ public class DriveConstants {
   public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.0);
   public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
 
+  // Motor/encoder inverted values for each module
+  public static final boolean frontLeftDriveInverted = false;
+  public static final boolean frontRightDriveInverted = false;
+  public static final boolean backLeftDriveInverted = false;
+  public static final boolean backRightDriveInverted = false;
+
+  public static final boolean frontLeftTurnInverted = false;
+  public static final boolean frontRightTurnInverted = false;
+  public static final boolean backLeftTurnInverted = false;
+  public static final boolean backRightTurnInverted = false;
+
+  public static final boolean frontLeftTurnEncoderInverted = true;
+  public static final boolean frontRightTurnEncoderInverted = true;
+  public static final boolean backLeftTurnEncoderInverted = true;
+  public static final boolean backRightTurnEncoderInverted = true;
+
   // Device CAN IDs
   public static final int pigeonCanId = 9;
 
@@ -71,7 +87,6 @@ public class DriveConstants {
   public static final String CANBusName = "rio";
 
   // Drive motor configuration
-  public static final boolean driveInverted = false;
   public static final int driveMotorSupplyCurrentLimit = 50;
   public static final int driveMotorStatorCurrentLimit = 80;
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
@@ -109,13 +124,11 @@ public class DriveConstants {
   }
 
   // Turn motor configuration
-  public static final boolean turnInverted = false;
   public static final int turnMotorCurrentLimit = 60;
   public static final double turnMotorReduction = 9424.0 / 203.0;
   public static final DCMotor turnGearbox = DCMotor.getNEO(1);
 
   // Turn encoder configuration
-  public static final boolean turnEncoderInverted = true;
   public static final double turnEncoderPositionFactor =
       2 * Math.PI / turnMotorReduction; // Rotations -> Radians
   public static final double turnEncoderVelocityFactor =
