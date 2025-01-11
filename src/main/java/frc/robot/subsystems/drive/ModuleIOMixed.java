@@ -108,27 +108,30 @@ public class ModuleIOMixed implements ModuleIO {
           case 3 -> backRightZeroRotation;
           default -> new Rotation2d();
         };
-    driveInverted = switch (module) {
-      case 0 -> frontLeftDriveInverted;
-      case 1 -> frontRightDriveInverted;
-      case 2 -> backLeftDriveInverted;
-      case 3 -> backRightDriveInverted;
-      default -> false;
-    };
-    turnInverted = switch (module) {
-      case 0 -> frontLeftTurnInverted;
-      case 1 -> frontRightTurnInverted;
-      case 2 -> backLeftTurnInverted;
-      case 3 -> backRightTurnInverted;
-      default -> false;
-    };
-    turnEncoderInverted = switch (module) {
-      case 0 -> frontLeftTurnEncoderInverted;
-      case 1 -> frontRightTurnEncoderInverted;
-      case 2 -> backLeftTurnEncoderInverted;
-      case 3 -> backRightTurnEncoderInverted;
-      default -> false;
-    };
+    driveInverted =
+        switch (module) {
+          case 0 -> frontLeftDriveInverted;
+          case 1 -> frontRightDriveInverted;
+          case 2 -> backLeftDriveInverted;
+          case 3 -> backRightDriveInverted;
+          default -> false;
+        };
+    turnInverted =
+        switch (module) {
+          case 0 -> frontLeftTurnInverted;
+          case 1 -> frontRightTurnInverted;
+          case 2 -> backLeftTurnInverted;
+          case 3 -> backRightTurnInverted;
+          default -> false;
+        };
+    turnEncoderInverted =
+        switch (module) {
+          case 0 -> frontLeftTurnEncoderInverted;
+          case 1 -> frontRightTurnEncoderInverted;
+          case 2 -> backLeftTurnEncoderInverted;
+          case 3 -> backRightTurnEncoderInverted;
+          default -> false;
+        };
     driveTalon =
         new TalonFX(
             switch (module) {
