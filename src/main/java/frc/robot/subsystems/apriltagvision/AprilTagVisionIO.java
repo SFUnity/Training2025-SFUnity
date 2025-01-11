@@ -1,7 +1,7 @@
 package frc.robot.subsystems.apriltagvision;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import frc.robot.util.PoseManager;
+import frc.robot.util.OldPoseManager;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface AprilTagVisionIO {
@@ -20,7 +20,7 @@ public interface AprilTagVisionIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {}
+  public default void updateInputs(AprilTagVisionIOInputs inputs, OldPoseManager poseManager) {}
 
   /** Sets the pipeline index. */
   public default void setPipeline(int pipeline) {}

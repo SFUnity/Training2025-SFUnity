@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AllianceFlipUtil;
-import frc.robot.util.PoseManager;
+import frc.robot.util.OldPoseManager;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class Autos {
   private final Drive drive;
-  private final PoseManager poseManager;
+  private final OldPoseManager poseManager;
 
   private final AutoFactory factory;
   private final AutoChooser chooser;
@@ -24,7 +24,7 @@ public class Autos {
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
   private static final boolean isChoreoAuto = true;
 
-  public Autos(Drive drive, PoseManager poseManager) {
+  public Autos(Drive drive, OldPoseManager poseManager) {
     this.drive = drive;
     this.poseManager = poseManager;
 

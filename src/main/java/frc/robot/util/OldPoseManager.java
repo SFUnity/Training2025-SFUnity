@@ -13,7 +13,7 @@ import edu.wpi.first.math.numbers.N3;
 import frc.robot.subsystems.drive.DriveConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
-public class PoseManager {
+public class OldPoseManager {
   private SwerveModulePosition[] lastModulePositions = // For reseting pose
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -28,7 +28,7 @@ public class PoseManager {
       new SwerveDrivePoseEstimator(
           DriveConstants.kinematics, lastGyroAngle, lastModulePositions, new Pose2d());
 
-  public PoseManager() {}
+  public OldPoseManager() {}
 
   public void addOdometryMeasurement(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     lastModulePositions = modulePositions;

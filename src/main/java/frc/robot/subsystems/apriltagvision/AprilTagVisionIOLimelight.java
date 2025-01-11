@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 import frc.robot.util.LimelightHelpers;
-import frc.robot.util.PoseManager;
+import frc.robot.util.OldPoseManager;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private String name;
@@ -29,7 +29,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   }
 
   @Override
-  public void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {
+  public void updateInputs(AprilTagVisionIOInputs inputs, OldPoseManager poseManager) {
     LimelightHelpers.SetRobotOrientation(
         "limelight", poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.PoseEstimate observation =

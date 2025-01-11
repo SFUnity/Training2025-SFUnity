@@ -16,7 +16,7 @@ import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.GeomUtil;
-import frc.robot.util.PoseManager;
+import frc.robot.util.OldPoseManager;
 import frc.robot.util.Util;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -24,9 +24,9 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagVision extends VirtualSubsystem {
   private final AprilTagVisionIO io;
   private final AprilTagVisionIOInputsAutoLogged inputs = new AprilTagVisionIOInputsAutoLogged();
-  private final PoseManager poseManager;
+  private final OldPoseManager poseManager;
 
-  public AprilTagVision(AprilTagVisionIO io, PoseManager poseManager) {
+  public AprilTagVision(AprilTagVisionIO io, OldPoseManager poseManager) {
     this.io = io;
     this.poseManager = poseManager;
     // TODO pipelines are the setting configured in the limelight software. download the correct
