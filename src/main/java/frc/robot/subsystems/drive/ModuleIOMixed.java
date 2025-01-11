@@ -183,11 +183,7 @@ public class ModuleIOMixed implements ModuleIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
-    tryUntilOk(
-        turnSpark,
-        () ->
-        configureTurnSpark(
-                turnConfig));
+    tryUntilOk(turnSpark, () -> configureTurnSpark(turnConfig));
     tryUntilOk(
         turnSpark, () -> turnEncoder.setPosition(cancoder.getPosition().getValue().in(Radians)));
 
@@ -307,11 +303,7 @@ public class ModuleIOMixed implements ModuleIO {
   public void setTurnPIDF(double turnkP, double turnkD) {
     SparkMaxConfig turnConfig = new SparkMaxConfig();
     turnConfig.closedLoop.pidf(turnkP, 0, turnkD, 0);
-    tryUntilOk(
-        turnSpark,
-        () ->
-        configureTurnSpark(
-                turnConfig));
+    tryUntilOk(turnSpark, () -> configureTurnSpark(turnConfig));
   }
 
   @Override
@@ -327,6 +319,7 @@ public class ModuleIOMixed implements ModuleIO {
   }
 
   private REVLibError configureTurnSpark(SparkMaxConfig config) {
-    return turnSpark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    return turnSpark.configure(
+        config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 }
