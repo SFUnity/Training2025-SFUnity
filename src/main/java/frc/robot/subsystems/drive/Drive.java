@@ -16,35 +16,44 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
+import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
+import frc.robot.subsystems.leds.Leds;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
-
+import frc.robot.util.Util;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-
-import choreo.trajectory.SwerveSample;
 
 public class Drive extends SubsystemBase {
   static final Lock odometryLock = new ReentrantLock();
@@ -56,6 +65,36 @@ public class Drive extends SubsystemBase {
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
   private final PoseManager poseManager;
+  private final DriveCommandsConfig config;
+  private static final double DEADBAND = 0.05;
+
+  private static final LoggedTunableNumber linearkP =
+      new LoggedTunableNumber("Drive/Commands/Linear/kP", 3.5);
+  private static final LoggedTunableNumber linearkD =
+      new LoggedTunableNumber("Drive/Commands/Linear/kD", 0.0);
+  private static final LoggedTunableNumber thetakP =
+      new LoggedTunableNumber("Drive/Commands/Theta/kP", 6.0);
+  private static final LoggedTunableNumber thetakD =
+      new LoggedTunableNumber("Drive/Commands/Theta/D", 0.0);
+  private static final LoggedTunableNumber linearTolerance =
+      new LoggedTunableNumber("Drive/Commands/Linear/tolerance", 0.08);
+  private static final LoggedTunableNumber thetaToleranceDeg =
+      new LoggedTunableNumber("Drive/Commands/Theta/toleranceDeg", 1.0);
+
+  private static final LoggedTunableNumber maxLinearVelocity =
+      new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", maxSpeedMetersPerSec);
+  private static final LoggedTunableNumber maxLinearAcceleration =
+      new LoggedTunableNumber(
+          "Drive/Commands/Linear - maxAcceleration", maxAccelerationMetersPerSec * 0.4);
+  private static final LoggedTunableNumber maxAngularVelocity =
+      new LoggedTunableNumber(
+          "Drive/Commands/Theta - maxVelocity", maxAngularSpeedRadiansPerSec * 0.8);
+  private static final LoggedTunableNumber maxAngularAcceleration =
+      new LoggedTunableNumber(
+          "Drive/Commands/Theta - maxAcceleration", maxAngularAccelerationRadiansPerSec * 0.8);
+
+  private final ProfiledPIDController thetaController;
+  private final ProfiledPIDController linearController;
 
   // Autos
   private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 15);
@@ -72,19 +111,26 @@ public class Drive extends SubsystemBase {
   private final PIDController headingAutoController =
       new PIDController(rkPAuto.get(), 0.0, rkDAuto.get());
 
+  // Auto coast mode
+  private boolean brakeMode;
+  private Timer brakeModeTimer = new Timer();
+  private static final double BREAK_MODE_DELAY_SEC = 10.0;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-      PoseManager poseManager) {
+      PoseManager poseManager,
+      DriveCommandsConfig config) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0);
     modules[1] = new Module(frModuleIO, 1);
     modules[2] = new Module(blModuleIO, 2);
     modules[3] = new Module(brModuleIO, 3);
     this.poseManager = poseManager;
+    this.config = config;
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -102,6 +148,23 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    // Configure controllers for commands
+    linearController =
+        new ProfiledPIDController(
+            linearkP.get(), 0, linearkD.get(), new TrapezoidProfile.Constraints(0, 0));
+    linearController.setTolerance(linearTolerance.get());
+
+    thetaController =
+        new ProfiledPIDController(
+            thetakP.get(), 0, thetakD.get(), new TrapezoidProfile.Constraints(0.0, 0.0));
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    thetaController.setTolerance(Units.degreesToRadians(thetaToleranceDeg.get()));
+
+    headingAutoController.enableContinuousInput(-Math.PI, Math.PI);
+
+    updateConstraints();
+    updateModuleTunables();
   }
 
   @Override
@@ -150,7 +213,8 @@ public class Drive extends SubsystemBase {
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
-        poseManager.rawGyroRotation = poseManager.rawGyroRotation.plus(new Rotation2d(twist.dtheta));
+        poseManager.rawGyroRotation =
+            poseManager.rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
 
       // Apply update
@@ -159,6 +223,11 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    // update the brake mode based on the robot's velocity and state (enabled/disabled)
+    updateBrakeMode();
+
+    Util.logSubsystem(this, "Drive");
   }
 
   /**
@@ -288,6 +357,279 @@ public class Drive extends SubsystemBase {
         },
         turnKp,
         turnKd);
+  }
+
+  /**
+   * If the robot is enabled and brake mode is not enabled, enable it. If the robot is disabled, has
+   * stopped moving for the specified period of time, and brake mode is enabled, disable it.
+   */
+  private void updateBrakeMode() {
+    if (DriverStation.isEnabled() && !brakeMode) {
+      brakeMode = true;
+      setBrakeMode(true);
+      brakeModeTimer.restart();
+    } else if (DriverStation.isDisabled()) {
+      boolean stillMoving = false;
+      double velocityLimit = 0.05; // In meters per second
+      ChassisSpeeds measuredChassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+      if (Math.abs(measuredChassisSpeeds.vxMetersPerSecond) > velocityLimit
+          || Math.abs(measuredChassisSpeeds.vyMetersPerSecond) > velocityLimit) {
+        stillMoving = true;
+        brakeModeTimer.restart();
+      }
+
+      if (brakeMode && !stillMoving && brakeModeTimer.hasElapsed(BREAK_MODE_DELAY_SEC)) {
+        brakeMode = false;
+        setBrakeMode(false);
+      }
+    }
+  }
+
+  private void setBrakeMode(boolean enable) {
+    for (var module : modules) {
+      module.setBrakeMode(enable);
+    }
+  }
+
+  // Drive Commands
+
+  /**
+   * Field relative drive command using two joysticks (controlling linear and angular velocities).
+   */
+  public Command joystickDrive() {
+    return run(() -> {
+          // Convert to doubles
+          double o = config.getOmegaInput();
+
+          // Check for slow mode
+          if (config.slowMode().getAsBoolean()) {
+            o *= config.slowTurnMultiplier().get();
+          }
+
+          // Apply deadband
+          double omega = MathUtil.applyDeadband(o, DEADBAND);
+
+          // Square values and scale to max velocity
+          omega = Math.copySign(omega * omega, omega);
+          omega *= maxAngularSpeedRadiansPerSec;
+
+          // Get linear velocity
+          Translation2d linearVelocity = getLinearVelocityFromJoysticks();
+
+          // Convert to field relative speeds & send command
+          runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  linearVelocity.getX(),
+                  linearVelocity.getY(),
+                  omega,
+                  AllianceFlipUtil.shouldFlip()
+                      ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
+                      : poseManager.getRotation()));
+        })
+        .withName("Joystick Drive");
+  }
+
+  /**
+   * Field relative drive command using one joystick (controlling linear velocity) with a
+   * ProfiledPID for angular velocity.
+   */
+  public Command headingDrive(Supplier<Rotation2d> goalHeading) {
+    return run(() -> {
+          updateThetaTunables();
+          updateThetaConstraints();
+
+          // Get linear velocity
+          Translation2d linearVelocity = getLinearVelocityFromJoysticks();
+
+          // Convert to field relative speeds & send command
+          runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  linearVelocity.getX(),
+                  linearVelocity.getY(),
+                  getAngularVelocityFromProfiledPID(goalHeading.get().getRadians()),
+                  AllianceFlipUtil.shouldFlip()
+                      ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
+                      : poseManager.getRotation()));
+
+          Leds.getInstance().alignedWithTarget = thetaAtGoal();
+        })
+        .beforeStarting(
+            () -> {
+              resetThetaController();
+            })
+        .finallyDo(
+            () -> {
+              stop();
+              Leds.getInstance().alignedWithTarget = false;
+            })
+        .withName("Heading Drive");
+  }
+
+  /**
+   * Field relative drive command using a ProfiledPID for linear velocity and a ProfiledPID for
+   * angular velocity.
+   */
+  public Command fullAutoDrive(Supplier<Pose2d> goalPose) {
+    return run(() -> {
+          updateTunables();
+          updateConstraints();
+
+          // Calculate linear speed
+          Pose2d targetPose = goalPose.get();
+
+          double currentDistance = poseManager.getDistanceTo(targetPose);
+
+          double driveVelocityScalar = linearController.calculate(currentDistance, 0.0);
+
+          if (linearAtGoal()) driveVelocityScalar = 0.0;
+
+          // Calculate angle to target then transform by velocity scalar
+          Rotation2d angleToTarget = poseManager.getHorizontalAngleTo(targetPose);
+
+          Translation2d driveVelocity = new Translation2d(driveVelocityScalar, angleToTarget);
+
+          // Calculate theta speed
+          double thetaVelocity =
+              getAngularVelocityFromProfiledPID(targetPose.getRotation().getRadians());
+          if (thetaController.atGoal()) thetaVelocity = 0.0;
+
+          // Send command
+          runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  driveVelocity.getX(),
+                  driveVelocity.getY(),
+                  thetaVelocity,
+                  poseManager.getRotation()));
+
+          Leds.getInstance().alignedWithTarget = linearAtGoal() && thetaAtGoal();
+
+          Logger.recordOutput("Drive/Commands/Linear/currentDistance", currentDistance);
+        })
+        .beforeStarting(
+            () -> {
+              resetControllers(goalPose.get());
+            })
+        .finallyDo(
+            () -> {
+              stop();
+              Leds.getInstance().alignedWithTarget = false;
+            })
+        .withName("Full Auto Drive");
+  }
+
+  private Translation2d getLinearVelocityFromJoysticks() {
+    // Convert to doubles
+    double x = config.getXInput();
+    double y = config.getYInput();
+
+    // The speed value here might need to change
+    double povMovementSpeed = 0.5;
+    if (config.povDownPressed()) {
+      x = povMovementSpeed;
+    } else if (config.povUpPressed()) {
+      x = -povMovementSpeed;
+    } else if (config.povLeftPressed()) {
+      y = -povMovementSpeed;
+    } else if (config.povRightPressed()) {
+      y = povMovementSpeed;
+    }
+
+    // Check for slow mode
+    if (config.slowMode().getAsBoolean()) {
+      double multiplier = config.slowDriveMultiplier().get();
+      x *= multiplier;
+      y *= multiplier;
+    }
+
+    // Apply deadband
+    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
+    Rotation2d linearDirection = new Rotation2d(x, y);
+
+    // Square values and scale to max velocity
+    linearMagnitude = linearMagnitude * linearMagnitude;
+    linearMagnitude *= maxSpeedMetersPerSec;
+
+    // Calcaulate new linear velocity
+    Translation2d linearVelocity = new Translation2d(linearMagnitude, linearDirection);
+
+    return linearVelocity;
+  }
+
+  private double getAngularVelocityFromProfiledPID(double goalHeadingRads) {
+    double output =
+        thetaController.calculate(
+            poseManager.getPose().getRotation().getRadians(), goalHeadingRads);
+
+    Logger.recordOutput("Drive/Commands/Theta/HeadingError", thetaController.getPositionError());
+    return output;
+  }
+
+  private void updateTunables() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> linearController.setPID(linearkP.get(), 0, linearkD.get()),
+        linearkP,
+        linearkD);
+    LoggedTunableNumber.ifChanged(
+        hashCode(), () -> linearController.setTolerance(linearTolerance.get()), linearTolerance);
+
+    updateThetaTunables();
+  }
+
+  private void updateThetaTunables() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> thetaController.setPID(thetakP.get(), 0, thetakD.get()),
+        thetakP,
+        thetakD);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> thetaController.setTolerance(Units.degreesToRadians(thetaToleranceDeg.get())),
+        thetaToleranceDeg);
+  }
+
+  private void updateConstraints() {
+    linearController.setConstraints(
+        new TrapezoidProfile.Constraints(maxLinearVelocity.get(), maxLinearAcceleration.get()));
+    updateThetaConstraints();
+  }
+
+  private void updateThetaConstraints() {
+    thetaController.setConstraints(
+        new TrapezoidProfile.Constraints(maxAngularVelocity.get(), maxAngularAcceleration.get()));
+  }
+
+  private void resetControllers(Pose2d goalPose) {
+    Twist2d fieldVelocity = poseManager.fieldVelocity();
+    double linearVelocity =
+        Math.min(
+            0.0,
+            new Translation2d(fieldVelocity.dx, fieldVelocity.dy)
+                .rotateBy(poseManager.getHorizontalAngleTo(goalPose))
+                .getX());
+    linearController.reset(poseManager.getDistanceTo(goalPose), linearVelocity);
+    resetThetaController();
+  }
+
+  private void resetThetaController() {
+    Pose2d currentPose = poseManager.getPose();
+    Twist2d fieldVelocity = poseManager.fieldVelocity();
+    thetaController.reset(currentPose.getRotation().getRadians(), fieldVelocity.dtheta);
+  }
+
+  /** Returns true if within tolerance of aiming at goal */
+  @AutoLogOutput(key = "Drive/Commands/Linear/AtGoal")
+  public boolean linearAtGoal() {
+    return linearController.atGoal();
+  }
+
+  /** Returns true if within tolerance of aiming at speaker */
+  @AutoLogOutput(key = "Drive/Commands/Theta/AtGoal")
+  public boolean thetaAtGoal() {
+    return Util.equalsWithTolerance(
+        thetaController.getSetpoint().position,
+        thetaController.getGoal().position,
+        Units.degreesToRadians(thetaToleranceDeg.get()));
   }
 
   // Tuning Commands

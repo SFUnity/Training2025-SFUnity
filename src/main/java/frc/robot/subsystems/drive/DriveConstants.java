@@ -18,16 +18,22 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
+import java.util.function.BooleanSupplier;
 
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.8;
+  public static final double maxAccelerationMetersPerSec =
+      Units.feetToMeters(75.0); // This is what 6328
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(26.5);
   public static final double wheelBase = Units.inchesToMeters(26.5);
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final double maxAngularSpeedRadiansPerSec = maxSpeedMetersPerSec / driveBaseRadius;
+  public static final double maxAngularAccelerationRadiansPerSec =
+      maxAccelerationMetersPerSec / driveBaseRadius;
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
         new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
@@ -35,7 +41,8 @@ public class DriveConstants {
         new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
         new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
       };
-      public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
+  public static final SwerveDriveKinematics kinematics =
+      new SwerveDriveKinematics(moduleTranslations);
 
   // Zeroed rotation values for each module, see setup instructions
   public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.0);
@@ -130,6 +137,57 @@ public class DriveConstants {
         turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnkP", 8.0);
         turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnkD", 0.0);
         break;
+    }
+  }
+
+  /**
+   * Drive Command Config
+   *
+   * @param xJoystick - Left Joystick X axis
+   * @param yJoystick - Left Joystick Y axis
+   * @param omegaJoystick - Right Joystick X axis
+   * @param slowMode - If the joystick drive should be slowed down
+   * @param slowDriveMultiplier - Multiplier for slow mode
+   * @param slowTurnMultiplier - Multiplier for slow mode
+   * @param povUp - POV/Dpad Up
+   * @param povDown - POV/Dpad Down
+   * @param povLeft - POV/Dpad Left
+   * @param povRight - POV/Dpad Right
+   */
+  public static final record DriveCommandsConfig(
+      CommandXboxController controller,
+      BooleanSupplier slowMode,
+      LoggedTunableNumber slowDriveMultiplier,
+      LoggedTunableNumber slowTurnMultiplier) {
+
+    private static final boolean simMode = Constants.currentMode == Constants.Mode.SIM;
+
+    public double getXInput() {
+      return simMode ? -controller.getLeftX() : controller.getLeftY();
+    }
+
+    public double getYInput() {
+      return simMode ? controller.getLeftY() : controller.getLeftX();
+    }
+
+    public double getOmegaInput() {
+      return -controller.getRightX();
+    }
+
+    public boolean povUpPressed() {
+      return controller.povUp().getAsBoolean();
+    }
+
+    public boolean povDownPressed() {
+      return controller.povDown().getAsBoolean();
+    }
+
+    public boolean povLeftPressed() {
+      return controller.povLeft().getAsBoolean();
+    }
+
+    public boolean povRightPressed() {
+      return controller.povRight().getAsBoolean();
     }
   }
 }
