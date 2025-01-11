@@ -58,19 +58,9 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+      private Rotation2d rawGyroRotation = new Rotation2d();
 
-  private Rotation2d rawGyroRotation = new Rotation2d();
-  private SwerveModulePosition[] lastModulePositions = // For delta tracking
-      new SwerveModulePosition[] {
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition()
-      };
-  private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
-
-      private final PoseManager poseManager;
+  private final PoseManager poseManager;
   private final OldPoseManager oldPoseManager;
 
   // Autos
@@ -172,9 +162,7 @@ public class Drive extends SubsystemBase {
       }
 
       // Apply update
-      poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
-      poseManager.addOdometryMeasurement(rawGyroRotation, modulePositions);
-      oldPoseManager.addOdometryMeasurement(rawGyroRotation, modulePositions);
+      poseManager.addOdometryMeasurementWithTimestamps(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
     // Update gyro alert
