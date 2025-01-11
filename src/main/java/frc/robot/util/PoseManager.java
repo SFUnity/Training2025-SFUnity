@@ -19,26 +19,25 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 public class PoseManager {
   static final Lock odometryLock = new ReentrantLock();
-  private SwerveModulePosition[] lastModulePositions = // For reseting pose
+  public SwerveModulePosition[] lastModulePositions = // For reseting pose
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
         new SwerveModulePosition(),
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
-  private Rotation2d lastGyroAngle = new Rotation2d();
+  public Rotation2d rawGyroRotation = new Rotation2d();
   private Twist2d robotVelocity = new Twist2d();
 
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(
-          DriveConstants.kinematics, lastGyroAngle, lastModulePositions, new Pose2d());
+          DriveConstants.kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   public PoseManager() {}
 
-  public void addOdometryMeasurementWithTimestamps(double currentTime, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+  public void addOdometryMeasurementWithTimestamps(double currentTime, SwerveModulePosition[] modulePositions) {
     lastModulePositions = modulePositions;
-    lastGyroAngle = gyroAngle;
-    poseEstimator.updateWithTime(currentTime, gyroAngle, modulePositions);
+    poseEstimator.updateWithTime(currentTime, rawGyroRotation, modulePositions);
   }
 
   public void addVisionMeasurement(Pose2d estimatedPose, double timestamp, Matrix<N3, N1> stdDevs) {
@@ -102,7 +101,7 @@ public class PoseManager {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    poseEstimator.resetPosition(lastGyroAngle, lastModulePositions, pose);
+    poseEstimator.resetPosition(rawGyroRotation, lastModulePositions, pose);
   }
 
   @AutoLogOutput(key = "Odometry/FieldVelocity")
