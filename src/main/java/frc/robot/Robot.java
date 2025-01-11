@@ -27,9 +27,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.subsystems.apriltagvision.AprilTagVision;
-import frc.robot.subsystems.apriltagvision.AprilTagVisionIO;
-import frc.robot.subsystems.apriltagvision.AprilTagVisionIOLimelight;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
@@ -37,7 +34,6 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -79,7 +75,6 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
-  private final AprilTagVision aprilTagVision;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -109,8 +104,6 @@ public class Robot extends LoggedRobot {
   @SuppressWarnings("resource")
   public Robot() {
     super();
-
-    Leds.getInstance();
 
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -178,8 +171,6 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision =
-            new AprilTagVision(new AprilTagVisionIOLimelight("limelight"), poseManager);
         break;
 
       case SIM:
@@ -193,7 +184,6 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
 
       default:
@@ -207,7 +197,6 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
     }
 
@@ -272,8 +261,6 @@ public class Robot extends LoggedRobot {
               "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
         }
         autoMessagePrinted = true;
-        Leds.getInstance().autoFinished = true;
-        Leds.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
       }
     }
 
@@ -297,7 +284,6 @@ public class Robot extends LoggedRobot {
     if (RobotController.getBatteryVoltage() <= lowBatteryVoltage
         && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
       lowBatteryAlert.set(true);
-      Leds.getInstance().lowBatteryAlert = true;
     }
   }
 
