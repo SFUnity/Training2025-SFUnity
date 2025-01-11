@@ -36,6 +36,9 @@ public class Module {
   public Module(ModuleIO io, int index) {
     this.io = io;
     this.index = index;
+
+    setBrakeMode(true);
+
     driveDisconnectedAlert =
         new Alert(
             "Disconnected drive motor on module " + Integer.toString(index) + ".",
@@ -142,5 +145,12 @@ public class Module {
 
   public void setTurnPIDF(double turnkP, double turnkD) {
     io.setTurnPIDF(turnkP, turnkD);
+  }
+
+  /** Sets whether brake mode is enabled. */
+  public void setBrakeMode(boolean enabled) {
+    Logger.recordOutput("Drive/BrakeMode/Module" + Integer.toString(index), enabled);
+    io.setDriveBrakeMode(enabled);
+    io.setTurnBrakeMode(enabled);
   }
 }

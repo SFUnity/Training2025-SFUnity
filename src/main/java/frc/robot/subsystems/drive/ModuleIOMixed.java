@@ -33,6 +33,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -185,8 +186,8 @@ public class ModuleIOMixed implements ModuleIO {
     tryUntilOk(
         turnSpark,
         () ->
-            turnSpark.configure(
-                turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        configureTurnSpark(
+                turnConfig));
     tryUntilOk(
         turnSpark, () -> turnEncoder.setPosition(cancoder.getPosition().getValue().in(Radians)));
 
@@ -309,7 +310,23 @@ public class ModuleIOMixed implements ModuleIO {
     tryUntilOk(
         turnSpark,
         () ->
-            turnSpark.configure(
-                turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        configureTurnSpark(
+                turnConfig));
+  }
+
+  @Override
+  public void setDriveBrakeMode(boolean brake) {
+    driveTalon.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+  }
+
+  @Override
+  public void setTurnBrakeMode(boolean brake) {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
+    configureTurnSpark(config);
+  }
+
+  private REVLibError configureTurnSpark(SparkMaxConfig config) {
+    return turnSpark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 }

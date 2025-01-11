@@ -59,4 +59,10 @@ public interface ModuleIO {
 
   /** Set PID & ff gains for turn motor */
   public default void setTurnPIDF(double turnkP, double turnkD) {}
+
+  /** Set the brake mode of the drive motor. */
+  public default void setDriveBrakeMode(boolean brakeMode) {}
+
+  /** Set the brake mode of the turn motor. */
+  public default void setTurnBrakeMode(boolean brakeMode) {}
 }
