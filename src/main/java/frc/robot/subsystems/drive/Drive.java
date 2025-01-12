@@ -162,7 +162,6 @@ public class Drive extends SubsystemBase {
     headingAutoController.enableContinuousInput(-Math.PI, Math.PI);
 
     updateConstraints();
-    updateModuleTunables();
   }
 
   @Override
@@ -174,9 +173,6 @@ public class Drive extends SubsystemBase {
       module.periodic();
     }
     odometryLock.unlock();
-
-    // Update tunables
-    updateModuleTunables();
 
     if (DriverStation.isDisabled()) {
       // Stop moving when disabled
@@ -337,27 +333,6 @@ public class Drive extends SubsystemBase {
       output += modules[i].getFFCharacterizationVelocity() / 4.0;
     }
     return output;
-  }
-
-  public void updateModuleTunables() {
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> {
-          for (var module : modules)
-            module.setDrivePIDF(driveKp.get(), driveKd.get(), driveKs.get(), driveKv.get());
-        },
-        driveKp,
-        driveKd,
-        driveKs,
-        driveKv);
-
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> {
-          for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());
-        },
-        turnKp,
-        turnKd);
   }
 
   /**
@@ -641,6 +616,8 @@ public class Drive extends SubsystemBase {
           LoggedTunableNumber.ifChanged(
               hashCode(),
               () -> {
+                for (var module : modules)
+                  module.setDrivePIDF(driveKp.get(), driveKd.get(), driveKs.get(), driveKv.get());
                 setAllModuleSetpointsToSame(
                     tuningDriveForward ? tuningDriveSpeed.get() : -tuningDriveSpeed.get(),
                     new Rotation2d());
@@ -651,7 +628,7 @@ public class Drive extends SubsystemBase {
               driveKd,
               tuningDriveSpeed);
           if (tuningTimer.hasElapsed(1.0)) {
-            setAllModuleSetpointsToSame(0, new Rotation2d());
+            stop();
             tuningTimer.stop();
             tuningTimer.reset();
           }
@@ -663,7 +640,7 @@ public class Drive extends SubsystemBase {
             })
         .finallyDo(
             () -> {
-              setAllModuleSetpointsToSame(0, new Rotation2d());
+              stop();
               tuningTimer.reset();
               tuningTimer.stop();
             })
@@ -675,6 +652,7 @@ public class Drive extends SubsystemBase {
           LoggedTunableNumber.ifChanged(
               hashCode(),
               () -> {
+                for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());
                 setAllModuleSetpointsToSame(
                     0, Rotation2d.fromDegrees(tuningTurnTo0 ? 0 : tuningTurnDelta.get()));
                 tuningTurnTo0 = !tuningTurnTo0;
@@ -684,7 +662,7 @@ public class Drive extends SubsystemBase {
               turnKd,
               tuningTurnDelta);
           if (tuningTimer.hasElapsed(1.0)) {
-            setAllModuleSetpointsToSame(0, new Rotation2d());
+            stop();
             tuningTimer.reset();
             tuningTimer.stop();
           }
@@ -696,7 +674,7 @@ public class Drive extends SubsystemBase {
             })
         .finallyDo(
             () -> {
-              setAllModuleSetpointsToSame(0, new Rotation2d());
+              stop();
               tuningTimer.reset();
               tuningTimer.stop();
             })
