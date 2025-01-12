@@ -9,6 +9,9 @@ public class AprilTagVisionConstants {
   /** distance from the center of the Limelight lens to the floor */
   public static final double limelightLensHeightInches = 26.5;
 
+  public static final String limelight1Name = "reef";
+  public static final String limelight2Name = "source";
+
   public static enum Pipelines {
     BLUE_SPEAKER,
     RED_SPEAKER,
