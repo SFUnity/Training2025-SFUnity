@@ -175,6 +175,9 @@ public class Drive extends SubsystemBase {
     }
     odometryLock.unlock();
 
+    // Update tunables
+    updateModuleTunables();
+
     if (DriverStation.isDisabled()) {
       // Stop moving when disabled
       for (var module : modules) {
