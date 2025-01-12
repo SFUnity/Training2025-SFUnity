@@ -137,12 +137,12 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnkP", 2.0);
-        turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnkD", 0.0);
+        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", 2.0);
+        turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnKd", 0.0);
         break;
       case SIM:
-        turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnkP", 8.0);
-        turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnkD", 0.0);
+        turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 8.0);
+        turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnKd", 0.0);
         break;
     }
   }
