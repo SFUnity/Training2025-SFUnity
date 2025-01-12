@@ -608,7 +608,6 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber tuningTurnDelta =
       new LoggedTunableNumber("Drive/ModuleTunables/turnDeltaForTuning", 90);
   private boolean tuningDriveForward = true;
-  private boolean tuningTurnTo0 = true;
   private Timer tuningTimer = new Timer();
 
   public Command tuneModuleDrive() {
@@ -653,9 +652,7 @@ public class Drive extends SubsystemBase {
               hashCode(),
               () -> {
                 for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());
-                setAllModuleSetpointsToSame(
-                    0, Rotation2d.fromDegrees(tuningTurnTo0 ? 0 : tuningTurnDelta.get()));
-                tuningTurnTo0 = !tuningTurnTo0;
+                setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get()));
                 tuningTimer.start();
               },
               turnKp,
