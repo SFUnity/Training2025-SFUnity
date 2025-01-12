@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constantsGlobal.Constants;
@@ -630,27 +629,75 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber("Drive/ModuleTunables/driveSpeedForTuning", 1);
   private static final LoggedTunableNumber tuningTurnDelta =
       new LoggedTunableNumber("Drive/ModuleTunables/turnDeltaForTuning", 90);
+  private boolean tuningDriveForward = true;
+  private boolean tuningTurnTo0 = true;
+  private Timer tuningTimer = new Timer();
 
   public Command tuneModuleDrive() {
-    return tuningCmdTemplate(
-            () -> setAllModuleSetpointsToSame(tuningDriveSpeed.get(), new Rotation2d()),
-            () -> setAllModuleSetpointsToSame(-tuningDriveSpeed.get(), new Rotation2d()))
+    return run(() -> {
+          LoggedTunableNumber.ifChanged(
+              hashCode(),
+              () -> {
+                setAllModuleSetpointsToSame(
+                    tuningDriveForward ? tuningDriveSpeed.get() : -tuningDriveSpeed.get(),
+                    new Rotation2d());
+                tuningDriveForward = !tuningDriveForward;
+                tuningTimer.start();
+              },
+              driveKp,
+              driveKd,
+              tuningDriveSpeed);
+          if (tuningTimer.hasElapsed(1.0)) {
+            setAllModuleSetpointsToSame(0, new Rotation2d());
+            tuningTimer.stop();
+            tuningTimer.reset();
+          }
+        })
+        .beforeStarting(
+            () -> {
+              tuningTimer.reset();
+              tuningTimer.stop();
+            })
+        .finallyDo(
+            () -> {
+              setAllModuleSetpointsToSame(0, new Rotation2d());
+              tuningTimer.reset();
+              tuningTimer.stop();
+            })
         .withName("tuneModuleDrive");
   }
 
   public Command tuneModuleTurn() {
-    return tuningCmdTemplate(
-            () -> setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(0)),
-            () -> setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
+    return run(() -> {
+          LoggedTunableNumber.ifChanged(
+              hashCode(),
+              () -> {
+                setAllModuleSetpointsToSame(
+                    0, Rotation2d.fromDegrees(tuningTurnTo0 ? 0 : tuningTurnDelta.get()));
+                tuningTurnTo0 = !tuningTurnTo0;
+                tuningTimer.start();
+              },
+              turnKp,
+              turnKd,
+              tuningTurnDelta);
+          if (tuningTimer.hasElapsed(1.0)) {
+            setAllModuleSetpointsToSame(0, new Rotation2d());
+            tuningTimer.reset();
+            tuningTimer.stop();
+          }
+        })
+        .beforeStarting(
+            () -> {
+              tuningTimer.reset();
+              tuningTimer.stop();
+            })
+        .finallyDo(
+            () -> {
+              setAllModuleSetpointsToSame(0, new Rotation2d());
+              tuningTimer.reset();
+              tuningTimer.stop();
+            })
         .withName("tuneModuleTurn");
-  }
-
-  private Command tuningCmdTemplate(Runnable run1, Runnable run2) {
-    return Commands.repeatingSequence(
-        run(run1).withTimeout(1),
-        run(() -> stop()).withTimeout(1),
-        run(run2).withTimeout(1),
-        run(() -> stop()).withTimeout(1));
   }
 
   // Autos
