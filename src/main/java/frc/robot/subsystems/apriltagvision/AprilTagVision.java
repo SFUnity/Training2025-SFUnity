@@ -14,7 +14,6 @@ import edu.wpi.first.math.numbers.N3;
 import frc.robot.constantsGlobal.FieldConstants;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.GeomUtil;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
@@ -37,8 +36,6 @@ public class AprilTagVision extends VirtualSubsystem {
   public void periodic() {
     io.updateInputs(inputs, poseManager);
     Logger.processInputs("AprilTagVision", inputs);
-
-    Leds.getInstance().tagsDetected = inputs.tagCount > 0;
 
     // TODO when testing these start with no checks and then slowly add in to make sure I don't lose
     // too much data
