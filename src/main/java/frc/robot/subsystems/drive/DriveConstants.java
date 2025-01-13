@@ -66,23 +66,23 @@ public class DriveConstants {
   public static final boolean backLeftTurnEncoderInverted = true;
   public static final boolean backRightTurnEncoderInverted = true;
 
-  // Device CAN IDs
-  public static final int pigeonCanId = 9;
+  // Device CAN IDs. Based off power port on PDH
+  public static final int pigeonCanId = 20;
 
-  public static final int frontLeftDriveCanId = 1;
-  public static final int backLeftDriveCanId = 3;
-  public static final int frontRightDriveCanId = 5;
-  public static final int backRightDriveCanId = 7;
+  public static final int frontLeftDriveCanId = 15;
+  public static final int backLeftDriveCanId = 0;
+  public static final int frontRightDriveCanId = 10;
+  public static final int backRightDriveCanId = 9;
 
-  public static final int frontLeftTurnCanId = 2;
-  public static final int backLeftTurnCanId = 4;
-  public static final int frontRightTurnCanId = 6;
-  public static final int backRightTurnCanId = 8;
+  public static final int frontLeftTurnCanId = 19;
+  public static final int backLeftTurnCanId = 2;
+  public static final int frontRightTurnCanId = 11;
+  public static final int backRightTurnCanId = 1;
 
-  public static final int frontLeftTurnEncoderCanId = 2;
+  public static final int frontLeftTurnEncoderCanId = 18;
   public static final int backLeftTurnEncoderCanId = 4;
-  public static final int frontRightTurnEncoderCanId = 6;
-  public static final int backRightTurnEncoderCanId = 8;
+  public static final int frontRightTurnEncoderCanId = 19; // on same power as 18
+  public static final int backRightTurnEncoderCanId = 5; // on same power as 4
 
   public static final String CANBusName = "rio";
 
