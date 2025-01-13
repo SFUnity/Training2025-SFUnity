@@ -10,6 +10,7 @@ import frc.robot.util.PoseManager;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private String name;
+  private double[] position;
 
   private static final double disconnectedTimeout = 0.5;
   private final Alert disconnectedAlert;
@@ -18,14 +19,16 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private final double DEFAUlT_CROP = 0.9;
   private final double CROP_BUFFER = 0.1;
 
-  public AprilTagVisionIOLimelight(String camName) {
+  public AprilTagVisionIOLimelight(String camName, double[] camPosition) {
     name = camName;
+    position = camPosition;
 
     LimelightHelpers.setLEDMode_PipelineControl(name);
 
     disconnectedAlert = new Alert("No data from: " + name, AlertType.kError);
 
     resetCropping();
+    setPosition(position);
   }
 
   @Override
@@ -61,6 +64,18 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   @Override
   public void setPipeline(Pipelines pipelineEnum) {
     LimelightHelpers.setPipelineIndex(name, Pipelines.getIndexFor(pipelineEnum));
+  }
+
+  @Override
+  public void setPosition(double[] position) {
+    LimelightHelpers.setCameraPose_RobotSpace(name, 
+    position[0],    // Forward offset (meters)
+    position[1],    // Side offset (meters)
+    position[2],    // Height offset (meters)
+    position[3],    // Roll (degrees)
+    position[4],   // Pitch (degrees)
+    position[5]     // Yaw (degrees)
+    );
   }
 
   // function crops the limelight window to only include the apriltags the robot can see

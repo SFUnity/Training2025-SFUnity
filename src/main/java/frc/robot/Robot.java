@@ -29,6 +29,7 @@ import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.apriltagvision.AprilTagVision;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIO;
+import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIOLimelight;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
@@ -40,6 +41,13 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight1HeightOffset;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight1Name;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight1Position;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight2Name;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight2Position;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -78,7 +86,8 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
-  private final AprilTagVision aprilTagVision;
+  private final AprilTagVision aprilTagVision1;
+  private final AprilTagVision aprilTagVision2;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -175,8 +184,10 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision =
-            new AprilTagVision(new AprilTagVisionIOLimelight("limelight"), poseManager);
+        aprilTagVision1 =
+            new AprilTagVision(new AprilTagVisionIOLimelight(limelight1Name, limelight1Position), poseManager);
+        aprilTagVision2 =
+            new AprilTagVision(new AprilTagVisionIOLimelight(limelight2Name, limelight2Position), poseManager);
         break;
 
       case SIM:

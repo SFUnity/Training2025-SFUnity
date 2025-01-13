@@ -27,4 +27,7 @@ public interface AprilTagVisionIO {
 
   /** Sets the pipeline through enum. */
   public default void setPipeline(AprilTagVisionConstants.Pipelines pipeline) {}
+
+  /** Sets the position of the limelight */
+  public default void setPosition(double[] position) {}
 }
