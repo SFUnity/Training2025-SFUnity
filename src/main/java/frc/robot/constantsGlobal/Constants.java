@@ -23,8 +23,8 @@ package frc.robot.constantsGlobal;
  */
 public final class Constants {
   public static final double loopPeriodSecs = 0.02;
-  public static final Mode currentMode = Mode.SIM;
-  public static final boolean tuningMode = false;
+  public static final Mode currentMode = Mode.REAL;
+  public static final boolean tuningMode = true;
 
   public static enum Mode {
     /** Running on a real robot. */
