@@ -172,8 +172,8 @@ public class ModuleIOMixed implements ModuleIO {
         new Slot0Configs()
             .withKP(driveKp.get())
             .withKD(driveKd.get())
-            .withKS(driveKs.get())
-            .withKV(driveKv.get());
+            .withKS(driveKs)
+            .withKV(driveKv);
     driveConfig.Feedback.SensorToMechanismRatio = driveMotorReduction;
     driveConfig.CurrentLimits.SupplyCurrentLimit = driveMotorSupplyCurrentLimit;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -318,12 +318,10 @@ public class ModuleIOMixed implements ModuleIO {
   }
 
   @Override
-  public void setDrivePIDF(double drivekP, double drivekD, double drivekS, double drivekV) {
+  public void setDrivePIDF(double drivekP, double drivekD) {
     var driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0.kP = drivekP;
     driveConfig.Slot0.kD = drivekD;
-    driveConfig.Slot0.kS = drivekS;
-    driveConfig.Slot0.kV = drivekV;
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
   }
 

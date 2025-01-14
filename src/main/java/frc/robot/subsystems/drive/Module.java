@@ -139,8 +139,8 @@ public class Module {
     return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
   }
 
-  public void setDrivePIDF(double drivekP, double drivekD, double drivekS, double drivekV) {
-    io.setDrivePIDF(drivekP, drivekD, drivekS, drivekV);
+  public void setDrivePIDF(double drivekP, double drivekD) {
+    io.setDrivePIDF(drivekP, drivekD);
   }
 
   public void setTurnPIDF(double turnkP, double turnkD) {

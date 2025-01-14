@@ -596,7 +596,7 @@ public class Drive extends SubsystemBase {
               hashCode(),
               () -> {
                 for (var module : modules)
-                  module.setDrivePIDF(driveKp.get(), driveKd.get(), driveKs.get(), driveKv.get());
+                  module.setDrivePIDF(driveKp.get(), driveKd.get());
                 setAllModuleSetpointsToSame(
                     tuningDriveForward ? tuningDriveSpeed.get() : -tuningDriveSpeed.get(),
                     new Rotation2d());
