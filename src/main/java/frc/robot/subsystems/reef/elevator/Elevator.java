@@ -22,13 +22,12 @@ public class Elevator extends SubsystemBase {
   ;
 
   private final ElevatorIO io;
-  // TODO: Impliment or remove poisemanager
-  // private final PoseManager poseManager;
+
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  public Elevator(ElevatorIO io /*, PoseManager poseManager */) {
+  public Elevator(ElevatorIO io ) {
     this.io = io;
-    // this.poseManager = poseManager;
+
   }
 
   @Override
@@ -49,7 +48,7 @@ public class Elevator extends SubsystemBase {
   public void stop() {
     io.stop();
   }
-  // TODO: fix desired height
+
   public boolean atDesiredHeight(double desiredHeight) {
     if (!Util.equalsWithTolerance(inputs.position.in(Meters), desiredHeight, 0.15)) {
       return true;
