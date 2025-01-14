@@ -24,12 +24,12 @@ import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = 4.8;
+  public static final double maxSpeedMetersPerSec = Units.feetToMeters(17.1);
   public static final double maxAccelerationMetersPerSec =
       Units.feetToMeters(75.0); // This is what 6328
   public static final double odometryFrequency = 100.0; // Hz
-  public static final double trackWidth = Units.inchesToMeters(26.5);
-  public static final double wheelBase = Units.inchesToMeters(26.5);
+  public static final double trackWidth = Units.inchesToMeters(20.75);
+  public static final double wheelBase = trackWidth;
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final double maxAngularSpeedRadiansPerSec = maxSpeedMetersPerSec / driveBaseRadius;
   public static final double maxAngularAccelerationRadiansPerSec =
@@ -140,7 +140,7 @@ public class DriveConstants {
         turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnKd", 0.0);
         break;
       case SIM:
-        turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 39.0);
+        turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 14.0);
         turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnKd", 0.0);
         break;
     }
