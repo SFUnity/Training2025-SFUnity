@@ -96,22 +96,22 @@ public class DriveConstants {
   // Drive PID configuration
   public static final LoggedTunableNumber driveKp;
   public static final LoggedTunableNumber driveKd;
-  public static final LoggedTunableNumber driveKs;
-  public static final LoggedTunableNumber driveKv;
+  public static final double driveKs;
+  public static final double driveKv;
 
   static {
     switch (Constants.currentMode) {
       default:
         driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.0);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = new LoggedTunableNumber("Drive/ModuleTunables/driveKs", 0.0);
-        driveKv = new LoggedTunableNumber("Drive/ModuleTunables/driveKv", 0.0);
+        driveKs = 0.0;
+        driveKv = 0.0;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.4);
         driveKd = new LoggedTunableNumber("Drive/SimModuleTunables/driveKd", 0.0);
-        driveKs = new LoggedTunableNumber("Drive/SimModuleTunables/driveKs", 0.0);
-        driveKv = new LoggedTunableNumber("Drive/SimModuleTunables/driveKv", 0.0789);
+        driveKs = 0.0;
+        driveKv = 0.0;
         break;
     }
   }
