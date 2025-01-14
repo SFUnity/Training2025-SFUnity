@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.subsystems.drive.DriveConstants.*;
+
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
@@ -56,7 +58,6 @@ public class Autos {
 
       // SysID & non-choreo routines
       if (!isChoreoAuto) {
-        nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
 
         // Set up SysId routines

@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
@@ -583,77 +584,32 @@ public class Drive extends SubsystemBase {
   }
 
   // Tuning Commands
-  private static final LoggedTunableNumber tuningDriveSpeed =
-      new LoggedTunableNumber("Drive/ModuleTunables/driveSpeedForTuning", 1);
+  // For tuning drive motor PID values use Phoenix Tuner X (and maybe ff also?)
   private static final LoggedTunableNumber tuningTurnDelta =
       new LoggedTunableNumber("Drive/ModuleTunables/turnDeltaForTuning", 90);
-  private boolean tuningDriveForward = true;
-  private Timer tuningTimer = new Timer();
-
-  public Command tuneModuleDrive() {
-    return run(() -> {
-          LoggedTunableNumber.ifChanged(
-              hashCode(),
-              () -> {
-                for (var module : modules)
-                  module.setDrivePIDF(driveKp.get(), driveKd.get(), driveKs.get(), driveKv.get());
-                setAllModuleSetpointsToSame(
-                    tuningDriveForward ? tuningDriveSpeed.get() : -tuningDriveSpeed.get(),
-                    new Rotation2d());
-                tuningDriveForward = !tuningDriveForward;
-                tuningTimer.start();
-              },
-              driveKp,
-              driveKd,
-              tuningDriveSpeed);
-          if (tuningTimer.hasElapsed(1.0)) {
-            stop();
-            tuningTimer.stop();
-            tuningTimer.reset();
-          }
-        })
-        .beforeStarting(
-            () -> {
-              tuningTimer.reset();
-              tuningTimer.stop();
-            })
-        .finallyDo(
-            () -> {
-              stop();
-              tuningTimer.reset();
-              tuningTimer.stop();
-            })
-        .withName("tuneModuleDrive");
-  }
 
   public Command tuneModuleTurn() {
-    return run(() -> {
-          LoggedTunableNumber.ifChanged(
-              hashCode(),
-              () -> {
-                for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());
-                setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get()));
-                tuningTimer.start();
-              },
-              turnKp,
-              turnKd,
-              tuningTurnDelta);
-          if (tuningTimer.hasElapsed(1.0)) {
-            stop();
-            tuningTimer.reset();
-            tuningTimer.stop();
-          }
-        })
-        .beforeStarting(
+    return Commands.run(
             () -> {
-              tuningTimer.reset();
-              tuningTimer.stop();
-            })
-        .finallyDo(
-            () -> {
-              stop();
-              tuningTimer.reset();
-              tuningTimer.stop();
+              LoggedTunableNumber.ifChanged(
+                  hashCode(),
+                  () -> {
+                    CommandScheduler.getInstance()
+                        .schedule(
+                            startRun(
+                                    () -> {
+                                      for (var module : modules)
+                                        module.setTurnPIDF(turnKp.get(), turnKd.get());
+                                    },
+                                    () ->
+                                        setAllModuleSetpointsToSame(
+                                            0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
+                                .withTimeout(1.0)
+                                .finallyDo(this::stop));
+                  },
+                  turnKp,
+                  turnKd,
+                  tuningTurnDelta);
             })
         .withName("tuneModuleTurn");
   }
