@@ -18,7 +18,7 @@ public interface GroundIO {
 
     default void updateInputs(GroundIOInputs inputs) {}
 
-    default void runIntakeRollers(double percentOutput) {}
+    default void runGroundRollers(double percentOutput) {}
 
     default void setPivotPosition(Angle angle) {}
 
