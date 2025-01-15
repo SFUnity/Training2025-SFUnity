@@ -22,5 +22,7 @@ public interface GroundIO {
 
     default void setPivotPosition(Angle angle) {}
 
+    default void setPID(double p){}
+
     default void stop() {}
 }
