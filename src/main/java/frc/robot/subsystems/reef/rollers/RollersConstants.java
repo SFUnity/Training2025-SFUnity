@@ -13,4 +13,6 @@ public class RollersConstants {
 
   public static final double algaeVelocityThreshold = 0;
   public static final double algaeCurrentThreshold = 0;
+
+  public static final int beamBreakNumber = 0;
 }

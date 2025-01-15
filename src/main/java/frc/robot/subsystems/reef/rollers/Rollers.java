@@ -1,6 +1,7 @@
 package frc.robot.subsystems.reef.rollers;
 
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -9,6 +10,7 @@ public class Rollers extends SubsystemBase {
   private final RollersIOInputsAutoLogged inputs;
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
+  private final DigitalInput beamBreak = new DigitalInput(RollersConstants.beamBreakNumber);
 
   public Rollers(RollersIO io, RollersIOInputsAutoLogged inputs) {
     this.io = io;
@@ -29,11 +31,7 @@ public class Rollers extends SubsystemBase {
   }
 
   public boolean coralHeld() {
-    double filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
-    double filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
-    return (filteredVelocity <= RollersConstants.coralVelocityThreshold
-            && (filteredStatorCurrent >= RollersConstants.coralCurrentThreshold)
-        || filteredStatorCurrent <= -2);
+    return !beamBreak.get();
   }
 
   public boolean algaeHeld() {

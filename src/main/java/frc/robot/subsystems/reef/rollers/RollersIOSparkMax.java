@@ -10,6 +10,7 @@ public class RollersIOSparkMax implements RollersIO {
       new SparkMax(RollersConstants.rollerMotorID, MotorType.kBrushless);
   private final SparkMaxConfig config = new SparkMaxConfig();
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
+  
 
   public RollersIOSparkMax() {}
 

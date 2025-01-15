@@ -25,9 +25,8 @@ public class Elevator extends SubsystemBase {
 
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  public Elevator(ElevatorIO io ) {
+  public Elevator(ElevatorIO io) {
     this.io = io;
-
   }
 
   @Override
