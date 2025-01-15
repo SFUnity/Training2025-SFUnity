@@ -111,8 +111,7 @@ public class ModuleIOSim implements ModuleIO {
   @Override
   public void setDriveVelocity(double velocityRadPerSec) {
     driveClosedLoop = true;
-    driveFFVolts =
-        driveKv * Math.signum(velocityRadPerSec) + driveKv * velocityRadPerSec;
+    driveFFVolts = driveKv * Math.signum(velocityRadPerSec) + driveKv * velocityRadPerSec;
     driveController.setSetpoint(velocityRadPerSec);
   }
 

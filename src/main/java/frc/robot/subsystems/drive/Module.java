@@ -37,7 +37,7 @@ public class Module {
     this.io = io;
     this.index = index;
 
-    setBrakeMode(true);
+    setBrakeMode(false);
 
     driveDisconnectedAlert =
         new Alert(
