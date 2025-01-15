@@ -201,7 +201,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        aprilTagVision1 = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        aprilTagVision2 = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
 
       default:
@@ -215,7 +216,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        aprilTagVision1 = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        aprilTagVision2 = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
     }
 
