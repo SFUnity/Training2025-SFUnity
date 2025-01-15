@@ -584,9 +584,11 @@ public class Drive extends SubsystemBase {
   }
 
   // Tuning Commands
-  // For tuning drive motor PID values use Phoenix Tuner X (and maybe ff also?)
+  // * For tuning drive motor PID values use Phoenix Tuner X (and maybe ff also?)
   private static final LoggedTunableNumber tuningTurnDelta =
       new LoggedTunableNumber("Drive/ModuleTunables/turnDeltaForTuning", 90);
+  private static final LoggedTunableNumber tuningDriveSpeed =
+      new LoggedTunableNumber("Drive/ModuleTunables/tuningDriveSpeed", 3);
 
   public Command tuneModuleTurn() {
     return Commands.run(
@@ -612,6 +614,32 @@ public class Drive extends SubsystemBase {
                   tuningTurnDelta);
             })
         .withName("tuneModuleTurn");
+  }
+
+  public Command tuneModuleDrive() {
+    return Commands.run(
+            () -> {
+              LoggedTunableNumber.ifChanged(
+                  hashCode(),
+                  () -> {
+                    CommandScheduler.getInstance()
+                        .schedule(
+                            startRun(
+                                    () -> {
+                                      for (var module : modules)
+                                        module.setDrivePIDF(driveKp.get(), driveKd.get());
+                                    },
+                                    () ->
+                                        setAllModuleSetpointsToSame(
+                                            tuningDriveSpeed.get(), new Rotation2d()))
+                                .withTimeout(1.0)
+                                .finallyDo(this::stop));
+                  },
+                  driveKp,
+                  driveKd,
+                  tuningDriveSpeed);
+            })
+        .withName("tuneModuleDrive");
   }
 
   // Autos

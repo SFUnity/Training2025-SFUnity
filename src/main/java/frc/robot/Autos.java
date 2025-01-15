@@ -1,13 +1,13 @@
 package frc.robot;
 
-import static frc.robot.subsystems.drive.DriveConstants.*;
-
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constantsGlobal.Constants;
+import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
@@ -59,6 +59,10 @@ public class Autos {
       // SysID & non-choreo routines
       if (!isChoreoAuto) {
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
+        if (Constants.currentMode == Mode.SIM) {
+          // Use Phoenix Tuner for real robot
+          nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
+        }
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
