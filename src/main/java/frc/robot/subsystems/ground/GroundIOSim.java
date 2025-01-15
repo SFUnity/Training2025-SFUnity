@@ -2,6 +2,7 @@ package frc.robot.subsystems.ground;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class GroundIOSim implements GroundIO {
@@ -17,5 +18,39 @@ public class GroundIOSim implements GroundIO {
             false, 
             0, 
             null);
+    
+    private final PIDController controller;
+    private double pivotAppliedVolts = 0.0;
+    private double rollersAppliedVolts = 0.0;
+
+    public GroundIOSim() {
+        controller = new PIDController(0.0,0.0,0.0);
+        sim.setState(0.0,0.0);
+    }
+    
+    @Override
+    public void updateInputs(GroundIOInputs inputs) {}
+
+    @Override
+    public void runGroundRollers(double percentOutput) {
+        rollersAppliedVolts = 12 * percentOutput;
+    }
+
+    @Override
+    public void setPivotPosition(Angle angle) {
+        /** INCOMPLETE */
+        sim.setInputVoltage(pivotAppliedVolts);
+    }
+
+    @Override
+    public void setPID(double p) {
+        controller.setPID(p, 0, 0);
+    }
+
+    @Override
+    public void stop() {
+        pivotAppliedVolts = 0.0;
+        sim.setInputVoltage(pivotAppliedVolts);
+    }
 }
  
