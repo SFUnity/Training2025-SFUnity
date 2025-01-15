@@ -19,7 +19,9 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private double deltaPosition = 0;
   private double deltaTime = 0;
 
-  public ElevatorIOSparkMax() {}
+  public ElevatorIOSparkMax() {
+    
+  }
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {

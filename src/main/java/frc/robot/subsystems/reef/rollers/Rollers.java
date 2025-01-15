@@ -7,14 +7,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Rollers extends SubsystemBase {
   private final RollersIO io;
-  private final RollersIOInputsAutoLogged inputs;
+  private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
   private final DigitalInput beamBreak = new DigitalInput(RollersConstants.beamBreakNumber);
 
-  public Rollers(RollersIO io, RollersIOInputsAutoLogged inputs) {
+  public Rollers(RollersIO io) {
     this.io = io;
-    this.inputs = inputs;
   }
 
   @Override

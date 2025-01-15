@@ -34,6 +34,15 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.reef.Reef;
+import frc.robot.subsystems.reef.elevator.Elevator;
+import frc.robot.subsystems.reef.elevator.ElevatorIO;
+import frc.robot.subsystems.reef.elevator.ElevatorIOSim;
+import frc.robot.subsystems.reef.elevator.ElevatorIOSparkMax;
+import frc.robot.subsystems.reef.rollers.Rollers;
+import frc.robot.subsystems.reef.rollers.RollersIO;
+import frc.robot.subsystems.reef.rollers.RollersIOSim;
+import frc.robot.subsystems.reef.rollers.RollersIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -75,7 +84,7 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
-
+  private final Reef reef;
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
   private final Autos autos;
@@ -171,6 +180,9 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
+        reef = 
+          new Reef(new Rollers(new RollersIOSparkMax()),  
+          new Elevator(new ElevatorIOSparkMax()));
         break;
 
       case SIM:
@@ -184,6 +196,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
+        reef = 
+                new Reef(new Rollers(new RollersIOSim()), new Elevator(new ElevatorIOSparkMax()));
         break;
 
       default:
@@ -197,6 +211,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
+        reef = 
+                new Reef(new Rollers(new RollersIO() {}), new Elevator(new ElevatorIO(){}));
         break;
     }
 
