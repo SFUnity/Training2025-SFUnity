@@ -6,6 +6,7 @@ import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
@@ -78,6 +79,15 @@ public class Autos {
   }
 
   // Routines
+public Command pickupAndScoreAuto() {
+    return Commands.sequence(
+        factory.resetOdometry("CenterWallToLK"), //   
+        // 
+        factory.trajectoryCmd("")
+        factory.trajectoryCmd("KLtoStationHigh")
+        //
 
+    );
+}
   // Commands
 }
