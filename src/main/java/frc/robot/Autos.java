@@ -2,6 +2,8 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -51,6 +53,7 @@ public class Autos {
 
     // Add choreo auto options
     // chooser.addAutoRoutine("name of routine", this::nameOfRoutineMethod);
+    
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
@@ -79,15 +82,41 @@ public class Autos {
   }
 
   // Routines
-public Command pickupAndScoreAuto() {
+public Command CenterWallLKAlgaeL1() {
     return Commands.sequence(
         factory.resetOdometry("CenterWallToLK"), //   
-        // 
-        factory.trajectoryCmd("")
-        factory.trajectoryCmd("KLtoStationHigh")
-        //
-
+        // PICK UP ALGAE AND SCORE CORAL
+        factory.trajectoryCmd("KLEject"), // GET RID OF ALGAE
+        factory.trajectoryCmd("KLtoStationHigh"), // GO TO CORAL PICKUP
+        //PICK UP CORAL
+         factory.trajectoryCmd("StationHighToKLL2") // GO TO CORAL
+         //PLACE CORAL
     );
 }
+public AutoRoutine pickupAndScoreAuto() {
+
+  // Options: .done() = when routine is done, AtTime("x") = run cmd on eventMarker, .active().whileTrue() = when traj is active
+
+    AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
+
+    // Load the routine's trajectories
+    AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
+    AutoTrajectory lKToStationHigh = routine.trajectory("KLtoStationHigh");
+     AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL1");
+
+    // When the routine begins, reset odometry and start the first trajectory 
+    routine.active().onTrue(
+        Commands.sequence(
+            centerToLK.resetOdometry(),
+            centerToLK.cmd()
+        )
+    );
+    centerToLK.done().onTrue(lKToStationHigh.cmd());
+    lKToStationHigh.done().onTrue(stationHighToLKL2.cmd());
+
+    return routine;
+    
+}
+
   // Commands
 }
