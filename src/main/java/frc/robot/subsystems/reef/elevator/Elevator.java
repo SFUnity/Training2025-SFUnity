@@ -13,13 +13,14 @@ public class Elevator extends SubsystemBase {
   private final ElevatorVisualizer elevatorVisualizer = new ElevatorVisualizer("elevator");
   private final ProfiledPIDController pid =
       new ProfiledPIDController(
-          ElevatorConstants.kP,
-          ElevatorConstants.kI,
-          ElevatorConstants.kD,
+          ElevatorConstants.kP.get(),
+          ElevatorConstants.kI.get(),
+          ElevatorConstants.kD.get(),
           new TrapezoidProfile.Constraints(
               ElevatorConstants.maxElevatorSpeed, ElevatorConstants.maxElevatorAcceleration));
   private final ElevatorFeedforward ffController =
-      new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
+      new ElevatorFeedforward(
+          ElevatorConstants.kS.get(), ElevatorConstants.kG.get(), ElevatorConstants.kV.get());
 
   private final ElevatorIO io;
 
