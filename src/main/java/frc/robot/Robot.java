@@ -185,9 +185,9 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         aprilTagVision1 =
-            new AprilTagVision(new AprilTagVisionIOLimelight(limelight1Name, limelight1Position), poseManager);
+            new AprilTagVision(new AprilTagVisionIOLimelight(reefName, reefPosition), poseManager);
         aprilTagVision2 =
-            new AprilTagVision(new AprilTagVisionIOLimelight(limelight2Name, limelight2Position), poseManager);
+            new AprilTagVision(new AprilTagVisionIOLimelight(sourceName, sourcePosition), poseManager);
         break;
 
       case SIM:
