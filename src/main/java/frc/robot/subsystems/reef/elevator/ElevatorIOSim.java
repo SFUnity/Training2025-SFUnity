@@ -14,8 +14,8 @@ public class ElevatorIOSim implements ElevatorIO {
       new ElevatorSim(
           DCMotor.getNEO(1),
           1,
-          ElevatorConstants.drumRadius,
           ElevatorConstants.carrageMass,
+          ElevatorConstants.drumRadius,
           ElevatorConstants.minHeight,
           ElevatorConstants.maxHeight,
           true,

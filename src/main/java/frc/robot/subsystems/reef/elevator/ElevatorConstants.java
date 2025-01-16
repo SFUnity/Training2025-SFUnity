@@ -25,12 +25,12 @@ public class ElevatorConstants {
   public static final double desiredHeightBottom = 0;
 
   public static final double carrageMass = 1;
-  public static final double drumRadius = 0;
+  public static final double drumRadius = 1;
   public static final double minHeight = 0;
   public static final double maxHeight = 2;
 
   public static final double gearRatio = 0;
-  public static final double wheelRadius = 0;
+  public static final double wheelRadius = 1;
 
   public static final double elevatorMinLength = 0;
 
