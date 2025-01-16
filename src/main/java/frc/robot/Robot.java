@@ -180,9 +180,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        reef = 
-          new Reef(new Rollers(new RollersIOSparkMax()),  
-          new Elevator(new ElevatorIOSparkMax()));
+        reef =
+            new Reef(new Rollers(new RollersIOSparkMax()), new Elevator(new ElevatorIOSparkMax()));
         break;
 
       case SIM:
@@ -196,8 +195,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        reef = 
-                new Reef(new Rollers(new RollersIOSim()), new Elevator(new ElevatorIOSparkMax()));
+        reef = new Reef(new Rollers(new RollersIOSim()), new Elevator(new ElevatorIOSim()));
         break;
 
       default:
@@ -211,8 +209,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        reef = 
-                new Reef(new Rollers(new RollersIO() {}), new Elevator(new ElevatorIO(){}));
+        reef = new Reef(new Rollers(new RollersIO() {}), new Elevator(new ElevatorIO() {}));
         break;
     }
 
@@ -258,6 +255,8 @@ public class Robot extends LoggedRobot {
     driver.leftBumper().onTrue(Commands.runOnce(() -> slowMode = !slowMode, drive));
 
     // Operator controls
+    driver.a().onTrue(reef.setCoralIntake());
+    operator.y().onTrue(reef.setScoreL1());
   }
 
   /** This function is called periodically during all modes. */

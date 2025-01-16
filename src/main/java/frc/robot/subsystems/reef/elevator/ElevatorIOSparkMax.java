@@ -7,30 +7,27 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.units.*;
-import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
 
   private final RelativeEncoder encoder = elevatorMotor.getEncoder();
-  private Distance prevoiusPosition;
-  private long prevoiusTime;
-  private long currentTime;
+  private double prevoiusPosition = 0;
+  private long prevoiusTime = 0;
+  private long currentTime = 0;
   private double deltaPosition = 0;
   private double deltaTime = 0;
 
-  public ElevatorIOSparkMax() {
-    
-  }
+  public ElevatorIOSparkMax() {}
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     prevoiusTime = currentTime;
     currentTime = System.nanoTime();
 
-    prevoiusPosition = inputs.position;
+    prevoiusPosition = inputs.position.in(Meters);
     inputs.position = Meters.of(encoder.getPosition());
-    deltaPosition = inputs.position.in(Meters) - prevoiusPosition.in(Meters);
+    deltaPosition = inputs.position.in(Meters) - prevoiusPosition;
     deltaTime = (currentTime - prevoiusTime) / 1e9;
     inputs.velocityMetersPerSec = deltaPosition / deltaTime;
 

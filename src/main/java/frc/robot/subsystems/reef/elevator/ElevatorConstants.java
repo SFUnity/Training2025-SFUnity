@@ -15,13 +15,13 @@ public class ElevatorConstants {
   public static final double kI = 0;
   public static final double kD = 0;
 
-  public static final double desiredHeightL1 = 1;
-  public static final double desiredHeightL2 = 0;
-  public static final double desiredHeightL3 = 0;
-  public static final double desiredHeightHighAlgae = 0;
-  public static final double desiredHeightLowAlgae = 0;
+  public static final double desiredHeightL1 = 0.5;
+  public static final double desiredHeightL2 = 1.5;
+  public static final double desiredHeightL3 = 2;
+  public static final double desiredHeightHighAlgae = 1;
+  public static final double desiredHeightLowAlgae = 1.75;
   public static final double desiredHeightProcessor = 0;
-  public static final double desiredHeightSource = 0;
+  public static final double desiredHeightSource = 2;
   public static final double desiredHeightBottom = 0;
 
   public static final double carrageMass = 1;

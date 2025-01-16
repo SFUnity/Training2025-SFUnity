@@ -7,9 +7,10 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.Util;
+import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
+  private final ElevatorVisualizer elevatorVisualizer = new ElevatorVisualizer("elevator");
   private final ProfiledPIDController pid =
       new ProfiledPIDController(
           ElevatorConstants.kP,
@@ -19,7 +20,6 @@ public class Elevator extends SubsystemBase {
               ElevatorConstants.maxElevatorSpeed, ElevatorConstants.maxElevatorAcceleration));
   private final ElevatorFeedforward ffController =
       new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
-  ;
 
   private final ElevatorIO io;
 
@@ -32,6 +32,8 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs("elevator", inputs);
+    elevatorVisualizer.update(inputs.position.in(Meters));
   }
 
   public void calculateDesiredPosition(double desiredPosition) {
@@ -49,11 +51,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean atDesiredHeight(double desiredHeight) {
-    if (!Util.equalsWithTolerance(inputs.position.in(Meters), desiredHeight, 0.15)) {
-      return true;
-    } else {
-      return false;
-    }
+    // if (!Util.equalsWithTolerance(inputs.position.in(Meters), desiredHeight, 0.15)) {
+    //  return true;
+    // } else {
+    //  return false;
+    // }
+    return false;
   }
 
   public Command l1() {
