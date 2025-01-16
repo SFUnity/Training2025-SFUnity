@@ -6,7 +6,8 @@ import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.constantsGlobal.Constants;
+import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
@@ -22,7 +23,7 @@ public class Autos {
 
   private final LoggedDashboardChooser<Command> nonChoreoChooser =
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
-  private static final boolean isChoreoAuto = true;
+  private static final boolean isChoreoAuto = false;
 
   public Autos(Drive drive, PoseManager poseManager) {
     this.drive = drive;
@@ -57,20 +58,17 @@ public class Autos {
 
       // SysID & non-choreo routines
       if (!isChoreoAuto) {
-        nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
+        if (Constants.currentMode == Mode.SIM) {
+          // Use Phoenix Tuner for real robot
+          nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
+        }
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
-            "Drive SysId (Quasistatic Forward)",
-            drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+            "Drive Wheel Radius Characterization", drive.wheelRadiusCharacterization());
         nonChoreoChooser.addOption(
-            "Drive SysId (Quasistatic Reverse)",
-            drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        nonChoreoChooser.addOption(
-            "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        nonChoreoChooser.addOption(
-            "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+            "Drive Simple FF Characterization", drive.feedforwardCharacterization());
       }
     }
   }

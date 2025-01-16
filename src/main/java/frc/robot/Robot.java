@@ -303,8 +303,8 @@ public class Robot extends LoggedRobot {
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
-    return !DriverStation.isJoystickConnected(controller.getHID().getPort())
-        || !DriverStation.getJoystickIsXbox(
+    return controller.isConnected()
+        && DriverStation.getJoystickIsXbox(
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
