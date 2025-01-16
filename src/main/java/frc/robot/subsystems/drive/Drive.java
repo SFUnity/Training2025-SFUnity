@@ -583,6 +583,49 @@ public class Drive extends SubsystemBase {
         Units.degreesToRadians(thetaToleranceDeg.get()));
   }
 
+  // Autos
+  public void followTrajectory(SwerveSample sample) {
+    updateAutoTunables();
+    Pose2d pose = poseManager.getPose();
+
+    double xFF = sample.vx;
+    double yFF = sample.vy;
+    double rotationFF = sample.omega;
+
+    double xFeedback = xAutoController.calculate(pose.getX(), sample.x);
+    double yFeedback = yAutoController.calculate(pose.getY(), sample.y);
+    double rotationFeedback =
+        headingAutoController.calculate(pose.getRotation().getRadians(), sample.heading);
+
+    ChassisSpeeds out =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, pose.getRotation());
+
+    Logger.recordOutput(
+        "Drive/Choreo/Target Pose", new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
+    Logger.recordOutput("Drive/Choreo/Target Speeds", out);
+
+    runVelocity(out);
+  }
+
+  private void updateAutoTunables() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> xAutoController.setPID(xkPAuto.get(), 0, xkDAuto.get()),
+        xkPAuto,
+        xkDAuto);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> yAutoController.setPID(ykPAuto.get(), 0, ykDAuto.get()),
+        ykPAuto,
+        ykDAuto);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> headingAutoController.setPID(rkPAuto.get(), 0, rkDAuto.get()),
+        rkPAuto,
+        rkDAuto);
+  }
+
   // Tuning Commands
   // * For tuning drive motor PID values use Phoenix Tuner X (and maybe ff also?)
   private static final LoggedTunableNumber tuningTurnDelta =
@@ -640,49 +683,6 @@ public class Drive extends SubsystemBase {
                   tuningDriveSpeed);
             })
         .withName("tuneModuleDrive");
-  }
-
-  // Autos
-  public void followTrajectory(SwerveSample sample) {
-    updateAutoTunables();
-    Pose2d pose = poseManager.getPose();
-
-    double xFF = sample.vx;
-    double yFF = sample.vy;
-    double rotationFF = sample.omega;
-
-    double xFeedback = xAutoController.calculate(pose.getX(), sample.x);
-    double yFeedback = yAutoController.calculate(pose.getY(), sample.y);
-    double rotationFeedback =
-        headingAutoController.calculate(pose.getRotation().getRadians(), sample.heading);
-
-    ChassisSpeeds out =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, pose.getRotation());
-
-    Logger.recordOutput(
-        "Drive/Choreo/Target Pose", new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
-    Logger.recordOutput("Drive/Choreo/Target Speeds", out);
-
-    runVelocity(out);
-  }
-
-  private void updateAutoTunables() {
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> xAutoController.setPID(xkPAuto.get(), 0, xkDAuto.get()),
-        xkPAuto,
-        xkDAuto);
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> yAutoController.setPID(ykPAuto.get(), 0, ykDAuto.get()),
-        ykPAuto,
-        ykDAuto);
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> headingAutoController.setPID(rkPAuto.get(), 0, rkDAuto.get()),
-        rkPAuto,
-        rkDAuto);
   }
 
   private static final double FF_START_DELAY = 2.0; // Secs
