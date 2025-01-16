@@ -13,10 +13,10 @@
 
 package frc.robot;
 
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight1Name;
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight1Position;
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight2Name;
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.limelight2Position;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.reefName;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.reefPosition;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.sourceName;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.sourcePosition;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
