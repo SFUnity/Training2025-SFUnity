@@ -174,8 +174,8 @@ public class Drive extends SubsystemBase {
       }
 
       // Log empty setpoint states when disabled
-      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+      Logger.recordOutput("Drive/SwerveStates/Setpoints", new SwerveModuleState[] {});
+      Logger.recordOutput("Drive/SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
     // Update odometry
@@ -230,7 +230,7 @@ public class Drive extends SubsystemBase {
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     setModuleSetpoints(setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+    Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", discreteSpeeds);
   }
 
   private void setAllModuleSetpointsToSame(double speed, Rotation2d angle) {
@@ -239,14 +239,14 @@ public class Drive extends SubsystemBase {
       moduleStates[i] = new SwerveModuleState(speed, angle);
     }
     setModuleSetpoints(moduleStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", new ChassisSpeeds());
+    Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", new ChassisSpeeds());
   }
 
   private void setModuleSetpoints(SwerveModuleState[] setpointStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
 
     // Log unoptimized setpoints and setpoint speeds
-    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -254,7 +254,7 @@ public class Drive extends SubsystemBase {
     }
 
     // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/SetpointsOptimized", setpointStates);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -283,7 +283,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
-  @AutoLogOutput(key = "SwerveStates/Measured")
+  @AutoLogOutput(key = "Drive/SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
@@ -293,7 +293,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the measured chassis speeds of the robot. */
-  @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
+  @AutoLogOutput(key = "Drive/SwerveChassisSpeeds/Measured")
   private ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
@@ -455,7 +455,7 @@ public class Drive extends SubsystemBase {
                   thetaVelocity,
                   poseManager.getRotation()));
 
-          Logger.recordOutput("Drive/Commands/Linear/currentDistance", currentDistance);
+          Logger.recordOutput("Drive/Commands/CurrentDistance", currentDistance);
         })
         .beforeStarting(
             () -> {
@@ -511,7 +511,7 @@ public class Drive extends SubsystemBase {
         thetaController.calculate(
             poseManager.getPose().getRotation().getRadians(), goalHeadingRads);
 
-    Logger.recordOutput("Drive/Commands/Theta/HeadingError", thetaController.getPositionError());
+    Logger.recordOutput("Drive/Commands/HeadingError", thetaController.getPositionError());
     return output;
   }
 
@@ -569,13 +569,13 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns true if within tolerance of aiming at goal */
-  @AutoLogOutput(key = "Drive/Commands/Linear/AtGoal")
+  @AutoLogOutput(key = "Drive/Commands/LinearAtGoal")
   public boolean linearAtGoal() {
     return linearController.atGoal();
   }
 
   /** Returns true if within tolerance of aiming at speaker */
-  @AutoLogOutput(key = "Drive/Commands/Theta/AtGoal")
+  @AutoLogOutput(key = "Drive/Commands/ThetaAtGoal")
   public boolean thetaAtGoal() {
     return Util.equalsWithTolerance(
         thetaController.getSetpoint().position,
