@@ -94,6 +94,7 @@ public class Autos {
     return isChoreoAuto ? chooser.selectedCommandScheduler() : nonChoreoChooser.get();
   }
 
+
   // Routines
 public Command CenterWallLKAlgaeL1() {
     return Commands.sequence(
@@ -106,12 +107,30 @@ public Command CenterWallLKAlgaeL1() {
          //PLACE CORAL
     );
 }
-public AutoRoutine SpamLsAuto() {
 
-  // Options: .done() = when routine is done, AtTime("x") = run cmd on eventMarker, 
+
+
+public Command score(){
+  return Commands.sequence(
+    Commands.print("scoring")
+  );
+}
+public Command intake(){
+  return Commands.sequence(
+    Commands.print("intake coral")
+  );
+}
+public Command RemoveAlgae(){
+  return Commands.sequence(
+    Commands.print("removing Algae")
+  );
+}
+
+ // Options: .done() = when routine is done, AtTime("x") = run cmd on eventMarker, 
   //.active().whileTrue() =  Trigger while the trajectory is still running.
 
   //Triggers can be combined using logical conditions for branching autos:
+public AutoRoutine SpamLsAuto() {
 
   AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
 
@@ -123,21 +142,25 @@ public AutoRoutine SpamLsAuto() {
     // When the routine begins, reset odometry and start the first trajectory 
       routine.active().onTrue(
         Commands.sequence(
-            Commands.print("Started CenterWallLKAlgaeL1 Auto!"),
+            centerToLK.cmd().beforeStarting(Commands.print("moving to LK")),
             centerToLK.resetOdometry(),
             centerToLK.cmd()   // start traj
         )
     );
-
-    centerToLK.done().onTrue(
-    Commands.sequence(
-        Commands.print("Arrived at LK, moving to Station High"),
-        lKToStationHigh.cmd()
+    
+    centerToLK.done().onTrue(                                                   // WHEN WE FINISH LAST PATH
+    Commands.sequence(                                                          // RUN THESE COMMANDS IN SEQUENTIAL ORDER
+        RemoveAlgae().beforeStarting(Commands.print("removing Algae")), // BEFORE REMOVING THE ALGAE PRINT MSG
+        RemoveAlgae(),                                                          // RUN REMOVE ALGAE CMD
+        score().beforeStarting(Commands.print("scoring")),              // BEFORE SCORING CORAL PRINT MSG
+        score(),                                                                // SCORE CORAL
+        lKToStationHigh.cmd()                                                   // START NEXT PATH
      )
 );
     lKToStationHigh.done().onTrue(
     Commands.sequence(
-      Commands.print("Arrived at Station High, moving to LK L2"),
+      intake(),
+      stationHighToLKL2.cmd().beforeStarting(Commands.print("Arrived at Station High, moving to LK")),
       stationHighToLKL2.cmd()
   )
 );
