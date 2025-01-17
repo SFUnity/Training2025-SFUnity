@@ -7,8 +7,11 @@ import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
@@ -49,10 +52,20 @@ public class Autos {
                   traj.getInitialPose(AllianceFlipUtil.shouldFlip()).get());
             });
 
-    chooser = new AutoChooser();
 
-    // Add choreo auto options
-    // chooser.addAutoRoutine("name of routine", this::nameOfRoutineMethod);
+    //TODO:
+    //factory
+    //.bind("scoreCoral", SCORECMD())
+    //.bind("RemoveAlgae", RemoveAlageCMD())
+
+    chooser = new AutoChooser();
+        // autoChooser.addCmd("Example Auto Command", this::exampleAutoCommand);
+
+        // Put the auto chooser on the dashboard
+       // SmartDashboard.putData(autoChooser);
+
+        // Schedule the selected auto during the autonomous period
+        //RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
     
 
     if (!DriverStation.isFMSAttached()) {
@@ -93,29 +106,42 @@ public Command CenterWallLKAlgaeL1() {
          //PLACE CORAL
     );
 }
-public AutoRoutine pickupAndScoreAuto() {
+public AutoRoutine SpamLsAuto() {
 
-  // Options: .done() = when routine is done, AtTime("x") = run cmd on eventMarker, .active().whileTrue() = when traj is active
+  // Options: .done() = when routine is done, AtTime("x") = run cmd on eventMarker, 
+  //.active().whileTrue() =  Trigger while the trajectory is still running.
 
-    AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
+  //Triggers can be combined using logical conditions for branching autos:
 
-    // Load the routine's trajectories
-    AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
-    AutoTrajectory lKToStationHigh = routine.trajectory("KLtoStationHigh");
-     AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL1");
+  AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
+
+  // Load the routine's trajectories
+  AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
+  AutoTrajectory lKToStationHigh = routine.trajectory("KLtoStationHigh");
+  AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL1");
 
     // When the routine begins, reset odometry and start the first trajectory 
-    routine.active().onTrue(
+      routine.active().onTrue(
         Commands.sequence(
+            Commands.print("Started CenterWallLKAlgaeL1 Auto!"),
             centerToLK.resetOdometry(),
-            centerToLK.cmd()
+            centerToLK.cmd()   // start traj
         )
     );
-    centerToLK.done().onTrue(lKToStationHigh.cmd());
-    lKToStationHigh.done().onTrue(stationHighToLKL2.cmd());
 
+    centerToLK.done().onTrue(
+    Commands.sequence(
+        Commands.print("Arrived at LK, moving to Station High"),
+        lKToStationHigh.cmd()
+     )
+);
+    lKToStationHigh.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Station High, moving to LK L2"),
+      stationHighToLKL2.cmd()
+  )
+);
     return routine;
-    
 }
 
   // Commands
