@@ -222,28 +222,6 @@ public class Robot extends LoggedRobot {
     }
   }
 
-  // Consider moving to its own file if/when it gets big
-  /** Use this method to define your button->command mappings. */
-  private void configureButtonBindings() {
-    // Default cmds
-    drive.setDefaultCommand(drive.joystickDrive());
-
-    // Driver controls
-    driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    driver
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        poseManager.setPose(
-                            new Pose2d(poseManager.getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
-    driver.leftBumper().onTrue(Commands.runOnce(() -> slowMode = !slowMode, drive));
-
-    // Operator controls
-  }
-
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
@@ -291,6 +269,28 @@ public class Robot extends LoggedRobot {
     return controller.isConnected()
         && DriverStation.getJoystickIsXbox(
             controller.getHID().getPort()); // Should be an XBox controller
+  }
+  
+  // Consider moving to its own file if/when it gets big
+  /** Use this method to define your button->command mappings. */
+  private void configureButtonBindings() {
+    // Default cmds
+    drive.setDefaultCommand(drive.joystickDrive());
+
+    // Driver controls
+    driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        poseManager.setPose(
+                            new Pose2d(poseManager.getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
+    driver.leftBumper().onTrue(Commands.runOnce(() -> slowMode = !slowMode, drive));
+
+    // Operator controls
   }
 
   /** This function is called once when the robot is disabled. */
