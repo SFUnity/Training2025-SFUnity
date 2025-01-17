@@ -6,8 +6,8 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorConstants {
   public static final int elevatorMotorID = 0;
-  public static final double maxElevatorSpeed = 0.5;
-  public static final double maxElevatorAcceleration = .5;
+  public static final double maxElevatorSpeed = 5;
+  public static final double maxElevatorAcceleration = 5;
 
   public static final double desiredHeightL1 = 0.5;
   public static final double desiredHeightL2 = 1.5;
@@ -18,10 +18,10 @@ public class ElevatorConstants {
   public static final double desiredHeightSource = 2;
   public static final double desiredHeightBottom = 0;
 
-  public static final double carrageMass = 1;
-  public static final double drumRadius = 1;
+  public static final double carrageMass = 9;
+  public static final double drumRadius = 0.4;
   public static final double minHeight = 0;
-  public static final double maxHeight = 2;
+  public static final double maxHeight = 5;
 
   public static final double gearRatio = 0;
   public static final double wheelRadius = 1;
@@ -33,9 +33,9 @@ public class ElevatorConstants {
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kI;
   public static final LoggedTunableNumber kD;
-  public static final double kS = 0;
-  public static final double kG = 2.28;
-  public static final double kV = 3.07;
+  public static final LoggedTunableNumber kS;
+  public static final LoggedTunableNumber kG;
+  public static final LoggedTunableNumber kV;
 
   static {
     switch (Constants.currentMode) {
@@ -43,12 +43,17 @@ public class ElevatorConstants {
         kP = new LoggedTunableNumber("Reef/Elevator/kP", 0.0);
         kI = new LoggedTunableNumber("Reef/Elevator/kI", 0.0);
         kD = new LoggedTunableNumber("Reef/Elevator/kD", 0.0);
-
+        kS = new LoggedTunableNumber("Reef/Elevator/kS", 0.0);
+        kG = new LoggedTunableNumber("Reef/Elevator/kG", 2.8);
+        kV = new LoggedTunableNumber("Reef/Elevator/kV", 3.07);
         break;
       case SIM:
         kP = new LoggedTunableNumber("Reef/Elevator/kP", 0.0);
         kI = new LoggedTunableNumber("Reef/Elevator/kI", 0.0);
         kD = new LoggedTunableNumber("Reef/Elevator/kD", 0.0);
+        kS = new LoggedTunableNumber("Reef/Elevator/kS", 0.0);
+        kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.0);
+        kV = new LoggedTunableNumber("Reef/Elevator/kV", 3.07);
 
         break;
     }

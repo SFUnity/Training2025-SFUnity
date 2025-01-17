@@ -20,7 +20,8 @@ public class Elevator extends SubsystemBase {
           new TrapezoidProfile.Constraints(
               ElevatorConstants.maxElevatorSpeed, ElevatorConstants.maxElevatorAcceleration));
   private final ElevatorFeedforward ffController =
-      new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
+      new ElevatorFeedforward(
+          ElevatorConstants.kS.get(), ElevatorConstants.kG.get(), ElevatorConstants.kV.get());
 
   private final ElevatorIO io;
 
@@ -37,7 +38,7 @@ public class Elevator extends SubsystemBase {
     elevatorVisualizer.update(inputs.position.in(Meters));
     updateTunables();
   }
- 
+
   private void updateTunables() {
     LoggedTunableNumber.ifChanged(
         hashCode(),
@@ -55,7 +56,7 @@ public class Elevator extends SubsystemBase {
   public void runElevator() {
     io.runVolts(
         pid.calculate(inputs.position.in(Meters), pid.getGoal())
-            + ffController.calculate(inputs.velocityMetersPerSec));
+            + ffController.calculate(pid.getSetpoint().velocity));
   }
 
   public void stop() {

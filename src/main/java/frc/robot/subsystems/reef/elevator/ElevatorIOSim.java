@@ -13,7 +13,7 @@ public class ElevatorIOSim implements ElevatorIO {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(1),
-          1,
+          5,
           ElevatorConstants.carrageMass,
           ElevatorConstants.drumRadius,
           ElevatorConstants.minHeight,
@@ -28,6 +28,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
+    sim.update(0.02);
     inputs.position = Meters.of(sim.getPositionMeters());
     inputs.velocityMetersPerSec = sim.getVelocityMetersPerSecond();
     inputs.appliedVolts = appliedVolts;
