@@ -7,6 +7,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -19,8 +20,7 @@ public class Elevator extends SubsystemBase {
           new TrapezoidProfile.Constraints(
               ElevatorConstants.maxElevatorSpeed, ElevatorConstants.maxElevatorAcceleration));
   private final ElevatorFeedforward ffController =
-      new ElevatorFeedforward(
-          ElevatorConstants.kS.get(), ElevatorConstants.kG.get(), ElevatorConstants.kV.get());
+      new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
 
   private final ElevatorIO io;
 
@@ -35,6 +35,17 @@ public class Elevator extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("elevator", inputs);
     elevatorVisualizer.update(inputs.position.in(Meters));
+    updateTunables();
+  }
+ 
+  private void updateTunables() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () ->
+            pid.setPID(
+                ElevatorConstants.kP.get(), ElevatorConstants.kI.get(), ElevatorConstants.kD.get()),
+        ElevatorConstants.kP,
+        ElevatorConstants.kD);
   }
 
   public void calculateDesiredPosition(double desiredPosition) {
@@ -43,7 +54,7 @@ public class Elevator extends SubsystemBase {
 
   public void runElevator() {
     io.runVolts(
-        pid.calculate(inputs.position.in(Meters))
+        pid.calculate(inputs.position.in(Meters), pid.getGoal())
             + ffController.calculate(inputs.velocityMetersPerSec));
   }
 
