@@ -36,6 +36,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -295,7 +296,10 @@ public class Robot extends LoggedRobot {
     driver
         .b()
         .whileTrue(
-            drive.fullAutoDrive(() -> AllianceFlipUtil.apply(FieldConstants.Processor.centerFace)));
+            drive.fullAutoDrive(
+                () ->
+                    AllianceFlipUtil.apply(FieldConstants.Processor.centerFace)
+                        .transformBy(GeomUtil.toTransform2d(.75 / 2, 0))));
     driver
         .y()
         .whileTrue(
