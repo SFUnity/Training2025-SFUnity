@@ -453,9 +453,7 @@ public class Drive extends SubsystemBase {
                   driveVelocity.getX(),
                   driveVelocity.getY(),
                   thetaVelocity,
-                  AllianceFlipUtil.shouldFlip()
-                      ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
-                      : poseManager.getRotation()));
+                  poseManager.getRotation().plus(new Rotation2d(Math.PI))));
 
           Logger.recordOutput("Drive/Commands/CurrentDistance", currentDistance);
         })
