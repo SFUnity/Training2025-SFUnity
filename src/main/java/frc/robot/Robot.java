@@ -298,8 +298,7 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             drive.fullAutoDrive(
                 () ->
-                    AllianceFlipUtil.apply(FieldConstants.Processor.centerFace)
-                        .transformBy(GeomUtil.toTransform2d(.75 / 2, 0))));
+                    AllianceFlipUtil.apply(FieldConstants.processorScore)));
     driver
         .y()
         .whileTrue(

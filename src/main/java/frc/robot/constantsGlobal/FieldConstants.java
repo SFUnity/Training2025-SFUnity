@@ -24,10 +24,8 @@ public class FieldConstants {
   public static final double startingLineX =
       Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
-  public static class Processor {
-    public static final Pose2d centerFace =
-        new Pose2d(Units.inchesToMeters(235.726), 0, Rotation2d.fromDegrees(90));
-  }
+  public static final Pose2d processorScore =
+      new Pose2d(Units.inchesToMeters(235.726), .75 / 2, Rotation2d.fromDegrees(90));
 
   public static class Barge {
     public static final Translation2d farCage =
