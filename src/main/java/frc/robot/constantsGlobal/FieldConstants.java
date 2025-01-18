@@ -139,6 +139,9 @@ public class FieldConstants {
                       Units.degreesToRadians(level.pitch),
                       poseDirection.getRotation().getRadians())));
         }
+        while (branchPositions.size() <= (face * 2) + 2) {
+          branchPositions.add(null); // Add null elements to reach the required size
+        }
         branchPositions.add((face * 2) + 1, fillRight);
         branchPositions.add((face * 2) + 2, fillLeft);
       }
