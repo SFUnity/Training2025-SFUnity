@@ -9,16 +9,12 @@ package frc.robot.constantsGlobal;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Contains various field dimensions and useful reference points. All units are in meters and poses
  * have a blue alliance origin.
  */
-public class FieldConstants {
+public final class FieldConstants {
   public static final double fieldLength = Units.inchesToMeters(690.876);
   public static final double fieldWidth = Units.inchesToMeters(317);
   public static final double startingLineX =
@@ -63,124 +59,160 @@ public class FieldConstants {
         new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
   }
 
-  public static class Reef {
-    public static final Translation2d center =
-        new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
-    public static final double faceToZoneLine =
-        Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
+  public static enum Face {
+    One(
+        new Pose2d(
+            Units.inchesToMeters(144.003),
+            Units.inchesToMeters(158.500),
+            Rotation2d.fromDegrees(180))),
+    Two(
+        new Pose2d(
+            Units.inchesToMeters(160.373),
+            Units.inchesToMeters(186.857),
+            Rotation2d.fromDegrees(120))),
+    Three(
+        new Pose2d(
+            Units.inchesToMeters(193.116),
+            Units.inchesToMeters(186.858),
+            Rotation2d.fromDegrees(60))),
+    Four(
+        new Pose2d(
+            Units.inchesToMeters(209.489),
+            Units.inchesToMeters(158.502),
+            Rotation2d.fromDegrees(0))),
+    Five(
+        new Pose2d(
+            Units.inchesToMeters(193.118),
+            Units.inchesToMeters(130.145),
+            Rotation2d.fromDegrees(-60))),
+    Six(
+        new Pose2d(
+            Units.inchesToMeters(160.375),
+            Units.inchesToMeters(130.144),
+            Rotation2d.fromDegrees(-120)));
 
-    public static final Pose2d[] centerFaces =
-        new Pose2d[6]; // Starting facing the driver station in clockwise order
-
-    static {
-      // Initialize faces
-      centerFaces[0] =
-          new Pose2d(
-              Units.inchesToMeters(144.003),
-              Units.inchesToMeters(158.500),
-              Rotation2d.fromDegrees(180));
-      centerFaces[1] =
-          new Pose2d(
-              Units.inchesToMeters(160.373),
-              Units.inchesToMeters(186.857),
-              Rotation2d.fromDegrees(120));
-      centerFaces[2] =
-          new Pose2d(
-              Units.inchesToMeters(193.116),
-              Units.inchesToMeters(186.858),
-              Rotation2d.fromDegrees(60));
-      centerFaces[3] =
-          new Pose2d(
-              Units.inchesToMeters(209.489),
-              Units.inchesToMeters(158.502),
-              Rotation2d.fromDegrees(0));
-      centerFaces[4] =
-          new Pose2d(
-              Units.inchesToMeters(193.118),
-              Units.inchesToMeters(130.145),
-              Rotation2d.fromDegrees(-60));
-      centerFaces[5] =
-          new Pose2d(
-              Units.inchesToMeters(160.375),
-              Units.inchesToMeters(130.144),
-              Rotation2d.fromDegrees(-120));
-
-      // Initialize branch positions
-      for (int face = 0; face < 6; face++) {
-        Map<ReefHeight, Pose3d> fillRight = new HashMap<>();
-        Map<ReefHeight, Pose3d> fillLeft = new HashMap<>();
-        for (var level : ReefHeight.values()) {
-          Pose2d poseDirection = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
-          double adjustX = Units.inchesToMeters(30.738);
-          double adjustY = Units.inchesToMeters(6.469);
-
-          fillRight.put(
-              level,
-              new Pose3d(
-                  new Translation3d(
-                      poseDirection
-                          .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
-                          .getX(),
-                      poseDirection
-                          .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
-                          .getY(),
-                      level.height),
-                  new Rotation3d(
-                      0,
-                      Units.degreesToRadians(level.pitch),
-                      poseDirection.getRotation().getRadians())));
-          fillLeft.put(
-              level,
-              new Pose3d(
-                  new Translation3d(
-                      poseDirection
-                          .transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d()))
-                          .getX(),
-                      poseDirection
-                          .transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d()))
-                          .getY(),
-                      level.height),
-                  new Rotation3d(
-                      0,
-                      Units.degreesToRadians(level.pitch),
-                      poseDirection.getRotation().getRadians())));
-        }
-        while (branchPositions.size() <= (face * 2) + 2) {
-          branchPositions.add(null); // Add null elements to reach the required size
-        }
-        branchPositions.add((face * 2) + 1, fillRight);
-        branchPositions.add((face * 2) + 2, fillLeft);
-      }
+    Face(Pose2d pose) {
+      this.pose = pose;
     }
+
+    public final Pose2d pose;
   }
 
-  public enum Branches {
-    A(new Translation2d()),
-    B(new Translation2d()),
-    C(new Translation2d()),
-    D(new Translation2d()),
-    E(new Translation2d()),
-    F(new Translation2d()),
-    G(new Translation2d()),
-    H(new Translation2d()),
-    I(new Translation2d()),
-    J(new Translation2d()),
-    K(new Translation2d()),
-    L(new Translation2d());
+  private static final double xOffset = 30.738 + .75 / 2;
 
-    Branches(Translation2d translation) {
-      this.translation = translation;
+  public static enum Branch {
+    A(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 1)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset), Units.inchesToMeters(6.469), new Rotation2d()))),
+    B(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 1)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset),
+                    -Units.inchesToMeters(6.469),
+                    new Rotation2d()))),
+    C(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 2)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset), Units.inchesToMeters(6.469), new Rotation2d()))),
+    D(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 2)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset),
+                    -Units.inchesToMeters(6.469),
+                    new Rotation2d()))),
+    E(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 3)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset), Units.inchesToMeters(6.469), new Rotation2d()))),
+    F(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 3)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset),
+                    -Units.inchesToMeters(6.469),
+                    new Rotation2d()))),
+    G(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 4)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset), Units.inchesToMeters(6.469), new Rotation2d()))),
+    H(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 4)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset),
+                    -Units.inchesToMeters(6.469),
+                    new Rotation2d()))),
+    I(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 5)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset), Units.inchesToMeters(6.469), new Rotation2d()))),
+    J(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 5)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset),
+                    -Units.inchesToMeters(6.469),
+                    new Rotation2d()))),
+    K(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 6)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset), Units.inchesToMeters(6.469), new Rotation2d()))),
+    L(
+        new Pose2d(
+                new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501)),
+                Rotation2d.fromDegrees(180 - (60 * 6)))
+            .transformBy(
+                new Transform2d(
+                    Units.inchesToMeters(xOffset),
+                    -Units.inchesToMeters(6.469),
+                    new Rotation2d())));
+
+    Branch(Pose2d pose) {
+      this.pose = pose;
     }
 
-    public final Translation2d translation;
+    public final Pose2d pose;
   }
 
   // TODO replace with robot heights instead
-  public enum ReefHeight {
+  public static enum ReefHeight {
     L4(Units.inchesToMeters(72)),
     L3(Units.inchesToMeters(47.625)),
     L2(Units.inchesToMeters(31.875)),
-    L1(Units.inchesToMeters(18));
+    L1(Units.inchesToMeters(18)),
+    AlgaeHigh(Units.inchesToMeters(55)),
+    AlgaeLow(Units.inchesToMeters(40));
 
     ReefHeight(double height) {
       this.height = height;
