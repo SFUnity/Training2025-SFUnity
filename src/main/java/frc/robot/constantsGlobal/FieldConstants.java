@@ -61,7 +61,7 @@ public final class FieldConstants {
 
   private static final double xOffset = Units.inchesToMeters(30.738) + .75 / 2 + .2;
   private static final Translation2d reefCenter =
-  new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
+      new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
 
   public static enum Face {
     One(
