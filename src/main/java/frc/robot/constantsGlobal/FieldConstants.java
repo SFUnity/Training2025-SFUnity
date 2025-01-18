@@ -53,6 +53,16 @@ public class FieldConstants {
             Rotation2d.fromDegrees(144.011 - 90));
   }
 
+  public static class StagingPositions {
+    // Measured from the center of the ice cream
+    public static final Pose2d leftIceCream =
+        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
+    public static final Pose2d middleIceCream =
+        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(158.5), new Rotation2d());
+    public static final Pose2d rightIceCream =
+        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
+  }
+
   public static class Reef {
     public static final Translation2d center =
         new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
@@ -61,8 +71,6 @@ public class FieldConstants {
 
     public static final Pose2d[] centerFaces =
         new Pose2d[6]; // Starting facing the driver station in clockwise order
-    public static final List<Map<ReefHeight, Pose3d>> branchPositions =
-        new ArrayList<>(); // Starting at the right branch facing the driver station in clockwise
 
     static {
       // Initialize faces
@@ -146,28 +154,38 @@ public class FieldConstants {
     }
   }
 
-  public static class StagingPositions {
-    // Measured from the center of the ice cream
-    public static final Pose2d leftIceCream =
-        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
-    public static final Pose2d middleIceCream =
-        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(158.5), new Rotation2d());
-    public static final Pose2d rightIceCream =
-        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
+  public enum Branches {
+    A(new Translation2d()),
+    B(new Translation2d()),
+    C(new Translation2d()),
+    D(new Translation2d()),
+    E(new Translation2d()),
+    F(new Translation2d()),
+    G(new Translation2d()),
+    H(new Translation2d()),
+    I(new Translation2d()),
+    J(new Translation2d()),
+    K(new Translation2d()),
+    L(new Translation2d());
+
+    Branches(Translation2d translation) {
+      this.translation = translation;
+    }
+
+    public final Translation2d translation;
   }
 
+  // TODO replace with robot heights instead
   public enum ReefHeight {
-    L4(Units.inchesToMeters(72), -90),
-    L3(Units.inchesToMeters(47.625), -35),
-    L2(Units.inchesToMeters(31.875), -35),
-    L1(Units.inchesToMeters(18), 0);
+    L4(Units.inchesToMeters(72)),
+    L3(Units.inchesToMeters(47.625)),
+    L2(Units.inchesToMeters(31.875)),
+    L1(Units.inchesToMeters(18));
 
-    ReefHeight(double height, double pitch) {
+    ReefHeight(double height) {
       this.height = height;
-      this.pitch = pitch; // in degrees
     }
 
     public final double height;
-    public final double pitch;
   }
 }
