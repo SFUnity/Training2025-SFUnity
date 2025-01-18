@@ -13,8 +13,11 @@
 
 package frc.robot;
 
+import static frc.robot.constantsGlobal.FieldConstants.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -27,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.constantsGlobal.FieldConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
@@ -36,7 +38,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.util.AllianceFlipUtil;
-import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -298,14 +299,13 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             drive.fullAutoDrive(
                 () ->
-                    AllianceFlipUtil.apply(FieldConstants.processorScore)));
+                    AllianceFlipUtil.apply(
+                        processorScore.transformBy(
+                            new Transform2d(0, 0, new Rotation2d(Math.PI))))));
+    driver.y().whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(processorScore)));
     driver
-        .y()
-        .whileTrue(
-            drive.headingDrive(
-                () ->
-                    poseManager.getHorizontalAngleTo(
-                        AllianceFlipUtil.apply(FieldConstants.StagingPositions.middleIceCream))));
+        .rightBumper()
+        .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
 
     // Operator controls
   }
