@@ -59,37 +59,29 @@ public final class FieldConstants {
         new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
   }
 
+  private static final double xOffset = Units.inchesToMeters(30.738) + .75 / 2 + .2;
+  private static final Translation2d reefCenter =
+  new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
+
   public static enum Face {
     One(
-        new Pose2d(
-            Units.inchesToMeters(144.003),
-            Units.inchesToMeters(158.500),
-            Rotation2d.fromDegrees(180))),
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d()))),
     Two(
-        new Pose2d(
-            Units.inchesToMeters(160.373),
-            Units.inchesToMeters(186.857),
-            Rotation2d.fromDegrees(120))),
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 1)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d()))),
     Three(
-        new Pose2d(
-            Units.inchesToMeters(193.116),
-            Units.inchesToMeters(186.858),
-            Rotation2d.fromDegrees(60))),
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 2)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d()))),
     Four(
-        new Pose2d(
-            Units.inchesToMeters(209.489),
-            Units.inchesToMeters(158.502),
-            Rotation2d.fromDegrees(0))),
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 3)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d()))),
     Five(
-        new Pose2d(
-            Units.inchesToMeters(193.118),
-            Units.inchesToMeters(130.145),
-            Rotation2d.fromDegrees(-60))),
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 4)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d()))),
     Six(
-        new Pose2d(
-            Units.inchesToMeters(160.375),
-            Units.inchesToMeters(130.144),
-            Rotation2d.fromDegrees(-120)));
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 5)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d())));
 
     Face(Pose2d pose) {
       this.pose = pose;
@@ -98,10 +90,7 @@ public final class FieldConstants {
     public final Pose2d pose;
   }
 
-  private static final double xOffset = Units.inchesToMeters(30.738) + .75 / 2;
   private static final double yOffset = Units.inchesToMeters(6.469);
-  private static final Translation2d reefCenter =
-      new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
 
   public static enum Branch {
     A(
