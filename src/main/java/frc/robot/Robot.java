@@ -14,9 +14,7 @@
 package frc.robot;
 
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.reefName;
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.reefPosition;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.sourceName;
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.sourcePosition;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -182,9 +180,9 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         aprilTagVision1 =
-            new AprilTagVision(new AprilTagVisionIOLimelight(reefName, reefPosition), poseManager);
+            new AprilTagVision(new AprilTagVisionIOLimelight(reefName), poseManager);
         aprilTagVision2 =
-            new AprilTagVision(new AprilTagVisionIOLimelight(sourceName, sourcePosition), poseManager);
+            new AprilTagVision(new AprilTagVisionIOLimelight(sourceName), poseManager);
         break;
 
       case SIM:

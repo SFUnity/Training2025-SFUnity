@@ -19,9 +19,14 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private final double DEFAUlT_CROP = 0.9;
   private final double CROP_BUFFER = 0.1;
 
-  public AprilTagVisionIOLimelight(String camName, double[] camPosition) {
+  public AprilTagVisionIOLimelight(String camName) {
     name = camName;
-    position = camPosition;
+    double[] position; 
+    switch(name) {
+      case AprilTagVisionConstants.reefName: position = AprilTagVisionConstants.reefPosition; break;
+      case AprilTagVisionConstants.sourceName: position = AprilTagVisionConstants.sourcePosition; break;
+      default: position = new double[0];
+    };
 
     LimelightHelpers.setLEDMode_PipelineControl(name);
 
