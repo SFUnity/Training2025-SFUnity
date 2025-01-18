@@ -112,28 +112,44 @@ public final class FieldConstants {
   public static enum Face {
     One(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI)))),
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.A,
+        Branch.B),
     Two(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 1)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI)))),
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.C,
+        Branch.D),
     Three(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 2)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI)))),
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.E,
+        Branch.F),
     Four(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 3)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI)))),
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.G,
+        Branch.H),
     Five(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 4)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI)))),
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.I,
+        Branch.J),
     Six(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 5)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))));
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.K,
+        Branch.L);
 
-    Face(Pose2d pose) {
+    Face(Pose2d pose, Branch lefBranch, Branch rightBranch) {
       this.pose = pose;
+      this.leftBranch = lefBranch;
+      this.rightBranch = rightBranch;
     }
 
     public final Pose2d pose;
+    public final Branch leftBranch;
+    public final Branch rightBranch;
   }
 
   // TODO replace with robot heights instead
