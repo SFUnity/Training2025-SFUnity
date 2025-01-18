@@ -33,10 +33,10 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   @Override
   public void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {
-    LimelightHelpers.SetRobotOrientation(
-        "limelight", poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation( //TODO do these have to be changed based on the camera
+        name, poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.PoseEstimate observation =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
     inputs.estimatedPose = observation.pose;
     inputs.timestamp = observation.timestampSeconds;
