@@ -280,7 +280,7 @@ public class Robot extends LoggedRobot {
     // Driver controls
     driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     driver
-        .a()
+        .start()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -288,7 +288,6 @@ public class Robot extends LoggedRobot {
                             new Pose2d(poseManager.getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-    driver.leftBumper().onTrue(Commands.runOnce(() -> slowMode = !slowMode, drive));
 
     // Operator controls
   }
