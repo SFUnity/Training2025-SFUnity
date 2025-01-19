@@ -74,7 +74,7 @@ public class ModuleIOMixed implements ModuleIO {
   private final SparkBase turnSpark;
   private final CANcoder cancoder;
   private final RelativeEncoder turnEncoder;
- 
+
   // Voltage control requests
   private final VoltageOut voltageRequest = new VoltageOut(0);
   private final SparkClosedLoopController turnController;
