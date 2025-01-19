@@ -1,6 +1,7 @@
 package frc.robot.subsystems.ground;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.RelativeEncoder;
@@ -29,7 +30,7 @@ public class GroundIOSparkMax implements GroundIO {
 
   @Override
   public void updateInputs(GroundIOInputs inputs) {
-    inputs.pivotCurrentPosition = Units.rotationsToDegrees(encoder.getPosition() / GEAR_RATIO);
+    inputs.pivotCurrentPosition = Rotations.of(encoder.getPosition() / GEAR_RATIO);
     inputs.pivotAppliedVolts = pivot.getAppliedOutput() * pivot.getBusVoltage();
     inputs.pivotCurrentAmps = pivot.getOutputCurrent();
 
