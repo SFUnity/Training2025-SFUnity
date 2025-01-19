@@ -1,10 +1,13 @@
 package frc.robot.subsystems.ground;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.constantsGlobal.Constants;
 
 public class GroundIOSim implements GroundIO {
 
@@ -30,7 +33,19 @@ public class GroundIOSim implements GroundIO {
   }
 
   @Override
-  public void updateInputs(GroundIOInputs inputs) {}
+  public void updateInputs(GroundIOInputs inputs) {
+
+    sim.update(Constants.loopPeriodSecs);
+
+    inputs.pivotCurrentPosition = Rotations.of(sim.getAngleRads());
+    inputs.pivotAppliedVolts = pivotAppliedVolts;
+    inputs.pivotCurrentAmps = sim.getCurrentDrawAmps();
+
+    inputs.rollersAppliedVolts = rollersAppliedVolts;
+
+    // Reset input
+    sim.setInputVoltage(0.0);
+  }
 
   @Override
   public void runGroundRollers(double percentOutput) {
