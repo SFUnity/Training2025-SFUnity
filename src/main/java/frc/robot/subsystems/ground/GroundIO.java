@@ -1,5 +1,7 @@
 package frc.robot.subsystems.ground;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.units.measure.Angle;
@@ -7,7 +9,7 @@ import edu.wpi.first.units.measure.Angle;
 public interface GroundIO {
     @AutoLog
     public static class GroundIOInputs {
-        public double pivotCurrentPosition = 0.0;
+        public Angle pivotCurrentPosition = Rotations.zero();
         public double pivotAppliedVolts = 0.0;
         public double pivotCurrentAmps = 0.0;
 
