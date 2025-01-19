@@ -34,6 +34,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.ground.Ground;
+import frc.robot.subsystems.ground.GroundIO;
+import frc.robot.subsystems.ground.GroundIOSim;
+import frc.robot.subsystems.ground.GroundIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -75,6 +79,7 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
+  private final Ground ground;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -171,6 +176,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
+        ground = new Ground(new GroundIOSparkMax());
         break;
 
       case SIM:
@@ -184,6 +190,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
+        ground = new Ground(new GroundIOSim());
         break;
 
       default:
@@ -197,6 +204,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
+        ground = new Ground(new GroundIO() {});
         break;
     }
 
@@ -227,6 +235,7 @@ public class Robot extends LoggedRobot {
   private void configureButtonBindings() {
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
+    ground.setDefaultCommand(ground.raiseAndStopCmd());
 
     // Driver controls
     driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -242,6 +251,7 @@ public class Robot extends LoggedRobot {
     driver.leftBumper().onTrue(Commands.runOnce(() -> slowMode = !slowMode, drive));
 
     // Operator controls
+    operator.x().whileTrue(ground.intakeCmd());
   }
 
   /** This function is called periodically during all modes. */

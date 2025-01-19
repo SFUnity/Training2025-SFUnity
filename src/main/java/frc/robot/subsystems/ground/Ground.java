@@ -6,7 +6,6 @@ import static frc.robot.subsystems.ground.GroundConstants.kP;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
@@ -88,7 +87,7 @@ public class Ground extends SubsystemBase {
         .withName("raise and stop");
   }
 
-  public Command intakeCmd(Trigger lowerTrig) {
+  public Command intakeCmd() {
     return run(() -> {
           lower();
           rollersIn();
