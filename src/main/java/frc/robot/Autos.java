@@ -438,5 +438,49 @@ public AutoRoutine HGAlgaeL1ScoreEFAlgaeCDAlgaeScore() {
               ));
   return routine;
 }
+public AutoRoutine WallJIL2AlgaeL2L1() {
+
+  AutoRoutine routine = factory.newRoutine("WallJIL2AlgaeL2L1");
+
+  // Load the routine's trajectories
+  AutoTrajectory centerToJI = routine.trajectory("CenterWallToJIAlgae");
+  AutoTrajectory JIToStationHigh = routine.trajectory("JIToStationHigh");
+  AutoTrajectory StationHighToJI = routine.trajectory("StationHighToJI");
+
+  // When the routine begins, reset odometry and start the first trajectory
+  routine
+      .active()
+      .onTrue(
+          Commands.sequence(
+              centerToLK.resetOdometry(),
+              centerToJI.cmd() // start traj
+              ));
+
+              centerToJI.done().onTrue( // WHEN WE FINISH LAST PATH
+          Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
+              score("ji"),
+              RemoveAlgae("ji"), // RUN REMOVE ALGAE CMD
+              JIToStationHigh.cmd() // START NEXT PATH
+              ));
+      JIToStationHigh.done().onTrue(
+          Commands.sequence(
+            StationHighToJI.cmd()));
+
+      StationHighToJI.done().onTrue(
+         Commands.sequence(
+               score("ji")
+               JIToStationHigh.cmd()
+                ));
+                JIToStationHigh.done().onTrue(
+                  Commands.sequence(
+                    StationHighToJI.cmd()));
+        
+              StationHighToJI.done().onTrue(
+                 Commands.sequence(
+                       score("ji")
+                       JIToStationHigh.cmd()
+                        ));
+  return routine;
+}
 }
 
