@@ -438,11 +438,22 @@ public AutoRoutine StationLowScoreCD(int timesRan){
   AutoTrajectory stationLowToCD = routine.trajectory("StationLowToCD");
 
   for (timesRan; timesRan < 2; timesRan++) {
-  
-    stationLowToCD.done().onTrue(
+    Commands.sequence(
+      cDToStationLow.cmd(),
+      intake(),
+      stationLowToCD.cmd(),
+      score()
+      );
+}}
+public AutoRoutine StationHighScorelk(int timesRan){
+  AutoTrajectory lKToStationHigh = routine.trajectory("LKtoStationHigh");
+  AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToLKL2");
+
+  for (timesRan; timesRan < 2; timesRan++) {
       Commands.sequence(
-        Commands.print("Arrived at Algae CD, moving to Station Low!"),
-        cDToStationLow.cmd()
-        )
-    );
+        lKToStationHigh(),
+        intake(),
+        stationHighToLKL2.cmd(),
+        score()
+        );
 }}
