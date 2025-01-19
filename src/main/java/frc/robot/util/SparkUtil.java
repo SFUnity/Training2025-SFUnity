@@ -15,6 +15,9 @@ package frc.robot.util;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
@@ -60,5 +63,21 @@ public class SparkUtil {
         sparkStickyFault = true;
       }
     }
+  }
+
+  /**
+   * @param persistParameters SHOULD ONLY BE TRUE AT STARTUP
+   */
+  public static void configureSpark(
+      SparkBase spark, SparkMaxConfig config, boolean persistParameters) {
+    tryUntilOk(
+        spark,
+        () ->
+            spark.configure(
+                config,
+                ResetMode.kResetSafeParameters,
+                persistParameters
+                    ? PersistMode.kPersistParameters
+                    : PersistMode.kNoPersistParameters));
   }
 }
