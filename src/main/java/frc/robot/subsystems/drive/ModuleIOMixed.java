@@ -64,6 +64,7 @@ public class ModuleIOMixed implements ModuleIO {
   private final boolean driveInverted;
   private final boolean turnInverted;
   private final boolean turnEncoderInverted;
+  private final int index;
 
   // Hardware objects
   private final TalonFX driveTalon;
@@ -96,6 +97,7 @@ public class ModuleIOMixed implements ModuleIO {
   private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
   public ModuleIOMixed(int module) {
+    this.index = module;
     zeroRotation =
         switch (module) {
           case 0 -> frontLeftZeroRotation;
@@ -287,6 +289,9 @@ public class ModuleIOMixed implements ModuleIO {
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
+
+    // Logging
+    logSparkMax("Drive/Module" + Integer.toString(index) + "TurnConfig", turnSpark);
   }
 
   @Override

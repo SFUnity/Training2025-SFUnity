@@ -17,11 +17,13 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class SparkUtil {
   /** Stores whether any error was has been detected by other utility methods. */
@@ -91,5 +93,11 @@ public class SparkUtil {
                 persistParameters
                     ? PersistMode.kPersistParameters
                     : PersistMode.kNoPersistParameters));
+  }
+
+  public static void logSparkMax(String key, SparkMax sparkMax) {
+    Logger.recordOutput(key + "/inverted", sparkMax.configAccessor.getInverted());
+    Logger.recordOutput(key + "/currentLimit", sparkMax.configAccessor.getSmartCurrentLimit());
+    Logger.recordOutput(key + "/idleMode", sparkMax.configAccessor.getIdleMode());
   }
 }
