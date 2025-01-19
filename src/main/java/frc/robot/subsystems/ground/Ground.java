@@ -4,8 +4,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
 
 public class Ground extends SubsystemBase {
-  private static final LoggedTunableNumber kP =
-      new LoggedTunableNumber("Ground/Gains/kP", gains.kP);
   private static final LoggedTunableNumber loweredAngle =
       new LoggedTunableNumber("Ground/Angles/lowered", 26);
   private static final LoggedTunableNumber raisedAngle =
