@@ -66,10 +66,12 @@ public class SparkUtil {
   }
 
   /**
+   *
+   *
    * <h2>persistParameters SHOULD ONLY BE TRUE AT STARTUP</h2>
-   * 
-   * <p>Configuring a SPARK MAX and SPARK Flex differs from other devices in REVLib with the addition
-   * of the persistMode parameter in their configure() methods, which specifies whether the
+   *
+   * <p>Configuring a SPARK MAX and SPARK Flex differs from other devices in REVLib with the
+   * addition of the persistMode parameter in their configure() methods, which specifies whether the
    * configuration settings applied to the device should be persisted between power cycles.
    *
    * <p>Persisting parameters involves saving them to the SPARK controller's memory, which is
