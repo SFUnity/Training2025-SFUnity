@@ -111,15 +111,15 @@ public class Autos {
         );
   }
 
-  public Command score() {
+  public Command score(string whereToScore) {
     return Commands.sequence(Commands.print("scoring"));
   }
 
-  public Command intake() {
+  public Command intake(string station) {
     return Commands.sequence(Commands.print("intake coral"));
   }
 
-  public Command RemoveAlgae() {
+  public Command RemoveAlgae(string position) {
     return Commands.sequence(Commands.print("removing Algae"));
   }
 
@@ -147,27 +147,35 @@ public class Autos {
                 centerToLK.cmd() // start traj
                 ));
 
-    centerToLK
-        .done()
-        .onTrue( // WHEN WE FINISH LAST PATH
+    centerToLK.done().onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-                RemoveAlgae()
-                    .beforeStarting(
-                        Commands.print("removing Algae")), // BEFORE REMOVING THE ALGAE PRINT MSG
-                RemoveAlgae(), // RUN REMOVE ALGAE CMD
-                score().beforeStarting(Commands.print("scoring")), // BEFORE SCORING CORAL PRINT MSG
-                score(), // SCORE CORAL
+                score("lk"), // SCORE CORAL
+                 RemoveAlgae("lk"), // RUN REMOVE ALGAE CMD
                 lKToStationHigh.cmd() // START NEXT PATH
                 ));
-    lKToStationHigh
-        .done()
-        .onTrue(
+    lKToStationHigh.done().onTrue(
             Commands.sequence(
-                intake(),
-                stationHighToLKL2
-                    .cmd()
-                    .beforeStarting(Commands.print("Arrived at Station High, moving to LK")),
+                intake("high"),
                 stationHighToLKL2.cmd()));
+     stationHighToLKL2.done().onTrue( // WHEN WE FINISH LAST PATH
+                Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
+                    score("lk"), // SCORE CORAL
+                    lKToStationHigh.cmd() // START NEXT PATH
+                    ));
+     lKToStationHigh.done().onTrue(
+                Commands.sequence(
+                    intake("high"),
+                    stationHighToLKL2.cmd()));
+     stationHighToLKL2.done().onTrue( // WHEN WE FINISH LAST PATH
+                    Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
+                        score("lk"), // SCORE CORAL
+                        lKToStationHigh.cmd() // START NEXT PATH
+                        ));
+      lKToStationHigh.done().onTrue(
+                    Commands.sequence(
+                        intake("high"),
+                        stationHighToLKL2.cmd()));
+                    
     return routine;
 }
 
@@ -411,14 +419,12 @@ public AutoRoutine HGAlgaeL1ScoreEFAlgaeCDAlgaeScore() {
 
   centerToGH.done().onTrue( // WHEN WE FINISH LAST PATH
           Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-              score(),
-              RemoveAlgae(),
-              RemoveAlgae(), // RUN REMOVE ALGAE CMD
+              score("gh"),
+              RemoveAlgae("gh"), // RUN REMOVE ALGAE CMD
               gHToProcessor.cmd() // START NEXT PATH
               ));
   gHToProcessor.done().onTrue(
           Commands.sequence(
-              intake(),
               processorToEF.cmd()));
   processorToEF.done().onTrue(
          Commands.sequence(
@@ -427,33 +433,10 @@ public AutoRoutine HGAlgaeL1ScoreEFAlgaeCDAlgaeScore() {
                 ));
   eFToCDAlgae.done().onTrue( // WHEN WE FINISH LAST PATH
            Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-              RemoveAlgae(), // RUN REMOVE ALGAE CMD
+              RemoveAlgae("cd"), // RUN REMOVE ALGAE CMD
               cDToProcessorScore.cmd() // START NEXT PATH
               ));
   return routine;
 }
 }
-public AutoRoutine StationLowScoreCD(int timesRan){
-  AutoTrajectory cDToStationLow = routine.trajectory("cDToStationLow");
-  AutoTrajectory stationLowToCD = routine.trajectory("StationLowToCD");
 
-  for (timesRan; timesRan < 2; timesRan++) {
-    Commands.sequence(
-      cDToStationLow.cmd(),
-      intake(),
-      stationLowToCD.cmd(),
-      score()
-      );
-}}
-public AutoRoutine StationHighScorelk(int timesRan){
-  AutoTrajectory lKToStationHigh = routine.trajectory("LKtoStationHigh");
-  AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToLKL2");
-
-  for (timesRan; timesRan < 2; timesRan++) {
-      Commands.sequence(
-        lKToStationHigh(),
-        intake(),
-        stationHighToLKL2.cmd(),
-        score()
-        );
-}}
