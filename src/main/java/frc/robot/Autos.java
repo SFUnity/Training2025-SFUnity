@@ -433,3 +433,16 @@ public AutoRoutine HGAlgaeL1ScoreEFAlgaeCDAlgaeScore() {
   return routine;
 }
 }
+public AutoRoutine StationLowScoreCD(int timesRan){
+  AutoTrajectory cDToStationLow = routine.trajectory("cDToStationLow");
+  AutoTrajectory stationLowToCD = routine.trajectory("StationLowToCD");
+
+  for (timesRan; timesRan < 2; timesRan++) {
+  
+    stationLowToCD.done().onTrue(
+      Commands.sequence(
+        Commands.print("Arrived at Algae CD, moving to Station Low!"),
+        cDToStationLow.cmd()
+        )
+    );
+}}
