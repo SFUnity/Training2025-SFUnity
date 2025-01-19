@@ -66,7 +66,17 @@ public class SparkUtil {
   }
 
   /**
-   * @param persistParameters SHOULD ONLY BE TRUE AT STARTUP
+   * <h2>persistParameters SHOULD ONLY BE TRUE AT STARTUP</h2>
+   * 
+   * <p>Configuring a SPARK MAX and SPARK Flex differs from other devices in REVLib with the addition
+   * of the persistMode parameter in their configure() methods, which specifies whether the
+   * configuration settings applied to the device should be persisted between power cycles.
+   *
+   * <p>Persisting parameters involves saving them to the SPARK controller's memory, which is
+   * time-intensive and blocks communication with the device. To provide flexibility, this process
+   * is not automatic, as this behavior may be unnecessary or undesirable in some cases. Therefore,
+   * users must manually specify the persist mode, and to help avoid possible pitfalls, it is a
+   * required parameter.
    */
   public static void configureSpark(
       SparkBase spark, SparkMaxConfig config, boolean persistParameters) {
