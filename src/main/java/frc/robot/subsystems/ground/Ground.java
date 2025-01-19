@@ -1,23 +1,109 @@
 package frc.robot.subsystems.ground;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static frc.robot.subsystems.ground.GroundConstants.kP;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.Util;
+import org.littletonrobotics.junction.Logger;
 
 public class Ground extends SubsystemBase {
+
+  // In rotations
   private static final LoggedTunableNumber loweredAngle =
       new LoggedTunableNumber("Ground/Angles/lowered", 26);
   private static final LoggedTunableNumber raisedAngle =
       new LoggedTunableNumber("Ground/Angles/raised", 0);
-
   // In percent output
   private static final LoggedTunableNumber rollersSpeed =
       new LoggedTunableNumber("Ground/Speeds/groundRollers", 1);
 
-  private double positionSetpoint = 0;
+  private Angle positionSetpoint = Degrees.zero();
 
   private final GroundIO io;
+  private final GroundIOInputsAutoLogged inputs = new GroundIOInputsAutoLogged();
 
   public Ground(GroundIO io) {
     this.io = io;
+
+    // Switch constants based on mode (the physics simulator is treated as a
+    // separate robot with different tuning)
+    switch (Constants.currentMode) {
+      case REAL:
+      case REPLAY:
+        io.setPID(0.08);
+        break;
+      case SIM:
+        io.setPID(20);
+        break;
+      default:
+        break;
+    }
   }
+
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Ground", inputs);
+
+    // Update controllers
+    LoggedTunableNumber.ifChanged(hashCode(), () -> io.setPID(kP.get()), kP);
+
+    // Logs
+    Logger.recordOutput("Ground/positionSetpointRotations", positionSetpoint);
+    Util.logSubsystem(this, "Ground");
+  }
+
+  private void lower() {
+    positionSetpoint = Degrees.of(loweredAngle.get());
+    io.setPivotPosition(positionSetpoint);
+  }
+
+  private void raise() {
+    positionSetpoint = Degrees.of(raisedAngle.get());
+    io.setPivotPosition(positionSetpoint);
+  }
+
+  private void rollersIn() {
+    io.runGroundRollers(rollersSpeed.get());
+  }
+
+  private void rollersOut() {
+    io.runGroundRollers(-rollersSpeed.get());
+  }
+
+  private void rollersStop() {
+    io.runGroundRollers(0);
+  }
+
+  public Command raiseAndStopCmd() {
+    return run(() -> {
+          raise();
+          rollersStop();
+        })
+        .withName("raise and stop");
+  }
+
+  public Command intakeCmd(Trigger lowerTrig) {
+    return run(() -> {
+          lower();
+          rollersIn();
+        })
+        .withName("ground");
+  }
+
+  public Command poopCmd() {
+    return run(() -> {
+          raise();
+          rollersOut();
+        })
+        .withName("poop");
+  }
+
+  // In percent output
+
 }
