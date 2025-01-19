@@ -127,6 +127,7 @@ public class Autos {
   // .active().whileTrue() =  Trigger while the trajectory is still running.
 
   // Triggers can be combined using logical conditions for branching autos:
+
   public AutoRoutine SpamLsAuto() {
 
     AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
@@ -169,6 +170,8 @@ public class Autos {
                 stationHighToLKL2.cmd()));
     return routine;
 }
+
+
 public AutoRoutine WallLKAlgaeL2L3 () {
   AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
 
@@ -386,4 +389,47 @@ lKToStationHigh.done().onTrue(
 }  
 // Commands
   
+public AutoRoutine HGAlgaeL1ScoreEFAlgaeCDAlgaeScore() {
+
+  AutoRoutine routine = factory.newRoutine("HGAlgaeL1ScoreEFAlgaeCDAlgaeScore");
+
+  // Load the routine's trajectories
+  AutoTrajectory centerToGH = routine.trajectory("CenterToHGAlgae");
+  AutoTrajectory gHToProcessor = routine.trajectory("GHToProcessorScore");
+  AutoTrajectory processorToEF = routine.trajectory("ProcessorScoreToEFAlgae");
+  AutoTrajectory eFToCDAlgae = routine.trajectory("EFToCDAlgae");
+  AutoTrajectory cDToProcessorScore = routine.trajectory("EFToProcessorScore");
+
+  // When the routine begins, reset odometry and start the first trajectory
+  routine
+      .active()
+      .onTrue(
+          Commands.sequence(
+              centerToLK.resetOdometry(),
+              centerToGH.cmd() // start traj
+              ));
+
+  centerToGH.done().onTrue( // WHEN WE FINISH LAST PATH
+          Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
+              score(),
+              RemoveAlgae(),
+              RemoveAlgae(), // RUN REMOVE ALGAE CMD
+              gHToProcessor.cmd() // START NEXT PATH
+              ));
+  gHToProcessor.done().onTrue(
+          Commands.sequence(
+              intake(),
+              processorToEF.cmd()));
+  processorToEF.done().onTrue(
+         Commands.sequence(
+               //remove Algae
+              eFToCDAlgae.cmd()
+                ));
+  eFToCDAlgae.done().onTrue( // WHEN WE FINISH LAST PATH
+           Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
+              RemoveAlgae(), // RUN REMOVE ALGAE CMD
+              cDToProcessorScore.cmd() // START NEXT PATH
+              ));
+  return routine;
+}
 }
