@@ -5,6 +5,7 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class GroundConstants {
   public static final LoggedTunableNumber kP;
+  public static final double pivotPositionFactor = 0;
 
   static {
     switch (Constants.currentMode) {
