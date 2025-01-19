@@ -38,18 +38,13 @@ public class AprilTagVisionConstants {
   };
 
   public static enum Pipelines {
-    BLUE_SPEAKER,
-    RED_SPEAKER,
-    SOURCE;
+    //TODO Add more pipelines
+    APRILTAGHM;
 
     public static int getIndexFor(Pipelines pipeline) {
       switch (pipeline) {
-        case BLUE_SPEAKER:
+        case APRILTAGHM:
           return 0;
-        case RED_SPEAKER:
-          return 1;
-        case SOURCE:
-          return 2;
         default:
           return 0;
       }

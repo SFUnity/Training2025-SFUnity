@@ -81,8 +81,8 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
-  private final AprilTagVision aprilTagVision1;
-  private final AprilTagVision aprilTagVision2;
+  private final AprilTagVision reefVision;
+  private final AprilTagVision sourceVision;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -179,9 +179,9 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision1 =
+        reefVision =
             new AprilTagVision(new AprilTagVisionIOLimelight(reefName), poseManager);
-        aprilTagVision2 =
+        sourceVision =
             new AprilTagVision(new AprilTagVisionIOLimelight(sourceName), poseManager);
         break;
 
@@ -196,8 +196,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision1 = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
-        aprilTagVision2 = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        reefVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        sourceVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
 
       default:
@@ -211,8 +211,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        aprilTagVision1 = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
-        aprilTagVision2 = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        reefVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        sourceVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
     }
 
