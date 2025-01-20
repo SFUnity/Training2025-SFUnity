@@ -21,12 +21,18 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   public AprilTagVisionIOLimelight(String camName) {
     name = camName;
-    double[] position; 
-    switch(name) {
-      case AprilTagVisionConstants.reefName: position = AprilTagVisionConstants.reefPosition; break;
-      case AprilTagVisionConstants.sourceName: position = AprilTagVisionConstants.sourcePosition; break;
-      default: position = new double[0];
-    };
+    double[] position;
+    switch (name) {
+      case AprilTagVisionConstants.reefName:
+        position = AprilTagVisionConstants.reefPosition;
+        break;
+      case AprilTagVisionConstants.sourceName:
+        position = AprilTagVisionConstants.sourcePosition;
+        break;
+      default:
+        position = new double[0];
+    }
+    ;
 
     LimelightHelpers.setLEDMode_PipelineControl(name);
 
@@ -38,7 +44,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   @Override
   public void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {
-    LimelightHelpers.SetRobotOrientation( //TODO do these have to be changed based on the camera
+    LimelightHelpers.SetRobotOrientation( // TODO do these have to be changed based on the camera
         name, poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.PoseEstimate observation =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);

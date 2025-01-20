@@ -179,10 +179,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        reefVision =
-            new AprilTagVision(new AprilTagVisionIOLimelight(reefName), poseManager);
-        sourceVision =
-            new AprilTagVision(new AprilTagVisionIOLimelight(sourceName), poseManager);
+        reefVision = new AprilTagVision(new AprilTagVisionIOLimelight(reefName), poseManager);
+        sourceVision = new AprilTagVision(new AprilTagVisionIOLimelight(sourceName), poseManager);
         break;
 
       case SIM:
