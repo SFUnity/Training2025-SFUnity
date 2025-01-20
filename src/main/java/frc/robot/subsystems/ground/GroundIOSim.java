@@ -38,7 +38,7 @@ public class GroundIOSim implements GroundIO {
 
     sim.update(Constants.loopPeriodSecs);
 
-    inputs.pivotCurrentPosition = Rotations.of(sim.getAngleRads());
+    inputs.pivotCurrentPosition = Radians.of(sim.getAngleRads());
     inputs.pivotAppliedVolts = pivotAppliedVolts;
     inputs.pivotCurrentAmps = sim.getCurrentDrawAmps();
 
