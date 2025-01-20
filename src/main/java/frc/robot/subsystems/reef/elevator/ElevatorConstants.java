@@ -17,7 +17,6 @@ public class ElevatorConstants {
   public static final double desiredHeightLowAlgae = 1.75;
   public static final double desiredHeightProcessor = 0;
   public static final double desiredHeightSource = 2;
-  public static final double desiredHeightBottom = 0;
 
   public static final double carrageMassKg = Units.lbsToKilograms(15);
   public static final double drumRadiusMeters = Units.inchesToMeters(1.4);
