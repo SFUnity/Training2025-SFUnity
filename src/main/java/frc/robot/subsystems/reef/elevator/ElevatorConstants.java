@@ -44,10 +44,10 @@ public class ElevatorConstants {
         kV = new LoggedTunableNumber("Reef/Elevator/kV", 11.3);
         break;
       case SIM:
-        kP = new LoggedTunableNumber("Reef/Elevator/kP", 40.0);
+        kP = new LoggedTunableNumber("Reef/Elevator/kP", 60.0);
         kD = new LoggedTunableNumber("Reef/Elevator/kD", 0.0);
         kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.06);
-        kV = new LoggedTunableNumber("Reef/Elevator/kV", 12.6);
+        kV = new LoggedTunableNumber("Reef/Elevator/kV", 0.4);
         break;
     }
   }
