@@ -30,6 +30,7 @@ public class Elevator extends SubsystemBase {
 
   public Elevator(ElevatorIO io) {
     this.io = io;
+    pid.setTolerance(0.15);
 
     setDefaultCommand(stow());
   }
@@ -68,13 +69,8 @@ public class Elevator extends SubsystemBase {
     io.stop();
   }
 
-  public boolean atDesiredHeight(double desiredHeight) {
-    // if (!Util.equalsWithTolerance(inputs.position.in(Meters), desiredHeight, 0.15)) {
-    //  return true;
-    // } else {
-    //  return false;
-    // }
-    return false;
+  public boolean atDesiredHeight() {
+    return pid.atGoal();
   }
 
   public Command stow() {
