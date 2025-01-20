@@ -1,8 +1,10 @@
 package frc.robot.subsystems.ground;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.ground.GroundConstants.kP;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -53,7 +55,7 @@ public class Ground extends SubsystemBase {
     LoggedTunableNumber.ifChanged(hashCode(), () -> io.setPID(kP.get()), kP);
 
     // Logs
-    Logger.recordOutput("Ground/positionSetpointRotations", positionSetpoint);
+    Logger.recordOutput("Ground/positionSetpointRadians",positionSetpoint.in(Radians));
     Util.logSubsystem(this, "Ground");
   }
 
