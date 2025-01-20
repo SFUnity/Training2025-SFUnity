@@ -27,7 +27,7 @@ public class ElevatorVisualizer {
   public void update(double heightMeters) {
     // Log Mechanism2d
     elevator.setLength(heightMeters);
-    Logger.recordOutput("Reef/Elevator/Mechanism2d/" + key, mechanism);
+    Logger.recordOutput("Elevator/Mechanism2d/" + key, mechanism);
 
     // Log 3D poses
     Pose3d elevator =
@@ -36,6 +36,6 @@ public class ElevatorVisualizer {
             heightMeters * 10,
             ElevatorConstants.elevatorOrigin.getY(),
             new Rotation3d(0, 0, 0.0));
-    Logger.recordOutput("Reef/Elevator/Mechanism3d/" + key, elevator);
+    Logger.recordOutput("Elevator/Mechanism3d/" + key, elevator);
   }
 }
