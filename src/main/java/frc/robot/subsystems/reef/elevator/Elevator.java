@@ -1,6 +1,7 @@
 package frc.robot.subsystems.reef.elevator;
 
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -15,14 +16,12 @@ public class Elevator extends SubsystemBase {
   private final ElevatorVisualizer elevatorVisualizer = new ElevatorVisualizer("elevator");
   private final ProfiledPIDController pid =
       new ProfiledPIDController(
-          ElevatorConstants.kP.get(),
-          ElevatorConstants.kI.get(),
-          ElevatorConstants.kD.get(),
-          new TrapezoidProfile.Constraints(
-              ElevatorConstants.maxElevatorSpeed, ElevatorConstants.maxElevatorAcceleration));
+          kP.get(),
+          kI.get(),
+          kD.get(),
+          new TrapezoidProfile.Constraints(maxElevatorSpeed, maxElevatorAcceleration));
   private final ElevatorFeedforward ffController =
-      new ElevatorFeedforward(
-          ElevatorConstants.kS.get(), ElevatorConstants.kG.get(), ElevatorConstants.kV.get());
+      new ElevatorFeedforward(kS.get(), kG.get(), kV.get());
 
   private final ElevatorIO io;
 
@@ -54,12 +53,7 @@ public class Elevator extends SubsystemBase {
 
   private void updateTunables() {
     LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () ->
-            pid.setPID(
-                ElevatorConstants.kP.get(), ElevatorConstants.kI.get(), ElevatorConstants.kD.get()),
-        ElevatorConstants.kP,
-        ElevatorConstants.kD);
+        hashCode(), () -> pid.setPID(kP.get(), kI.get(), kD.get()), kP, kD);
   }
 
   public boolean atDesiredHeight() {
@@ -67,37 +61,34 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command stow() {
-    return run(() -> pid.setGoal(ElevatorConstants.minHeightInches)).withName("readyStow");
+    return run(() -> pid.setGoal(minHeightInches)).withName("readyStow");
   }
 
   public Command l1() {
-    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightL1)).withName("readyL1");
+    return run(() -> pid.setGoal(desiredHeightL1)).withName("readyL1");
   }
 
   public Command l2() {
-    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightL2)).withName("readyL2");
+    return run(() -> pid.setGoal(desiredHeightL2)).withName("readyL2");
   }
 
   public Command l3() {
-    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightL3)).withName("readyL3");
+    return run(() -> pid.setGoal(desiredHeightL3)).withName("readyL3");
   }
 
   public Command lowAlgae() {
-    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightLowAlgae))
-        .withName("readyLowAlgae");
+    return run(() -> pid.setGoal(desiredHeightLowAlgae)).withName("readyLowAlgae");
   }
 
   public Command highAlgae() {
-    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightHighAlgae))
-        .withName("readyHighAlgae");
+    return run(() -> pid.setGoal(desiredHeightHighAlgae)).withName("readyHighAlgae");
   }
 
   public Command processor() {
-    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightProcessor))
-        .withName("readyProcessor");
+    return run(() -> pid.setGoal(desiredHeightProcessor)).withName("readyProcessor");
   }
 
   public Command source() {
-    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightSource)).withName("readySource");
+    return run(() -> pid.setGoal(desiredHeightSource)).withName("readySource");
   }
 }
