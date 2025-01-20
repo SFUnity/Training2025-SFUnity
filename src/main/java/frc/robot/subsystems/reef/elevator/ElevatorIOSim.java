@@ -1,12 +1,12 @@
 package frc.robot.subsystems.reef.elevator;
 
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
 
 public class ElevatorIOSim implements ElevatorIO {
   private final PIDController pid;
