@@ -20,8 +20,7 @@ public class GroundIOSim implements GroundIO {
           Units.degreesToRadians(18.39),
           Units.degreesToRadians(87.39),
           false,
-          Units.degreesToRadians(87.39),
-          null);
+          Units.degreesToRadians(87.39));
 
   private final PIDController controller;
   private double pivotAppliedVolts = 0.0;
