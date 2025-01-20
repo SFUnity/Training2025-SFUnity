@@ -17,11 +17,10 @@ public class Elevator extends SubsystemBase {
   private final ProfiledPIDController pid =
       new ProfiledPIDController(
           kP.get(),
-          kI.get(),
+          0,
           kD.get(),
           new TrapezoidProfile.Constraints(maxElevatorSpeed, maxElevatorAcceleration));
-  private final ElevatorFeedforward ffController =
-      new ElevatorFeedforward(kS.get(), kG.get(), kV.get());
+  private ElevatorFeedforward ffController = new ElevatorFeedforward(0, kG.get(), kV.get());
 
   private final ElevatorIO io;
 
@@ -52,8 +51,9 @@ public class Elevator extends SubsystemBase {
   }
 
   private void updateTunables() {
+    LoggedTunableNumber.ifChanged(hashCode(), () -> pid.setPID(kP.get(), 0, kD.get()), kP, kD);
     LoggedTunableNumber.ifChanged(
-        hashCode(), () -> pid.setPID(kP.get(), kI.get(), kD.get()), kP, kD);
+        hashCode(), () -> ffController = new ElevatorFeedforward(0, kG.get(), kV.get()), kG, kV);
   }
 
   public boolean atDesiredHeight() {
