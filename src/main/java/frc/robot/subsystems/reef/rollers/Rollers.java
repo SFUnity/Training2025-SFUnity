@@ -17,6 +17,8 @@ public class Rollers extends SubsystemBase {
 
   public Rollers(RollersIO io) {
     this.io = io;
+
+    setDefaultCommand(stop());
   }
 
   @Override

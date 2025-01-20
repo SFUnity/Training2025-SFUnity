@@ -29,6 +29,8 @@ public class Elevator extends SubsystemBase {
 
   public Elevator(ElevatorIO io) {
     this.io = io;
+
+    setDefaultCommand(stow());
   }
 
   @Override
