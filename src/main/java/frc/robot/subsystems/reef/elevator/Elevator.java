@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -38,9 +37,10 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("elevator", inputs);
+    Logger.processInputs("Elevator", inputs);
     elevatorVisualizer.update(inputs.position.in(Meters));
     updateTunables();
+    Logger.recordOutput("Elevator/goal", pid.getGoal().position);
     Util.logSubsystem(this, "Elevator");
   }
 
