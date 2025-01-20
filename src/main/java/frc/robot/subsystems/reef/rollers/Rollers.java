@@ -38,6 +38,13 @@ public class Rollers extends SubsystemBase {
         || filteredStatorCurrent <= -2);
   }
 
+  public Command stop() {
+    return run(() -> {
+          io.runVolts(0);
+        })
+        .withName("stopRollers");
+  }
+
   public Command placeCoralAndHighDealgify() {
     return run(() -> {
           io.runVolts(RollersConstants.placeSpeed);
