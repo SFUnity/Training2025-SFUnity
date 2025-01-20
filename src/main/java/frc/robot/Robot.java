@@ -13,8 +13,11 @@
 
 package frc.robot;
 
+import static frc.robot.constantsGlobal.FieldConstants.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -43,6 +46,7 @@ import frc.robot.subsystems.reef.rollers.Rollers;
 import frc.robot.subsystems.reef.rollers.RollersIO;
 import frc.robot.subsystems.reef.rollers.RollersIOSim;
 import frc.robot.subsystems.reef.rollers.RollersIOSparkMax;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -235,30 +239,6 @@ public class Robot extends LoggedRobot {
     }
   }
 
-  // Consider moving to its own file if/when it gets big
-  /** Use this method to define your button->command mappings. */
-  private void configureButtonBindings() {
-    // Default cmds
-    drive.setDefaultCommand(drive.joystickDrive());
-
-    // Driver controls
-    driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    driver
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        poseManager.setPose(
-                            new Pose2d(poseManager.getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
-    driver.leftBumper().onTrue(Commands.runOnce(() -> slowMode = !slowMode, drive));
-
-    // Operator controls
-    driver.a().onTrue(reef.setCoralIntake());
-    operator.y().onTrue(reef.setScoreL1());
-  }
-
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
@@ -306,6 +286,42 @@ public class Robot extends LoggedRobot {
     return controller.isConnected()
         && DriverStation.getJoystickIsXbox(
             controller.getHID().getPort()); // Should be an XBox controller
+  }
+
+  // Consider moving to its own file if/when it gets big
+  /** Use this method to define your button->command mappings. */
+  private void configureButtonBindings() {
+    // Default cmds
+    drive.setDefaultCommand(drive.joystickDrive());
+
+    // Driver controls
+    driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver
+        .start()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        poseManager.setPose(
+                            new Pose2d(poseManager.getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
+
+    driver
+        .b()
+        .whileTrue(
+            drive.fullAutoDrive(
+                () ->
+                    AllianceFlipUtil.apply(
+                        processorScore.transformBy(
+                            new Transform2d(0, 0, new Rotation2d(Math.PI))))));
+    driver.y().whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(processorScore)));
+    driver
+        .rightBumper()
+        .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
+
+    // Operator controls
+    driver.a().onTrue(reef.setCoralIntake());
+    operator.y().onTrue(reef.setScoreL1());
   }
 
   /** This function is called once when the robot is disabled. */

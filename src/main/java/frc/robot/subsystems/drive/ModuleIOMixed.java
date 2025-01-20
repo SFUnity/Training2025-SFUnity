@@ -33,12 +33,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -68,10 +64,11 @@ public class ModuleIOMixed implements ModuleIO {
   private final boolean driveInverted;
   private final boolean turnInverted;
   private final boolean turnEncoderInverted;
+  private final int index;
 
   // Hardware objects
   private final TalonFX driveTalon;
-  private final SparkBase turnSpark;
+  private final SparkMax turnSpark;
   private final CANcoder cancoder;
   private final RelativeEncoder turnEncoder;
 
@@ -100,6 +97,7 @@ public class ModuleIOMixed implements ModuleIO {
   private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
   public ModuleIOMixed(int module) {
+    this.index = module;
     zeroRotation =
         switch (module) {
           case 0 -> frontLeftZeroRotation;
@@ -211,7 +209,7 @@ public class ModuleIOMixed implements ModuleIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
-    tryUntilOk(turnSpark, () -> configureTurnSpark(turnConfig));
+    configureSpark(turnSpark, turnConfig, true);
 
     // Configure CANCoder
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
@@ -291,6 +289,9 @@ public class ModuleIOMixed implements ModuleIO {
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
+
+    // Logging
+    logSparkMax("Drive/Module" + Integer.toString(index) + "TurnConfig", turnSpark);
   }
 
   @Override
@@ -327,9 +328,9 @@ public class ModuleIOMixed implements ModuleIO {
 
   @Override
   public void setTurnPIDF(double turnkP, double turnkD) {
-    SparkMaxConfig turnConfig = new SparkMaxConfig();
-    turnConfig.closedLoop.pidf(turnkP, 0, turnkD, 0);
-    tryUntilOk(turnSpark, () -> configureTurnSpark(turnConfig));
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.closedLoop.pidf(turnkP, 0, turnkD, 0);
+    configureSpark(turnSpark, config, false);
   }
 
   @Override
@@ -341,11 +342,6 @@ public class ModuleIOMixed implements ModuleIO {
   public void setTurnBrakeMode(boolean brake) {
     SparkMaxConfig config = new SparkMaxConfig();
     config.idleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
-    configureTurnSpark(config);
-  }
-
-  private REVLibError configureTurnSpark(SparkMaxConfig config) {
-    return turnSpark.configure(
-        config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    configureSpark(turnSpark, config, false);
   }
 }

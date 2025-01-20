@@ -79,7 +79,7 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber thetakD =
       new LoggedTunableNumber("Drive/Commands/Theta/D", 0.0);
   private static final LoggedTunableNumber linearTolerance =
-      new LoggedTunableNumber("Drive/Commands/Linear/tolerance", 0.08);
+      new LoggedTunableNumber("Drive/Commands/Linear/tolerance", 0.05);
   private static final LoggedTunableNumber thetaToleranceDeg =
       new LoggedTunableNumber("Drive/Commands/Theta/toleranceDeg", 1.0);
 
@@ -494,7 +494,7 @@ public class Drive extends SubsystemBase {
 
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
-    Rotation2d linearDirection = new Rotation2d(x, y);
+    Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
     // Square values and scale to max velocity
     linearMagnitude = linearMagnitude * linearMagnitude;

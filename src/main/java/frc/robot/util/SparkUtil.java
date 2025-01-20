@@ -15,10 +15,15 @@ package frc.robot.util;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class SparkUtil {
   /** Stores whether any error was has been detected by other utility methods. */
@@ -60,5 +65,39 @@ public class SparkUtil {
         sparkStickyFault = true;
       }
     }
+  }
+
+  /**
+   *
+   *
+   * <h2>persistParameters SHOULD ONLY BE TRUE AT STARTUP</h2>
+   *
+   * <p>Configuring a SPARK MAX and SPARK Flex differs from other devices in REVLib with the
+   * addition of the persistMode parameter in their configure() methods, which specifies whether the
+   * configuration settings applied to the device should be persisted between power cycles.
+   *
+   * <p>Persisting parameters involves saving them to the SPARK controller's memory, which is
+   * time-intensive and blocks communication with the device. To provide flexibility, this process
+   * is not automatic, as this behavior may be unnecessary or undesirable in some cases. Therefore,
+   * users must manually specify the persist mode, and to help avoid possible pitfalls, it is a
+   * required parameter.
+   */
+  public static void configureSpark(
+      SparkBase spark, SparkMaxConfig config, boolean persistParameters) {
+    tryUntilOk(
+        spark,
+        () ->
+            spark.configure(
+                config,
+                ResetMode.kResetSafeParameters,
+                persistParameters
+                    ? PersistMode.kPersistParameters
+                    : PersistMode.kNoPersistParameters));
+  }
+
+  public static void logSparkMax(String key, SparkMax sparkMax) {
+    Logger.recordOutput(key + "/inverted", sparkMax.configAccessor.getInverted());
+    Logger.recordOutput(key + "/currentLimit", sparkMax.configAccessor.getSmartCurrentLimit());
+    Logger.recordOutput(key + "/idleMode", sparkMax.configAccessor.getIdleMode());
   }
 }
