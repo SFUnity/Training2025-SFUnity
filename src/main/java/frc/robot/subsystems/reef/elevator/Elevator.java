@@ -1,11 +1,13 @@
 package frc.robot.subsystems.reef.elevator;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
@@ -41,12 +43,12 @@ public class Elevator extends SubsystemBase {
     updateTunables();
 
     io.runVolts(
-        pid.calculate(inputs.position.in(Meters), pid.getGoal())
+        pid.calculate(inputs.position.in(Inches))
             + ffController.calculate(pid.getSetpoint().velocity));
 
     elevatorVisualizer.update(inputs.position.in(Meters));
 
-    Logger.recordOutput("Elevator/goal", pid.getGoal().position);
+    Logger.recordOutput("Elevator/goal", Units.inchesToMeters(pid.getGoal().position));
     Util.logSubsystem(this, "Elevator");
   }
 
