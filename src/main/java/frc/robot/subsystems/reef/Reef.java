@@ -10,11 +10,11 @@ import static frc.robot.subsystems.reef.elevator.ElevatorConstants.desiredHeight
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.reef.elevator.Elevator;
 import frc.robot.subsystems.reef.rollers.Rollers;
-import frc.robot.util.VirtualSubsystem;
 
-public class Reef extends VirtualSubsystem {
+public class Reef extends SubsystemBase {
   private final Rollers rollers;
   private final Elevator elevator;
 
