@@ -1,15 +1,6 @@
 package frc.robot.subsystems.reef;
 
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.desiredHeightHighAlgae;
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.desiredHeightL1;
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.desiredHeightL2;
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.desiredHeightL3;
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.desiredHeightLowAlgae;
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.desiredHeightProcessor;
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.desiredHeightSource;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.reef.elevator.Elevator;
 import frc.robot.subsystems.reef.rollers.Rollers;
@@ -25,14 +16,14 @@ public class Reef extends SubsystemBase {
 
   public void periodic() {}
 
-  public boolean atDesiredHeight(double desiredHeight) {
-    return elevator.atDesiredHeight(desiredHeight);
+  public boolean atDesiredHeight() {
+    return elevator.atDesiredHeight();
   }
 
   public Command setCoralIntake() {
     return elevator
         .source()
-        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightSource)))
+        .until(() -> atDesiredHeight())
         .andThen(rollers.intakeCoral())
         .withName("intakeCoral");
   }
@@ -40,7 +31,7 @@ public class Reef extends SubsystemBase {
   public Command setScoreL1() {
     return elevator
         .source()
-        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL1)))
+        .until(() -> atDesiredHeight())
         .andThen(rollers.placeCoralAndHighDealgify())
         .withName("scoreL1");
   }
@@ -48,7 +39,7 @@ public class Reef extends SubsystemBase {
   public Command setScoreL2() {
     return elevator
         .source()
-        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL2)))
+        .until(() -> atDesiredHeight())
         .andThen(rollers.placeCoralAndHighDealgify())
         .withName("scoreL2");
   }
@@ -56,7 +47,7 @@ public class Reef extends SubsystemBase {
   public Command setScoreL3() {
     return elevator
         .source()
-        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightL3)))
+        .until(() -> atDesiredHeight())
         .andThen(rollers.placeCoralAndHighDealgify())
         .withName("scoreL3");
   }
@@ -64,7 +55,7 @@ public class Reef extends SubsystemBase {
   public Command setDealgaeLow() {
     return elevator
         .source()
-        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightLowAlgae)))
+        .until(() -> atDesiredHeight())
         .andThen(rollers.lowDealgaefy())
         .withName("dealgaefyLow");
   }
@@ -72,7 +63,7 @@ public class Reef extends SubsystemBase {
   public Command setDealgaeHigh() {
     return elevator
         .source()
-        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightHighAlgae)))
+        .until(() -> atDesiredHeight())
         .andThen(rollers.placeCoralAndHighDealgify())
         .withName("dealgaefyHigh");
   }
@@ -80,7 +71,7 @@ public class Reef extends SubsystemBase {
   public Command setScoreProcessor() {
     return elevator
         .source()
-        .alongWith(Commands.waitUntil(() -> atDesiredHeight(desiredHeightProcessor)))
+        .until(() -> atDesiredHeight())
         .andThen(rollers.scoreProcessor())
         .withName("");
   }
