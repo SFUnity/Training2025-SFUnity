@@ -212,8 +212,6 @@ public class ModuleIOMixed implements ModuleIO {
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
     tryUntilOk(turnSpark, () -> configureTurnSpark(turnConfig));
-    tryUntilOk(
-        turnSpark, () -> turnEncoder.setPosition(cancoder.getPosition().getValue().in(Radians)));
 
     // Configure CANCoder
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
@@ -223,6 +221,8 @@ public class ModuleIOMixed implements ModuleIO {
             ? SensorDirectionValue.Clockwise_Positive
             : SensorDirectionValue.CounterClockwise_Positive;
     cancoder.getConfigurator().apply(cancoderConfig);
+    tryUntilOk(
+        turnSpark, () -> turnEncoder.setPosition(cancoder.getPosition().getValue().in(Radians)));
 
     // Create timestamp queue
     timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();

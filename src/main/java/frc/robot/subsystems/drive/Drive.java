@@ -13,7 +13,6 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
 import choreo.trajectory.SwerveSample;
@@ -23,6 +22,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -40,7 +40,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
@@ -48,6 +47,10 @@ import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -59,7 +62,6 @@ public class Drive extends SubsystemBase {
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
-  private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
@@ -137,17 +139,6 @@ public class Drive extends SubsystemBase {
     // Start odometry thread
     PhoenixOdometryThread.getInstance().start();
 
-    // Configure SysId
-    sysId =
-        new SysIdRoutine(
-            new SysIdRoutine.Config(
-                null,
-                null,
-                null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism(
-                (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
-
     // Configure controllers for commands
     linearController =
         new ProfiledPIDController(
@@ -163,7 +154,6 @@ public class Drive extends SubsystemBase {
     headingAutoController.enableContinuousInput(-Math.PI, Math.PI);
 
     updateConstraints();
-    updateModuleTunables();
   }
 
   @Override
@@ -291,18 +281,6 @@ public class Drive extends SubsystemBase {
     stop();
   }
 
-  /** Returns a command to run a quasistatic test in the specified direction. */
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return run(() -> runCharacterization(0.0))
-        .withTimeout(1.0)
-        .andThen(sysId.quasistatic(direction));
-  }
-
-  /** Returns a command to run a dynamic test in the specified direction. */
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
-  }
-
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
   @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
@@ -335,27 +313,6 @@ public class Drive extends SubsystemBase {
       output += modules[i].getFFCharacterizationVelocity() / 4.0;
     }
     return output;
-  }
-
-  public void updateModuleTunables() {
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> {
-          for (var module : modules)
-            module.setDrivePIDF(driveKp.get(), driveKd.get(), driveKs.get(), driveKv.get());
-        },
-        driveKp,
-        driveKd,
-        driveKs,
-        driveKv);
-
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> {
-          for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());
-        },
-        turnKp,
-        turnKd);
   }
 
   /**
@@ -630,27 +587,75 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber("Drive/ModuleTunables/driveSpeedForTuning", 1);
   private static final LoggedTunableNumber tuningTurnDelta =
       new LoggedTunableNumber("Drive/ModuleTunables/turnDeltaForTuning", 90);
+  private boolean tuningDriveForward = true;
+  private Timer tuningTimer = new Timer();
 
   public Command tuneModuleDrive() {
-    return tuningCmdTemplate(
-            () -> setAllModuleSetpointsToSame(tuningDriveSpeed.get(), new Rotation2d()),
-            () -> setAllModuleSetpointsToSame(-tuningDriveSpeed.get(), new Rotation2d()))
+    return run(() -> {
+          LoggedTunableNumber.ifChanged(
+              hashCode(),
+              () -> {
+                for (var module : modules)
+                  module.setDrivePIDF(driveKp.get(), driveKd.get(), driveKs.get(), driveKv.get());
+                setAllModuleSetpointsToSame(
+                    tuningDriveForward ? tuningDriveSpeed.get() : -tuningDriveSpeed.get(),
+                    new Rotation2d());
+                tuningDriveForward = !tuningDriveForward;
+                tuningTimer.start();
+              },
+              driveKp,
+              driveKd,
+              tuningDriveSpeed);
+          if (tuningTimer.hasElapsed(1.0)) {
+            stop();
+            tuningTimer.stop();
+            tuningTimer.reset();
+          }
+        })
+        .beforeStarting(
+            () -> {
+              tuningTimer.reset();
+              tuningTimer.stop();
+            })
+        .finallyDo(
+            () -> {
+              stop();
+              tuningTimer.reset();
+              tuningTimer.stop();
+            })
         .withName("tuneModuleDrive");
   }
 
   public Command tuneModuleTurn() {
-    return tuningCmdTemplate(
-            () -> setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(0)),
-            () -> setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
+    return run(() -> {
+          LoggedTunableNumber.ifChanged(
+              hashCode(),
+              () -> {
+                for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());
+                setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get()));
+                tuningTimer.start();
+              },
+              turnKp,
+              turnKd,
+              tuningTurnDelta);
+          if (tuningTimer.hasElapsed(1.0)) {
+            stop();
+            tuningTimer.reset();
+            tuningTimer.stop();
+          }
+        })
+        .beforeStarting(
+            () -> {
+              tuningTimer.reset();
+              tuningTimer.stop();
+            })
+        .finallyDo(
+            () -> {
+              stop();
+              tuningTimer.reset();
+              tuningTimer.stop();
+            })
         .withName("tuneModuleTurn");
-  }
-
-  private Command tuningCmdTemplate(Runnable run1, Runnable run2) {
-    return Commands.repeatingSequence(
-        run(run1).withTimeout(1),
-        run(() -> stop()).withTimeout(1),
-        run(run2).withTimeout(1),
-        run(() -> stop()).withTimeout(1));
   }
 
   // Autos
@@ -694,5 +699,144 @@ public class Drive extends SubsystemBase {
         () -> headingAutoController.setPID(rkPAuto.get(), 0, rkDAuto.get()),
         rkPAuto,
         rkDAuto);
+  }
+
+  private static final double FF_START_DELAY = 2.0; // Secs
+  private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
+  private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
+  private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+  /**
+   * Measures the velocity feedforward constants for the drive motors.
+   *
+   * <p>This command should only be used in voltage control mode.
+   */
+  public Command feedforwardCharacterization() {
+    List<Double> velocitySamples = new LinkedList<>();
+    List<Double> voltageSamples = new LinkedList<>();
+    Timer timer = new Timer();
+
+    return Commands.sequence(
+        // Reset data
+        Commands.runOnce(
+            () -> {
+              velocitySamples.clear();
+              voltageSamples.clear();
+            }),
+
+        // Allow modules to orient
+        run(() -> {
+              runCharacterization(0.0);
+            })
+            .withTimeout(FF_START_DELAY),
+
+        // Start timer
+        Commands.runOnce(timer::restart),
+
+        // Accelerate and gather data
+        run(() -> {
+              double voltage = timer.get() * FF_RAMP_RATE;
+              this.runCharacterization(voltage);
+              velocitySamples.add(getFFCharacterizationVelocity());
+              voltageSamples.add(voltage);
+            })
+
+            // When cancelled, calculate and print results
+            .finallyDo(
+                () -> {
+                  int n = velocitySamples.size();
+                  double sumX = 0.0;
+                  double sumY = 0.0;
+                  double sumXY = 0.0;
+                  double sumX2 = 0.0;
+                  for (int i = 0; i < n; i++) {
+                    sumX += velocitySamples.get(i);
+                    sumY += voltageSamples.get(i);
+                    sumXY += velocitySamples.get(i) * voltageSamples.get(i);
+                    sumX2 += velocitySamples.get(i) * velocitySamples.get(i);
+                  }
+                  double kS = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
+                  double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+
+                  NumberFormat formatter = new DecimalFormat("#0.00000");
+                  System.out.println("********** Drive FF Characterization Results **********");
+                  System.out.println("\tkS: " + formatter.format(kS));
+                  System.out.println("\tkV: " + formatter.format(kV));
+                }));
+  }
+
+  /** Measures the robot's wheel radius by spinning in a circle. */
+  public Command wheelRadiusCharacterization() {
+    SlewRateLimiter limiter = new SlewRateLimiter(WHEEL_RADIUS_RAMP_RATE);
+    WheelRadiusCharacterizationState state = new WheelRadiusCharacterizationState();
+
+    return Commands.parallel(
+        // Drive control sequence
+        Commands.sequence(
+            // Reset acceleration limiter
+            Commands.runOnce(
+                () -> {
+                  limiter.reset(0.0);
+                }),
+
+            // Turn in place, accelerating up to full speed
+            run(
+                () -> {
+                  double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
+                  runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
+                })),
+
+        // Measurement sequence
+        Commands.sequence(
+            // Wait for modules to fully orient before starting measurement
+            Commands.waitSeconds(1.0),
+
+            // Record starting measurement
+            Commands.runOnce(
+                () -> {
+                  state.positions = getWheelRadiusCharacterizationPositions();
+                  state.lastAngle = poseManager.getRotation();
+                  state.gyroDelta = 0.0;
+                }),
+
+            // Update gyro delta
+            Commands.run(
+                    () -> {
+                      var rotation = poseManager.getRotation();
+                      state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
+                      state.lastAngle = rotation;
+                    })
+
+                // When cancelled, calculate and print results
+                .finallyDo(
+                    () -> {
+                      double[] positions = getWheelRadiusCharacterizationPositions();
+                      double wheelDelta = 0.0;
+                      for (int i = 0; i < 4; i++) {
+                        wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
+                      }
+                      double wheelRadius =
+                          (state.gyroDelta * DriveConstants.driveBaseRadius) / wheelDelta;
+
+                      NumberFormat formatter = new DecimalFormat("#0.000");
+                      System.out.println(
+                          "********** Wheel Radius Characterization Results **********");
+                      System.out.println(
+                          "\tWheel Delta: " + formatter.format(wheelDelta) + " radians");
+                      System.out.println(
+                          "\tGyro Delta: " + formatter.format(state.gyroDelta) + " radians");
+                      System.out.println(
+                          "\tWheel Radius: "
+                              + formatter.format(wheelRadius)
+                              + " meters, "
+                              + formatter.format(Units.metersToInches(wheelRadius))
+                              + " inches");
+                    })));
+  }
+
+  private static class WheelRadiusCharacterizationState {
+    double[] positions = new double[4];
+    Rotation2d lastAngle = new Rotation2d();
+    double gyroDelta = 0.0;
   }
 }

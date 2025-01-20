@@ -94,12 +94,6 @@ public class DriveConstants {
       (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
   public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
 
-  // Drive encoder configuration
-  public static final double driveEncoderPositionFactor =
-      2 * Math.PI / driveMotorReduction; // Rotor Rotations -> Wheel Radians
-  public static final double driveEncoderVelocityFactor =
-      (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
-
   // Drive PID configuration
   public static final LoggedTunableNumber driveKp;
   public static final LoggedTunableNumber driveKd;
@@ -112,10 +106,10 @@ public class DriveConstants {
         driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.0);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
         driveKs = new LoggedTunableNumber("Drive/ModuleTunables/driveKs", 0.0);
-        driveKv = new LoggedTunableNumber("Drive/ModuleTunables/driveKv", 0.1);
+        driveKv = new LoggedTunableNumber("Drive/ModuleTunables/driveKv", 0.0);
         break;
       case SIM:
-        driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.05);
+        driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.4);
         driveKd = new LoggedTunableNumber("Drive/SimModuleTunables/driveKd", 0.0);
         driveKs = new LoggedTunableNumber("Drive/SimModuleTunables/driveKs", 0.0);
         driveKv = new LoggedTunableNumber("Drive/SimModuleTunables/driveKv", 0.0789);
@@ -143,12 +137,12 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnkP", 2.0);
-        turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnkD", 0.0);
+        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", 0.0);
+        turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnKd", 0.0);
         break;
       case SIM:
-        turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnkP", 8.0);
-        turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnkD", 0.0);
+        turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 39.0);
+        turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnKd", 0.0);
         break;
     }
   }
