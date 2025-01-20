@@ -15,7 +15,7 @@ public class GroundIOSim implements GroundIO {
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
           DCMotor.getNEO(1),
-          1,
+          50,
           0.5,
           Units.inchesToMeters(15),
           Units.degreesToRadians(18.39),
@@ -34,7 +34,6 @@ public class GroundIOSim implements GroundIO {
 
   @Override
   public void updateInputs(GroundIOInputs inputs) {
-
     sim.update(Constants.loopPeriodSecs);
 
     inputs.pivotCurrentPosition = Radians.of(sim.getAngleRads());
