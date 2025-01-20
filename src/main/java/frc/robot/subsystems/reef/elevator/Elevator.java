@@ -72,6 +72,19 @@ public class Elevator extends SubsystemBase {
     return false;
   }
 
+  public Command stow() {
+    return run(() -> {
+          calculateDesiredPosition(ElevatorConstants.minHeightInches);
+          runElevator();
+        })
+        .finallyDo(
+            () -> {
+              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
+              runElevator();
+            })
+        .withName("readyStow");
+  }
+
   public Command l1() {
     return run(() -> {
           calculateDesiredPosition(ElevatorConstants.desiredHeightL1);
