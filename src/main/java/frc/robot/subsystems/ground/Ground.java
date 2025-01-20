@@ -4,11 +4,9 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.ground.GroundConstants.kP;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
@@ -17,9 +15,9 @@ public class Ground extends SubsystemBase {
 
   // In rotations
   private static final LoggedTunableNumber loweredAngle =
-      new LoggedTunableNumber("Ground/Angles/lowered", 26);
+      new LoggedTunableNumber("Ground/Angles/lowered", 19);
   private static final LoggedTunableNumber raisedAngle =
-      new LoggedTunableNumber("Ground/Angles/raised", 0);
+      new LoggedTunableNumber("Ground/Angles/raised", 86);
   // In percent output
   private static final LoggedTunableNumber rollersSpeed =
       new LoggedTunableNumber("Ground/Speeds/groundRollers", 1);
@@ -32,19 +30,7 @@ public class Ground extends SubsystemBase {
   public Ground(GroundIO io) {
     this.io = io;
 
-    // Switch constants based on mode (the physics simulator is treated as a
-    // separate robot with different tuning)
-    switch (Constants.currentMode) {
-      case REAL:
-      case REPLAY:
-        io.setPID(0.08);
-        break;
-      case SIM:
-        io.setPID(20);
-        break;
-      default:
-        break;
-    }
+    io.setPID(kP.get());
   }
 
   public void periodic() {
@@ -55,7 +41,7 @@ public class Ground extends SubsystemBase {
     LoggedTunableNumber.ifChanged(hashCode(), () -> io.setPID(kP.get()), kP);
 
     // Logs
-    Logger.recordOutput("Ground/positionSetpointRadians",positionSetpoint.in(Radians));
+    Logger.recordOutput("Ground/positionSetpointRadians", positionSetpoint.in(Radians));
     Util.logSubsystem(this, "Ground");
   }
 
