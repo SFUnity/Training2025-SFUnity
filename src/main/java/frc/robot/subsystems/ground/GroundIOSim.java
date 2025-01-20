@@ -1,7 +1,9 @@
 package frc.robot.subsystems.ground;
 
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -53,7 +55,9 @@ public class GroundIOSim implements GroundIO {
 
   @Override
   public void setPivotPosition(Angle angle) {
-    /** INCOMPLETE */
+
+    double volts = controller.calculate(sim.getAngleRads(), angle.in(Radians));
+    pivotAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
     sim.setInputVoltage(pivotAppliedVolts);
   }
 
