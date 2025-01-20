@@ -22,19 +22,17 @@ public class Rollers extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
-     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
+    filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
+    filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
     Util.logSubsystem(this, "Rollers");
   }
-
-  
 
   public boolean coralHeld() {
     return !beamBreak.get();
   }
 
   public boolean algaeHeld() {
-    
+
     return (filteredVelocity <= RollersConstants.algaeVelocityThreshold.get()
             && (filteredStatorCurrent >= RollersConstants.algaeCurrentThreshold.get())
         || filteredStatorCurrent <= -2);
@@ -42,7 +40,6 @@ public class Rollers extends SubsystemBase {
 
   public Command placeCoralAndHighDealgify() {
     return run(() -> {
-
           io.runVolts(RollersConstants.placeSpeed);
         })
         .withName("placeCoralRollers");
@@ -50,7 +47,6 @@ public class Rollers extends SubsystemBase {
 
   public Command lowDealgaefy() {
     return run(() -> {
-
           io.runVolts(RollersConstants.dealgifyingSpeed);
         })
         .until(() -> algaeHeld())
@@ -64,7 +60,6 @@ public class Rollers extends SubsystemBase {
 
   public Command intakeCoral() {
     return run(() -> {
-
           io.runVolts(RollersConstants.intakingSpeed);
         })
         .until(() -> coralHeld())
@@ -78,7 +73,6 @@ public class Rollers extends SubsystemBase {
 
   public Command scoreProcessor() {
     return run(() -> {
-          
           io.runVolts(RollersConstants.intakingSpeed);
         })
         .withName("scoreProcessor");

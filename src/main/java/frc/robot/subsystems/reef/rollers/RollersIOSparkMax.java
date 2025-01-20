@@ -25,8 +25,4 @@ public class RollersIOSparkMax implements RollersIO {
   public void runVolts(double volts) {
     rollerMotor.setVoltage(volts);
   }
-
- 
-
-
 }
