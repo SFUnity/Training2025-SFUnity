@@ -1,6 +1,7 @@
 package frc.robot.subsystems.reef.elevator;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 
@@ -18,10 +19,10 @@ public class ElevatorConstants {
   public static final double desiredHeightSource = 2;
   public static final double desiredHeightBottom = 0;
 
-  public static final double carrageMass = 9;
-  public static final double drumRadius = 0.4;
-  public static final double minHeight = 0;
-  public static final double maxHeight = 5;
+  public static final double carrageMassKg = Units.lbsToKilograms(15);
+  public static final double drumRadiusMeters = Units.inchesToMeters(1.4);
+  public static final double minHeightInches = 0;
+  public static final double maxHeightInches = 23.0;
 
   public static final double gearRatio = 0;
   public static final double wheelRadius = 1;
@@ -54,7 +55,7 @@ public class ElevatorConstants {
         kS = new LoggedTunableNumber("Reef/Elevator/kS", 0.0);
         kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.06);
         kV = new LoggedTunableNumber("Reef/Elevator/kV", 12.6);
-      
+
         break;
     }
   }

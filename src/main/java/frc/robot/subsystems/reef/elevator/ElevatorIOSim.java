@@ -4,7 +4,9 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
 
 public class ElevatorIOSim implements ElevatorIO {
   private final PIDController pid;
@@ -13,11 +15,11 @@ public class ElevatorIOSim implements ElevatorIO {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(1),
-          5,
-          ElevatorConstants.carrageMass,
-          ElevatorConstants.drumRadius,
-          ElevatorConstants.minHeight,
-          ElevatorConstants.maxHeight,
+          25,
+          carrageMassKg,
+          drumRadiusMeters,
+          Units.inchesToMeters(minHeightInches),
+          Units.inchesToMeters(maxHeightInches),
           true,
           0);
 
