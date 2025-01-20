@@ -13,8 +13,11 @@
 
 package frc.robot;
 
+import static frc.robot.constantsGlobal.FieldConstants.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -34,6 +37,7 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -288,6 +292,19 @@ public class Robot extends LoggedRobot {
                             new Pose2d(poseManager.getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    driver
+        .b()
+        .whileTrue(
+            drive.fullAutoDrive(
+                () ->
+                    AllianceFlipUtil.apply(
+                        processorScore.transformBy(
+                            new Transform2d(0, 0, new Rotation2d(Math.PI))))));
+    driver.y().whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(processorScore)));
+    driver
+        .rightBumper()
+        .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
 
     // Operator controls
   }
