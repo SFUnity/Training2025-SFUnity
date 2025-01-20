@@ -39,8 +39,15 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
-    elevatorVisualizer.update(inputs.position.in(Meters));
+
     updateTunables();
+
+    io.runVolts(
+        pid.calculate(inputs.position.in(Meters), pid.getGoal())
+            + ffController.calculate(pid.getSetpoint().velocity));
+
+    elevatorVisualizer.update(inputs.position.in(Meters));
+
     Logger.recordOutput("Elevator/goal", pid.getGoal().position);
     Util.logSubsystem(this, "Elevator");
   }
@@ -55,125 +62,42 @@ public class Elevator extends SubsystemBase {
         ElevatorConstants.kD);
   }
 
-  public void calculateDesiredPosition(double desiredPosition) {
-    pid.setGoal(desiredPosition);
-  }
-
-  public void runElevator() {
-    io.runVolts(
-        pid.calculate(inputs.position.in(Meters), pid.getGoal())
-            + ffController.calculate(pid.getSetpoint().velocity));
-  }
-
-  public void stop() {
-    io.stop();
-  }
-
   public boolean atDesiredHeight() {
     return pid.atGoal();
   }
 
   public Command stow() {
-    return run(() -> {
-          calculateDesiredPosition(ElevatorConstants.minHeightInches);
-          runElevator();
-        })
-        .finallyDo(
-            () -> {
-              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
-              runElevator();
-            })
-        .withName("readyStow");
+    return run(() -> pid.setGoal(ElevatorConstants.minHeightInches)).withName("readyStow");
   }
 
   public Command l1() {
-    return run(() -> {
-          calculateDesiredPosition(ElevatorConstants.desiredHeightL1);
-          runElevator();
-        })
-        .finallyDo(
-            () -> {
-              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
-              runElevator();
-            })
-        .withName("readyL1");
+    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightL1)).withName("readyL1");
   }
 
   public Command l2() {
-    return run(() -> {
-          calculateDesiredPosition(ElevatorConstants.desiredHeightL2);
-          runElevator();
-        })
-        .finallyDo(
-            () -> {
-              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
-              runElevator();
-            })
-        .withName("readyL2");
+    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightL2)).withName("readyL2");
   }
 
   public Command l3() {
-    return run(() -> {
-          calculateDesiredPosition(ElevatorConstants.desiredHeightL3);
-          runElevator();
-        })
-        .finallyDo(
-            () -> {
-              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
-              runElevator();
-            })
-        .withName("readyL3");
+    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightL3)).withName("readyL3");
   }
 
   public Command lowAlgae() {
-    return run(() -> {
-          calculateDesiredPosition(ElevatorConstants.desiredHeightLowAlgae);
-          runElevator();
-        })
-        .finallyDo(
-            () -> {
-              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
-              runElevator();
-            })
+    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightLowAlgae))
         .withName("readyLowAlgae");
   }
 
   public Command highAlgae() {
-    return run(() -> {
-          calculateDesiredPosition(ElevatorConstants.desiredHeightHighAlgae);
-          runElevator();
-        })
-        .finallyDo(
-            () -> {
-              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
-              runElevator();
-            })
+    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightHighAlgae))
         .withName("readyHighAlgae");
   }
 
   public Command processor() {
-    return run(() -> {
-          calculateDesiredPosition(ElevatorConstants.desiredHeightProcessor);
-          runElevator();
-        })
-        .finallyDo(
-            () -> {
-              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
-              runElevator();
-            })
+    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightProcessor))
         .withName("readyProcessor");
   }
 
   public Command source() {
-    return run(() -> {
-          calculateDesiredPosition(ElevatorConstants.desiredHeightSource);
-          runElevator();
-        })
-        .finallyDo(
-            () -> {
-              calculateDesiredPosition(ElevatorConstants.desiredHeightBottom);
-              runElevator();
-            })
-        .withName("readySource");
+    return run(() -> pid.setGoal(ElevatorConstants.desiredHeightSource)).withName("readySource");
   }
 }
