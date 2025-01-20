@@ -17,8 +17,8 @@ public class GroundIOSim implements GroundIO {
       new SingleJointedArmSim(
           DCMotor.getNEO(1),
           1,
-          (3.6768198 * 0.2533142 * 0.2533142) / 3,
-          5.7366408,
+          0.5,
+          Units.inchesToMeters(15),
           Units.degreesToRadians(18.39),
           Units.degreesToRadians(87.39),
           false,
