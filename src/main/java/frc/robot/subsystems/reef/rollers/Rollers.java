@@ -4,6 +4,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Util;
 
 public class Rollers extends SubsystemBase {
   private final RollersIO io;
@@ -11,6 +12,8 @@ public class Rollers extends SubsystemBase {
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
   private final DigitalInput beamBreak = new DigitalInput(RollersConstants.beamBreakNumber);
+  private double filteredVelocity;
+  private double filteredStatorCurrent;
 
   public Rollers(RollersIO io) {
     this.io = io;
@@ -19,68 +22,64 @@ public class Rollers extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
+     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
+    Util.logSubsystem(this, "Rollers");
   }
 
-  private void runRollers(double volts) {
-    io.runVolts(volts);
-  }
-
-  private void stopRollers() {
-    io.stop();
-  }
+  
 
   public boolean coralHeld() {
     return !beamBreak.get();
   }
 
   public boolean algaeHeld() {
-    double filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
-    double filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
-    return (filteredVelocity <= RollersConstants.algaeVelocityThreshold
-            && (filteredStatorCurrent >= RollersConstants.algaeCurrentThreshold)
+    
+    return (filteredVelocity <= RollersConstants.algaeVelocityThreshold.get()
+            && (filteredStatorCurrent >= RollersConstants.algaeCurrentThreshold.get())
         || filteredStatorCurrent <= -2);
   }
 
-  public Command placeCoralAndHighAlgae() {
+  public Command placeCoralAndHighDealgify() {
     return run(() -> {
-          io.runMotorStraight();
-          runRollers(RollersConstants.rollersPlaceSpeed);
+
+          io.runVolts(RollersConstants.placeSpeed);
         })
         .withName("placeCoralRollers");
   }
 
-  public Command lowDeAlgaefy() {
+  public Command lowDealgaefy() {
     return run(() -> {
-          io.runMotorStraight();
-          runRollers(RollersConstants.rollersDealgifyingSpeed);
+
+          io.runVolts(RollersConstants.dealgifyingSpeed);
         })
         .until(() -> algaeHeld())
         .andThen(
             run(
                 () -> {
-                  stopRollers();
+                  io.runVolts(0);
                 }))
-        .withName("deAlgaefy");
+        .withName("dealgaefy");
   }
 
   public Command intakeCoral() {
     return run(() -> {
-          io.runMotorStraight();
-          runRollers(RollersConstants.rollersIntakingSpeed);
+
+          io.runVolts(RollersConstants.intakingSpeed);
         })
         .until(() -> coralHeld())
         .andThen(
             run(
                 () -> {
-                  stopRollers();
+                  io.runVolts(0);
                 }))
         .withName("intakeCoralRollers");
   }
 
   public Command scoreProcessor() {
     return run(() -> {
-          io.reverseMotor();
-          runRollers(RollersConstants.rollersIntakingSpeed);
+          
+          io.runVolts(RollersConstants.intakingSpeed);
         })
         .withName("scoreProcessor");
   }

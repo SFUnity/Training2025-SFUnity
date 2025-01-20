@@ -26,18 +26,7 @@ public class RollersIOSparkMax implements RollersIO {
     rollerMotor.setVoltage(volts);
   }
 
-  @Override
-  public void runMotorStraight() {
-    config.inverted(false);
-  }
+ 
 
-  @Override
-  public void reverseMotor() {
-    config.inverted(true);
-  }
 
-  @Override
-  public void stop() {
-    rollerMotor.stopMotor();
-  }
 }

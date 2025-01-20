@@ -33,7 +33,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
     inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
     inputs.currentAmps =
-        new double[] {elevatorMotor.getOutputCurrent(), elevatorMotor.getOutputCurrent()};
+        new double[] {elevatorMotor.getOutputCurrent()};
   }
 
   @Override
