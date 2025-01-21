@@ -1,11 +1,11 @@
 package frc.robot.subsystems.ground;
 
 import static edu.wpi.first.units.Units.Radians;
+import static frc.robot.subsystems.ground.GroundConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.constantsGlobal.Constants;
@@ -17,11 +17,11 @@ public class GroundIOSim implements GroundIO {
           DCMotor.getNEO(1),
           50,
           0.5,
-          Units.inchesToMeters(15),
-          Units.degreesToRadians(18.39),
-          Units.degreesToRadians(87.39),
+          armLengthMeters,
+          minAngleRads,
+          maxAngleRads,
           false,
-          Units.degreesToRadians(87.39));
+          maxAngleRads);
 
   private final PIDController controller;
   private double pivotAppliedVolts = 0.0;

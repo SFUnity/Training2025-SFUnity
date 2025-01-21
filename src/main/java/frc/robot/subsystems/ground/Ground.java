@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.ground.GroundConstants.kP;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
@@ -12,7 +13,8 @@ import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
 public class Ground extends SubsystemBase {
-
+  private final GroundVisualizer measuredVisualizer = new GroundVisualizer("Measured", Color.kRed);
+  private final GroundVisualizer setpointVisualizer = new GroundVisualizer("Setpoint", Color.kBlue);
   // In rotations
   private static final LoggedTunableNumber loweredAngle =
       new LoggedTunableNumber("Ground/Angles/lowered", 19);
@@ -41,6 +43,8 @@ public class Ground extends SubsystemBase {
     LoggedTunableNumber.ifChanged(hashCode(), () -> io.setPID(kP.get()), kP);
 
     // Logs
+    measuredVisualizer.update(inputs.pivotCurrentPosition);
+    setpointVisualizer.update(positionSetpoint);
     Logger.recordOutput("Ground/positionSetpointRadians", positionSetpoint.in(Radians));
     Util.logSubsystem(this, "Ground");
   }
