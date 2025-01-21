@@ -19,13 +19,19 @@ public class ElevatorVisualizer {
   private final LoggedMechanismLigament2d carriage;
   private final String key;
 
-  public ElevatorVisualizer(String key) {
+  public ElevatorVisualizer(String key, Color color, double lineWidth) {
     this.key = key;
     mechanism = new LoggedMechanism2d(.3, .7, new Color8Bit(Color.kBlack));
     root = mechanism.getRoot("Elevator", 0, Units.inchesToMeters(1.1));
-    carriage = new LoggedMechanismLigament2d("Carriage", 0, ELEVATOR_ANGLE_DEG);
+    carriage =
+        new LoggedMechanismLigament2d(
+            "Carriage", 0, ELEVATOR_ANGLE_DEG, lineWidth, new Color8Bit(color));
 
     root.append(carriage);
+  }
+
+  public ElevatorVisualizer(String key, Color color) {
+    this(key, color, 5);
   }
 
   /** Update intake visualizer with current intake angle */

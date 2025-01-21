@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
@@ -15,7 +16,10 @@ import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
-  private final ElevatorVisualizer elevatorVisualizer = new ElevatorVisualizer("elevator");
+  private final ElevatorVisualizer meausedVisualizer =
+      new ElevatorVisualizer("Meausred", Color.kGreen);
+  private final ElevatorVisualizer setpointVisualizer =
+      new ElevatorVisualizer("Setpoint", Color.kBlue, 10);
   private final ProfiledPIDController pid =
       new ProfiledPIDController(
           kP.get(),
@@ -46,7 +50,8 @@ public class Elevator extends SubsystemBase {
         pid.calculate(inputs.position.in(Inches))
             + ffController.calculate(pid.getSetpoint().velocity));
 
-    elevatorVisualizer.update(inputs.position.in(Meters));
+    meausedVisualizer.update(inputs.position.in(Meters));
+    setpointVisualizer.update(Units.inchesToMeters(pid.getGoal().position));
 
     Logger.recordOutput("Elevator/goal", Units.inchesToMeters(pid.getGoal().position));
     Util.logSubsystem(this, "Elevator");
