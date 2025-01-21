@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
@@ -78,7 +79,7 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber thetakD =
       new LoggedTunableNumber("Drive/Commands/Theta/D", 0.0);
   private static final LoggedTunableNumber linearTolerance =
-      new LoggedTunableNumber("Drive/Commands/Linear/tolerance", 0.08);
+      new LoggedTunableNumber("Drive/Commands/Linear/tolerance", 0.05);
   private static final LoggedTunableNumber thetaToleranceDeg =
       new LoggedTunableNumber("Drive/Commands/Theta/toleranceDeg", 1.0);
 
@@ -173,8 +174,8 @@ public class Drive extends SubsystemBase {
       }
 
       // Log empty setpoint states when disabled
-      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+      Logger.recordOutput("Drive/SwerveStates/Setpoints", new SwerveModuleState[] {});
+      Logger.recordOutput("Drive/SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
     // Update odometry
@@ -229,7 +230,7 @@ public class Drive extends SubsystemBase {
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     setModuleSetpoints(setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+    Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", discreteSpeeds);
   }
 
   private void setAllModuleSetpointsToSame(double speed, Rotation2d angle) {
@@ -238,14 +239,14 @@ public class Drive extends SubsystemBase {
       moduleStates[i] = new SwerveModuleState(speed, angle);
     }
     setModuleSetpoints(moduleStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", new ChassisSpeeds());
+    Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", new ChassisSpeeds());
   }
 
   private void setModuleSetpoints(SwerveModuleState[] setpointStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
 
     // Log unoptimized setpoints and setpoint speeds
-    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -253,7 +254,7 @@ public class Drive extends SubsystemBase {
     }
 
     // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/SetpointsOptimized", setpointStates);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -282,7 +283,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
-  @AutoLogOutput(key = "SwerveStates/Measured")
+  @AutoLogOutput(key = "Drive/SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
@@ -292,7 +293,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the measured chassis speeds of the robot. */
-  @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
+  @AutoLogOutput(key = "Drive/SwerveChassisSpeeds/Measured")
   private ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
@@ -454,7 +455,7 @@ public class Drive extends SubsystemBase {
                   thetaVelocity,
                   poseManager.getRotation()));
 
-          Logger.recordOutput("Drive/Commands/Linear/currentDistance", currentDistance);
+          Logger.recordOutput("Drive/Commands/CurrentDistance", currentDistance);
         })
         .beforeStarting(
             () -> {
@@ -493,7 +494,7 @@ public class Drive extends SubsystemBase {
 
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
-    Rotation2d linearDirection = new Rotation2d(x, y);
+    Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
     // Square values and scale to max velocity
     linearMagnitude = linearMagnitude * linearMagnitude;
@@ -510,7 +511,7 @@ public class Drive extends SubsystemBase {
         thetaController.calculate(
             poseManager.getPose().getRotation().getRadians(), goalHeadingRads);
 
-    Logger.recordOutput("Drive/Commands/Theta/HeadingError", thetaController.getPositionError());
+    Logger.recordOutput("Drive/Commands/HeadingError", thetaController.getPositionError());
     return output;
   }
 
@@ -568,94 +569,18 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns true if within tolerance of aiming at goal */
-  @AutoLogOutput(key = "Drive/Commands/Linear/AtGoal")
+  @AutoLogOutput(key = "Drive/Commands/LinearAtGoal")
   public boolean linearAtGoal() {
     return linearController.atGoal();
   }
 
   /** Returns true if within tolerance of aiming at speaker */
-  @AutoLogOutput(key = "Drive/Commands/Theta/AtGoal")
+  @AutoLogOutput(key = "Drive/Commands/ThetaAtGoal")
   public boolean thetaAtGoal() {
     return Util.equalsWithTolerance(
         thetaController.getSetpoint().position,
         thetaController.getGoal().position,
         Units.degreesToRadians(thetaToleranceDeg.get()));
-  }
-
-  // Tuning Commands
-  private static final LoggedTunableNumber tuningDriveSpeed =
-      new LoggedTunableNumber("Drive/ModuleTunables/driveSpeedForTuning", 1);
-  private static final LoggedTunableNumber tuningTurnDelta =
-      new LoggedTunableNumber("Drive/ModuleTunables/turnDeltaForTuning", 90);
-  private boolean tuningDriveForward = true;
-  private Timer tuningTimer = new Timer();
-
-  public Command tuneModuleDrive() {
-    return run(() -> {
-          LoggedTunableNumber.ifChanged(
-              hashCode(),
-              () -> {
-                for (var module : modules)
-                  module.setDrivePIDF(driveKp.get(), driveKd.get(), driveKs.get(), driveKv.get());
-                setAllModuleSetpointsToSame(
-                    tuningDriveForward ? tuningDriveSpeed.get() : -tuningDriveSpeed.get(),
-                    new Rotation2d());
-                tuningDriveForward = !tuningDriveForward;
-                tuningTimer.start();
-              },
-              driveKp,
-              driveKd,
-              tuningDriveSpeed);
-          if (tuningTimer.hasElapsed(1.0)) {
-            stop();
-            tuningTimer.stop();
-            tuningTimer.reset();
-          }
-        })
-        .beforeStarting(
-            () -> {
-              tuningTimer.reset();
-              tuningTimer.stop();
-            })
-        .finallyDo(
-            () -> {
-              stop();
-              tuningTimer.reset();
-              tuningTimer.stop();
-            })
-        .withName("tuneModuleDrive");
-  }
-
-  public Command tuneModuleTurn() {
-    return run(() -> {
-          LoggedTunableNumber.ifChanged(
-              hashCode(),
-              () -> {
-                for (var module : modules) module.setTurnPIDF(turnKp.get(), turnKd.get());
-                setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get()));
-                tuningTimer.start();
-              },
-              turnKp,
-              turnKd,
-              tuningTurnDelta);
-          if (tuningTimer.hasElapsed(1.0)) {
-            stop();
-            tuningTimer.reset();
-            tuningTimer.stop();
-          }
-        })
-        .beforeStarting(
-            () -> {
-              tuningTimer.reset();
-              tuningTimer.stop();
-            })
-        .finallyDo(
-            () -> {
-              stop();
-              tuningTimer.reset();
-              tuningTimer.stop();
-            })
-        .withName("tuneModuleTurn");
   }
 
   // Autos
@@ -699,6 +624,65 @@ public class Drive extends SubsystemBase {
         () -> headingAutoController.setPID(rkPAuto.get(), 0, rkDAuto.get()),
         rkPAuto,
         rkDAuto);
+  }
+
+  // Tuning Commands
+  // * For tuning drive motor PID values use Phoenix Tuner X (and maybe ff also?)
+  private static final LoggedTunableNumber tuningTurnDelta =
+      new LoggedTunableNumber("Drive/ModuleTunables/turnDeltaForTuning", 90);
+  private static final LoggedTunableNumber tuningDriveSpeed =
+      new LoggedTunableNumber("Drive/ModuleTunables/tuningDriveSpeed", 3);
+
+  public Command tuneModuleTurn() {
+    return Commands.run(
+            () -> {
+              LoggedTunableNumber.ifChanged(
+                  hashCode(),
+                  () -> {
+                    CommandScheduler.getInstance()
+                        .schedule(
+                            startRun(
+                                    () -> {
+                                      for (var module : modules)
+                                        module.setTurnPIDF(turnKp.get(), turnKd.get());
+                                    },
+                                    () ->
+                                        setAllModuleSetpointsToSame(
+                                            0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
+                                .withTimeout(1.0)
+                                .finallyDo(this::stop));
+                  },
+                  turnKp,
+                  turnKd,
+                  tuningTurnDelta);
+            })
+        .withName("tuneModuleTurn");
+  }
+
+  public Command tuneModuleDrive() {
+    return Commands.run(
+            () -> {
+              LoggedTunableNumber.ifChanged(
+                  hashCode(),
+                  () -> {
+                    CommandScheduler.getInstance()
+                        .schedule(
+                            startRun(
+                                    () -> {
+                                      for (var module : modules)
+                                        module.setDrivePIDF(driveKp.get(), driveKd.get());
+                                    },
+                                    () ->
+                                        setAllModuleSetpointsToSame(
+                                            tuningDriveSpeed.get(), new Rotation2d()))
+                                .withTimeout(1.0)
+                                .finallyDo(this::stop));
+                  },
+                  driveKp,
+                  driveKd,
+                  tuningDriveSpeed);
+            })
+        .withName("tuneModuleDrive");
   }
 
   private static final double FF_START_DELAY = 2.0; // Secs

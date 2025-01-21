@@ -1,4 +1,4 @@
-// Copyright (c) 2024 FRC 6328
+// Copyright (c) 2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by an MIT-style
@@ -10,138 +10,161 @@ package frc.robot.constantsGlobal;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 
-// TODO must update to new field
 /**
- * Contains various field dimensions and useful reference points. Dimensions are in meters, and sets
- * of corners start in the lower left moving clockwise. <b>All units in Meters</b> <br>
- * <br>
- *
- * <p>All translations and poses are stored with the origin at the rightmost point on the BLUE
- * ALLIANCE wall.<br>
- * <br>
- * Length refers to the <i>x</i> direction (as described by wpilib) <br>
- * Width refers to the <i>y</i> direction (as described by wpilib)
+ * Contains various field dimensions and useful reference points. All units are in meters and poses
+ * have a blue alliance origin.
  */
-public class FieldConstants {
-  public static final double fieldLength = Units.inchesToMeters(651.223);
-  public static final double fieldWidth = Units.inchesToMeters(323.277);
-  public static final double wingX = Units.inchesToMeters(229.201);
-  public static final double podiumX = Units.inchesToMeters(126.75);
-  public static final double startingLineX = Units.inchesToMeters(74.111);
+public final class FieldConstants {
+  public static final double fieldLength = Units.inchesToMeters(690.876);
+  public static final double fieldWidth = Units.inchesToMeters(317);
+  public static final double startingLineX =
+      Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
-  public static final Translation2d ampCenter =
-      new Translation2d(Units.inchesToMeters(72.455), fieldWidth);
+  public static final Pose2d processorScore =
+      new Pose2d(Units.inchesToMeters(235.726), .75 / 2, Rotation2d.fromDegrees(-90));
 
-  /** Staging locations for each note */
-  public static final class StagingLocations {
-    public static final double centerlineX = fieldLength / 2.0;
+  public static class Barge {
+    public static final Translation2d farCage =
+        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(286.779));
+    public static final Translation2d middleCage =
+        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(242.855));
+    public static final Translation2d closeCage =
+        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(199.947));
 
-    // need to update
-    public static final double centerlineFirstY = Units.inchesToMeters(29.638);
-    public static final double centerlineSeparationY = Units.inchesToMeters(66);
-    public static final double spikeX = Units.inchesToMeters(114);
-    // need
-    public static final double spikeFirstY = Units.inchesToMeters(161.638);
-    public static final double spikeSeparationY = Units.inchesToMeters(57);
+    // Measured from floor to bottom of cage
+    public static final double deepHeight = Units.inchesToMeters(3.125);
+    public static final double shallowHeight = Units.inchesToMeters(30.125);
+  }
 
-    public static final Translation2d[] centerlineTranslations = new Translation2d[5];
-    public static final Translation2d[] spikeTranslations = new Translation2d[3];
+  public static class CoralStation {
+    public static final Pose2d leftCenterFace =
+        new Pose2d(
+            Units.inchesToMeters(33.526),
+            Units.inchesToMeters(291.176),
+            Rotation2d.fromDegrees(90 - 144.011));
+    public static final Pose2d rightCenterFace =
+        new Pose2d(
+            Units.inchesToMeters(33.526),
+            Units.inchesToMeters(25.824),
+            Rotation2d.fromDegrees(144.011 - 90));
+  }
 
-    static {
-      for (int i = 0; i < centerlineTranslations.length; i++) {
-        centerlineTranslations[i] =
-            new Translation2d(centerlineX, centerlineFirstY + (i * centerlineSeparationY));
-      }
+  public static class StagingPositions {
+    // Measured from the center of the ice cream
+    public static final Pose2d leftIceCream =
+        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
+    public static final Pose2d middleIceCream =
+        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(158.5), new Rotation2d());
+    public static final Pose2d rightIceCream =
+        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
+  }
+
+  private static final double xOffset = Units.inchesToMeters(30.738) + .75 / 2 + .2;
+  private static final double yOffset = Units.inchesToMeters(6.469);
+  private static final Translation2d reefCenter =
+      new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
+
+  public static enum Branch {
+    A(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 1)))
+            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+    B(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 1)))
+            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+    C(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 2)))
+            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+    D(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 2)))
+            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+    E(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 3)))
+            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+    F(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 3)))
+            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+    G(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 4)))
+            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+    H(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 4)))
+            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+    I(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 5)))
+            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+    J(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 5)))
+            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+    K(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 6)))
+            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+    L(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 6)))
+            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI))));
+
+    Branch(Pose2d pose) {
+      this.pose = pose;
     }
 
-    static {
-      for (int i = 0; i < spikeTranslations.length; i++) {
-        spikeTranslations[i] = new Translation2d(spikeX, spikeFirstY + (i * spikeSeparationY));
-      }
+    public final Pose2d pose;
+  }
+
+  public static enum Face {
+    One(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.A,
+        Branch.B),
+    Two(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 1)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.C,
+        Branch.D),
+    Three(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 2)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.E,
+        Branch.F),
+    Four(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 3)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.G,
+        Branch.H),
+    Five(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 4)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.I,
+        Branch.J),
+    Six(
+        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 - (60 * 5)))
+            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        Branch.K,
+        Branch.L);
+
+    Face(Pose2d pose, Branch lefBranch, Branch rightBranch) {
+      this.pose = pose;
+      this.leftBranch = lefBranch;
+      this.rightBranch = rightBranch;
     }
+
+    public final Pose2d pose;
+    public final Branch leftBranch;
+    public final Branch rightBranch;
   }
 
-  /** Each corner of the speaker * */
-  public static final class Speaker {
+  // TODO replace with robot heights instead
+  public static enum ReefHeight {
+    L4(Units.inchesToMeters(72)),
+    L3(Units.inchesToMeters(47.625)),
+    L2(Units.inchesToMeters(31.875)),
+    L1(Units.inchesToMeters(18)),
+    AlgaeHigh(Units.inchesToMeters(55)),
+    AlgaeLow(Units.inchesToMeters(40));
 
-    // corners (blue alliance origin)
-    public static final Translation3d topRightSpeaker =
-        new Translation3d(
-            Units.inchesToMeters(18.055),
-            Units.inchesToMeters(238.815),
-            Units.inchesToMeters(83.091));
+    ReefHeight(double height) {
+      this.height = height;
+    }
 
-    public static final Translation3d topLeftSpeaker =
-        new Translation3d(
-            Units.inchesToMeters(18.055),
-            Units.inchesToMeters(197.765),
-            Units.inchesToMeters(83.091));
-
-    public static final Translation3d bottomRightSpeaker =
-        new Translation3d(0.0, Units.inchesToMeters(238.815), Units.inchesToMeters(78.324));
-    public static final Translation3d bottomLeftSpeaker =
-        new Translation3d(0.0, Units.inchesToMeters(197.765), Units.inchesToMeters(78.324));
-
-    /** Center of the speaker opening (blue alliance) */
-    public static final Translation3d centerSpeakerOpening =
-        bottomLeftSpeaker.interpolate(topRightSpeaker, 0.5);
+    public final double height;
   }
-
-  public static final class Subwoofer {
-    public static final Pose2d ampFaceCorner =
-        new Pose2d(
-            Units.inchesToMeters(35.775),
-            Units.inchesToMeters(239.366),
-            Rotation2d.fromDegrees(-120));
-
-    public static final Pose2d sourceFaceCorner =
-        new Pose2d(
-            Units.inchesToMeters(35.775),
-            Units.inchesToMeters(197.466),
-            Rotation2d.fromDegrees(120));
-
-    public static final Pose2d centerFace =
-        new Pose2d(
-            Units.inchesToMeters(35.775),
-            Units.inchesToMeters(218.416),
-            Rotation2d.fromDegrees(180));
-  }
-
-  public static final class Stage {
-    public static final Pose2d podiumLeg =
-        new Pose2d(Units.inchesToMeters(126.75), Units.inchesToMeters(161.638), new Rotation2d());
-    public static final Pose2d ampLeg =
-        new Pose2d(
-            Units.inchesToMeters(220.873),
-            Units.inchesToMeters(212.425),
-            Rotation2d.fromDegrees(-30));
-    public static final Pose2d sourceLeg =
-        new Pose2d(
-            Units.inchesToMeters(220.873),
-            Units.inchesToMeters(110.837),
-            Rotation2d.fromDegrees(30));
-
-    public static final Pose2d centerPodiumAmpChain =
-        new Pose2d(
-            podiumLeg.getTranslation().interpolate(ampLeg.getTranslation(), 0.5),
-            Rotation2d.fromDegrees(120.0));
-    public static final Pose2d centerAmpSourceChain =
-        new Pose2d(
-            ampLeg.getTranslation().interpolate(sourceLeg.getTranslation(), 0.5), new Rotation2d());
-    public static final Pose2d centerSourcePodiumChain =
-        new Pose2d(
-            sourceLeg.getTranslation().interpolate(podiumLeg.getTranslation(), 0.5),
-            Rotation2d.fromDegrees(240.0));
-    public static final Pose2d center =
-        new Pose2d(Units.inchesToMeters(192.55), Units.inchesToMeters(161.638), new Rotation2d());
-    public static final double centerToChainDistance =
-        center.getTranslation().getDistance(centerPodiumAmpChain.getTranslation());
-  }
-
-  public static final class Amp {
-    public static final Translation2d ampTapeTopCorner =
-        new Translation2d(Units.inchesToMeters(130.0), Units.inchesToMeters(305.256));
-  }
-
-  public static final double aprilTagWidth = Units.inchesToMeters(6.50);
 }
