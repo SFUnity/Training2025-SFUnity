@@ -46,7 +46,7 @@ public class Reef extends SubsystemBase {
 
   public Command setScoreL3() {
     return elevator
-        .source()
+        .l3()
         .until(() -> atDesiredHeight())
         .andThen(rollers.placeCoralAndHighDealgify())
         .withName("scoreL3");

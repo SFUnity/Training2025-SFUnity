@@ -21,7 +21,7 @@ public class ElevatorVisualizer {
 
   public ElevatorVisualizer(String key) {
     this.key = key;
-    mechanism = new LoggedMechanism2d(3.0, 3.0, new Color8Bit(Color.kBlack));
+    mechanism = new LoggedMechanism2d(.3, .7, new Color8Bit(Color.kBlack));
     root = mechanism.getRoot("Elevator", 0, Units.inchesToMeters(1.1));
     carriage = new LoggedMechanismLigament2d("Carriage", 0, ELEVATOR_ANGLE_DEG);
 

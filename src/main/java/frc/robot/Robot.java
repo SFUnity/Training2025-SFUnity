@@ -320,7 +320,7 @@ public class Robot extends LoggedRobot {
         .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
 
     // Operator controls
-    driver.a().whileTrue(reef.setCoralIntake());
+    driver.a().whileTrue(reef.setScoreL3());
     operator.y().whileTrue(reef.setScoreL1());
   }
 

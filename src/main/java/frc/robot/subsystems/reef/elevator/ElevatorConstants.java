@@ -12,7 +12,7 @@ public class ElevatorConstants {
 
   public static final double desiredHeightL1 = 0.5;
   public static final double desiredHeightL2 = 1.5;
-  public static final double desiredHeightL3 = 2;
+  public static final double desiredHeightL3 = 23;
   public static final double desiredHeightHighAlgae = 1;
   public static final double desiredHeightLowAlgae = 1.75;
   public static final double desiredHeightProcessor = 0;
