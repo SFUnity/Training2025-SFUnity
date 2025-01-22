@@ -16,7 +16,6 @@ package frc.robot;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
@@ -234,7 +233,7 @@ public class Robot extends LoggedRobot {
 
     // For tuning visualizations
     // Logger.recordOutput("ZeroedPose2d", new Pose2d());
-    // Logger.recordOutput("ZeroedPose3d", new Pose3d());
+    // Logger.recordOutput("ZeroedPose3d", new Pose3d[] {new Pose3d(), new Pose3d()});
 
     // Set up port forwarding for limelights so we can connect to them through the RoboRIO USB port
     for (int port = 5800; port <= 5809; port++) {
@@ -323,7 +322,7 @@ public class Robot extends LoggedRobot {
         .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
 
     // Operator controls
-
+    operator.a().whileTrue(elevator.l3());
   }
 
   /** This function is called once when the robot is disabled. */
