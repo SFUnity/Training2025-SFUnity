@@ -6,13 +6,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
+import static frc.robot.subsystems.reef.rollers.RollersConstants.*;  
 
 public class Rollers extends SubsystemBase {
   private final RollersIO io;
   private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
-  private final DigitalInput beamBreak = new DigitalInput(RollersConstants.beamBreakNumber);
+  private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
   private double filteredVelocity;
   private double filteredStatorCurrent;
 
@@ -37,8 +38,8 @@ public class Rollers extends SubsystemBase {
 
   public boolean algaeHeld() {
 
-    return (filteredVelocity <= RollersConstants.algaeVelocityThreshold.get()
-            && (filteredStatorCurrent >= RollersConstants.algaeCurrentThreshold.get())
+    return (filteredVelocity <= algaeVelocityThreshold.get()
+            && (filteredStatorCurrent >= algaeCurrentThreshold.get())
         || filteredStatorCurrent <= -2);
   }
 
@@ -51,14 +52,14 @@ public class Rollers extends SubsystemBase {
 
   public Command placeCoralAndHighDealgify() {
     return run(() -> {
-          io.runVolts(RollersConstants.placeSpeed);
+          io.runVolts(placeSpeed);
         })
         .withName("placeCoralRollers");
   }
 
   public Command lowDealgaefy() {
     return run(() -> {
-          io.runVolts(RollersConstants.dealgifyingSpeed);
+          io.runVolts(dealgifyingSpeed);
         })
         .until(() -> algaeHeld())
         .andThen(
@@ -71,7 +72,7 @@ public class Rollers extends SubsystemBase {
 
   public Command intakeCoral() {
     return run(() -> {
-          io.runVolts(RollersConstants.intakingSpeed);
+          io.runVolts(intakingSpeed);
         })
         .until(() -> coralHeld())
         .andThen(
@@ -84,7 +85,7 @@ public class Rollers extends SubsystemBase {
 
   public Command scoreProcessor() {
     return run(() -> {
-          io.runVolts(RollersConstants.intakingSpeed);
+          io.runVolts(intakingSpeed);
         })
         .withName("scoreProcessor");
   }
