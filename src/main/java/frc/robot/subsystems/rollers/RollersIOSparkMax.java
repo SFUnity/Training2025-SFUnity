@@ -9,8 +9,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class RollersIOSparkMax implements RollersIO {
   private final SparkMax rollerMotor = new SparkMax(rollerMotorID, MotorType.kBrushless);
-  private final SparkMaxConfig config = new SparkMaxConfig();
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
+  private final SparkMaxConfig config = new SparkMaxConfig();
 
   public RollersIOSparkMax() {}
 

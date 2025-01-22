@@ -19,9 +19,3 @@ public interface ElevatorIO {
 
   public default void runVolts(double volts) {}
 }
-
-// Calculate
-// updateInputs
-// setHeight
-// setPID
-// setFF

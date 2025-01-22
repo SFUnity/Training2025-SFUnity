@@ -12,9 +12,11 @@ import org.littletonrobotics.junction.Logger;
 public class Rollers extends SubsystemBase {
   private final RollersIO io;
   private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
+
+  private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
+
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
-  private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
   private double filteredVelocity;
   private double filteredStatorCurrent;
 
@@ -28,8 +30,10 @@ public class Rollers extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Rollers", inputs);
+
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
+
     Util.logSubsystem(this, "Rollers");
   }
 
@@ -38,30 +42,21 @@ public class Rollers extends SubsystemBase {
   }
 
   public boolean algaeHeld() {
-
     return (filteredVelocity <= algaeVelocityThreshold.get()
             && (filteredStatorCurrent >= algaeCurrentThreshold.get())
         || filteredStatorCurrent <= -2);
   }
 
   public Command stop() {
-    return run(() -> {
-          io.runVolts(0);
-        })
-        .withName("stopRollers");
+    return run(() -> io.runVolts(0)).withName("stopRollers");
   }
 
   public Command placeCoralAndHighDealgify() {
-    return run(() -> {
-          io.runVolts(placeSpeed);
-        })
-        .withName("placeCoralRollers");
+    return run(() -> io.runVolts(placeSpeed)).withName("placeCoralRollers");
   }
 
   public Command lowDealgaefy() {
-    return run(() -> {
-          io.runVolts(dealgifyingSpeed);
-        })
+    return run(() -> io.runVolts(dealgifyingSpeed))
         .until(() -> algaeHeld())
         .andThen(
             run(
@@ -72,9 +67,7 @@ public class Rollers extends SubsystemBase {
   }
 
   public Command intakeCoral() {
-    return run(() -> {
-          io.runVolts(intakingSpeed);
-        })
+    return run(() -> io.runVolts(intakingSpeed))
         .until(() -> coralHeld())
         .andThen(
             run(
@@ -85,10 +78,6 @@ public class Rollers extends SubsystemBase {
   }
 
   public Command scoreProcessor() {
-    return run(() -> {
-          io.runVolts(intakingSpeed);
-        })
-        .withName("scoreProcessor");
+    return run(() -> io.runVolts(intakingSpeed)).withName("scoreProcessor");
   }
-  // TODO: add "until when 2m distance sensor gets set up"
 }

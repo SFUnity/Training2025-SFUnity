@@ -29,11 +29,11 @@ public class Elevator extends SubsystemBase {
   private ElevatorFeedforward ffController = new ElevatorFeedforward(0, kG.get(), kV.get());
 
   private final ElevatorIO io;
-
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   public Elevator(ElevatorIO io) {
     this.io = io;
+
     pid.setTolerance(0.15);
 
     setDefaultCommand(stow());

@@ -13,9 +13,9 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
-
   private final RelativeEncoder encoder = elevatorMotor.getEncoder();
   private final SparkMaxConfig motorConfig = new SparkMaxConfig();
+
   private double prevoiusPosition = 0;
   private long prevoiusTime = 0;
   private long currentTime = 0;
