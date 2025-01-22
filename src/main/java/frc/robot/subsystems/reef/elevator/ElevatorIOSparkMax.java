@@ -6,7 +6,7 @@ import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.units.*;
+
 
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
@@ -32,7 +32,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     inputs.velocityMetersPerSec = deltaPosition / deltaTime;
 
     inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
-    inputs.currentAmps = new double[] {elevatorMotor.getOutputCurrent()};
+    inputs.currentAmps = elevatorMotor.getOutputCurrent();
   }
 
   @Override
