@@ -32,20 +32,19 @@ import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.reef.Reef;
-import frc.robot.subsystems.reef.elevator.Elevator;
-import frc.robot.subsystems.reef.elevator.ElevatorIO;
-import frc.robot.subsystems.reef.elevator.ElevatorIOSim;
-import frc.robot.subsystems.reef.elevator.ElevatorIOSparkMax;
-import frc.robot.subsystems.reef.rollers.Rollers;
-import frc.robot.subsystems.reef.rollers.RollersIO;
-import frc.robot.subsystems.reef.rollers.RollersIOSim;
-import frc.robot.subsystems.reef.rollers.RollersIOSparkMax;
+import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.subsystems.rollers.RollersIO;
+import frc.robot.subsystems.rollers.RollersIOSim;
+import frc.robot.subsystems.rollers.RollersIOSparkMax;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
@@ -88,7 +87,8 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
-  private final Reef reef;
+  private final Elevator elevator;
+  private final Rollers rollers;
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
   private final Autos autos;
@@ -184,8 +184,10 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        reef =
-            new Reef(new Rollers(new RollersIOSparkMax()), new Elevator(new ElevatorIOSparkMax()));
+        elevator =
+            new Elevator(new ElevatorIOSparkMax());
+        rollers = 
+            new Rollers(new RollersIOSparkMax());
         break;
 
       case SIM:
@@ -199,7 +201,10 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        reef = new Reef(new Rollers(new RollersIOSim()), new Elevator(new ElevatorIOSim()));
+        elevator =
+                new Elevator(new ElevatorIOSim());
+        rollers = 
+                new Rollers(new RollersIOSim());
         break;
 
       default:
@@ -213,7 +218,10 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        reef = new Reef(new Rollers(new RollersIO() {}), new Elevator(new ElevatorIO() {}));
+                elevator =
+                new Elevator(new ElevatorIO() {});
+            rollers = 
+                new Rollers(new RollersIO(){});
         break;
     }
 
@@ -320,8 +328,7 @@ public class Robot extends LoggedRobot {
         .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
 
     // Operator controls
-    driver.a().whileTrue(reef.setScoreL3());
-    operator.y().whileTrue(reef.setScoreL1());
+
   }
 
   /** This function is called once when the robot is disabled. */

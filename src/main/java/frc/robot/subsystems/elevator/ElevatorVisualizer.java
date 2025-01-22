@@ -1,4 +1,4 @@
-package frc.robot.subsystems.reef.elevator;
+package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;

@@ -1,12 +1,15 @@
-package frc.robot.subsystems.reef.rollers;
+package frc.robot.subsystems.rollers;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.reef.rollers.RollersIOInputsAutoLogged;
 import frc.robot.util.Util;
-import org.littletonrobotics.junction.Logger;
-import static frc.robot.subsystems.reef.rollers.RollersConstants.*;  
+
+import static frc.robot.subsystems.rollers.RollersConstants.*;
+
+import org.littletonrobotics.junction.Logger;  
 
 public class Rollers extends SubsystemBase {
   private final RollersIO io;

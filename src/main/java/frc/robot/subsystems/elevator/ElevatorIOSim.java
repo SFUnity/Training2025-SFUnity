@@ -1,7 +1,7 @@
-package frc.robot.subsystems.reef.elevator;
+package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.subsystems.reef.elevator.ElevatorConstants.*;
+import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;

@@ -1,10 +1,11 @@
-package frc.robot.subsystems.reef.rollers;
+package frc.robot.subsystems.rollers;
+
+import static frc.robot.subsystems.rollers.RollersConstants.*;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import static frc.robot.subsystems.reef.rollers.RollersConstants.*;  
+import com.revrobotics.spark.config.SparkMaxConfig;  
 
 public class RollersIOSparkMax implements RollersIO {
   private final SparkMax rollerMotor =
