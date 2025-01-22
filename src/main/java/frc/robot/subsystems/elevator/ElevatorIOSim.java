@@ -3,6 +3,7 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -15,7 +16,7 @@ public class ElevatorIOSim implements ElevatorIO {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(1),
-          25,
+          9,
           carrageMassKg,
           drumRadiusMeters,
           Units.inchesToMeters(minHeightInches),
@@ -39,6 +40,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void runVolts(double volts) {
+    MathUtil.clamp(volts, -12.0, 12.0);
     appliedVolts = volts;
     sim.setInputVoltage(volts);
   }
