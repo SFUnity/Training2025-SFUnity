@@ -67,6 +67,10 @@ public class Elevator extends SubsystemBase {
     return pid.atGoal();
   }
 
+  public Command goTo(ElevatorHeight height) {
+    return run(() -> pid.setGoal(height.get())).withName("goTo" + height.toString());
+  }
+
   public Command stow() {
     return run(() -> pid.setGoal(minHeightInches)).withName("readyStow");
   }

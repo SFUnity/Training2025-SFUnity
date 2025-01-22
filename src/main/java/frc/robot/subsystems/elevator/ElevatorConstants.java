@@ -63,6 +63,7 @@ public class ElevatorConstants {
     }
   }
 
+  /** In inches */
   public static enum ElevatorHeight {
     L3(new LoggedTunableNumber("Elevator/L3", 23)),
     L2(new LoggedTunableNumber("Elevator/L2", 0)),
@@ -79,29 +80,8 @@ public class ElevatorConstants {
 
     public final LoggedTunableNumber height;
 
-    public double L1() {
-      return L1.height.get();
-    }
-    public double L2() {
-      return L2.height.get();
-    }
-    public double L3() {
-      return L3.height.get();
-    }
-    public double AlgaeHigh() {
-      return AlgaeHigh.height.get();
-    }
-    public double AlgaeLow() {
-      return AlgaeLow.height.get();
-    }
-    public double Processor() {
-      return Processor.height.get();
-    }
-    public double Source() {
-      return Source.height.get();
-    }
-    public double Stow() {
-      return Stow.height.get();
+    public double get() {
+      return height.get();
     }
   }
 }
