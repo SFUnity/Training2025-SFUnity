@@ -1,6 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.constantsGlobal.Constants;
@@ -11,7 +10,6 @@ public class ElevatorConstants {
   public static final double maxElevatorSpeed = 5;
   public static final double maxElevatorAcceleration = 10;
 
-
   public static enum ElevatorHeights {
     L3(desiredHeightL3.get()),
     L2(desiredHeightL2.get()),
@@ -20,14 +18,16 @@ public class ElevatorConstants {
     AlgaeLow(desiredHeightLowAlgae.get()),
     Processor(desiredHeightProcessor.get()),
     Source(desiredHeightSource.get());
+
     ElevatorHeights(double height) {
       this.height = height;
     }
 
     public final double height;
   }
+
   public static final LoggedTunableNumber desiredHeightL1;
-  public static final LoggedTunableNumber desiredHeightL2 ;
+  public static final LoggedTunableNumber desiredHeightL2;
   public static final LoggedTunableNumber desiredHeightL3;
   public static final LoggedTunableNumber desiredHeightHighAlgae;
   public static final LoggedTunableNumber desiredHeightLowAlgae;

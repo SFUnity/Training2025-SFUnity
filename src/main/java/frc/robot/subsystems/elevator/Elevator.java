@@ -11,7 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.reef.elevator.ElevatorIOInputsAutoLogged;
+import frc.robot.subsystems.elevator.ElevatorIOInputsAutoLogged;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
@@ -101,10 +101,8 @@ public class Elevator extends SubsystemBase {
   public Command source() {
     return run(() -> goalHeight = ElevatorHeights.Source.height);
   }
-  
+
   public Command setElevator() {
     return run(() -> pid.setGoal(goalHeight)).withName("moveElevator");
   }
-
-  
 }

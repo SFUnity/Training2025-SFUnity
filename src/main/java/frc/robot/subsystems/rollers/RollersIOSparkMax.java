@@ -5,11 +5,10 @@ import static frc.robot.subsystems.rollers.RollersConstants.*;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;  
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class RollersIOSparkMax implements RollersIO {
-  private final SparkMax rollerMotor =
-      new SparkMax(rollerMotorID, MotorType.kBrushless);
+  private final SparkMax rollerMotor = new SparkMax(rollerMotorID, MotorType.kBrushless);
   private final SparkMaxConfig config = new SparkMaxConfig();
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
 
