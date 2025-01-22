@@ -49,16 +49,16 @@ public class ElevatorConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Reef/Elevator/kP", 150.0);
-        kD = new LoggedTunableNumber("Reef/Elevator/kD", 17.53);
-        kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.11591);
-        kV = new LoggedTunableNumber("Reef/Elevator/kV", 11.3);
+        kP = new LoggedTunableNumber("Elevator/kP", 150.0);
+        kD = new LoggedTunableNumber("Elevator/kD", 17.53);
+        kG = new LoggedTunableNumber("Elevator/kG", 0.11591);
+        kV = new LoggedTunableNumber("Elevator/kV", 11.3);
         break;
       case SIM:
-        kP = new LoggedTunableNumber("Reef/Elevator/kP", 60.0);
-        kD = new LoggedTunableNumber("Reef/Elevator/kD", 0.0);
-        kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.437);
-        kV = new LoggedTunableNumber("Reef/Elevator/kV", 12.6);
+        kP = new LoggedTunableNumber("Elevator/kP", 60.0);
+        kD = new LoggedTunableNumber("Elevator/kD", 0.0);
+        kG = new LoggedTunableNumber("Elevator/kG", 0.437);
+        kV = new LoggedTunableNumber("Elevator/kV", 12.6);
         break;
     }
   }
