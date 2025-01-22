@@ -62,4 +62,20 @@ public class ElevatorConstants {
         break;
     }
   }
+
+  public static enum ElevatorHeight {
+    L3(new LoggedTunableNumber("Elevator/L3", 23)),
+    L2(new LoggedTunableNumber("Elevator/L2", 0)),
+    L1(new LoggedTunableNumber("Elevator/L1", 0)),
+    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 0)),
+    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", 0)),
+    Processor(new LoggedTunableNumber("Elevator/Processor", 0)),
+    Source(new LoggedTunableNumber("Elevator/Source", 0));
+
+    ElevatorHeight(LoggedTunableNumber height) {
+      this.height = height;
+    }
+
+    public final LoggedTunableNumber height;
+  }
 }
