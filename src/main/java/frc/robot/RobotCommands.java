@@ -6,7 +6,7 @@ import frc.robot.subsystems.rollers.Rollers;
 
 /** Put high level commands here */
 public final class RobotCommands {
-    public Command setCoralIntake(Elevator elevator, Rollers rollers) {
+  public Command setCoralIntake(Elevator elevator, Rollers rollers) {
     return elevator
         .source()
         .until(() -> elevator.atDesiredHeight())

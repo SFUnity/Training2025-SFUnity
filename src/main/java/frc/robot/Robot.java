@@ -16,6 +16,7 @@ package frc.robot;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
@@ -32,15 +33,15 @@ import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
@@ -184,10 +185,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        elevator =
-            new Elevator(new ElevatorIOSparkMax());
-        rollers = 
-            new Rollers(new RollersIOSparkMax());
+        elevator = new Elevator(new ElevatorIOSparkMax());
+        rollers = new Rollers(new RollersIOSparkMax());
         break;
 
       case SIM:
@@ -201,10 +200,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        elevator =
-                new Elevator(new ElevatorIOSim());
-        rollers = 
-                new Rollers(new RollersIOSim());
+        elevator = new Elevator(new ElevatorIOSim());
+        rollers = new Rollers(new RollersIOSim());
         break;
 
       default:
@@ -218,10 +215,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-                elevator =
-                new Elevator(new ElevatorIO() {});
-            rollers = 
-                new Rollers(new RollersIO(){});
+        elevator = new Elevator(new ElevatorIO() {});
+        rollers = new Rollers(new RollersIO() {});
         break;
     }
 
