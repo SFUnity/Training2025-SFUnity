@@ -70,12 +70,38 @@ public class ElevatorConstants {
     AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 0)),
     AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", 0)),
     Processor(new LoggedTunableNumber("Elevator/Processor", 0)),
-    Source(new LoggedTunableNumber("Elevator/Source", 0));
+    Source(new LoggedTunableNumber("Elevator/Source", 0)),
+    Stow(new LoggedTunableNumber("Elevator/Stow", 0));
 
     ElevatorHeight(LoggedTunableNumber height) {
       this.height = height;
     }
 
     public final LoggedTunableNumber height;
+
+    public double L1() {
+      return L1.height.get();
+    }
+    public double L2() {
+      return L2.height.get();
+    }
+    public double L3() {
+      return L3.height.get();
+    }
+    public double AlgaeHigh() {
+      return AlgaeHigh.height.get();
+    }
+    public double AlgaeLow() {
+      return AlgaeLow.height.get();
+    }
+    public double Processor() {
+      return Processor.height.get();
+    }
+    public double Source() {
+      return Source.height.get();
+    }
+    public double Stow() {
+      return Stow.height.get();
+    }
   }
 }
