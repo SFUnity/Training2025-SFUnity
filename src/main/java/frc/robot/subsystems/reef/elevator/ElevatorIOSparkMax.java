@@ -40,8 +40,5 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     elevatorMotor.setVoltage(volts);
   }
 
-  @Override
-  public void stop() {
-    elevatorMotor.stopMotor();
-  }
+
 }

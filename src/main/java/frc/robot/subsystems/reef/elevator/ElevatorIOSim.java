@@ -43,8 +43,5 @@ public class ElevatorIOSim implements ElevatorIO {
     sim.setInputVoltage(volts);
   }
 
-  @Override
-  public void stop() {
-    runVolts(0);
-  }
+  
 }
