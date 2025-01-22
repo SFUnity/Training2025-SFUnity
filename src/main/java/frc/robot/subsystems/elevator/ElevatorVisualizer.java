@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
@@ -18,6 +19,10 @@ public class ElevatorVisualizer {
   private final LoggedMechanismRoot2d root;
   private final LoggedMechanismLigament2d carriage;
   private final String key;
+
+  private final LoggedTunableNumber xOffset = new LoggedTunableNumber("Elevator/xOffset", -.4);
+  private final LoggedTunableNumber yOffset = new LoggedTunableNumber("Elevator/yOffset", -7.65);
+  private final LoggedTunableNumber zOffset = new LoggedTunableNumber("Elevator/zOffset", 4.7);
 
   public ElevatorVisualizer(String key, Color color, double lineWidth) {
     this.key = key;
@@ -45,9 +50,9 @@ public class ElevatorVisualizer {
     // The inches to meters stuff here will have to be changed
     Pose3d carriagePose =
         new Pose3d(
-            Units.inchesToMeters(4.5) + carriage.getLength() * elevatorAngle.getCos(),
-            0.0,
-            Units.inchesToMeters(7.0) + carriage.getLength() * elevatorAngle.getSin(),
+            Units.inchesToMeters(xOffset.get()) + carriage.getLength() * elevatorAngle.getCos(),
+            Units.inchesToMeters(yOffset.get()),
+            Units.inchesToMeters(zOffset.get()) + carriage.getLength() * elevatorAngle.getSin(),
             new Rotation3d());
     Logger.recordOutput("Elevator/Mechanism3d/" + key, carriagePose);
   }
