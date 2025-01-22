@@ -46,6 +46,6 @@ public class GroundVisualizer {
     // The inches to meters stuff here will have to be changed
     Pose3d carriagePose =
         new Pose3d(0, 0, Units.inchesToMeters(10), new Rotation3d(0.0, angle.in(Radians), 0.0));
-    Logger.recordOutput("Elevator/Mechanism3d/" + key, carriagePose);
+    Logger.recordOutput("Ground/Mechanism3d/" + key, carriagePose);
   }
 }
