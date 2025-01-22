@@ -36,7 +36,7 @@ public class Elevator extends SubsystemBase {
 
     pid.setTolerance(0.15);
 
-    setDefaultCommand(stow());
+    setDefaultCommand(goTo(Stow));
   }
 
   @Override
