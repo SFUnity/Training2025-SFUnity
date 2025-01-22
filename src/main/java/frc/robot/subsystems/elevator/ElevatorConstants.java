@@ -55,9 +55,9 @@ public class ElevatorConstants {
         kV = new LoggedTunableNumber("Elevator/kV", 11.3);
         break;
       case SIM:
-        kP = new LoggedTunableNumber("Elevator/kP", 60.0);
+        kP = new LoggedTunableNumber("Elevator/kP", 6.0);
         kD = new LoggedTunableNumber("Elevator/kD", 0.0);
-        kG = new LoggedTunableNumber("Elevator/kG", 0.437);
+        kG = new LoggedTunableNumber("Elevator/kG", 0.06);
         kV = new LoggedTunableNumber("Elevator/kV", 12.6);
         break;
     }

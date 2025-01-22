@@ -15,7 +15,7 @@ public class ElevatorIOSim implements ElevatorIO {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(1),
-          25,
+          9,
           carrageMassKg,
           drumRadiusMeters,
           Units.inchesToMeters(minHeightInches),
