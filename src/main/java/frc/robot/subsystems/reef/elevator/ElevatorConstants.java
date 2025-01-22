@@ -30,10 +30,21 @@ public class ElevatorConstants {
 
   public static final Translation2d elevatorOrigin = new Translation2d(0, 0);
 
+  public static final int currentLimit = 0;
+
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
   public static final LoggedTunableNumber kG;
   public static final LoggedTunableNumber kV;
+
+  public static final double turnPIDMinInput = 0;
+  public static final double turnPIDMaxInput = 2 * Math.PI;
+
+  public static final double turnMotorReduction = 150 / 7;
+  public static final double encoderPositionFactor =
+      2 * Math.PI / turnMotorReduction; // Rotations -> Radians
+  public static final double encoderVelocityFactor =
+      (2 * Math.PI) / 60.0 / turnMotorReduction; // RPM -> Rad/Sec
 
   static {
     switch (Constants.currentMode) {

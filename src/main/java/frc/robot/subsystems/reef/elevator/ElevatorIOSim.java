@@ -42,6 +42,4 @@ public class ElevatorIOSim implements ElevatorIO {
     appliedVolts = volts;
     sim.setInputVoltage(volts);
   }
-
-  
 }
