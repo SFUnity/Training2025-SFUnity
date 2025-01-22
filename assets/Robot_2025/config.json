@@ -20,5 +20,28 @@
     0.442
   ],
   "cameras": [],
-  "components": []
+  "components": [
+    {
+      "name": "Carriage",
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "y",
+          "degrees": 0
+        },
+        {
+          "axis": "z",
+          "degrees": -90
+        }
+      ],
+      "zeroedPosition": [
+        0.22,
+        0.1,
+        0.375
+      ]
+    }
+  ]
 }
