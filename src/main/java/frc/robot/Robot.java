@@ -14,6 +14,7 @@
 package frc.robot;
 
 import static frc.robot.constantsGlobal.FieldConstants.*;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -322,7 +323,7 @@ public class Robot extends LoggedRobot {
         .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
 
     // Operator controls
-    operator.a().whileTrue(elevator.l3());
+    operator.a().whileTrue(elevator.goTo(L3));
   }
 
   /** This function is called once when the robot is disabled. */
