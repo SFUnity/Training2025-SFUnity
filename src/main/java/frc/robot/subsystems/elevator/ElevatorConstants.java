@@ -7,8 +7,8 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorConstants {
   public static final int elevatorMotorID = 0;
-  public static final double maxElevatorSpeed = 5;
-  public static final double maxElevatorAcceleration = 10;
+  public static final double maxElevatorSpeed = 1000;
+  public static final double maxElevatorAcceleration = 1000;
 
   public static final double desiredHeightL1 = 0.5;
   public static final double desiredHeightL2 = 1.5;
@@ -57,8 +57,8 @@ public class ElevatorConstants {
       case SIM:
         kP = new LoggedTunableNumber("Reef/Elevator/kP", 60.0);
         kD = new LoggedTunableNumber("Reef/Elevator/kD", 0.0);
-        kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.06);
-        kV = new LoggedTunableNumber("Reef/Elevator/kV", 0.4);
+        kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.437);
+        kV = new LoggedTunableNumber("Reef/Elevator/kV", 12.6);
         break;
     }
   }
