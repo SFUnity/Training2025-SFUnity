@@ -327,6 +327,7 @@ public class Robot extends LoggedRobot {
         .rightBumper()
         .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
 
+    
     // Operator controls
 
   }

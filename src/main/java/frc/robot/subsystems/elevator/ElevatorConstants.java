@@ -10,6 +10,20 @@ public class ElevatorConstants {
   public static final double maxElevatorSpeed = 5;
   public static final double maxElevatorAcceleration = 10;
 
+
+  public static enum ReefHeight {
+    L3(Units.inchesToMeters(47.625)),
+    L2(Units.inchesToMeters(31.875)),
+    L1(Units.inchesToMeters(18)),
+    AlgaeHigh(Units.inchesToMeters(55)),
+    AlgaeLow(Units.inchesToMeters(40));
+
+    ReefHeight(double height) {
+      this.height = height;
+    }
+
+    public final double height;
+  }
   public static final double desiredHeightL1 = 0.5;
   public static final double desiredHeightL2 = 1.5;
   public static final double desiredHeightL3 = 23;

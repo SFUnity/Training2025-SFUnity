@@ -33,6 +33,8 @@ public class Elevator extends SubsystemBase {
 
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
+  public double goalHeight = 0;
+
   public Elevator(ElevatorIO io) {
     this.io = io;
     pid.setTolerance(0.15);
@@ -73,30 +75,36 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command l1() {
-    return run(() -> pid.setGoal(desiredHeightL1)).withName("readyL1");
+    return run(() -> goalHeight = ReefHeight.L1.height).withName("readyL1");
   }
 
   public Command l2() {
-    return run(() -> pid.setGoal(desiredHeightL2)).withName("readyL2");
+    return run(() -> goalHeight = ReefHeight.L2.height).withName("readyL2");
   }
 
   public Command l3() {
-    return run(() -> pid.setGoal(desiredHeightL3)).withName("readyL3");
+    return run(() -> goalHeight = ReefHeight.L3.height).withName("readyL3");
   }
 
   public Command lowAlgae() {
-    return run(() -> pid.setGoal(desiredHeightLowAlgae)).withName("readyLowAlgae");
+    return run(() -> goalHeight = ReefHeight.AlgaeLow.height).withName("readyLowAlgae");
   }
 
   public Command highAlgae() {
-    return run(() -> pid.setGoal(desiredHeightHighAlgae)).withName("readyHighAlgae");
+    return run(() -> goalHeight = ReefHeight.AlgaeHigh.height).withName("readyHighAlgae");
   }
 
   public Command processor() {
-    return run(() -> pid.setGoal(desiredHeightProcessor)).withName("readyProcessor");
+    return run(() -> goalHeight = desiredHeightProcessor).withName("readyProcessor");
   }
 
   public Command source() {
-    return run(() -> pid.setGoal(desiredHeightSource)).withName("readySource");
+    return run(() -> goalHeight = desiredHeightSource);
   }
+  
+  public Command setElevator() {
+    return run(() -> pid.setGoal(goalHeight)).withName("moveElevator");
+  }
+
+  
 }

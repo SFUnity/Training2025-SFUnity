@@ -154,7 +154,6 @@ public final class FieldConstants {
 
   // TODO replace with robot heights instead
   public static enum ReefHeight {
-    L4(Units.inchesToMeters(72)),
     L3(Units.inchesToMeters(47.625)),
     L2(Units.inchesToMeters(31.875)),
     L1(Units.inchesToMeters(18)),
