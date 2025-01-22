@@ -329,7 +329,7 @@ public class Robot extends LoggedRobot {
 
     
     // Operator controls
-
+    
   }
 
   /** This function is called once when the robot is disabled. */

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.constantsGlobal.Constants;
@@ -11,26 +12,27 @@ public class ElevatorConstants {
   public static final double maxElevatorAcceleration = 10;
 
 
-  public static enum ReefHeight {
-    L3(Units.inchesToMeters(47.625)),
-    L2(Units.inchesToMeters(31.875)),
-    L1(Units.inchesToMeters(18)),
-    AlgaeHigh(Units.inchesToMeters(55)),
-    AlgaeLow(Units.inchesToMeters(40));
-
-    ReefHeight(double height) {
+  public static enum ElevatorHeights {
+    L3(desiredHeightL3.get()),
+    L2(desiredHeightL2.get()),
+    L1(desiredHeightL1.get()),
+    AlgaeHigh(desiredHeightHighAlgae.get()),
+    AlgaeLow(desiredHeightLowAlgae.get()),
+    Processor(desiredHeightProcessor.get()),
+    Source(desiredHeightSource.get());
+    ElevatorHeights(double height) {
       this.height = height;
     }
 
     public final double height;
   }
-  public static final double desiredHeightL1 = 0.5;
-  public static final double desiredHeightL2 = 1.5;
-  public static final double desiredHeightL3 = 23;
-  public static final double desiredHeightHighAlgae = 1;
-  public static final double desiredHeightLowAlgae = 1.75;
-  public static final double desiredHeightProcessor = 0;
-  public static final double desiredHeightSource = 2;
+  public static final LoggedTunableNumber desiredHeightL1;
+  public static final LoggedTunableNumber desiredHeightL2 ;
+  public static final LoggedTunableNumber desiredHeightL3;
+  public static final LoggedTunableNumber desiredHeightHighAlgae;
+  public static final LoggedTunableNumber desiredHeightLowAlgae;
+  public static final LoggedTunableNumber desiredHeightProcessor;
+  public static final LoggedTunableNumber desiredHeightSource;
 
   public static final double carrageMassKg = Units.lbsToKilograms(15);
   public static final double drumRadiusMeters = Units.inchesToMeters(1.4);
@@ -67,12 +69,27 @@ public class ElevatorConstants {
         kD = new LoggedTunableNumber("Reef/Elevator/kD", 17.53);
         kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.11591);
         kV = new LoggedTunableNumber("Reef/Elevator/kV", 11.3);
+
+        desiredHeightL1 = new LoggedTunableNumber("Reef/Elevator/L1");
+        desiredHeightL2 = new LoggedTunableNumber("Reef/Elevator/L2");
+        desiredHeightL3 = new LoggedTunableNumber("Reef/Elevator/L3");
+        desiredHeightLowAlgae = new LoggedTunableNumber("Reef/Elevator/LowAlgae");
+        desiredHeightHighAlgae = new LoggedTunableNumber("Reef/Elevator/HighAlgae");
+        desiredHeightSource = new LoggedTunableNumber("Reef/Elevator/Source");
+        desiredHeightProcessor = new LoggedTunableNumber("Reef/Elevator/Processor");
         break;
       case SIM:
         kP = new LoggedTunableNumber("Reef/Elevator/kP", 60.0);
         kD = new LoggedTunableNumber("Reef/Elevator/kD", 0.0);
         kG = new LoggedTunableNumber("Reef/Elevator/kG", 0.06);
         kV = new LoggedTunableNumber("Reef/Elevator/kV", 0.4);
+        desiredHeightL1 = new LoggedTunableNumber("Reef/Elevator/L1");
+        desiredHeightL2 = new LoggedTunableNumber("Reef/Elevator/L2");
+        desiredHeightL3 = new LoggedTunableNumber("Reef/Elevator/L3");
+        desiredHeightLowAlgae = new LoggedTunableNumber("Reef/Elevator/LowAlgae");
+        desiredHeightHighAlgae = new LoggedTunableNumber("Reef/Elevator/HighAlgae");
+        desiredHeightSource = new LoggedTunableNumber("Reef/Elevator/Source");
+        desiredHeightProcessor = new LoggedTunableNumber("Reef/Elevator/Processor");
         break;
     }
   }
