@@ -3,6 +3,7 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -69,37 +70,5 @@ public class Elevator extends SubsystemBase {
 
   public Command goTo(ElevatorHeight height) {
     return run(() -> pid.setGoal(height.get())).withName("goTo" + height.toString());
-  }
-
-  public Command stow() {
-    return run(() -> pid.setGoal(minHeightInches)).withName("readyStow");
-  }
-
-  public Command l1() {
-    return run(() -> pid.setGoal(desiredHeightL1)).withName("readyL1");
-  }
-
-  public Command l2() {
-    return run(() -> pid.setGoal(desiredHeightL2)).withName("readyL2");
-  }
-
-  public Command l3() {
-    return run(() -> pid.setGoal(desiredHeightL3)).withName("readyL3");
-  }
-
-  public Command lowAlgae() {
-    return run(() -> pid.setGoal(desiredHeightLowAlgae)).withName("readyLowAlgae");
-  }
-
-  public Command highAlgae() {
-    return run(() -> pid.setGoal(desiredHeightHighAlgae)).withName("readyHighAlgae");
-  }
-
-  public Command processor() {
-    return run(() -> pid.setGoal(desiredHeightProcessor)).withName("readyProcessor");
-  }
-
-  public Command source() {
-    return run(() -> pid.setGoal(desiredHeightSource)).withName("readySource");
   }
 }
