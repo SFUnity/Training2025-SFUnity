@@ -63,8 +63,8 @@ public class Autos {
     chooser = new AutoChooser();
         // autoChooser.addCmd("Example Auto Command", this::exampleAutoCommand);
       chooser.addRoutine("WallLKAlgaeL2L3",this::WallLKAlgaeL2L3);
-      chooser.addRoutine("ProcessorCDAlgaeL2L3",this::ProcessorCDAlgaeL2L3);
-      chooser.addRoutine("ProcessorCDAlgaeProcessorL2L3",this::ProcessorCDAlgaeProcessorL2L3);
+      chooser.addRoutine("ProcessorCDAlgaeL2L3",this::CenterJIProcessorHGProcessorEFProcessorAlgaeIL2);
+      chooser.addRoutine("ProcessorCDAlgaeProcessorL2L3",this::WallJIL2AlgaeL2L1);
       chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJILKAlgaeL2L3);
         // Put the auto chooser on the dashboard
        // SmartDashboard.putData(autoChooser);
@@ -101,7 +101,7 @@ public class Autos {
 
 
 
-  // Routines
+  // Example Routines
 public Command CenterWallLKAlgaeL1() {
     return Commands.sequence(
         factory.resetOdometry("CenterWallToLK"), //   
@@ -169,65 +169,39 @@ public AutoRoutine SpamLsAuto() {
     return routine;
 }
 
-
+// Routines
 public AutoRoutine WallLKAlgaeL2L3 () {
+
   AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
 
   AutoTrajectory centerWallToLK = routine.trajectory("CenterWallToLK");
   AutoTrajectory lKToStationHigh = routine.trajectory("LKtoStationHigh");
   AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToLKL2");
   
-    
-    routine.active().onTrue(
-      Commands.sequence(
-          Commands.print("Performing WallLKAlgaeL2L3 Auto!"),
-          centerWallToLK.resetOdometry(),
-          centerWallToLK.cmd() 
+  routine.active().onTrue(
+    Commands.sequence(
+      Commands.print("Performing WallLKAlgaeL2L3 Auto!"),
+      centerWallToLK.resetOdometry(),
+      centerWallToLK.cmd() 
       )
   );
   
   centerWallToLK.done().onTrue(
-  Commands.sequence(
+    Commands.sequence(
       //Placeholder; no meaning or use until Subsystem team gets their stuff done
       Commands.print("Dealgaefied!"),
       Commands.print("Arrived at Algae LK, moving to Station High!"),
-      lKToStationHigh.cmd()
-   )
-);
-
-for (int i = 0; i < 3; i++) {
-  lKToStationHigh.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK L2!"),
-      stationHighToLKL2.cmd()
-  )
-  );
-  stationHighToLKL2.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Algae LK L2, moving to Station High!"),
-      lKToStationHigh.cmd()
+        lKToStationHigh.cmd()
       )
   );
-}
 
   lKToStationHigh.done().onTrue(
     Commands.sequence(
       Commands.print("Arrived at Station High, moving to Algae LK L2!"),
       stationHighToLKL2.cmd()
-  )
-  );
-  stationHighToLKL2.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Algae LK L2, moving to Station High!"),
-      lKToStationHigh.cmd()
       )
   );
-  lKToStationHigh.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK L2!"),
-      stationHighToLKL2.cmd()
-  )
-  );
+
   stationHighToLKL2.done().onTrue(
     Commands.sequence(
       Commands.print("Arrived at Algae LK L2, moving to Station High!"),
@@ -235,75 +209,133 @@ for (int i = 0; i < 3; i++) {
       )
   );
 
-lKToStationHigh.done().onTrue(
+  lKToStationHigh.done().onTrue(
     Commands.sequence(
       Commands.print("Arrived at Station High, moving to Algae LK L2!"),
       stationHighToLKL2.cmd()
-  )
+      )
   );
-}
+
+  stationHighToLKL2.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Algae LK L2, moving to Station High!"),
+      lKToStationHigh.cmd()
+      )
+  );
+
+  lKToStationHigh.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Station High, moving to Algae LK L2!"),
+      stationHighToLKL2.cmd()
+      )
+  );
+
+  stationHighToLKL2.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Algae LK L2, moving to Station High!"),
+      lKToStationHigh.cmd()
+      )
+  );
+
+  lKToStationHigh.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Station High, moving to Algae LK L2!"),
+      stationHighToLKL2.cmd()
+      )
+  );
+
   return routine;
+
 }
 public AutoRoutine WallJILKAlgaeL2L3 () {
+ 
   AutoRoutine routine = factory.newRoutine("WallJILKAlgaeL2L3");
 
   AutoTrajectory centerWallToJI = routine.trajectory("CenterWallToJI");
   AutoTrajectory lKToStationHigh = routine.trajectory("LKtoStationHigh");
   AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToLKL2");
   AutoTrajectory jIToKLAlgae = routine.trajectory("JIToKLAlgae");
-  
-  
-    
-    routine.active().onTrue(
-      Commands.sequence(
-          Commands.print("Performing WallLKAlgaeL2L3 Auto!"),
-          centerWallToJI.resetOdometry(),
-          centerWallToJI.cmd() 
+   
+  routine.active().onTrue(
+    Commands.sequence(
+      Commands.print("Performing WallLKAlgaeL2L3 Auto!"),
+      centerWallToJI.resetOdometry(),
+      centerWallToJI.cmd() 
       )
   );
   
   centerWallToJI.done().onTrue(
-  Commands.sequence(
+    Commands.sequence(
       //Placeholder; no meaning or use until Subsystem team gets their stuff done
       Commands.print("Dealgaefied!"),
       Commands.print("Arrived at Algae JI, moving to Algae LK!"),
       jIToKLAlgae.cmd()
-   )
-);
+      )
+  );
 
   jIToKLAlgae.done().onTrue(
-  Commands.sequence(
+    Commands.sequence(
       //Placeholder; no meaning or use until Subsystem team gets their stuff done
       Commands.print("Dealgaefied!"),
       Commands.print("Arrived at Algae LK, moving to Station High!"),
       lKToStationHigh.cmd()
-   )
-);
+      )
+  );
 
-for (int i = 0; i < 3; i++) {
   lKToStationHigh.done().onTrue(
     Commands.sequence(
       Commands.print("Arrived at Station High, moving to Algae LK!"),
       stationHighToLKL2.cmd()
-  )
+      )
   );
+
   stationHighToLKL2.done().onTrue(
     Commands.sequence(
       Commands.print("Arrived at Algae LK, moving to Station High!"),
       lKToStationHigh.cmd()
       )
   );
-}
 
-lKToStationHigh.done().onTrue(
+  lKToStationHigh.done().onTrue(
     Commands.sequence(
       Commands.print("Arrived at Station High, moving to Algae LK!"),
       stationHighToLKL2.cmd()
-  )
+      )
   );
+
+  stationHighToLKL2.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Algae LK, moving to Station High!"),
+      lKToStationHigh.cmd()
+      )
+  );
+
+  lKToStationHigh.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Station High, moving to Algae LK!"),
+      stationHighToLKL2.cmd()
+      )
+  );
+
+  stationHighToLKL2.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Algae LK, moving to Station High!"),
+      lKToStationHigh.cmd()
+      )
+  );
+
+  lKToStationHigh.done().onTrue(
+    Commands.sequence(
+      Commands.print("Arrived at Station High, moving to Algae LK!"),
+      stationHighToLKL2.cmd()
+      )
+  );
+
   return routine;
+
 }  
 public AutoRoutine CenterJIProcessorHGProcessorEFProcessorAlgaeIL2 () {
+  
   AutoRoutine routine = factory.newRoutine("CenterJIProcessorHGProcessorEFProcessorAlgaeIL2");
 
   AutoTrajectory centerWallToJI = routine.trajectory("CenterWallToJI");
@@ -313,61 +345,61 @@ public AutoRoutine CenterJIProcessorHGProcessorEFProcessorAlgaeIL2 () {
   AutoTrajectory processorScoreToEFAlgae = routine.trajectory("ProcessorScoreToEFAlgae");
   AutoTrajectory processorScoreToHGAlgae = routine.trajectory("ProcessorScoreToHGAlgae");
   
-    
-    routine.active().onTrue(
-      Commands.sequence(
-          Commands.print("Performing CenterJIProcessorHGProcessorEFProcessorAlgaeIL2 Auto!"),
-          centerWallToJI.resetOdometry(),
-          centerWallToJI.cmd() 
+  routine.active().onTrue(
+    Commands.sequence(
+      Commands.print("Performing CenterJIProcessorHGProcessorEFProcessorAlgaeIL2 Auto!"),
+      centerWallToJI.resetOdometry(),
+      centerWallToJI.cmd() 
       )
   );
   
-    centerWallToJI.done().onTrue(
-      Commands.sequence(
-        //Placeholder; no meaning or use until Subsystem team gets their stuff done
-        Commands.print("Dealgaefied!"),
-        Commands.print("Arrived at Algae JI, moving to Processor Score!"),
-        jIToProcessorScore.cmd() 
-    )
-);
+  centerWallToJI.done().onTrue(
+    Commands.sequence(
+      //Placeholder; no meaning or use until Subsystem team gets their stuff done
+      Commands.print("Dealgaefied!"),
+      Commands.print("Arrived at Algae JI, moving to Processor Score!"),
+      jIToProcessorScore.cmd() 
+      )
+  );
 
   jIToProcessorScore.done().onTrue(
-  Commands.sequence(
+    Commands.sequence(
       //Placeholder; no meaning or use until Subsystem team gets their stuff done
-    Commands.print("Algae Scored!"),
+      Commands.print("Algae Scored!"),
       Commands.print("Arrived at Processor Score, moving to Algae EF!"),
       processorScoreToEFAlgae.cmd()
-   )
-);
-processorScoreToEFAlgae.done().onTrue(
-  Commands.sequence(
+      )
+  );
+
+  processorScoreToEFAlgae.done().onTrue(
+    Commands.sequence(
       //Placeholder; no meaning or use until Subsystem team gets their stuff done
       Commands.print("Dealgaefied!"),
       Commands.print("Arrived at Algae EF, moving to Processor Score!"),
       eFToProcessorScore.cmd()
-   )
-);
+      )
+  );
 
   eFToProcessorScore.done().onTrue(
-  Commands.sequence(
+    Commands.sequence(
       //Placeholder; no meaning or use until Subsystem team gets their stuff done
       Commands.print("Algae Scored!"),
       Commands.print("Arrived at Processor Score, moving to Algae HG!"),
       processorScoreToHGAlgae.cmd()
-   )
-);
+      )
+  );
 
-processorScoreToHGAlgae.done().onTrue(
-  Commands.sequence(
+  processorScoreToHGAlgae.done().onTrue(
+    Commands.sequence(
       //Placeholder; no meaning or use until Subsystem team gets their stuff done
       Commands.print("Dealgaefied!"),
       Commands.print("Arrived at Algae HG, moving to Processor Score!"),
       gHToProcessorScore.cmd()
-   )
-);
-
+      )
+  );
 
   return routine;
+
 }
 public AutoRoutine WallJIL2AlgaeL2L1() {
 
@@ -413,5 +445,5 @@ public AutoRoutine WallJIL2AlgaeL2L1() {
                         ));
   return routine;
 }
-}\
+}
 
