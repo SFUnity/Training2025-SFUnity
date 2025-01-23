@@ -14,10 +14,10 @@
 package frc.robot;
 
 import static frc.robot.constantsGlobal.FieldConstants.*;
+import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -37,7 +37,6 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -301,7 +300,32 @@ public class Robot extends LoggedRobot {
                             new Pose2d(poseManager.getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-    driver.back().onTrue(Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
+    driver
+        .back()
+        .onTrue(
+            Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
+
+    driver
+        .leftBumper()
+        // .and(() -> !carriage.hasCoral())
+        .whileTrue(
+            switch (intakeState) {
+              case Source -> drive.headingDrive(
+                  () -> {
+                    final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+                    final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
+                    Pose2d closerStation;
+
+                    if (poseManager.getDistanceTo(leftFaceFlipped)
+                        < poseManager.getDistanceTo(rightFaceFlipped)) {
+                      closerStation = leftFaceFlipped;
+                    } else {
+                      closerStation = rightFaceFlipped;
+                    }
+                    return closerStation.getRotation();
+                  });
+              default -> Commands.none();
+            });
 
     // Operator controls
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
@@ -317,7 +341,7 @@ public class Robot extends LoggedRobot {
     LeftBranch,
     RightBranch
   }
-  
+
   private enum IntakeState {
     Source,
     Ice_Cream,
