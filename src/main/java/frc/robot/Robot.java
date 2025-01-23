@@ -276,7 +276,7 @@ public class Robot extends LoggedRobot {
   }
 
   private IntakeState intakeState = IntakeState.Source;
-  private ScoreState scoreState = ScoreState.Dealgify;
+  private ScoreState scoreState = ScoreState.LeftBranch;
   private boolean dealgifyAfterPlacing = false;
 
   // Consider moving to its own file if/when it gets big
