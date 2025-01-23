@@ -133,9 +133,6 @@ public AutoRoutine CenterWallL1() {
                 centerToLK.resetOdometry(),
                 centerToLK.cmd() // start traj
                 ));
-
-
-                centerToGH.AllianceFlipUtil.applyY()
     centerToLK.done().onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
                  // SCORE CORAL L1 KL
