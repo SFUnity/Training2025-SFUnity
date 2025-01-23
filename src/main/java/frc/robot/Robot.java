@@ -321,8 +321,9 @@ public class Robot extends LoggedRobot {
         .rightBumper()
         .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
 
+    driver.rightBumper().whileTrue(RobotCommands.score(elevator, rollers));
     // Operator controls
-
+    operator.x().onTrue(elevator.l3());
   }
 
   /** This function is called once when the robot is disabled. */

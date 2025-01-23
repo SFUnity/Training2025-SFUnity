@@ -11,7 +11,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.elevator.ElevatorIOInputsAutoLogged;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
@@ -34,12 +33,13 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   public double goalHeight = 0;
+  public boolean setHeight = false;
 
   public Elevator(ElevatorIO io) {
     this.io = io;
     pid.setTolerance(0.15);
 
-    setDefaultCommand(stow());
+    // setDefaultCommand(stow());
   }
 
   @Override
@@ -58,6 +58,12 @@ public class Elevator extends SubsystemBase {
 
     Logger.recordOutput("Elevator/goal", Units.inchesToMeters(pid.getGoal().position));
     Util.logSubsystem(this, "Elevator");
+
+    if (setHeight) {
+      pid.setGoal(goalHeight);
+    } else {
+      pid.setGoal(0);
+    }
   }
 
   private void updateTunables() {
@@ -70,9 +76,11 @@ public class Elevator extends SubsystemBase {
     return pid.atGoal();
   }
 
-  public Command stow() {
-    return run(() -> pid.setGoal(minHeightInches)).withName("readyStow");
-  }
+  
+
+  // public Command stow() {
+  //   return run(() -> pid.setGoal(minHeightInches)).withName("readyStow");
+  // }
 
   public Command l1() {
     return run(() -> goalHeight = ElevatorHeights.L1.height).withName("readyL1");
@@ -102,7 +110,10 @@ public class Elevator extends SubsystemBase {
     return run(() -> goalHeight = ElevatorHeights.Source.height);
   }
 
-  public Command setElevator() {
-    return run(() -> pid.setGoal(goalHeight)).withName("moveElevator");
+  public Command enableElevator(){
+    return run(() -> setHeight = true);
+  }
+  public Command disableElevator(){
+    return run(() -> setHeight = false);
   }
 }

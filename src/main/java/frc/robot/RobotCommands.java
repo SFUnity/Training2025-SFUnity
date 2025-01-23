@@ -14,51 +14,13 @@ public final class RobotCommands {
         .withName("intakeCoral");
   }
 
-  public Command setScoreL1(Elevator elevator, Rollers rollers) {
+  public static Command score(Elevator elevator, Rollers rollers) {
     return elevator
-        .source()
+        .enableElevator()
         .until(() -> elevator.atDesiredHeight())
         .andThen(rollers.placeCoralAndHighDealgify())
-        .withName("scoreL1");
-  }
-
-  public Command setScoreL2(Elevator elevator, Rollers rollers) {
-    return elevator
-        .source()
-        .until(() -> elevator.atDesiredHeight())
-        .andThen(rollers.placeCoralAndHighDealgify())
-        .withName("scoreL2");
-  }
-
-  public Command setScoreL3(Elevator elevator, Rollers rollers) {
-    return elevator
-        .l3()
-        .until(() -> elevator.atDesiredHeight())
-        .andThen(rollers.placeCoralAndHighDealgify())
-        .withName("scoreL3");
-  }
-
-  public Command setDealgaeLow(Elevator elevator, Rollers rollers) {
-    return elevator
-        .source()
-        .until(() -> elevator.atDesiredHeight())
-        .andThen(rollers.lowDealgaefy())
-        .withName("dealgaefyLow");
-  }
-
-  public Command setDealgaeHigh(Elevator elevator, Rollers rollers) {
-    return elevator
-        .source()
-        .until(() -> elevator.atDesiredHeight())
-        .andThen(rollers.placeCoralAndHighDealgify())
-        .withName("dealgaefyHigh");
-  }
-
-  public Command setScoreProcessor(Elevator elevator, Rollers rollers) {
-    return elevator
-        .source()
-        .until(() -> elevator.atDesiredHeight())
-        .andThen(rollers.scoreProcessor())
-        .withName("");
+        .until(() -> rollers.coralHeld() == false)
+        .andThen(elevator.disableElevator())
+        .withName("score");
   }
 }
