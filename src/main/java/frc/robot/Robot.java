@@ -18,6 +18,7 @@ import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -40,6 +41,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -266,6 +268,13 @@ public class Robot extends LoggedRobot {
         && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
       lowBatteryAlert.set(true);
     }
+
+    // Logs
+    Logger.recordOutput("Controls/intakeState", intakeState.toString());
+    Logger.recordOutput("Controls/scoreState", scoreState.toString());
+    Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
+    Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
+    Logger.recordOutput("Controls/goalPose", goalPose);
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
@@ -275,9 +284,10 @@ public class Robot extends LoggedRobot {
   }
 
   private IntakeState intakeState = IntakeState.Source;
-  private ScoreState scoreState = ScoreState.LeftBranch;
+  private ScoreState scoreState = ScoreState.Processor;
   private boolean dealgifyAfterPlacing = false;
   private boolean allowAutoRotation = true;
+  private Pose2d goalPose = new Pose2d();
 
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
@@ -326,6 +336,40 @@ public class Robot extends LoggedRobot {
                   });
               default -> Commands.none();
             });
+    driver
+        .rightBumper()
+        .whileTrue(
+            Commands.select(
+                    Map.of(
+                        ScoreState.LeftBranch, drive.fullAutoDrive(() -> goalPose),
+                        ScoreState.RightBranch, drive.fullAutoDrive(() -> goalPose),
+                        ScoreState.Dealgify, drive.fullAutoDrive(() -> goalPose),
+                        ScoreState.Processor,
+                            drive.fullAutoDrive(
+                                () ->
+                                    apply(processorScore)
+                                        .transformBy(new Transform2d(0, 0, new Rotation2d())))),
+                    () -> scoreState)
+                .beforeStarting(
+                    Commands.runOnce(
+                        () -> {
+                          Face closestFace = Face.One;
+                          double distanceToClosestFace = Double.MAX_VALUE;
+                          for (Face face : Face.values()) {
+                            double distance = poseManager.getDistanceTo(apply(face.pose));
+                            if (distance < distanceToClosestFace) {
+                              distanceToClosestFace = distance;
+                              closestFace = face;
+                            }
+                          }
+                          if (scoreState == ScoreState.LeftBranch) {
+                            goalPose = apply(closestFace.leftBranch.pose);
+                          } else if (scoreState == ScoreState.RightBranch) {
+                            goalPose = apply(closestFace.rightBranch.pose);
+                          } else {
+                            goalPose = apply(closestFace.pose);
+                          }
+                        })));
 
     // Operator controls
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
@@ -339,7 +383,9 @@ public class Robot extends LoggedRobot {
 
   private enum ScoreState {
     LeftBranch,
-    RightBranch
+    RightBranch,
+    Dealgify,
+    Processor
   }
 
   private enum IntakeState {
