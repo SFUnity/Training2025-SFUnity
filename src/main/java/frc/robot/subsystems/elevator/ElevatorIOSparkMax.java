@@ -33,7 +33,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .positionWrappingEnabled(true)
-        .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput);
+        .positionWrappingInputRange(elevatorPIDMinInput, elevatorPIDMaxInput);
 
     motorConfig
         .encoder

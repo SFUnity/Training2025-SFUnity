@@ -9,8 +9,9 @@ public final class RobotCommands {
   public Command setCoralIntake(Elevator elevator, Rollers rollers) {
     return elevator
         .source()
-        .until(() -> elevator.atDesiredHeight())
-        .andThen(rollers.intakeCoral())
+        .withDeadline(rollers.intakeCoral())
+        .until(elevator::atDesiredHeight)
+        
         .withName("intakeCoral");
   }
 

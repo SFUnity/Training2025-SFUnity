@@ -53,8 +53,8 @@ public class ElevatorConstants {
   public static final LoggedTunableNumber kG;
   public static final LoggedTunableNumber kV;
 
-  public static final double turnPIDMinInput = 0;
-  public static final double turnPIDMaxInput = 2 * Math.PI;
+  public static final double elevatorPIDMinInput = 0;
+  public static final double elevatorPIDMaxInput = 2 * Math.PI;
 
   public static final double turnMotorReduction = 150 / 7;
   public static final double encoderPositionFactor =
