@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 import static frc.robot.util.SparkUtil.configureSpark;
 
@@ -32,8 +33,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .positionWrappingEnabled(true)
-        .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
-        .pidf(kP.get(), 0.0, kD.get(), kV.get());
+        .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput);
+
     motorConfig
         .encoder
         .positionConversionFactor(encoderPositionFactor)
@@ -48,7 +49,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
-    configureSpark(elevatorMotor, motorConfig, false);
+    configureSpark(elevatorMotor, motorConfig, true);
   }
 
   @Override
@@ -60,7 +61,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     inputs.position = Meters.of(encoder.getPosition());
     deltaPosition = inputs.position.in(Meters) - prevoiusPosition;
     deltaTime = (currentTime - prevoiusTime) / 1e9;
-    inputs.velocityMetersPerSec = deltaPosition / deltaTime;
+    inputs.velocityMetersPerSec = MetersPerSecond.of(deltaPosition / deltaTime);
 
     inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
     inputs.currentAmps = elevatorMotor.getOutputCurrent();

@@ -3,6 +3,8 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -10,7 +12,7 @@ public interface ElevatorIO {
   public static class ElevatorIOInputs {
     public Distance position = Distance.ofBaseUnits(0, Meters);
 
-    public double velocityMetersPerSec;
+    public LinearVelocity velocityMetersPerSec;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
   }
