@@ -77,8 +77,6 @@ public class Elevator extends SubsystemBase {
     return pid.atGoal();
   }
 
-  
-
   // public Command stow() {
   //   return run(() -> pid.setGoal(minHeightInches)).withName("readyStow");
   // }
@@ -111,11 +109,14 @@ public class Elevator extends SubsystemBase {
     return run(() -> goalHeight = ElevatorHeights.Source.height);
   }
 
-  public Command enableElevator(){
+  public Command enableElevator() {
     return run(() -> setHeight = true);
   }
-  public Command disableElevator(){
+
+  public Command disableElevator() {
     return run(() -> setHeight = false);
+  }
+
   public Command goTo(ElevatorHeight height) {
     return run(() -> pid.setGoal(height.get())).withName("goTo" + height.toString());
   }
