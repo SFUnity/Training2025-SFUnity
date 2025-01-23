@@ -22,9 +22,9 @@ public class GroundVisualizer {
   private final LoggedMechanismLigament2d ground;
   private final String key;
 
-  private final LoggedTunableNumber xOffset = new LoggedTunableNumber("Ground/xOffset", -.4);
-  private final LoggedTunableNumber yOffset = new LoggedTunableNumber("Ground/yOffset", -7.65);
-  private final LoggedTunableNumber zOffset = new LoggedTunableNumber("Ground/zOffset", 4.7);
+  private final LoggedTunableNumber xOffset = new LoggedTunableNumber("Ground/xOffset", -10.2);
+  private final LoggedTunableNumber yOffset = new LoggedTunableNumber("Ground/yOffset", -8);
+  private final LoggedTunableNumber zOffset = new LoggedTunableNumber("Ground/zOffset", 9);
 
   public GroundVisualizer(String key, Color color) {
     this.key = key;
