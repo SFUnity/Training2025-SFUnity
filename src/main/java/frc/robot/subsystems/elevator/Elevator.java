@@ -32,12 +32,15 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
+  public double goalHeight = 0;
+  public boolean setHeight = false;
+
   public Elevator(ElevatorIO io) {
     this.io = io;
 
     pid.setTolerance(0.15);
 
-    setDefaultCommand(goTo(Stow));
+    // setDefaultCommand(goTo(Stow));
   }
 
   @Override
@@ -56,6 +59,12 @@ public class Elevator extends SubsystemBase {
 
     Logger.recordOutput("Elevator/goal", Units.inchesToMeters(pid.getGoal().position));
     Util.logSubsystem(this, "Elevator");
+
+    if (setHeight) {
+      pid.setGoal(goalHeight);
+    } else {
+      pid.setGoal(0);
+    }
   }
 
   private void updateTunables() {
@@ -68,6 +77,45 @@ public class Elevator extends SubsystemBase {
     return pid.atGoal();
   }
 
+  
+
+  // public Command stow() {
+  //   return run(() -> pid.setGoal(minHeightInches)).withName("readyStow");
+  // }
+
+  public Command l1() {
+    return run(() -> goalHeight = ElevatorHeights.L1.height).withName("readyL1");
+  }
+
+  public Command l2() {
+    return run(() -> goalHeight = ElevatorHeights.L2.height).withName("readyL2");
+  }
+
+  public Command l3() {
+    return run(() -> goalHeight = ElevatorHeights.L3.height).withName("readyL3");
+  }
+
+  public Command lowAlgae() {
+    return run(() -> goalHeight = ElevatorHeights.AlgaeLow.height).withName("readyLowAlgae");
+  }
+
+  public Command highAlgae() {
+    return run(() -> goalHeight = ElevatorHeights.AlgaeHigh.height).withName("readyHighAlgae");
+  }
+
+  public Command processor() {
+    return run(() -> goalHeight = ElevatorHeights.Processor.height).withName("readyProcessor");
+  }
+
+  public Command source() {
+    return run(() -> goalHeight = ElevatorHeights.Source.height);
+  }
+
+  public Command enableElevator(){
+    return run(() -> setHeight = true);
+  }
+  public Command disableElevator(){
+    return run(() -> setHeight = false);
   public Command goTo(ElevatorHeight height) {
     return run(() -> pid.setGoal(height.get())).withName("goTo" + height.toString());
   }
