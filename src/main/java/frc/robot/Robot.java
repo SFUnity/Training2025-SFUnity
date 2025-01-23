@@ -278,6 +278,7 @@ public class Robot extends LoggedRobot {
   private IntakeState intakeState = IntakeState.Source;
   private ScoreState scoreState = ScoreState.LeftBranch;
   private boolean dealgifyAfterPlacing = false;
+  private boolean allowAutoRotation = true;
 
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
@@ -286,7 +287,11 @@ public class Robot extends LoggedRobot {
     drive.setDefaultCommand(drive.joystickDrive());
 
     // Driver controls
-    driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver.y().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)));
+    driver.b().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)));
+    driver.a().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)));
+    driver.x().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)));
     driver
         .start()
         .onTrue(
@@ -296,6 +301,7 @@ public class Robot extends LoggedRobot {
                             new Pose2d(poseManager.getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+    driver.back().onTrue(Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
     // Operator controls
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
