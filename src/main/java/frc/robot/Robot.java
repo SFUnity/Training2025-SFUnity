@@ -275,6 +275,10 @@ public class Robot extends LoggedRobot {
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
+  private IntakeState intakeState = IntakeState.Source;
+  private ScoreState scoreState = ScoreState.Dealgify;
+  private boolean dealgifyAfterPlacing = false;
+
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
@@ -293,20 +297,25 @@ public class Robot extends LoggedRobot {
                     drive)
                 .ignoringDisable(true));
 
-    driver
-        .b()
-        .whileTrue(
-            drive.fullAutoDrive(
-                () ->
-                    AllianceFlipUtil.apply(
-                        processorScore.transformBy(
-                            new Transform2d(0, 0, new Rotation2d(Math.PI))))));
-    driver.y().whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(processorScore)));
-    driver
-        .rightBumper()
-        .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
-
     // Operator controls
+    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
+    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
+    operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
+
+    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Source));
+    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
+    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
+  }
+
+  private enum ScoreState {
+    LeftBranch,
+    RightBranch
+  }
+  
+  private enum IntakeState {
+    Source,
+    Ice_Cream,
+    Ground
   }
 
   /** This function is called once when the robot is disabled. */
