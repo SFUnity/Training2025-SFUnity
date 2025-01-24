@@ -14,8 +14,8 @@
 package frc.robot;
 
 import static frc.robot.constantsGlobal.FieldConstants.*;
-import static frc.robot.util.AllianceFlipUtil.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -387,12 +386,19 @@ public class Robot extends LoggedRobot {
                           } else {
                             goalPose = apply(closestFace.pose);
                           }
-                        })).until(() -> poseManager.getDistanceTo(goalPose) <= ElevatorConstants.subsystemExtentionLimit).andThen(RobotCommands.score(elevator, rollers)))
-                        ;
+                        }))
+                .until(
+                    () ->
+                        poseManager.getDistanceTo(goalPose)
+                            <= ElevatorConstants.subsystemExtentionLimit)
+                .andThen(RobotCommands.score(elevator, rollers)));
 
     // Operator controls
-    operator.x().onTrue(elevator.l3());
-    operator.a().whileTrue(elevator.goTo(L3));
+    operator.y().onTrue(elevator.l3());
+    // TODO: remove after testing
+    operator.b().whileTrue(elevator.goTo(L3));
+    operator.a().onTrue(elevator.l1());
+    operator.x().onTrue(elevator.l2());
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
     operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));

@@ -11,7 +11,6 @@ public final class RobotCommands {
         .source()
         .withDeadline(rollers.intakeCoral())
         .until(elevator::atDesiredHeight)
-        
         .withName("intakeCoral");
   }
 

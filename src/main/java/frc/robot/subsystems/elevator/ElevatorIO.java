@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {

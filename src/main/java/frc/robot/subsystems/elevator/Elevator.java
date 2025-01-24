@@ -116,7 +116,7 @@ public class Elevator extends SubsystemBase {
   public Command disableElevator() {
     return run(() -> setHeight = false);
   }
-
+  // TODO: remove after testing
   public Command goTo(ElevatorHeight height) {
     return run(() -> pid.setGoal(height.get())).withName("goTo" + height.toString());
   }
