@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
@@ -387,16 +388,25 @@ public class Robot extends LoggedRobot {
                             goalPose = apply(closestFace.pose);
                           }
                         }))
-                .until(
-                    () ->
-                        poseManager.getDistanceTo(goalPose)
-                            < ElevatorConstants.subsystemExtentionLimit)
-                .andThen(RobotCommands.score(elevator, rollers)));
+                .alongWith(
+                    new WaitUntilCommand(
+                            () ->
+                                poseManager.getDistanceTo(goalPose)
+                                    < ElevatorConstants.subsystemExtentionLimit)
+                        .andThen(RobotCommands.score(elevator, rollers))));
+
+    // .until(
+    //     () ->
+    //         poseManager.getDistanceTo(goalPose)
+    //             < ElevatorConstants.subsystemExtentionLimit)
+    // .andThen(RobotCommands.score(elevator, rollers)));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
-    operator.a().onTrue(elevator.request(L2));
-    operator.x().onTrue(elevator.request(L1));
+    // TODO: remove after testing
+    operator.b().whileTrue(elevator.request(L3).andThen(RobotCommands.score(elevator, rollers)));
+    operator.a().onTrue(elevator.request(L1));
+    operator.x().onTrue(elevator.request(L2));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
     operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
