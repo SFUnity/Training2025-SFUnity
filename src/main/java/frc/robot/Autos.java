@@ -63,9 +63,8 @@ public class Autos {
     chooser = new AutoChooser();
         // autoChooser.addCmd("Example Auto Command", this::exampleAutoCommand);
       chooser.addRoutine("WallLKAlgaeL2L3",this::WallLKAlgaeL2L3);
-      chooser.addRoutine("CenterWallL1", this::CenterWallL1);
-      chooser.addRoutine("CenterGHProcessorEFProcessorCDProcessorAlgaeIL2",this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
-      chooser.addRoutine("WallJIL2AlgaeL2L1", this::WallJIL2AlgaeL2L1);
+      chooser.addRoutine("ProcessorCDAlgaeL2L3",this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
+      chooser.addRoutine("ProcessorCDAlgaeProcessorL2L3",this::WallJIL2AlgaeL2L1);
       chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJILKAlgaeL2L3);
       chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJIL2AlgaeL2L1);
         // Put the auto chooser on the dashboard
@@ -197,7 +196,7 @@ public AutoRoutine WallLKAlgaeL2L3 () {
                     ));
      lKToStationHigh.done().onTrue(
                 Commands.sequence(
-                    //INTAKE CORAL
+                    intake("high"),
                     stationHighToLKL2.cmd()));
      stationHighToLKL2.done().onTrue( 
                     Commands.sequence(
@@ -292,6 +291,7 @@ public AutoRoutine CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 () {
   AutoTrajectory cDprocessorScore = routine.trajectory("CDToProcessorScore");
   AutoTrajectory gHToProcessorScore = routine.trajectory("GHToProcessorScore");
   AutoTrajectory eFToCD = routine.trajectory("EFToCDAlgae");
+  AutoTrajectory eFToProcessorScore = routine.trajectory("eFToProcessorScore");
   AutoTrajectory processorScoreToEFAlgae = routine.trajectory("ProcessorScoreToEFAlgae");
   AutoTrajectory processorScoreToCDAlgae = routine.trajectory("ProcessorScoreToCD");
   
@@ -327,11 +327,7 @@ public AutoRoutine CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 () {
       cDprocessorScore.cmd()
    )
   );
-  cDprocessorScore.done().onTrue(
-  Commands.sequence(
-     //SCORE ALGAE
-   )
-  );
+  
   return routine;
 
 }
@@ -381,5 +377,45 @@ public AutoRoutine WallJIL2AlgaeL2L1() {
               ));
   return routine;
 }
+public AutoRoutine CenterJIProcessorGHProcessorEFProcessorAlgaeIL2 () {
+  AutoRoutine routine = factory.newRoutine("CenterJIProcessorHGProcessorEFProcessorAlgaeIL2");
+
+  AutoTrajectory centerToJI = routine.trajectory("CenterToJIAlgae");
+  AutoTrajectory cDprocessorScore = routine.trajectory("CDToProcessorScore");
+  AutoTrajectory gHToProcessorScore = routine.trajectory("GHToProcessorScore");
+  AutoTrajectory eFToCD = routine.trajectory("EFToCDAlgae");
+  AutoTrajectory jIToGH = routine.trajectory("jIToGH");
+  AutoTrajectory eFToProcessorScore = routine.trajectory("eFToProcessorScore");
+  AutoTrajectory processorScoreToEFAlgae = routine.trajectory("ProcessorScoreToEFAlgae");
+  AutoTrajectory processorScoreToCDAlgae = routine.trajectory("ProcessorScoreToCD");
+  
+    routine.active().onTrue(
+      Commands.sequence(
+          Commands.print("Performing CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 Auto!"),
+          centerToJI.resetOdometry(),
+          centerToJI.cmd() 
+      )
+  );
+  centerToJI.done().onTrue(
+      Commands.sequence(
+        //SCORE CORAL L1 GH
+        //REMOVE ALGAE L2 GH KEEP
+        jIToGH.cmd() 
+    )
+  );
+  jIToGH.done().onTrue(
+  Commands.sequence(
+      //SCORE ALGAE
+      gHToProcessorScore.cmd()
+   )
+  );
+  gHToProcessorScore.done().onTrue(
+  Commands.sequence(
+      //REMOVE ALGAE L3 EF 
+      processorScoreToEFAlgae.cmd()
+   )
+  );
+  return routine;
+
 }
 
