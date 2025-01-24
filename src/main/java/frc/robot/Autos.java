@@ -100,8 +100,9 @@ public class Autos {
   }
 
 
-
-  // Example Routines
+ // Options: .done() = when routine is done, AtTime("x") = run cmd on eventMarker, 
+  //.active().whileTrue() =  Trigger while the trajectory is still running.
+  // Routines
 public Command CenterWallLKAlgaeL1() {
     return Commands.sequence(
         factory.resetOdometry("CenterWallToLK"), //   
@@ -113,16 +114,59 @@ public Command CenterWallLKAlgaeL1() {
          //PLACE CORAL
     );
 }
-public AutoRoutine SpamLsAuto() {
-
-  // Options: .done() = when routine is done, AtTime("x") = run cmd on eventMarker, 
-  //.active().whileTrue() =  Trigger while the trajectory is still running.
+public AutoRoutine CenterWallL1() {
 
   //Triggers can be combined using logical conditions for branching autos:
 
-  AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
-
   // Load the routine's trajectories
+  AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
+  AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
+  AutoTrajectory lKToStationHigh = routine.trajectory("KLtoStationHigh");
+  AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL1");
+
+    // When the routine begins, reset odometry and start the first trajectory
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                centerToLK.cmd().beforeStarting(Commands.print("moving to LK")),
+                centerToLK.resetOdometry(),
+                centerToLK.cmd() // start traj
+                ));
+
+
+                centerToGH.AllianceFlipUtil.applyY()
+    centerToLK.done().onTrue( // WHEN WE FINISH LAST PATH
+            Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
+                 // SCORE CORAL L1 KL
+                lKToStationHigh.cmd() // START NEXT PATH
+                ));
+    lKToStationHigh.done().onTrue(
+            Commands.sequence(
+                // INTAKE CORAL
+                stationHighToLKL2.cmd()));
+     stationHighToLKL2.done().onTrue( 
+                Commands.sequence( 
+                    // SCORE CORAL L1 KL
+                    lKToStationHigh.cmd()
+                    ));
+     lKToStationHigh.done().onTrue(
+                Commands.sequence(
+                    intake("high"),
+                    stationHighToLKL2.cmd()));
+     stationHighToLKL2.done().onTrue( 
+                    Commands.sequence(
+                        // SCORE CORAL L1 KL
+                        lKToStationHigh.cmd() 
+                        ));
+      lKToStationHigh.done().onTrue(
+                    Commands.sequence(
+                        // INTAKE CORAL
+                        stationHighToLKL2.cmd()));       
+    return routine;
+}
+public AutoRoutine WallLKAlgaeL2L3 () {
+  AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
   AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
   AutoTrajectory lKToStationHigh = routine.trajectory("KLtoStationHigh");
   AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL1");
@@ -139,111 +183,32 @@ public AutoRoutine SpamLsAuto() {
 
     centerToLK.done().onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-                score("lk"), // SCORE CORAL
-                 RemoveAlgae("lk"), // RUN REMOVE ALGAE CMD
+                 // SCORE CORAL L1 KL
+                 // REMOVE ALGAE L2 KL
                 lKToStationHigh.cmd() // START NEXT PATH
                 ));
     lKToStationHigh.done().onTrue(
             Commands.sequence(
-                intake("high"),
+                // INTAKE CORAL
                 stationHighToLKL2.cmd()));
-     stationHighToLKL2.done().onTrue( // WHEN WE FINISH LAST PATH
-                Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-                    score("lk"), // SCORE CORAL
-                    lKToStationHigh.cmd() // START NEXT PATH
+     stationHighToLKL2.done().onTrue( 
+                Commands.sequence( 
+                    // SCORE CORAL L2/3 KL
+                    lKToStationHigh.cmd()
                     ));
      lKToStationHigh.done().onTrue(
                 Commands.sequence(
                     intake("high"),
                     stationHighToLKL2.cmd()));
-     stationHighToLKL2.done().onTrue( // WHEN WE FINISH LAST PATH
-                    Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-                        score("lk"), // SCORE CORAL
-                        lKToStationHigh.cmd() // START NEXT PATH
+     stationHighToLKL2.done().onTrue( 
+                    Commands.sequence(
+                        // SCORE CORAL L2/3 KL
+                        lKToStationHigh.cmd() 
                         ));
       lKToStationHigh.done().onTrue(
                     Commands.sequence(
-                        intake("high"),
-                        stationHighToLKL2.cmd()));
-                    
-    return routine;
-}
-
-// Routines
-public AutoRoutine WallLKAlgaeL2L3 () {
-
-  AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
-
-  AutoTrajectory centerWallToLK = routine.trajectory("CenterWallToLK");
-  AutoTrajectory lKToStationHigh = routine.trajectory("LKtoStationHigh");
-  AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToLKL2");
-  
-  routine.active().onTrue(
-    Commands.sequence(
-      Commands.print("Performing WallLKAlgaeL2L3 Auto!"),
-      centerWallToLK.resetOdometry(),
-      centerWallToLK.cmd() 
-      )
-  );
-  
-  centerWallToLK.done().onTrue(
-    Commands.sequence(
-      //Placeholder; no meaning or use until Subsystem team gets their stuff done
-      Commands.print("Dealgaefied!"),
-      Commands.print("Arrived at Algae LK, moving to Station High!"),
-        lKToStationHigh.cmd()
-      )
-  );
-
-  lKToStationHigh.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK L2!"),
-      stationHighToLKL2.cmd()
-      )
-  );
-
-  stationHighToLKL2.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Algae LK L2, moving to Station High!"),
-      lKToStationHigh.cmd()
-      )
-  );
-
-  lKToStationHigh.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK L2!"),
-      stationHighToLKL2.cmd()
-      )
-  );
-
-  stationHighToLKL2.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Algae LK L2, moving to Station High!"),
-      lKToStationHigh.cmd()
-      )
-  );
-
-  lKToStationHigh.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK L2!"),
-      stationHighToLKL2.cmd()
-      )
-  );
-
-  stationHighToLKL2.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Algae LK L2, moving to Station High!"),
-      lKToStationHigh.cmd()
-      )
-  );
-
-  lKToStationHigh.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK L2!"),
-      stationHighToLKL2.cmd()
-      )
-  );
-
+                        // INTAKE CORAL
+                        stationHighToLKL2.cmd()));       
   return routine;
 
 }
@@ -255,149 +220,119 @@ public AutoRoutine WallJILKAlgaeL2L3 () {
   AutoTrajectory lKToStationHigh = routine.trajectory("LKtoStationHigh");
   AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToLKL2");
   AutoTrajectory jIToKLAlgae = routine.trajectory("JIToKLAlgae");
-   
-  routine.active().onTrue(
-    Commands.sequence(
-      Commands.print("Performing WallLKAlgaeL2L3 Auto!"),
-      centerWallToJI.resetOdometry(),
-      centerWallToJI.cmd() 
+  
+    routine.active().onTrue(
+      Commands.sequence(
+          Commands.print("Performing WallLKAlgaeL2L3 Auto!"),
+          centerWallToJI.resetOdometry(),
+          centerWallToJI.cmd() 
       )
   );
-  
   centerWallToJI.done().onTrue(
     Commands.sequence(
-      //Placeholder; no meaning or use until Subsystem team gets their stuff done
-      Commands.print("Dealgaefied!"),
-      Commands.print("Arrived at Algae JI, moving to Algae LK!"),
-      jIToKLAlgae.cmd()
-      )
+       //SCORE CORAL L2 IJ
+       jIToKLAlgae.cmd()
+   )
   );
-
   jIToKLAlgae.done().onTrue(
     Commands.sequence(
-      //Placeholder; no meaning or use until Subsystem team gets their stuff done
-      Commands.print("Dealgaefied!"),
-      Commands.print("Arrived at Algae LK, moving to Station High!"),
-      lKToStationHigh.cmd()
-      )
+       //REMOVE ALGAE L2 LK
+       lKToStationHigh.cmd()
+   )
   );
-
   lKToStationHigh.done().onTrue(
     Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK!"),
-      stationHighToLKL2.cmd()
+       //INTAKE CORAL
+        stationHighToLKL2.cmd()
+      )
+  );
+  stationHighToLKL2.done().onTrue(
+      Commands.sequence(
+        //SCORE CORAL L2/3
+        lKToStationHigh.cmd()
+    )
+  );
+  lKToStationHigh.done().onTrue(
+    Commands.sequence(
+        //INTAKE CORAL
+        stationHighToLKL2.cmd()
       )
   );
 
   stationHighToLKL2.done().onTrue(
     Commands.sequence(
-      Commands.print("Arrived at Algae LK, moving to Station High!"),
-      lKToStationHigh.cmd()
-      )
+        //SCORE CORAL L2/3
+        lKToStationHigh.cmd()
+    ) 
   );
-
   lKToStationHigh.done().onTrue(
     Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK!"),
-      stationHighToLKL2.cmd()
+       //INTAKE CORAL
+       stationHighToLKL2.cmd()
       )
   );
-
   stationHighToLKL2.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Algae LK, moving to Station High!"),
-      lKToStationHigh.cmd()
-      )
+      Commands.sequence(
+        //SCORE CORAL L2/3
+         lKToStationHigh.cmd()
+    )
   );
-
   lKToStationHigh.done().onTrue(
     Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK!"),
-      stationHighToLKL2.cmd()
-      )
-  );
-
-  stationHighToLKL2.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Algae LK, moving to Station High!"),
-      lKToStationHigh.cmd()
-      )
-  );
-
-  lKToStationHigh.done().onTrue(
-    Commands.sequence(
-      Commands.print("Arrived at Station High, moving to Algae LK!"),
-      stationHighToLKL2.cmd()
-      )
-  );
-
+        //INTAKE CORAL
+        stationHighToLKL2.cmd()
+        )
+    );
   return routine;
 
 }  
-public AutoRoutine CenterJIProcessorHGProcessorEFProcessorAlgaeIL2 () {
-  
+public AutoRoutine CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 () {
   AutoRoutine routine = factory.newRoutine("CenterJIProcessorHGProcessorEFProcessorAlgaeIL2");
 
-  AutoTrajectory centerWallToJI = routine.trajectory("CenterWallToJI");
-  AutoTrajectory jIToProcessorScore = routine.trajectory("JIToProcessorScore");
+  AutoTrajectory centerToGH = routine.trajectory("CenterToHGAlgae");
+  AutoTrajectory cDprocessorScore = routine.trajectory("CDToProcessorScore");
   AutoTrajectory gHToProcessorScore = routine.trajectory("GHToProcessorScore");
-  AutoTrajectory eFToProcessorScore = routine.trajectory("EFToProcessorScore");
+  AutoTrajectory eFToCD = routine.trajectory("EFToCDAlgae");
   AutoTrajectory processorScoreToEFAlgae = routine.trajectory("ProcessorScoreToEFAlgae");
-  AutoTrajectory processorScoreToHGAlgae = routine.trajectory("ProcessorScoreToHGAlgae");
+  AutoTrajectory processorScoreToCDAlgae = routine.trajectory("ProcessorScoreToCD");
   
-  routine.active().onTrue(
-    Commands.sequence(
-      Commands.print("Performing CenterJIProcessorHGProcessorEFProcessorAlgaeIL2 Auto!"),
-      centerWallToJI.resetOdometry(),
-      centerWallToJI.cmd() 
+    routine.active().onTrue(
+      Commands.sequence(
+          Commands.print("Performing CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 Auto!"),
+          centerToGH.resetOdometry(),
+          centerToGH.cmd() 
       )
   );
-  
-  centerWallToJI.done().onTrue(
-    Commands.sequence(
-      //Placeholder; no meaning or use until Subsystem team gets their stuff done
-      Commands.print("Dealgaefied!"),
-      Commands.print("Arrived at Algae JI, moving to Processor Score!"),
-      jIToProcessorScore.cmd() 
-      )
+  centerToGH.done().onTrue(
+      Commands.sequence(
+        //SCORE CORAL L1 GH
+        //REMOVE ALGAE L2 GH KEEP
+        gHToProcessorScore.cmd() 
+    )
   );
-
-  jIToProcessorScore.done().onTrue(
-    Commands.sequence(
-      //Placeholder; no meaning or use until Subsystem team gets their stuff done
-      Commands.print("Algae Scored!"),
-      Commands.print("Arrived at Processor Score, moving to Algae EF!"),
+  gHToProcessorScore.done().onTrue(
+  Commands.sequence(
+      //SCORE ALGAE
       processorScoreToEFAlgae.cmd()
-      )
+   )
   );
-
   processorScoreToEFAlgae.done().onTrue(
-    Commands.sequence(
-      //Placeholder; no meaning or use until Subsystem team gets their stuff done
-      Commands.print("Dealgaefied!"),
-      Commands.print("Arrived at Algae EF, moving to Processor Score!"),
+  Commands.sequence(
+      //REMOVE ALGAE L3 EF 
+      eFToCD.cmd()
+   )
+  );
+  eFToCD.done().onTrue(
+  Commands.sequence(
+        //REMOVE ALGAE L2 CD KEEP
       eFToProcessorScore.cmd()
-      )
+   )
   );
-
   eFToProcessorScore.done().onTrue(
-    Commands.sequence(
-      //Placeholder; no meaning or use until Subsystem team gets their stuff done
-      Commands.print("Algae Scored!"),
-      Commands.print("Arrived at Processor Score, moving to Algae HG!"),
-      processorScoreToHGAlgae.cmd()
-      )
+  Commands.sequence(
+     //SCORE ALGAE
+   )
   );
-
-  processorScoreToHGAlgae.done().onTrue(
-    Commands.sequence(
-      //Placeholder; no meaning or use until Subsystem team gets their stuff done
-      Commands.print("Dealgaefied!"),
-      Commands.print("Arrived at Algae HG, moving to Processor Score!"),
-      gHToProcessorScore.cmd()
-      )
-  );
-
   return routine;
 
 }
@@ -415,34 +350,36 @@ public AutoRoutine WallJIL2AlgaeL2L1() {
       .active()
       .onTrue(
           Commands.sequence(
-              centerToLK.resetOdometry(),
+              centerToJI.resetOdometry(),
               centerToJI.cmd() // start traj
               ));
 
-              centerToJI.done().onTrue( // WHEN WE FINISH LAST PATH
-          Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-              score("ji"),
-              RemoveAlgae("ji"), // RUN REMOVE ALGAE CMD
-              JIToStationHigh.cmd() // START NEXT PATH
+      centerToJI.done().onTrue( 
+          Commands.sequence(
+              //SCORE CORAL L1 JI
+              // REMOVE ALGAE L3 JI
+              JIToStationHigh.cmd() 
               ));
       JIToStationHigh.done().onTrue(
           Commands.sequence(
-            StationHighToJI.cmd()));
-
+            //INTAKE CORAL
+            StationHighToJI.cmd()
+            ));
       StationHighToJI.done().onTrue(
          Commands.sequence(
-               score("ji")
-               JIToStationHigh.cmd()
-                ));
-                JIToStationHigh.done().onTrue(
-                  Commands.sequence(
-                    StationHighToJI.cmd()));
-        
-              StationHighToJI.done().onTrue(
-                 Commands.sequence(
-                       score("ji")
-                       JIToStationHigh.cmd()
-                        ));
+            //SCORE CORAL L2/3 JI
+            JIToStationHigh.cmd()
+            ));
+      JIToStationHigh.done().onTrue(
+          Commands.sequence(
+              //INTAKE CORAL
+              StationHighToJI.cmd()
+              ));
+       StationHighToJI.done().onTrue(
+          Commands.sequence(
+              //SCORE JI
+              JIToStationHigh.cmd()
+              ));
   return routine;
 }
 }
