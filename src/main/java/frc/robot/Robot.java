@@ -52,7 +52,7 @@ import frc.robot.subsystems.rollers.RollersIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
-import java.util.Map;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -292,7 +292,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
     Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
     Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
-    Logger.recordOutput("Controls/goalPose", goalPose);
+    Logger.recordOutput("Controls/goalPose", goalPose().get());
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
@@ -302,10 +302,9 @@ public class Robot extends LoggedRobot {
   }
 
   private IntakeState intakeState = IntakeState.Source;
-  private ScoreState scoreState = ScoreState.Processor;
+  private ScoreState scoreState = ScoreState.ProcessorBack;
   private boolean dealgifyAfterPlacing = false;
   private boolean allowAutoRotation = true;
-  private Pose2d goalPose = new Pose2d();
 
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
@@ -357,41 +356,12 @@ public class Robot extends LoggedRobot {
     driver
         .rightBumper()
         .whileTrue(
-            Commands.select(
-                    Map.of(
-                        ScoreState.LeftBranch, drive.fullAutoDrive(() -> goalPose),
-                        ScoreState.RightBranch, drive.fullAutoDrive(() -> goalPose),
-                        ScoreState.Dealgify, drive.fullAutoDrive(() -> goalPose),
-                        ScoreState.Processor,
-                            drive.fullAutoDrive(
-                                () ->
-                                    apply(processorScore)
-                                        .transformBy(new Transform2d(0, 0, new Rotation2d())))),
-                    () -> scoreState)
-                .beforeStarting(
-                    Commands.runOnce(
-                        () -> {
-                          Face closestFace = Face.One;
-                          double distanceToClosestFace = Double.MAX_VALUE;
-                          for (Face face : Face.values()) {
-                            double distance = poseManager.getDistanceTo(apply(face.pose));
-                            if (distance < distanceToClosestFace) {
-                              distanceToClosestFace = distance;
-                              closestFace = face;
-                            }
-                          }
-                          if (scoreState == ScoreState.LeftBranch) {
-                            goalPose = apply(closestFace.leftBranch.pose);
-                          } else if (scoreState == ScoreState.RightBranch) {
-                            goalPose = apply(closestFace.rightBranch.pose);
-                          } else {
-                            goalPose = apply(closestFace.pose);
-                          }
-                        }))
+            drive
+                .fullAutoDrive(goalPose())
                 .alongWith(
                     new WaitUntilCommand(
                             () ->
-                                poseManager.getDistanceTo(goalPose)
+                                poseManager.getDistanceTo(goalPose().get())
                                     < ElevatorConstants.subsystemExtentionLimit)
                         .andThen(RobotCommands.score(elevator, rollers))));
 
@@ -420,13 +390,49 @@ public class Robot extends LoggedRobot {
     LeftBranch,
     RightBranch,
     Dealgify,
-    Processor
+    ProcessorFront,
+    ProcessorBack
   }
 
   private enum IntakeState {
     Source,
     Ice_Cream,
     Ground
+  }
+
+  private Supplier<Pose2d> goalPose() {
+    return () -> {
+      switch (scoreState) {
+        case LeftBranch:
+          return apply(closestFace().leftBranch.pose);
+        case RightBranch:
+          return apply(closestFace().rightBranch.pose);
+        case Dealgify:
+          return apply(closestFace().pose);
+        case ProcessorFront:
+          return apply(processorScore);
+        case ProcessorBack:
+          return apply(processorScore).transformBy(new Transform2d(0, 0, new Rotation2d(Math.PI)));
+        default:
+          {
+            System.out.println("Invalid score state");
+            return poseManager.getPose();
+          }
+      }
+    };
+  }
+
+  private Face closestFace() {
+    Face closestFace = Face.One;
+    double distanceToClosestFace = Double.MAX_VALUE;
+    for (Face face : Face.values()) {
+      double distance = poseManager.getDistanceTo(apply(face.pose));
+      if (distance < distanceToClosestFace) {
+        distanceToClosestFace = distance;
+        closestFace = face;
+      }
+    }
+    return closestFace;
   }
 
   /** This function is called once when the robot is disabled. */
