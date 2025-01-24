@@ -67,6 +67,7 @@ public class Autos {
       chooser.addRoutine("CenterGHProcessorEFProcessorCDProcessorAlgaeIL2",this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
       chooser.addRoutine("WallJIL2AlgaeL2L1", this::WallJIL2AlgaeL2L1);
       chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJILKAlgaeL2L3);
+      chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJIL2AlgaeL2L1);
         // Put the auto chooser on the dashboard
        // SmartDashboard.putData(autoChooser);
       SmartDashboard.putData(chooser);
@@ -150,7 +151,7 @@ public AutoRoutine CenterWallL1() {
                     ));
      lKToStationHigh.done().onTrue(
                 Commands.sequence(
-                    intake("high"),
+                    //intake("high"),
                     stationHighToLKL2.cmd()));
      stationHighToLKL2.done().onTrue( 
                     Commands.sequence(
@@ -208,8 +209,10 @@ public AutoRoutine WallLKAlgaeL2L3 () {
                         // INTAKE CORAL
                         stationHighToLKL2.cmd()));       
   return routine;
+
 }
 public AutoRoutine WallJILKAlgaeL2L3 () {
+ 
   AutoRoutine routine = factory.newRoutine("WallJILKAlgaeL2L3");
 
   AutoTrajectory centerWallToJI = routine.trajectory("CenterWallToJI");
@@ -254,6 +257,7 @@ public AutoRoutine WallJILKAlgaeL2L3 () {
         stationHighToLKL2.cmd()
       )
   );
+
   stationHighToLKL2.done().onTrue(
     Commands.sequence(
         //SCORE CORAL L2/3
@@ -279,6 +283,7 @@ public AutoRoutine WallJILKAlgaeL2L3 () {
         )
     );
   return routine;
+
 }  
 public AutoRoutine CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 () {
   AutoRoutine routine = factory.newRoutine("CenterJIProcessorHGProcessorEFProcessorAlgaeIL2");
@@ -293,7 +298,7 @@ public AutoRoutine CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 () {
     routine.active().onTrue(
       Commands.sequence(
           Commands.print("Performing CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 Auto!"),
-          centerWallToJI.resetOdometry(),
+          centerToGH.resetOdometry(),
           centerToGH.cmd() 
       )
   );
@@ -328,6 +333,7 @@ public AutoRoutine CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 () {
    )
   );
   return routine;
+
 }
 public AutoRoutine WallJIL2AlgaeL2L1() {
 
@@ -343,7 +349,7 @@ public AutoRoutine WallJIL2AlgaeL2L1() {
       .active()
       .onTrue(
           Commands.sequence(
-              centerToLK.resetOdometry(),
+              centerToJI.resetOdometry(),
               centerToJI.cmd() // start traj
               ));
 
