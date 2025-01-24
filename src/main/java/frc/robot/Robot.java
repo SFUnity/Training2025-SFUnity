@@ -363,7 +363,8 @@ public class Robot extends LoggedRobot {
                             () ->
                                 poseManager.getDistanceTo(goalPose().get())
                                     < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(RobotCommands.score(elevator, rollers))));
+                        .andThen(RobotCommands.score(elevator, rollers)))
+                .withName("Score/Dealgify"));
 
     // .until(
     //     () ->
