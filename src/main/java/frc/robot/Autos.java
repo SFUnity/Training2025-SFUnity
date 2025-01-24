@@ -327,7 +327,7 @@ public AutoRoutine CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 () {
       cDprocessorScore.cmd()
    )
   );
-  
+
   return routine;
 
 }
@@ -419,3 +419,4 @@ public AutoRoutine CenterJIProcessorGHProcessorEFProcessorAlgaeIL2 () {
 
 }
 
+}
