@@ -390,7 +390,7 @@ public class Robot extends LoggedRobot {
                 .until(
                     () ->
                         poseManager.getDistanceTo(goalPose)
-                            <= ElevatorConstants.subsystemExtentionLimit)
+                            < ElevatorConstants.subsystemExtentionLimit)
                 .andThen(RobotCommands.score(elevator, rollers)));
 
     // Operator controls
