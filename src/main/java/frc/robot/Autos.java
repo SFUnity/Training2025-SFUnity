@@ -63,8 +63,9 @@ public class Autos {
     chooser = new AutoChooser();
         // autoChooser.addCmd("Example Auto Command", this::exampleAutoCommand);
       chooser.addRoutine("WallLKAlgaeL2L3",this::WallLKAlgaeL2L3);
-      chooser.addRoutine("ProcessorCDAlgaeL2L3",this::ProcessorCDAlgaeL2L3);
-      chooser.addRoutine("ProcessorCDAlgaeProcessorL2L3",this::ProcessorCDAlgaeProcessorL2L3);
+      chooser.addRoutine("CenterWallL1", this::CenterWallL1);
+      chooser.addRoutine("CenterGHProcessorEFProcessorCDProcessorAlgaeIL2",this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
+      chooser.addRoutine("WallJIL2AlgaeL2L1", this::WallJIL2AlgaeL2L1);
       chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJILKAlgaeL2L3);
         // Put the auto chooser on the dashboard
        // SmartDashboard.putData(autoChooser);
@@ -374,5 +375,5 @@ public AutoRoutine WallJIL2AlgaeL2L1() {
               ));
   return routine;
 }
-
+}
 
