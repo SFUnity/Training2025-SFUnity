@@ -197,7 +197,7 @@ public AutoRoutine WallLKAlgaeL2L3 () {
                     ));
      lKToStationHigh.done().onTrue(
                 Commands.sequence(
-                    intake("high"),
+                    //intake("high"),
                     stationHighToLKL2.cmd()));
      stationHighToLKL2.done().onTrue( 
                     Commands.sequence(
