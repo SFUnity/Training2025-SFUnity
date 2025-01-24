@@ -38,8 +38,6 @@ public class Elevator extends SubsystemBase {
     this.io = io;
 
     pid.setTolerance(0.5); // should prob be decreased
-
-    // setDefaultCommand(goTo(Stow));
   }
 
   @Override
