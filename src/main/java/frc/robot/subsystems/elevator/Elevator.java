@@ -82,7 +82,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command disableElevator() {
-    return run(() -> setHeight = false).withName("disableElevator");
+    return runOnce(() -> setHeight = false).withName("disableElevator");
   }
 
   public Command request(ElevatorHeight height) {
