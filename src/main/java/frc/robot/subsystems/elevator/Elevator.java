@@ -77,38 +77,6 @@ public class Elevator extends SubsystemBase {
     return pid.atGoal();
   }
 
-  // public Command stow() {
-  //   return run(() -> pid.setGoal(minHeightInches)).withName("readyStow");
-  // }
-
-  public Command l1() {
-    return run(() -> goalHeight = ElevatorHeights.L1.height).withName("readyL1");
-  }
-
-  public Command l2() {
-    return run(() -> goalHeight = ElevatorHeights.L2.height).withName("readyL2");
-  }
-
-  public Command l3() {
-    return run(() -> goalHeight = ElevatorHeights.L3.height).withName("readyL3");
-  }
-
-  public Command lowAlgae() {
-    return run(() -> goalHeight = ElevatorHeights.AlgaeLow.height).withName("readyLowAlgae");
-  }
-
-  public Command highAlgae() {
-    return run(() -> goalHeight = ElevatorHeights.AlgaeHigh.height).withName("readyHighAlgae");
-  }
-
-  public Command processor() {
-    return run(() -> goalHeight = ElevatorHeights.Processor.height).withName("readyProcessor");
-  }
-
-  public Command source() {
-    return run(() -> goalHeight = ElevatorHeights.Source.height);
-  }
-
   public Command enableElevator() {
     return run(() -> setHeight = true);
   }
@@ -116,8 +84,8 @@ public class Elevator extends SubsystemBase {
   public Command disableElevator() {
     return run(() -> setHeight = false);
   }
-  // TODO: remove after testing
-  public Command goTo(ElevatorHeight height) {
-    return run(() -> pid.setGoal(height.get())).withName("goTo" + height.toString());
+
+  public Command request(ElevatorHeight height) {
+    return run(() -> goalHeight = height.get()).withName("goTo" + height.toString());
   }
 }
