@@ -374,7 +374,16 @@ public class Robot extends LoggedRobot {
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     // TODO: remove after testing
-    operator.b().onTrue(elevator.request(L3).andThen(RobotCommands.score(elevator, rollers)));
+    operator
+        .b()
+        .onTrue(
+            elevator
+                .request(L3)
+                .until(
+                    () ->
+                        poseManager.getDistanceTo(goalPose().get())
+                            < ElevatorConstants.subsystemExtentionLimit)
+                .andThen(RobotCommands.score(elevator, rollers)));
     operator.a().onTrue(elevator.request(L1));
     operator.x().onTrue(elevator.disableElevator());
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));

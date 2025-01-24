@@ -48,7 +48,7 @@ public class ElevatorConstants {
 
   public static final int currentLimit = 0;
 
-  public static final double subsystemExtentionLimit = 100; // Meters
+  public static final double subsystemExtentionLimit = 2; // Meters
 
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
