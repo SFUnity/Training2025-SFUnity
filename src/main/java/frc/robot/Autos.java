@@ -197,7 +197,7 @@ public AutoRoutine WallLKAlgaeL2L3 () {
                     ));
      lKToStationHigh.done().onTrue(
                 Commands.sequence(
-                    intake("high"),
+                    //INTAKE CORAL
                     stationHighToLKL2.cmd()));
      stationHighToLKL2.done().onTrue( 
                     Commands.sequence(
@@ -324,10 +324,10 @@ public AutoRoutine CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 () {
   eFToCD.done().onTrue(
   Commands.sequence(
         //REMOVE ALGAE L2 CD KEEP
-      eFToProcessorScore.cmd()
+      cDprocessorScore.cmd()
    )
   );
-  eFToProcessorScore.done().onTrue(
+  cDprocessorScore.done().onTrue(
   Commands.sequence(
      //SCORE ALGAE
    )
