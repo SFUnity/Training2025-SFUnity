@@ -67,6 +67,7 @@ public class Autos {
       chooser.addRoutine("ProcessorCDAlgaeProcessorL2L3",this::WallJIL2AlgaeL2L1);
       chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJILKAlgaeL2L3);
       chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJIL2AlgaeL2L1);
+      chooser.addRoutine("ProcessorCDAlgaeL2L3",this::CenterJIProcessorGHProcessorEFProcessorAlgaeIL2);
         // Put the auto chooser on the dashboard
        // SmartDashboard.putData(autoChooser);
       SmartDashboard.putData(chooser);
