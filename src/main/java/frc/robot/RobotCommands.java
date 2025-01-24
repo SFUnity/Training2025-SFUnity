@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.subsystems.rollers.Rollers;
@@ -18,9 +19,9 @@ public final class RobotCommands {
   public static Command score(Elevator elevator, Rollers rollers) {
     return elevator
         .enableElevator()
-        .until(() -> elevator.atDesiredHeight())
-        .andThen(rollers.placeCoralAndHighDealgify())
-        .until(() -> rollers.coralHeld() == false)
+        .andThen(new WaitUntilCommand(() -> elevator.atDesiredHeight()))
+        //.andThen(rollers.placeCoralAndHighDealgify())
+        //.until(() -> rollers.coralHeld() == false)
         .andThen(elevator.disableElevator())
         .withName("score");
   }
