@@ -63,9 +63,10 @@ public class Autos {
     chooser = new AutoChooser();
         // autoChooser.addCmd("Example Auto Command", this::exampleAutoCommand);
       chooser.addRoutine("WallLKAlgaeL2L3",this::WallLKAlgaeL2L3);
-      chooser.addRoutine("ProcessorCDAlgaeL2L3",this::CenterJIProcessorHGProcessorEFProcessorAlgaeIL2);
+      chooser.addRoutine("ProcessorCDAlgaeL2L3",this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
       chooser.addRoutine("ProcessorCDAlgaeProcessorL2L3",this::WallJIL2AlgaeL2L1);
       chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJILKAlgaeL2L3);
+      chooser.addRoutine("WallJILKAlgaeL2L3",this::WallJIL2AlgaeL2L1);
         // Put the auto chooser on the dashboard
        // SmartDashboard.putData(autoChooser);
       SmartDashboard.putData(chooser);
@@ -149,7 +150,7 @@ public AutoRoutine CenterWallL1() {
                     ));
      lKToStationHigh.done().onTrue(
                 Commands.sequence(
-                    intake("high"),
+                    //intake("high"),
                     stationHighToLKL2.cmd()));
      stationHighToLKL2.done().onTrue( 
                     Commands.sequence(
