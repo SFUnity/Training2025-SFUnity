@@ -86,6 +86,6 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command request(ElevatorHeight height) {
-    return run(() -> goalHeight = height.get()).withName("goTo" + height.toString());
+    return run(() -> goalHeight = height.get()).withName("request" + height.toString());
   }
 }
