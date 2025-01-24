@@ -20,8 +20,8 @@ public final class RobotCommands {
     return elevator
         .enableElevator()
         .andThen(new WaitUntilCommand(() -> elevator.atDesiredHeight()))
-        //.andThen(rollers.placeCoralAndHighDealgify())
-        //.until(() -> rollers.coralHeld() == false)
+        .andThen(rollers.placeCoralAndHighDealgify())
+        // .until(() -> rollers.coralHeld() == false)
         .andThen(elevator.disableElevator())
         .withName("score");
   }
