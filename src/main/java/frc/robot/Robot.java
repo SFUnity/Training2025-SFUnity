@@ -14,6 +14,7 @@
 package frc.robot;
 
 import static frc.robot.constantsGlobal.FieldConstants.*;
+import static frc.robot.util.AllianceFlipUtil.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -46,10 +47,10 @@ import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOSparkMax;
-import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -283,6 +284,13 @@ public class Robot extends LoggedRobot {
         && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
       lowBatteryAlert.set(true);
     }
+
+    // Logs
+    Logger.recordOutput("Controls/intakeState", intakeState.toString());
+    Logger.recordOutput("Controls/scoreState", scoreState.toString());
+    Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
+    Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
+    Logger.recordOutput("Controls/goalPose", goalPose);
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
@@ -291,6 +299,12 @@ public class Robot extends LoggedRobot {
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
+  private IntakeState intakeState = IntakeState.Source;
+  private ScoreState scoreState = ScoreState.Processor;
+  private boolean dealgifyAfterPlacing = false;
+  private boolean allowAutoRotation = true;
+  private Pose2d goalPose = new Pose2d();
+
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
@@ -298,7 +312,11 @@ public class Robot extends LoggedRobot {
     drive.setDefaultCommand(drive.joystickDrive());
 
     // Driver controls
-    driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver.y().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)));
+    driver.b().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)));
+    driver.a().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)));
+    driver.x().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)));
     driver
         .start()
         .onTrue(
@@ -308,24 +326,90 @@ public class Robot extends LoggedRobot {
                             new Pose2d(poseManager.getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+    driver
+        .back()
+        .onTrue(
+            Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
     driver
-        .b()
+        .leftBumper()
+        // .and(() -> !carriage.hasCoral())
         .whileTrue(
-            drive.fullAutoDrive(
-                () ->
-                    AllianceFlipUtil.apply(
-                        processorScore.transformBy(
-                            new Transform2d(0, 0, new Rotation2d(Math.PI))))));
-    driver.y().whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(processorScore)));
+            switch (intakeState) {
+              case Source -> drive.headingDrive(
+                  () -> {
+                    final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+                    final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
+                    Pose2d closerStation;
+
+                    if (poseManager.getDistanceTo(leftFaceFlipped)
+                        < poseManager.getDistanceTo(rightFaceFlipped)) {
+                      closerStation = leftFaceFlipped;
+                    } else {
+                      closerStation = rightFaceFlipped;
+                    }
+                    return closerStation.getRotation();
+                  });
+              default -> Commands.none();
+            });
     driver
         .rightBumper()
-        .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
+        .whileTrue(
+            Commands.select(
+                    Map.of(
+                        ScoreState.LeftBranch, drive.fullAutoDrive(() -> goalPose),
+                        ScoreState.RightBranch, drive.fullAutoDrive(() -> goalPose),
+                        ScoreState.Dealgify, drive.fullAutoDrive(() -> goalPose),
+                        ScoreState.Processor,
+                            drive.fullAutoDrive(
+                                () ->
+                                    apply(processorScore)
+                                        .transformBy(new Transform2d(0, 0, new Rotation2d())))),
+                    () -> scoreState)
+                .beforeStarting(
+                    Commands.runOnce(
+                        () -> {
+                          Face closestFace = Face.One;
+                          double distanceToClosestFace = Double.MAX_VALUE;
+                          for (Face face : Face.values()) {
+                            double distance = poseManager.getDistanceTo(apply(face.pose));
+                            if (distance < distanceToClosestFace) {
+                              distanceToClosestFace = distance;
+                              closestFace = face;
+                            }
+                          }
+                          if (scoreState == ScoreState.LeftBranch) {
+                            goalPose = apply(closestFace.leftBranch.pose);
+                          } else if (scoreState == ScoreState.RightBranch) {
+                            goalPose = apply(closestFace.rightBranch.pose);
+                          } else {
+                            goalPose = apply(closestFace.pose);
+                          }
+                        })));
 
-    driver.rightBumper().whileTrue(RobotCommands.score(elevator, rollers));
     // Operator controls
     operator.x().onTrue(elevator.l3());
     operator.a().whileTrue(elevator.goTo(L3));
+    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
+    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
+    operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
+
+    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Source));
+    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
+    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
+  }
+
+  private enum ScoreState {
+    LeftBranch,
+    RightBranch,
+    Dealgify,
+    Processor
+  }
+
+  private enum IntakeState {
+    Source,
+    Ice_Cream,
+    Ground
   }
 
   /** This function is called once when the robot is disabled. */
