@@ -14,7 +14,6 @@ public interface ElevatorIO {
     public LinearVelocity velocityMetersPerSec;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
-    public double goalHeight = 0;
   }
 
   public default void updateInputs(ElevatorIOInputs inputs) {}
