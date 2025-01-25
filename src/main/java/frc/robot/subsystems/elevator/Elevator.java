@@ -50,6 +50,7 @@ public class Elevator extends SubsystemBase {
 
     if (setHeight) {
       pid.setGoal(goalHeightInches);
+
     } else {
       pid.setGoal(0);
     }
@@ -74,7 +75,7 @@ public class Elevator extends SubsystemBase {
 
   @AutoLogOutput
   public boolean atDesiredHeight() {
-    return pid.atGoal();
+    return pid.atSetpoint();
   }
 
   @AutoLogOutput

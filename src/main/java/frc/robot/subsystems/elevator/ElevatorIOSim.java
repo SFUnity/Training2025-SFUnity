@@ -38,8 +38,9 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void runVolts(double volts) {
-    MathUtil.clamp(volts, -12.0, 12.0);
-    appliedVolts = volts;
-    sim.setInputVoltage(volts);
+
+    appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    ;
+    sim.setInputVoltage(appliedVolts);
   }
 }
