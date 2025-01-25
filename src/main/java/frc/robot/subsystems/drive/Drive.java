@@ -438,7 +438,8 @@ public class Drive extends SubsystemBase {
           if (linearAtGoal()) driveVelocityScalar = 0.0;
 
           // Calculate angle to target then transform by velocity scalar
-          Rotation2d angleToTarget = poseManager.getHorizontalAngleTo(targetPose);
+          Rotation2d angleToTarget =
+              poseManager.getHorizontalAngleTo(targetPose).rotateBy(Rotation2d.kPi);
 
           Translation2d driveVelocity = new Translation2d(driveVelocityScalar, angleToTarget);
 
@@ -556,7 +557,7 @@ public class Drive extends SubsystemBase {
         Math.min(
             0.0,
             new Translation2d(fieldVelocity.dx, fieldVelocity.dy)
-                .rotateBy(poseManager.getHorizontalAngleTo(goalPose))
+                .rotateBy(poseManager.getHorizontalAngleTo(goalPose).rotateBy(Rotation2d.kPi))
                 .getX());
     linearController.reset(poseManager.getDistanceTo(goalPose), linearVelocity);
     resetThetaController();
