@@ -65,8 +65,12 @@ public class Autos {
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
-    chooser.addRoutine( "CenterGHProcessorEFProcessorCDProcessorAlgaeIL2", this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
-    chooser.addRoutine("CenterJIProcessorGHProcessorEFProcessorAlgaeIL2",this::CenterJIProcessorGHProcessorEFProcessorAlgaeIL2);
+    chooser.addRoutine(
+        "CenterGHProcessorEFProcessorCDProcessorAlgaeIL2",
+        this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
+    chooser.addRoutine(
+        "CenterJIProcessorGHProcessorEFProcessorAlgaeIL2",
+        this::CenterJIProcessorGHProcessorEFProcessorAlgaeIL2);
     chooser.addRoutine("WallJILKAlgaeL2L3", this::WallJILKAlgaeL2L3);
     chooser.addRoutine("WallJIL2AlgaeL2L1", this::WallJIL2AlgaeL2L1);
     chooser.addRoutine("CenterWallL1", this::CenterWallL1);
@@ -121,8 +125,7 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                centerToLK.resetOdometry(),
-                centerToLK.cmd() // start traj
+                centerToLK.resetOdometry(), centerToLK.cmd() // start traj
                 ));
 
     centerToLK
@@ -133,41 +136,18 @@ public class Autos {
                 lKToStationHigh.cmd() // START NEXT PATH
                 ));
     lKToStationHigh
-         .done()
-         .onTrue(
-             Commands.sequence(
-              // INTAKE CORAL
-             stationHighToLKL2.cmd()));
-    stationHighToLKL2
         .done()
-        .onTrue(
-             Commands.sequence(
-                // SCORE CORAL L1 KL
-            lKToStationHigh.cmd()));
-    lKToStationHigh
-         .done()
         .onTrue(
             Commands.sequence(
-            // intake("high"),
-            stationHighToLKL2.cmd()));
+                // INTAKE CORAL
+                stationHighToLKL2.cmd()));
     stationHighToLKL2
         .done()
         .onTrue(
-             Commands.sequence(
-           // SCORE CORAL L1 KL
-             lKToStationHigh.cmd()));
-    lKToStationHigh
-         .done()
-        .onTrue(       
-              Commands.sequence(
-                // INTAKE CORAL
-             stationHighToLKL2.cmd()));
-    stationHighToLKL2
-             .done()
-             .onTrue(
-                  Commands.sequence(
+            Commands.sequence(
                 // SCORE CORAL L1 KL
-                  lKToStationHigh.cmd()));
+                lKToStationHigh.cmd()));
+
     return routine;
   }
 
@@ -182,8 +162,7 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                centerToLK.resetOdometry(),
-                centerToLK.cmd() // start traj
+                centerToLK.resetOdometry(), centerToLK.cmd() // start traj
                 ));
     centerToLK
         .done()
@@ -224,11 +203,11 @@ public class Autos {
                 // INTAKE CORAL
                 stationHighToLKL2.cmd()));
     stationHighToLKL2
-                .done()
-                .onTrue(
-                     Commands.sequence(
-                   // SCORE CORAL L2/3 KL
-                     lKToStationHigh.cmd()));
+        .done()
+        .onTrue(
+            Commands.sequence(
+                // SCORE CORAL L2/3 KL
+                lKToStationHigh.cmd()));
     return routine;
   }
 
@@ -436,10 +415,7 @@ public class Autos {
             Commands.sequence(
                 // REMOVE ALGAE L3 EF
                 processorScoreToEFAlgae.cmd()));
-    processorScoreToEFAlgae.done().onTrue(
-        Commands.sequence(
-            eFToProcessorScore.cmd()
-        ));
+    processorScoreToEFAlgae.done().onTrue(Commands.sequence(eFToProcessorScore.cmd()));
     return routine;
   }
 }
