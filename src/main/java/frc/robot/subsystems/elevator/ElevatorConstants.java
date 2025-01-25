@@ -59,6 +59,8 @@ public class ElevatorConstants {
   public static final double elevatorPIDMinInput = 0;
   public static final double elevatorPIDMaxInput = 2 * Math.PI;
 
+  public static final double pidTolerance = .3;
+
   public static final double turnMotorReduction = 150 / 7;
   public static final double encoderPositionFactor =
       2 * Math.PI / turnMotorReduction; // Rotations -> Radians
