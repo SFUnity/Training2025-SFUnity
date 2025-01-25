@@ -6,7 +6,7 @@ public class CarrageIOSim implements CarrageIO {
   public CarrageIOSim() {}
 
   @Override
-  public void updateInputs(RollersIOInputs inputs) {
+  public void updateInputs(CarrageIOInputs inputs) {
     inputs.appliedVolts = appliedVolts;
   }
 

@@ -1,10 +1,12 @@
 package frc.robot.subsystems.carrage;
 
 import static frc.robot.subsystems.carrage.CarrageConstants.*;
+import static frc.robot.util.SparkUtil.configureSpark;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class CarrageIOSparkMax implements CarrageIO {
@@ -12,10 +14,26 @@ public class CarrageIOSparkMax implements CarrageIO {
   private final SparkMaxConfig config = new SparkMaxConfig();
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
 
-  public CarrageIOSparkMax() {}
+  public CarrageIOSparkMax() {
+    config
+        .inverted(false)
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(currentLimit)
+        .voltageCompensation(12.0);
+    config
+        .signals
+        .primaryEncoderPositionAlwaysOn(true)
+        .primaryEncoderPositionPeriodMs((int) (1000.0 / 100))
+        .primaryEncoderVelocityAlwaysOn(true)
+        .primaryEncoderVelocityPeriodMs(20)
+        .appliedOutputPeriodMs(20)
+        .busVoltagePeriodMs(20)
+        .outputCurrentPeriodMs(20);
+    configureSpark(rollerMotor, config, true);
+  }
 
   @Override
-  public void updateInputs(RollersIOInputs inputs) {
+  public void updateInputs(CarrageIOInputs inputs) {
     inputs.positionRots = encoder.getPosition();
     inputs.velocityRotsPerSec = encoder.getVelocity();
     inputs.appliedVolts = rollerMotor.getAppliedOutput() * rollerMotor.getBusVoltage();

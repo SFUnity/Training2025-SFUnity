@@ -1,21 +1,19 @@
 package frc.robot.subsystems.carrage;
 
+import static frc.robot.subsystems.carrage.CarrageConstants.*;
+
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.subsystems.rollers.RollersIOInputsAutoLogged;
 import frc.robot.util.Util;
-
-import static frc.robot.subsystems.carrage.CarrageConstants.*;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Carrage extends SubsystemBase {
   private final CarrageIO io;
-  private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
+  private final CarrageIOInputsAutoLogged inputs = new CarrageIOInputsAutoLogged();
 
   private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
 
@@ -36,12 +34,12 @@ public class Carrage extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Rollers", inputs);
+    Logger.processInputs("Carrage", inputs);
 
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
-    Util.logSubsystem(this, "Rollers");
+    Util.logSubsystem(this, "Carrage");
   }
 
   @AutoLogOutput
@@ -69,6 +67,7 @@ public class Carrage extends SubsystemBase {
   public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeed.get())).withName("placeCoralRollers");
   }
+
   public Command highDelagifiy() {
     return run(() -> io.runVolts(dealgifyingSpeed.get())).withName("placeCoralRollers");
   }
