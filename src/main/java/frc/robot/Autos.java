@@ -65,13 +65,11 @@ public class Autos {
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
-    chooser.addRoutine(
-        "ProcessorCDAlgaeL2L3", this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
-    chooser.addRoutine("ProcessorCDAlgaeProcessorL2L3", this::WallJIL2AlgaeL2L1);
+    chooser.addRoutine( "CenterGHProcessorEFProcessorCDProcessorAlgaeIL2", this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
+    chooser.addRoutine("CenterJIProcessorGHProcessorEFProcessorAlgaeIL2",this::CenterJIProcessorGHProcessorEFProcessorAlgaeIL2);
     chooser.addRoutine("WallJILKAlgaeL2L3", this::WallJILKAlgaeL2L3);
-    chooser.addRoutine("WallJILKAlgaeL2L3", this::WallJIL2AlgaeL2L1);
-    chooser.addRoutine(
-        "ProcessorCDAlgaeL2L3", this::CenterJIProcessorGHProcessorEFProcessorAlgaeIL2);
+    chooser.addRoutine("WallJIL2AlgaeL2L1", this::WallJIL2AlgaeL2L1);
+    chooser.addRoutine("CenterWallL1", this::CenterWallL1);
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
@@ -107,17 +105,6 @@ public class Autos {
   // Options: .done() = when routine is done, AtTime("x") = run cmd on eventMarker,
   // .active().whileTrue() =  Trigger while the trajectory is still running.
   // Routines
-  public Command CenterWallLKAlgaeL1() {
-    return Commands.sequence(
-        factory.resetOdometry("CenterWallToLK"), //
-        // PICK UP ALGAE AND SCORE CORAL
-        factory.trajectoryCmd("KLEject"), // GET RID OF ALGAE
-        factory.trajectoryCmd("KLtoStationHigh"), // GO TO CORAL PICKUP
-        // PICK UP CORAL
-        factory.trajectoryCmd("StationHighToKLL2") // GO TO CORAL
-        // PLACE CORAL
-        );
-  }
 
   public AutoRoutine CenterWallL1() {
 
@@ -126,18 +113,18 @@ public class Autos {
     // Load the routine's trajectories
     AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
     AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
-    AutoTrajectory lKToStationHigh = routine.trajectory("KLtoStationHigh");
-    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL1");
+    AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
+    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                centerToLK.cmd().beforeStarting(Commands.print("moving to LK")),
                 centerToLK.resetOdometry(),
                 centerToLK.cmd() // start traj
                 ));
+
     centerToLK
         .done()
         .onTrue( // WHEN WE FINISH LAST PATH
@@ -146,54 +133,58 @@ public class Autos {
                 lKToStationHigh.cmd() // START NEXT PATH
                 ));
     lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL
-                stationHighToLKL2.cmd()));
+         .done()
+         .onTrue(
+             Commands.sequence(
+              // INTAKE CORAL
+             stationHighToLKL2.cmd()));
     stationHighToLKL2
         .done()
         .onTrue(
-            Commands.sequence(
+             Commands.sequence(
                 // SCORE CORAL L1 KL
-                lKToStationHigh.cmd()));
+            lKToStationHigh.cmd()));
     lKToStationHigh
-        .done()
+         .done()
         .onTrue(
             Commands.sequence(
-                // intake("high"),
-                stationHighToLKL2.cmd()));
+            // intake("high"),
+            stationHighToLKL2.cmd()));
     stationHighToLKL2
         .done()
         .onTrue(
-            Commands.sequence(
-                // SCORE CORAL L1 KL
-                lKToStationHigh.cmd()));
+             Commands.sequence(
+           // SCORE CORAL L1 KL
+             lKToStationHigh.cmd()));
     lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
+         .done()
+        .onTrue(       
+              Commands.sequence(
                 // INTAKE CORAL
-                stationHighToLKL2.cmd()));
+             stationHighToLKL2.cmd()));
+    stationHighToLKL2
+             .done()
+             .onTrue(
+                  Commands.sequence(
+                // SCORE CORAL L1 KL
+                  lKToStationHigh.cmd()));
     return routine;
   }
 
   public AutoRoutine WallLKAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
     AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
-    AutoTrajectory lKToStationHigh = routine.trajectory("KLtoStationHigh");
-    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL1");
+    AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
+    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                centerToLK.cmd().beforeStarting(Commands.print("moving to LK")),
                 centerToLK.resetOdometry(),
                 centerToLK.cmd() // start traj
                 ));
-
     centerToLK
         .done()
         .onTrue( // WHEN WE FINISH LAST PATH
@@ -232,6 +223,12 @@ public class Autos {
             Commands.sequence(
                 // INTAKE CORAL
                 stationHighToLKL2.cmd()));
+    stationHighToLKL2
+                .done()
+                .onTrue(
+                     Commands.sequence(
+                   // SCORE CORAL L2/3 KL
+                     lKToStationHigh.cmd()));
     return routine;
   }
 
@@ -239,9 +236,9 @@ public class Autos {
 
     AutoRoutine routine = factory.newRoutine("WallJILKAlgaeL2L3");
 
-    AutoTrajectory centerWallToJI = routine.trajectory("CenterWallToJI");
-    AutoTrajectory lKToStationHigh = routine.trajectory("LKtoStationHigh");
-    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToLKL2");
+    AutoTrajectory centerWallToJI = routine.trajectory("CenterWallToJIAlgae");
+    AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
+    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
     AutoTrajectory jIToKLAlgae = routine.trajectory("JIToKLAlgae");
 
     routine
@@ -406,22 +403,20 @@ public class Autos {
   public AutoRoutine CenterJIProcessorGHProcessorEFProcessorAlgaeIL2() {
     AutoRoutine routine = factory.newRoutine("CenterJIProcessorHGProcessorEFProcessorAlgaeIL2");
 
-    AutoTrajectory centerToJI = routine.trajectory("CenterToJIAlgae");
-    AutoTrajectory cDprocessorScore = routine.trajectory("CDToProcessorScore");
+    AutoTrajectory centerToJI = routine.trajectory("CenterWallToJIAlgae");
     AutoTrajectory gHToProcessorScore = routine.trajectory("GHToProcessorScore");
-    AutoTrajectory eFToCD = routine.trajectory("EFToCDAlgae");
-    AutoTrajectory jIToGH = routine.trajectory("jIToGH");
+    AutoTrajectory jIToGH = routine.trajectory("JIToGH");
     AutoTrajectory eFToProcessorScore = routine.trajectory("eFToProcessorScore");
     AutoTrajectory processorScoreToEFAlgae = routine.trajectory("ProcessorScoreToEFAlgae");
-    AutoTrajectory processorScoreToCDAlgae = routine.trajectory("ProcessorScoreToCD");
 
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.print("Performing CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 Auto!"),
+                Commands.print("Performing penis Auto!"),
                 centerToJI.resetOdometry(),
-                centerToJI.cmd()));
+                centerToJI.cmd(),
+                Commands.print("xcvbn")));
     centerToJI
         .done()
         .onTrue(
@@ -441,6 +436,10 @@ public class Autos {
             Commands.sequence(
                 // REMOVE ALGAE L3 EF
                 processorScoreToEFAlgae.cmd()));
+    processorScoreToEFAlgae.done().onTrue(
+        Commands.sequence(
+            eFToProcessorScore.cmd()
+        ));
     return routine;
   }
 }
