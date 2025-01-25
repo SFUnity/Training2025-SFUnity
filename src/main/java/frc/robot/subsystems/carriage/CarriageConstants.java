@@ -2,7 +2,7 @@ package frc.robot.subsystems.carriage;
 
 import frc.robot.util.LoggedTunableNumber;
 
-public class CarrageConstants {
+public class CarriageConstants {
   public static final int rollerMotorID = 0;
 
   public static final int currentLimit = 0;

@@ -1,6 +1,6 @@
 package frc.robot.subsystems.carriage;
 
-import static frc.robot.subsystems.carriage.CarrageConstants.*;
+import static frc.robot.subsystems.carriage.CarriageConstants.*;
 import static frc.robot.util.SparkUtil.configureSpark;
 
 import com.revrobotics.RelativeEncoder;
