@@ -1,4 +1,4 @@
-package frc.robot.subsystems.carrage;
+package frc.robot.subsystems.carriage;
 
 public class CarrageIOSim implements CarrageIO {
   private double appliedVolts = 0.0;
