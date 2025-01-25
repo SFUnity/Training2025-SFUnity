@@ -7,10 +7,8 @@ import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.carriage.Carriage;
@@ -62,6 +60,7 @@ public class Autos {
 
     // .bind("scoreAlgae", ScoreAlgaeCMD())
 
+    // Set up main choreo routines
     chooser = new AutoChooser();
     // autoChooser.addCmd("Example Auto Command", this::exampleAutoCommand);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
@@ -72,12 +71,6 @@ public class Autos {
     chooser.addRoutine("WallJILKAlgaeL2L3", this::WallJIL2AlgaeL2L1);
     chooser.addRoutine(
         "ProcessorCDAlgaeL2L3", this::CenterJIProcessorGHProcessorEFProcessorAlgaeIL2);
-    // Put the auto chooser on the dashboard
-    // SmartDashboard.putData(autoChooser);
-    SmartDashboard.putData(chooser);
-    // Schedule the selected auto during the autonomous period
-    // RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
-    RobotModeTriggers.autonomous().whileTrue(chooser.selectedCommandScheduler());
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
