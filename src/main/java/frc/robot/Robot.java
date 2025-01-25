@@ -99,7 +99,7 @@ public class Robot extends LoggedRobot {
   // Subsystems
   private final Drive drive;
   private final Elevator elevator;
-  private final Carriage rollers;
+  private final Carriage carriage;
   private final Ground ground;
 
   // Non-subsystems
@@ -198,7 +198,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
-        rollers = new Carriage(new CarriageIOSparkMax());
+        carriage = new Carriage(new CarriageIOSparkMax());
         ground = new Ground(new GroundIOSparkMax());
         break;
 
@@ -214,7 +214,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim());
-        rollers = new Carriage(new CarriageIOSim());
+        carriage = new Carriage(new CarriageIOSim());
         ground = new Ground(new GroundIOSim());
         break;
 
@@ -230,12 +230,12 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
-        rollers = new Carriage(new CarriageIO() {});
+        carriage = new Carriage(new CarriageIO() {});
         ground = new Ground(new GroundIO() {});
         break;
     }
 
-    autos = new Autos(drive, poseManager, elevator, rollers);
+    autos = new Autos(drive, poseManager, elevator, carriage);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -380,12 +380,12 @@ public class Robot extends LoggedRobot {
                             () ->
                                 poseManager.getDistanceTo(goalPose().get())
                                     < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(score(elevator, rollers)))
+                        .andThen(score(elevator, carriage)))
                 .withName("Score/Dealgify"));
 
-    new Trigger(rollers::coralHeld)
+    new Trigger(carriage::coralHeld)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(rollers::algaeHeld)
+    new Trigger(carriage::algaeHeld)
         .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
 
     // Operator controls
@@ -400,7 +400,7 @@ public class Robot extends LoggedRobot {
                     () ->
                         poseManager.getDistanceTo(goalPose().get())
                             < ElevatorConstants.subsystemExtentionLimit)
-                .andThen(score(elevator, rollers)));
+                .andThen(score(elevator, carriage)));
     operator.a().onTrue(elevator.request(L1));
     operator.x().whileTrue(ground.intakeCmd());
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
