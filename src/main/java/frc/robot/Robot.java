@@ -16,6 +16,7 @@ package frc.robot;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
+import static frc.robot.RobotCommands.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -363,14 +364,14 @@ public class Robot extends LoggedRobot {
                             () ->
                                 poseManager.getDistanceTo(goalPose().get())
                                     < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(RobotCommands.score(elevator, rollers)))
+                        .andThen(score(elevator, rollers)))
                 .withName("Score/Dealgify"));
 
     // .until(
     //     () ->
     //         poseManager.getDistanceTo(goalPose)
     //             < ElevatorConstants.subsystemExtentionLimit)
-    // .andThen(RobotCommands.score(elevator, rollers)));
+    // .andThen(score(elevator, rollers)));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -384,7 +385,7 @@ public class Robot extends LoggedRobot {
                     () ->
                         poseManager.getDistanceTo(goalPose().get())
                             < ElevatorConstants.subsystemExtentionLimit)
-                .andThen(RobotCommands.score(elevator, rollers)));
+                .andThen(score(elevator, rollers)));
     operator.a().onTrue(elevator.request(L1));
     operator.x().onTrue(elevator.disableElevator());
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
