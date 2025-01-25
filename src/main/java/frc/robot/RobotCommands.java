@@ -19,8 +19,8 @@ public final class RobotCommands {
     return elevator
         .enableElevator()
         .until(elevator::atGoalHeight)
-        .andThen(carriage.placeCoral().withTimeout(1))
-        // .until(() -> carriage.coralHeld() == false)
+        .andThen(carriage.placeCoral())
+        .until(() -> !carriage.coralHeld())
         .andThen(elevator.disableElevator())
         .withName("score");
   }
