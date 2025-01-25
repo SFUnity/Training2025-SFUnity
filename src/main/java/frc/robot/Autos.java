@@ -30,7 +30,7 @@ public class Autos {
 
   private final LoggedDashboardChooser<Command> nonChoreoChooser =
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
-  private static final boolean isChoreoAuto = false;
+  private static final boolean isChoreoAuto = true;
 
   public Autos(Drive drive, PoseManager poseManager, Elevator elevator, Carriage carriage) {
     this.drive = drive;
