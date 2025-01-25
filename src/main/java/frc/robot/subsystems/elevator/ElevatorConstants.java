@@ -9,6 +9,7 @@ public class ElevatorConstants {
   public static final int elevatorMotorID = 0;
   public static final double maxElevatorSpeed = 10;
   public static final double maxElevatorAcceleration = 5;
+  public static final double elevatorDistanceToleranceInches = 0.3;
 
   public static enum ElevatorHeights {
     L3(desiredHeightL3.get()),

@@ -38,7 +38,7 @@ public class Elevator extends SubsystemBase {
   public Elevator(ElevatorIO io) {
     this.io = io;
 
-    pid.setTolerance(0.15); // should prob be decreased
+    pid.setTolerance(elevatorDistanceToleranceInches);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class Elevator extends SubsystemBase {
 
   @AutoLogOutput
   public boolean atGoalHeight() {
-    return Util.equalsWithTolerance(goalHeight, inputs.position.in(Meters), 0.15);
+    return Util.equalsWithTolerance(goalHeightInches, inputs.position.in(Inches), elevatorDistanceToleranceInches);
   }
 
   public Command enableElevator() {
