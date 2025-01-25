@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.carriage.Carriage;
-import frc.robot.subsystems.carriage.CarrageIO;
+import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarrageIOSim;
 import frc.robot.subsystems.carriage.CarrageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
@@ -230,7 +230,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
-        rollers = new Carriage(new CarrageIO() {});
+        rollers = new Carriage(new CarriageIO() {});
         ground = new Ground(new GroundIO() {});
         break;
     }

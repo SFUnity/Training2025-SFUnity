@@ -2,7 +2,7 @@ package frc.robot.subsystems.carriage;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface CarrageIO {
+public interface CarriageIO {
   @AutoLog
   public static class CarrageIOInputs {
     public double positionRots = 0.0;

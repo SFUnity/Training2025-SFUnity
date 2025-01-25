@@ -13,7 +13,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Carriage extends SubsystemBase {
-  private final CarrageIO io;
+  private final CarriageIO io;
   private final CarrageIOInputsAutoLogged inputs = new CarrageIOInputsAutoLogged();
 
   private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
@@ -26,7 +26,7 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
-  public Carriage(CarrageIO io) {
+  public Carriage(CarriageIO io) {
     this.io = io;
 
     setDefaultCommand(stop());

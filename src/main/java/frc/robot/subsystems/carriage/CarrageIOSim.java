@@ -1,6 +1,6 @@
 package frc.robot.subsystems.carriage;
 
-public class CarrageIOSim implements CarrageIO {
+public class CarrageIOSim implements CarriageIO {
   private double appliedVolts = 0.0;
 
   public CarrageIOSim() {}
