@@ -12,7 +12,7 @@ public interface ElevatorIO {
   public static class ElevatorIOInputs {
     public Distance position = Distance.ofBaseUnits(0, Inches);
 
-    public LinearVelocity velocityMetersPerSec = LinearVelocity.ofBaseUnits(0, InchesPerSecond);
+    public LinearVelocity velocityInchesPerSec = LinearVelocity.ofBaseUnits(0, InchesPerSecond);
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
   }
