@@ -20,5 +20,28 @@
     0.442
   ],
   "cameras": [],
-  "components": []
+  "components": [
+    {
+      "name": "Intake",
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": -180
+        },
+        {
+          "axis": "y",
+          "degrees": 0
+        },
+        {
+          "axis": "z",
+          "degrees": -90
+        }
+      ],
+      "zeroedPosition": [
+        -0.375,
+        0,
+        -0.065
+      ]
+    }
+  ]
 }

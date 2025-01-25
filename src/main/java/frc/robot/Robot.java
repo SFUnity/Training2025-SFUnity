@@ -23,12 +23,14 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.drive.Drive;
@@ -38,6 +40,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.ground.Ground;
+import frc.robot.subsystems.ground.GroundIO;
+import frc.robot.subsystems.ground.GroundIOSim;
+import frc.robot.subsystems.ground.GroundIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -80,6 +86,7 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
+  private final Ground ground;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -176,6 +183,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
+        ground = new Ground(new GroundIOSparkMax());
         break;
 
       case SIM:
@@ -189,6 +197,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
+        ground = new Ground(new GroundIOSim());
         break;
 
       default:
@@ -202,6 +211,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
+        ground = new Ground(new GroundIO() {});
         break;
     }
 
@@ -292,8 +302,13 @@ public class Robot extends LoggedRobot {
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
+    // Setup rumble
+    new Trigger(() -> ground.hasAlgae())
+        .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
+
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
+    ground.setDefaultCommand(ground.raiseAndStopCmd());
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -372,6 +387,7 @@ public class Robot extends LoggedRobot {
                         })));
 
     // Operator controls
+    operator.x().whileTrue(ground.intakeCmd());
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
     operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
