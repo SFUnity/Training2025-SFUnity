@@ -67,35 +67,25 @@ public class Carrage extends SubsystemBase {
   }
 
   public Command placeCoral() {
-    return run(() -> io.runVolts(placeSpeed)).withName("placeCoralRollers");
+    return run(() -> io.runVolts(placeSpeed.get())).withName("placeCoralRollers");
   }
   public Command highDelagifiy() {
-    return run(() -> io.runVolts(dealgifyingSpeed)).withName("placeCoralRollers");
+    return run(() -> io.runVolts(dealgifyingSpeed.get())).withName("placeCoralRollers");
   }
 
   public Command lowDealgaefy() {
-    return run(() -> io.runVolts(dealgifyingSpeed))
+    return run(() -> io.runVolts(dealgifyingSpeed.get()))
         .until(() -> algaeHeld())
-        .andThen(
-            run(
-                () -> {
-                  io.runVolts(0);
-                }))
         .withName("dealgaefy");
   }
 
   public Command intakeCoral() {
-    return run(() -> io.runVolts(intakingSpeed))
+    return run(() -> io.runVolts(intakingSpeed.get()))
         .until(() -> coralHeld())
-        .andThen(
-            run(
-                () -> {
-                  io.runVolts(0);
-                }))
         .withName("intakeCoralRollers");
   }
 
   public Command scoreProcessor() {
-    return run(() -> io.runVolts(intakingSpeed)).withName("scoreProcessor");
+    return run(() -> io.runVolts(intakingSpeed.get())).withName("scoreProcessor");
   }
 }
