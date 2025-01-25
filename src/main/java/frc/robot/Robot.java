@@ -38,8 +38,8 @@ import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
-import frc.robot.subsystems.carriage.CarrageIOSim;
-import frc.robot.subsystems.carriage.CarrageIOSparkMax;
+import frc.robot.subsystems.carriage.CarriageIOSim;
+import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
@@ -198,7 +198,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
-        rollers = new Carriage(new CarrageIOSparkMax());
+        rollers = new Carriage(new CarriageIOSparkMax());
         ground = new Ground(new GroundIOSparkMax());
         break;
 
@@ -214,7 +214,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim());
-        rollers = new Carriage(new CarrageIOSim());
+        rollers = new Carriage(new CarriageIOSim());
         ground = new Ground(new GroundIOSim());
         break;
 
