@@ -17,7 +17,7 @@ public class GroundConstants {
         kP = new LoggedTunableNumber("Ground/kP", 2.0);
         break;
       case SIM:
-        kP = new LoggedTunableNumber("Ground/simkP", 8.0);
+        kP = new LoggedTunableNumber("Ground/simkP", 4.82);
         break;
     }
   }
