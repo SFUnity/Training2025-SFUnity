@@ -36,6 +36,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.carrage.Carrage;
+import frc.robot.subsystems.carrage.CarrageIO;
+import frc.robot.subsystems.carrage.CarrageIOSim;
+import frc.robot.subsystems.carrage.CarrageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
@@ -52,10 +56,6 @@ import frc.robot.subsystems.ground.Ground;
 import frc.robot.subsystems.ground.GroundIO;
 import frc.robot.subsystems.ground.GroundIOSim;
 import frc.robot.subsystems.ground.GroundIOSparkMax;
-import frc.robot.subsystems.rollers.Rollers;
-import frc.robot.subsystems.rollers.RollersIO;
-import frc.robot.subsystems.rollers.RollersIOSim;
-import frc.robot.subsystems.rollers.RollersIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -99,7 +99,7 @@ public class Robot extends LoggedRobot {
   // Subsystems
   private final Drive drive;
   private final Elevator elevator;
-  private final Rollers rollers;
+  private final Carrage rollers;
   private final Ground ground;
 
   // Non-subsystems
@@ -198,7 +198,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
-        rollers = new Rollers(new RollersIOSparkMax());
+        rollers = new Carrage(new CarrageIOSparkMax());
         ground = new Ground(new GroundIOSparkMax());
         break;
 
@@ -214,7 +214,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim());
-        rollers = new Rollers(new RollersIOSim());
+        rollers = new Carrage(new CarrageIOSim());
         ground = new Ground(new GroundIOSim());
         break;
 
@@ -230,7 +230,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
-        rollers = new Rollers(new RollersIO() {});
+        rollers = new Carrage(new CarrageIO() {});
         ground = new Ground(new GroundIO() {});
         break;
     }
@@ -411,8 +411,8 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
 
-    operator.start().onTrue(Commands.runOnce(() -> Rollers.simHasCoral = !Rollers.simHasCoral));
-    operator.back().onTrue(Commands.runOnce(() -> Rollers.simHasAlgae = !Rollers.simHasAlgae));
+    operator.start().onTrue(Commands.runOnce(() -> Carrage.simHasCoral = !Carrage.simHasCoral));
+    operator.back().onTrue(Commands.runOnce(() -> Carrage.simHasAlgae = !Carrage.simHasAlgae));
   }
 
   private enum ScoreState {

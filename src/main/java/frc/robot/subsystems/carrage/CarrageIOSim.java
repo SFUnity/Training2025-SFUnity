@@ -1,9 +1,9 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.carrage;
 
-public class RollersIOSim implements RollersIO {
+public class CarrageIOSim implements CarrageIO {
   private double appliedVolts = 0.0;
 
-  public RollersIOSim() {}
+  public CarrageIOSim() {}
 
   @Override
   public void updateInputs(RollersIOInputs inputs) {

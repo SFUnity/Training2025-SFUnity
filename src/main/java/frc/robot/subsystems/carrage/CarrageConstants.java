@@ -1,8 +1,8 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.carrage;
 
 import frc.robot.util.LoggedTunableNumber;
 
-public class RollersConstants {
+public class CarrageConstants {
   public static final int rollerMotorID = 0;
 
   public static final double intakingSpeed = 1;

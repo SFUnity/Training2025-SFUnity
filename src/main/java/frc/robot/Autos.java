@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
+import frc.robot.subsystems.carrage.Carrage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.Logger;
@@ -27,7 +27,7 @@ public class Autos {
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
   private static final boolean isChoreoAuto = false;
 
-  public Autos(Drive drive, PoseManager poseManager, Elevator elevator, Rollers rollers) {
+  public Autos(Drive drive, PoseManager poseManager, Elevator elevator, Carrage rollers) {
     this.drive = drive;
     this.poseManager = poseManager;
 

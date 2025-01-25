@@ -1,18 +1,20 @@
-package frc.robot.subsystems.rollers;
-
-import static frc.robot.subsystems.rollers.RollersConstants.*;
+package frc.robot.subsystems.carrage;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.rollers.RollersIOInputsAutoLogged;
 import frc.robot.util.Util;
+
+import static frc.robot.subsystems.carrage.CarrageConstants.*;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Rollers extends SubsystemBase {
-  private final RollersIO io;
+public class Carrage extends SubsystemBase {
+  private final CarrageIO io;
   private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
 
   private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
@@ -25,7 +27,7 @@ public class Rollers extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
-  public Rollers(RollersIO io) {
+  public Carrage(CarrageIO io) {
     this.io = io;
 
     setDefaultCommand(stop());

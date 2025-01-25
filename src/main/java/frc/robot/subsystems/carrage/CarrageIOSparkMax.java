@@ -1,18 +1,18 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.carrage;
 
-import static frc.robot.subsystems.rollers.RollersConstants.*;
+import static frc.robot.subsystems.carrage.CarrageConstants.*;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-public class RollersIOSparkMax implements RollersIO {
+public class CarrageIOSparkMax implements CarrageIO {
   private final SparkMax rollerMotor = new SparkMax(rollerMotorID, MotorType.kBrushless);
   private final SparkMaxConfig config = new SparkMaxConfig();
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
 
-  public RollersIOSparkMax() {}
+  public CarrageIOSparkMax() {}
 
   @Override
   public void updateInputs(RollersIOInputs inputs) {

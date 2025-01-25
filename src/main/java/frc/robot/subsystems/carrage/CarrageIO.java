@@ -1,8 +1,8 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.carrage;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface RollersIO {
+public interface CarrageIO {
   @AutoLog
   public static class RollersIOInputs {
     public double positionRots = 0.0;
