@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.Util;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Rollers extends SubsystemBase {
@@ -41,6 +42,7 @@ public class Rollers extends SubsystemBase {
     Util.logSubsystem(this, "Rollers");
   }
 
+  @AutoLogOutput
   public boolean coralHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasCoral;
@@ -48,6 +50,7 @@ public class Rollers extends SubsystemBase {
     return !beamBreak.get();
   }
 
+  @AutoLogOutput
   public boolean algaeHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasAlgae;
