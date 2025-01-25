@@ -29,7 +29,7 @@ public class GroundIOSim implements GroundIO {
 
   public GroundIOSim() {
     controller = new PIDController(0.0, 0.0, 0.0);
-    sim.setState(0.0, 0.0);
+    sim.setState(maxAngleRads, 0.0);
   }
 
   @Override

@@ -13,7 +13,10 @@
 
 package frc.robot;
 
+import static frc.robot.RobotCommands.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,18 +24,22 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.constantsGlobal.FieldConstants.Branch;
+import frc.robot.subsystems.carriage.Carriage;
+import frc.robot.subsystems.carriage.CarriageIO;
+import frc.robot.subsystems.carriage.CarriageIOSim;
+import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
@@ -40,14 +47,19 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.ground.Ground;
 import frc.robot.subsystems.ground.GroundIO;
 import frc.robot.subsystems.ground.GroundIOSim;
 import frc.robot.subsystems.ground.GroundIOSparkMax;
-import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -86,6 +98,8 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
+  private final Elevator elevator;
+  private final Carriage carriage;
   private final Ground ground;
 
   // Non-subsystems
@@ -183,6 +197,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
+        elevator = new Elevator(new ElevatorIOSparkMax());
+        carriage = new Carriage(new CarriageIOSparkMax());
         ground = new Ground(new GroundIOSparkMax());
         break;
 
@@ -197,6 +213,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
+        elevator = new Elevator(new ElevatorIOSim());
+        carriage = new Carriage(new CarriageIOSim());
         ground = new Ground(new GroundIOSim());
         break;
 
@@ -211,11 +229,13 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
+        elevator = new Elevator(new ElevatorIO() {});
+        carriage = new Carriage(new CarriageIO() {});
         ground = new Ground(new GroundIO() {});
         break;
     }
 
-    autos = new Autos(drive, poseManager);
+    autos = new Autos(drive, poseManager, elevator, carriage);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -229,7 +249,7 @@ public class Robot extends LoggedRobot {
 
     // For tuning visualizations
     // Logger.recordOutput("ZeroedPose2d", new Pose2d());
-    // Logger.recordOutput("ZeroedPose3d", new Pose3d());
+    // Logger.recordOutput("ZeroedPose3d", new Pose3d[] {new Pose3d(), new Pose3d()});
 
     // Set up port forwarding for limelights so we can connect to them through the RoboRIO USB port
     for (int port = 5800; port <= 5809; port++) {
@@ -278,6 +298,13 @@ public class Robot extends LoggedRobot {
         && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
       lowBatteryAlert.set(true);
     }
+
+    // Logs
+    Logger.recordOutput("Controls/intakeState", intakeState.toString());
+    Logger.recordOutput("Controls/scoreState", scoreState.toString());
+    Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
+    Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
+    Logger.recordOutput("Controls/goalPose", goalPose().get());
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
@@ -286,18 +313,28 @@ public class Robot extends LoggedRobot {
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
+  private IntakeState intakeState = IntakeState.Source;
+  private ScoreState scoreState = ScoreState.ProcessorBack;
+  private boolean dealgifyAfterPlacing = false;
+  private boolean allowAutoRotation = true;
+
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     // Setup rumble
-    new Trigger(() -> ground.hasAlgae()).onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
+    new Trigger(() -> ground.hasAlgae())
+        .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
 
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
     ground.setDefaultCommand(ground.raiseAndStopCmd());
 
     // Driver controls
-    driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver.y().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)));
+    driver.b().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)));
+    driver.a().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)));
+    driver.x().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)));
     driver
         .start()
         .onTrue(
@@ -307,22 +344,124 @@ public class Robot extends LoggedRobot {
                             new Pose2d(poseManager.getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+    driver
+        .back()
+        .onTrue(
+            Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
     driver
-        .b()
+        .leftBumper()
+        // .and(() -> !carriage.hasCoral())
         .whileTrue(
-            drive.fullAutoDrive(
-                () ->
-                    AllianceFlipUtil.apply(
-                        processorScore.transformBy(
-                            new Transform2d(0, 0, new Rotation2d(Math.PI))))));
-    driver.y().whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(processorScore)));
+            switch (intakeState) {
+              case Source -> drive.headingDrive(
+                  () -> {
+                    final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+                    final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
+                    Pose2d closerStation;
+
+                    if (poseManager.getDistanceTo(leftFaceFlipped)
+                        < poseManager.getDistanceTo(rightFaceFlipped)) {
+                      closerStation = leftFaceFlipped;
+                    } else {
+                      closerStation = rightFaceFlipped;
+                    }
+                    return closerStation.getRotation();
+                  });
+              default -> Commands.none();
+            });
     driver
         .rightBumper()
-        .whileTrue(drive.fullAutoDrive(() -> AllianceFlipUtil.apply(Branch.A.pose)));
+        .whileTrue(
+            drive
+                .fullAutoDrive(goalPose())
+                .alongWith(
+                    new WaitUntilCommand(
+                            () ->
+                                poseManager.getDistanceTo(goalPose().get())
+                                    < ElevatorConstants.subsystemExtentionLimit)
+                        .andThen(score(elevator, carriage)))
+                .withName("Score/Dealgify"));
+
+    new Trigger(carriage::coralHeld)
+        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+    new Trigger(carriage::algaeHeld)
+        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
 
     // Operator controls
+    operator.y().onTrue(elevator.request(L3));
+    // TODO: remove after testing
+    operator
+        .b()
+        .onTrue(
+            elevator
+                .request(L3)
+                .until(
+                    () ->
+                        poseManager.getDistanceTo(goalPose().get())
+                            < ElevatorConstants.subsystemExtentionLimit)
+                .andThen(score(elevator, carriage)));
+    operator.a().onTrue(elevator.request(L1));
     operator.x().whileTrue(ground.intakeCmd());
+    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
+    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
+    operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
+
+    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Source));
+    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
+    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
+
+    operator.start().onTrue(Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
+    operator.back().onTrue(Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+  }
+
+  private enum ScoreState {
+    LeftBranch,
+    RightBranch,
+    Dealgify,
+    ProcessorFront,
+    ProcessorBack
+  }
+
+  private enum IntakeState {
+    Source,
+    Ice_Cream,
+    Ground
+  }
+
+  private Supplier<Pose2d> goalPose() {
+    return () -> {
+      switch (scoreState) {
+        case LeftBranch:
+          return apply(closestFace().leftBranch.pose);
+        case RightBranch:
+          return apply(closestFace().rightBranch.pose);
+        case Dealgify:
+          return apply(closestFace().pose);
+        case ProcessorFront:
+          return apply(processorScore);
+        case ProcessorBack:
+          return apply(processorScore).transformBy(new Transform2d(0, 0, new Rotation2d(Math.PI)));
+        default:
+          {
+            System.out.println("Invalid score state");
+            return poseManager.getPose();
+          }
+      }
+    };
+  }
+
+  private Face closestFace() {
+    Face closestFace = Face.One;
+    double distanceToClosestFace = Double.MAX_VALUE;
+    for (Face face : Face.values()) {
+      double distance = poseManager.getDistanceTo(apply(face.pose));
+      if (distance < distanceToClosestFace) {
+        distanceToClosestFace = distance;
+        closestFace = face;
+      }
+    }
+    return closestFace;
   }
 
   /** This function is called once when the robot is disabled. */
