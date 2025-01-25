@@ -383,7 +383,7 @@ public class Robot extends LoggedRobot {
                                       < ElevatorConstants.subsystemExtentionLimit)
                           .andThen(score(elevator, carriage));
 
-                      case ProcessorBack -> Commands.none();
+                      case ProcessorBack -> ground.poopCmd().until(() -> !ground.algaeHeld());
                     })
                 .withName("Score/Dealgify"));
 
@@ -391,6 +391,8 @@ public class Robot extends LoggedRobot {
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld)
         .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
+    new Trigger(ground::algaeHeld)
+        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorBack));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
