@@ -368,6 +368,8 @@ public class Robot extends LoggedRobot {
                     }
                     return closerStation.getRotation();
                   });
+                case Ground -> 
+                    ground.intakeCmd().until(ground::algaeHeld);
               default -> Commands.none();
             });
     driver
