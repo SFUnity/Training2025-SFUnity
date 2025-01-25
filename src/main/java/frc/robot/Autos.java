@@ -27,7 +27,7 @@ public class Autos {
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
   private static final boolean isChoreoAuto = false;
 
-  public Autos(Drive drive, PoseManager poseManager, Elevator elevator, Carriage rollers) {
+  public Autos(Drive drive, PoseManager poseManager, Elevator elevator, Carriage carriage) {
     this.drive = drive;
     this.poseManager = poseManager;
 
