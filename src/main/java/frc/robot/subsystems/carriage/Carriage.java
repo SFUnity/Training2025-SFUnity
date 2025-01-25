@@ -1,14 +1,13 @@
 package frc.robot.subsystems.carriage;
 
+import static frc.robot.subsystems.carriage.CarriageConstants.*;
+
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.Util;
-
-import static frc.robot.subsystems.carriage.CarriageConstants.*;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
