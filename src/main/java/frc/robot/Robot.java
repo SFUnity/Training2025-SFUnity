@@ -25,6 +25,7 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -47,6 +48,10 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
+import frc.robot.subsystems.ground.Ground;
+import frc.robot.subsystems.ground.GroundIO;
+import frc.robot.subsystems.ground.GroundIOSim;
+import frc.robot.subsystems.ground.GroundIOSparkMax;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.RollersIO;
 import frc.robot.subsystems.rollers.RollersIOSim;
@@ -95,6 +100,8 @@ public class Robot extends LoggedRobot {
   private final Drive drive;
   private final Elevator elevator;
   private final Rollers rollers;
+  private final Ground ground;
+
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
   private final Autos autos;
@@ -192,6 +199,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
         rollers = new Rollers(new RollersIOSparkMax());
+        ground = new Ground(new GroundIOSparkMax());
         break;
 
       case SIM:
@@ -207,6 +215,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim());
         rollers = new Rollers(new RollersIOSim());
+        ground = new Ground(new GroundIOSim());
         break;
 
       default:
@@ -222,6 +231,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
         rollers = new Rollers(new RollersIO() {});
+        ground = new Ground(new GroundIO() {});
         break;
     }
 
@@ -311,8 +321,13 @@ public class Robot extends LoggedRobot {
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
+    // Setup rumble
+    new Trigger(() -> ground.hasAlgae())
+        .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
+
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
+    ground.setDefaultCommand(ground.raiseAndStopCmd());
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -387,7 +402,7 @@ public class Robot extends LoggedRobot {
                             < ElevatorConstants.subsystemExtentionLimit)
                 .andThen(score(elevator, rollers)));
     operator.a().onTrue(elevator.request(L1));
-    operator.x().onTrue(elevator.disableElevator());
+    operator.x().whileTrue(ground.intakeCmd());
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
     operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
