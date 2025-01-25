@@ -11,8 +11,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.constantsGlobal.Constants;
+import frc.robot.constantsGlobal.Constants.Mode;
+import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.Logger;
@@ -27,9 +30,9 @@ public class Autos {
 
   private final LoggedDashboardChooser<Command> nonChoreoChooser =
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
-  private static final boolean isChoreoAuto = true;
+  private static final boolean isChoreoAuto = false;
 
-  public Autos(Drive drive, PoseManager poseManager) {
+  public Autos(Drive drive, PoseManager poseManager, Elevator elevator, Carriage carriage) {
     this.drive = drive;
     this.poseManager = poseManager;
 
@@ -80,8 +83,11 @@ public class Autos {
 
       // SysID & non-choreo routines
       if (!isChoreoAuto) {
-        nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
+        if (Constants.currentMode == Mode.SIM) {
+          // Use Phoenix Tuner for real robot
+          nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
+        }
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
