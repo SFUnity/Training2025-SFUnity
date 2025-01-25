@@ -19,12 +19,12 @@ public class CarriageConstants {
   public static final int beamBreakNumber = 0;
 
   static {
-    algaeVelocityThreshold = new LoggedTunableNumber("Reef/Rollers/algaeVelocityThreshold");
-    algaeCurrentThreshold = new LoggedTunableNumber("Reef/Rollers/algaeCurrentThreshold");
+    algaeVelocityThreshold = new LoggedTunableNumber("Carriage/algaeVelocityThreshold");
+    algaeCurrentThreshold = new LoggedTunableNumber("Carriage/algaeCurrentThreshold");
 
-    intakingSpeed = new LoggedTunableNumber("Reef/Rollers/intakingSpeed", 1);
-    placeSpeed = new LoggedTunableNumber("Reef/Rollers/placeSpeed", 1);
-    dealgifyingSpeed = new LoggedTunableNumber("Reef/Rollers/dealgifyingSpeed", 1);
-    processorSpeed = new LoggedTunableNumber("Reef/Rollers/processorSpeed", -1);
+    intakingSpeed = new LoggedTunableNumber("Carriage/intakingSpeed", 1);
+    placeSpeed = new LoggedTunableNumber("Carriage/placeSpeed", 1);
+    dealgifyingSpeed = new LoggedTunableNumber("Carriage/dealgifyingSpeed", 1);
+    processorSpeed = new LoggedTunableNumber("Carriage/processorSpeed", -1);
   }
 }
