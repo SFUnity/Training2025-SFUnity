@@ -18,7 +18,7 @@ public final class RobotCommands {
   public static Command score(Elevator elevator, Carriage carriage) {
     return elevator
         .enableElevator()
-        .until(elevator::atDesiredHeight)
+        .until(elevator::atGoalHeight)
         .andThen(carriage.placeCoral().withTimeout(1))
         // .until(() -> carriage.coralHeld() == false)
         .andThen(elevator.disableElevator())
