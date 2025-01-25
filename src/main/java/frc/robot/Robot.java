@@ -370,6 +370,8 @@ public class Robot extends LoggedRobot {
 
     new Trigger(rollers::coralHeld)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+    new Trigger(rollers::algaeHeld)
+        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
