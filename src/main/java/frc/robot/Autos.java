@@ -15,6 +15,7 @@ import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.ground.Ground;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.Logger;
@@ -22,6 +23,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class Autos {
   private final Drive drive;
+  private final Carriage carriage;
+  private final Elevator elevator;
+  private final Ground ground;
   private final PoseManager poseManager;
 
   private final AutoFactory factory;
@@ -31,9 +35,13 @@ public class Autos {
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
   private static final boolean isChoreoAuto = true;
 
-  public Autos(Drive drive, PoseManager poseManager, Elevator elevator, Carriage carriage) {
+  public Autos(Drive drive, Carriage carriage, Elevator elevator, Ground ground, PoseManager poseManager) {
     this.drive = drive;
+    this.carriage = carriage;
+    this.elevator = elevator;
+    this.ground = ground;
     this.poseManager = poseManager;
+   
 
     factory =
         new AutoFactory(
