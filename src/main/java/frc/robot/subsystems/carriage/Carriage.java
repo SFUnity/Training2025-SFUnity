@@ -68,11 +68,7 @@ public class Carriage extends SubsystemBase {
     return run(() -> io.runVolts(placeSpeedVolts.get())).withName("placeCoralRollers");
   }
 
-  public Command highDelagifiy() {
-    return run(() -> io.runVolts(dealgifyingSpeedVolts.get())).withName("placeCoralRollers");
-  }
-
-  public Command lowDealgaefy() {
+  public Command dealgify() {
     return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
         .until(() -> algaeHeld())
         .withName("dealgaefy");

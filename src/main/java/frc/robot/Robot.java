@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.constantsGlobal.FieldConstants.Face;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarriageIOSim;
@@ -400,7 +401,27 @@ public class Robot extends LoggedRobot {
                     () ->
                         poseManager.getDistanceTo(goalPose().get())
                             < ElevatorConstants.subsystemExtentionLimit)
-                .andThen(score(elevator, carriage)));
+                .andThen(
+                    elevator
+                        .enableElevator()
+                        .until(elevator::atGoalHeight)
+                        .andThen(
+                            () -> {
+                              if (scoreState == ScoreState.Dealgify) {
+                                carriage.dealgify().withTimeout(1);
+                              } else if (scoreState == ScoreState.LeftBranch
+                                  || scoreState == ScoreState.LeftBranch) {
+                                carriage.placeCoral().withTimeout(1);
+                              } else if (scoreState == ScoreState.ProcessorFront) {
+                                carriage.scoreProcessor().withTimeout(1);
+                              } else if (scoreState == ScoreState.ProcessorBack) {
+                                ground.poopCmd();
+                              }
+                            })
+
+                        // .until(() -> carriage.coralHeld() == false)
+                        .andThen(elevator.disableElevator())
+                        .withName("score")));
     operator.a().onTrue(elevator.request(L1));
     operator.x().whileTrue(ground.intakeCmd());
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));

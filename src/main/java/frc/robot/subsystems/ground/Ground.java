@@ -97,6 +97,7 @@ public class Ground extends SubsystemBase {
           raise();
           rollersOut();
         })
+        .until(this::hasAlgae)
         .withName("poop");
   }
 
