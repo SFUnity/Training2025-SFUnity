@@ -66,8 +66,11 @@ public class Carrage extends SubsystemBase {
     return run(() -> io.runVolts(0)).withName("stopRollers");
   }
 
-  public Command placeCoralAndHighDealgify() {
+  public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeed)).withName("placeCoralRollers");
+  }
+  public Command highDelagifiy() {
+    return run(() -> io.runVolts(dealgifyingSpeed)).withName("placeCoralRollers");
   }
 
   public Command lowDealgaefy() {

@@ -19,7 +19,7 @@ public final class RobotCommands {
     return elevator
         .enableElevator()
         .until(elevator::atDesiredHeight)
-        .andThen(rollers.placeCoralAndHighDealgify().withTimeout(1))
+        .andThen(rollers.placeCoral().withTimeout(1))
         // .until(() -> rollers.coralHeld() == false)
         .andThen(elevator.disableElevator())
         .withName("score");
