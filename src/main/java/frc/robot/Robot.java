@@ -376,11 +376,15 @@ public class Robot extends LoggedRobot {
             drive
                 .fullAutoDrive(goalPose())
                 .alongWith(
-                    new WaitUntilCommand(
-                            () ->
-                                poseManager.getDistanceTo(goalPose().get())
-                                    < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(score(elevator, carriage)))
+                    switch (scoreState) {
+                      default -> new WaitUntilCommand(
+                              () ->
+                                  poseManager.getDistanceTo(goalPose().get())
+                                      < ElevatorConstants.subsystemExtentionLimit)
+                          .andThen(score(elevator, carriage));
+
+                      case ProcessorBack -> Commands.none();
+                    })
                 .withName("Score/Dealgify"));
 
     new Trigger(carriage::coralHeld)
