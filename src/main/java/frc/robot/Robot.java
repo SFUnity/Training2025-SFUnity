@@ -367,12 +367,6 @@ public class Robot extends LoggedRobot {
                         .andThen(score(elevator, rollers)))
                 .withName("Score/Dealgify"));
 
-    // .until(
-    //     () ->
-    //         poseManager.getDistanceTo(goalPose)
-    //             < ElevatorConstants.subsystemExtentionLimit)
-    // .andThen(score(elevator, rollers)));
-
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     // TODO: remove after testing
