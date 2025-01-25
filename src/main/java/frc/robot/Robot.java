@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.subsystems.carriage.Carrage;
+import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarrageIO;
 import frc.robot.subsystems.carriage.CarrageIOSim;
 import frc.robot.subsystems.carriage.CarrageIOSparkMax;
@@ -99,7 +99,7 @@ public class Robot extends LoggedRobot {
   // Subsystems
   private final Drive drive;
   private final Elevator elevator;
-  private final Carrage rollers;
+  private final Carriage rollers;
   private final Ground ground;
 
   // Non-subsystems
@@ -198,7 +198,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
-        rollers = new Carrage(new CarrageIOSparkMax());
+        rollers = new Carriage(new CarrageIOSparkMax());
         ground = new Ground(new GroundIOSparkMax());
         break;
 
@@ -214,7 +214,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim());
-        rollers = new Carrage(new CarrageIOSim());
+        rollers = new Carriage(new CarrageIOSim());
         ground = new Ground(new GroundIOSim());
         break;
 
@@ -230,7 +230,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
-        rollers = new Carrage(new CarrageIO() {});
+        rollers = new Carriage(new CarrageIO() {});
         ground = new Ground(new GroundIO() {});
         break;
     }
@@ -411,8 +411,8 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
 
-    operator.start().onTrue(Commands.runOnce(() -> Carrage.simHasCoral = !Carrage.simHasCoral));
-    operator.back().onTrue(Commands.runOnce(() -> Carrage.simHasAlgae = !Carrage.simHasAlgae));
+    operator.start().onTrue(Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
+    operator.back().onTrue(Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
   }
 
   private enum ScoreState {

@@ -1,13 +1,13 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.carriage.Carrage;
+import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 
 /** Put high level commands here */
 public final class RobotCommands {
-  public Command setCoralIntake(Elevator elevator, Carrage rollers) {
+  public Command setCoralIntake(Elevator elevator, Carriage rollers) {
     return elevator
         .request(ElevatorHeight.Source)
         .withDeadline(rollers.intakeCoral())
@@ -15,7 +15,7 @@ public final class RobotCommands {
         .withName("intakeCoral");
   }
 
-  public static Command score(Elevator elevator, Carrage rollers) {
+  public static Command score(Elevator elevator, Carriage rollers) {
     return elevator
         .enableElevator()
         .until(elevator::atDesiredHeight)

@@ -12,7 +12,7 @@ import static frc.robot.subsystems.carriage.CarrageConstants.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Carrage extends SubsystemBase {
+public class Carriage extends SubsystemBase {
   private final CarrageIO io;
   private final CarrageIOInputsAutoLogged inputs = new CarrageIOInputsAutoLogged();
 
@@ -26,7 +26,7 @@ public class Carrage extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
-  public Carrage(CarrageIO io) {
+  public Carriage(CarrageIO io) {
     this.io = io;
 
     setDefaultCommand(stop());
@@ -35,12 +35,12 @@ public class Carrage extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Carrage", inputs);
+    Logger.processInputs("Carriage", inputs);
 
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
-    Util.logSubsystem(this, "Carrage");
+    Util.logSubsystem(this, "Carriage");
   }
 
   @AutoLogOutput
