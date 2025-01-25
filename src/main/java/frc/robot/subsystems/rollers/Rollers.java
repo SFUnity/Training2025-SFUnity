@@ -6,6 +6,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
@@ -19,6 +20,9 @@ public class Rollers extends SubsystemBase {
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
   private double filteredVelocity;
   private double filteredStatorCurrent;
+
+  public static boolean simHasCoral = false;
+  public static boolean simHasAlgae = false;
 
   public Rollers(RollersIO io) {
     this.io = io;
@@ -38,10 +42,16 @@ public class Rollers extends SubsystemBase {
   }
 
   public boolean coralHeld() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      return simHasCoral;
+    }
     return !beamBreak.get();
   }
 
   public boolean algaeHeld() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      return simHasAlgae;
+    }
     return (filteredVelocity <= algaeVelocityThreshold.get()
             && (filteredStatorCurrent >= algaeCurrentThreshold.get())
         || filteredStatorCurrent <= -2);

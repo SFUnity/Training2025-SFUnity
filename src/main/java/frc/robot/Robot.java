@@ -389,6 +389,9 @@ public class Robot extends LoggedRobot {
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
+
+    operator.start().onChange(Commands.runOnce(() -> Rollers.simHasCoral = !Rollers.simHasCoral));  
+    operator.back().onChange(Commands.runOnce(() -> Rollers.simHasAlgae = !Rollers.simHasAlgae));
   }
 
   private enum ScoreState {
