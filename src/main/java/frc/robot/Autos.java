@@ -292,9 +292,7 @@ public class Autos {
     AutoTrajectory cDprocessorScore = routine.trajectory("CDToProcessorScore");
     AutoTrajectory gHToProcessorScore = routine.trajectory("GHToProcessorScore");
     AutoTrajectory eFToCD = routine.trajectory("EFToCDAlgae");
-    AutoTrajectory eFToProcessorScore = routine.trajectory("eFToProcessorScore");
     AutoTrajectory processorScoreToEFAlgae = routine.trajectory("ProcessorScoreToEFAlgae");
-    AutoTrajectory processorScoreToCDAlgae = routine.trajectory("ProcessorScoreToCD");
 
     routine
         .active()
@@ -392,7 +390,7 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.print("Performing penis Auto!"),
+                Commands.print("Performing Auto!"),
                 centerToJI.resetOdometry(),
                 centerToJI.cmd(),
                 Commands.print("xcvbn")));
