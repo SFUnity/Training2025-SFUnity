@@ -33,7 +33,7 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   public boolean setHeight = false;
-  public double goalHeight = 0;
+  public double goalHeightInches = 0;
 
   public Elevator(ElevatorIO io) {
     this.io = io;
@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase {
     updateTunables();
 
     if (setHeight) {
-      pid.setGoal(goalHeight);
+      pid.setGoal(goalHeightInches);
     } else {
       pid.setGoal(0);
     }
@@ -91,6 +91,6 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command request(ElevatorHeight height) {
-    return runOnce(() -> goalHeight = height.get()).withName("request" + height.toString());
+    return runOnce(() -> goalHeightInches = height.get()).withName("request" + height.toString());
   }
 }
