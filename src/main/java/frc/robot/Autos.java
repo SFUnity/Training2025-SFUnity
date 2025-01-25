@@ -60,9 +60,9 @@ public class Autos {
 
     // .bind("scoreAlgae", ScoreAlgaeCMD())
 
-    // Set up main choreo routines
+    /* Set up main choreo routines */
     chooser = new AutoChooser();
-    // autoChooser.addCmd("Example Auto Command", this::exampleAutoCommand);
+    // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
     chooser.addRoutine(
         "ProcessorCDAlgaeL2L3", this::CenterGHProcessorEFProcessorCDProcessorAlgaeIL2);
