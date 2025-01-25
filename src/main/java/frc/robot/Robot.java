@@ -13,10 +13,10 @@
 
 package frc.robot;
 
+import static frc.robot.RobotCommands.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
-import static frc.robot.RobotCommands.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.drive.Drive;
@@ -367,6 +368,9 @@ public class Robot extends LoggedRobot {
                         .andThen(score(elevator, rollers)))
                 .withName("Score/Dealgify"));
 
+    new Trigger(rollers::coralHeld)
+        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     // TODO: remove after testing
@@ -390,7 +394,7 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
 
-    operator.start().onChange(Commands.runOnce(() -> Rollers.simHasCoral = !Rollers.simHasCoral));  
+    operator.start().onChange(Commands.runOnce(() -> Rollers.simHasCoral = !Rollers.simHasCoral));
     operator.back().onChange(Commands.runOnce(() -> Rollers.simHasAlgae = !Rollers.simHasAlgae));
   }
 
