@@ -1,7 +1,6 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.InchesPerSecond;
-import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.Distance;
