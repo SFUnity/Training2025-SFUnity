@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
   @AutoLog
-  public static class GroundIOInputs {
+  public static class IntakeIOInputs {
     public Angle pivotCurrentPosition = Rotations.zero();
     public double pivotAppliedVolts = 0.0;
     public double pivotCurrentAmps = 0.0;
@@ -16,9 +16,9 @@ public interface IntakeIO {
     public double rollersCurrentAmps = 0.0;
   }
 
-  default void updateInputs(GroundIOInputs inputs) {}
+  default void updateInputs(IntakeIOInputs inputs) {}
 
-  default void runGroundRollers(double percentOutput) {}
+  default void runRollers(double percentOutput) {}
 
   default void setPivotPosition(Angle angle) {}
 

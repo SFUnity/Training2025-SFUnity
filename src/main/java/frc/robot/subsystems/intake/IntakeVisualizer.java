@@ -22,9 +22,9 @@ public class IntakeVisualizer {
   private final LoggedMechanismLigament2d ground;
   private final String key;
 
-  private final LoggedTunableNumber xOffset = new LoggedTunableNumber("Ground/xOffset", -10.2);
-  private final LoggedTunableNumber yOffset = new LoggedTunableNumber("Ground/yOffset", -8);
-  private final LoggedTunableNumber zOffset = new LoggedTunableNumber("Ground/zOffset", 9);
+  private final LoggedTunableNumber xOffset = new LoggedTunableNumber("Intake/xOffset", -10.2);
+  private final LoggedTunableNumber yOffset = new LoggedTunableNumber("Intake/yOffset", -8);
+  private final LoggedTunableNumber zOffset = new LoggedTunableNumber("Intake/zOffset", 9);
 
   public IntakeVisualizer(String key, Color color) {
     this.key = key;
@@ -45,7 +45,7 @@ public class IntakeVisualizer {
   public void update(Angle angle) {
     // Log Mechanism2d
     ground.setAngle(angle.in(Degrees));
-    Logger.recordOutput("Ground/Mechanism2d/" + key, mechanism);
+    Logger.recordOutput("Intake/Mechanism2d/" + key, mechanism);
 
     // Log 3D poses
     // The inches to meters stuff here will have to be changed
@@ -55,6 +55,6 @@ public class IntakeVisualizer {
             Units.inchesToMeters(yOffset.get()),
             Units.inchesToMeters(zOffset.get()),
             new Rotation3d(0.0, angle.in(Radians), 0.0));
-    Logger.recordOutput("Ground/Mechanism3d/" + key, carriagePose);
+    Logger.recordOutput("Intake/Mechanism3d/" + key, carriagePose);
   }
 }

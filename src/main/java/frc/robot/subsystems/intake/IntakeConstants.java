@@ -19,10 +19,10 @@ public class IntakeConstants {
     algaeCurrentThreshold = new LoggedTunableNumber("ground/algaeCurrentThreshold");
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Ground/kP", 2.0);
+        kP = new LoggedTunableNumber("Intake/kP", 2.0);
         break;
       case SIM:
-        kP = new LoggedTunableNumber("Ground/simkP", 4.82);
+        kP = new LoggedTunableNumber("Intake/simkP", 4.82);
         break;
     }
   }

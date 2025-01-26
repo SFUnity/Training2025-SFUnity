@@ -33,7 +33,7 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   @Override
-  public void updateInputs(GroundIOInputs inputs) {
+  public void updateInputs(IntakeIOInputs inputs) {
     sim.update(Constants.loopPeriodSecs);
 
     inputs.pivotCurrentPosition = Radians.of(sim.getAngleRads());
@@ -47,7 +47,7 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   @Override
-  public void runGroundRollers(double percentOutput) {
+  public void runRollers(double percentOutput) {
     rollersAppliedVolts = 12 * percentOutput;
   }
 

@@ -72,7 +72,7 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
-  public void updateInputs(GroundIOInputs inputs) {
+  public void updateInputs(IntakeIOInputs inputs) {
     inputs.pivotCurrentPosition = Rotations.of(encoder.getPosition() / GEAR_RATIO);
     inputs.pivotAppliedVolts = pivot.getAppliedOutput() * pivot.getBusVoltage();
     inputs.pivotCurrentAmps = pivot.getOutputCurrent();
@@ -82,7 +82,7 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
-  public void runGroundRollers(double percentOutput) {
+  public void runRollers(double percentOutput) {
     rollers.set(percentOutput);
   }
 

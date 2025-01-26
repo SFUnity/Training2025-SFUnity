@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.subsystems.ground.GroundIOInputsAutoLogged;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -23,17 +22,17 @@ public class Intake extends SubsystemBase {
   public static boolean simHasAlgae = false;
   // In rotations
   private static final LoggedTunableNumber loweredAngle =
-      new LoggedTunableNumber("Ground/Angles/lowered", 19);
+      new LoggedTunableNumber("Intake/loweredAngle", 19);
   private static final LoggedTunableNumber raisedAngle =
-      new LoggedTunableNumber("Ground/Angles/raised", 86);
+      new LoggedTunableNumber("Intake/raisedAngle", 86);
   // In percent output
   private static final LoggedTunableNumber rollersSpeed =
-      new LoggedTunableNumber("Ground/Speeds/groundRollers", 1);
+      new LoggedTunableNumber("Intake/rollerSpeed", 1);
 
   private Angle positionSetpoint = Degrees.zero();
 
   private final IntakeIO io;
-  private final GroundIOInputsAutoLogged inputs = new GroundIOInputsAutoLogged();
+  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   public Intake(IntakeIO io) {
     this.io = io;
@@ -43,7 +42,7 @@ public class Intake extends SubsystemBase {
 
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Ground", inputs);
+    Logger.processInputs("Intake", inputs);
 
     // Update controllers
     LoggedTunableNumber.ifChanged(hashCode(), () -> io.setPID(kP.get()), kP);
@@ -51,8 +50,8 @@ public class Intake extends SubsystemBase {
     // Logs
     measuredVisualizer.update(inputs.pivotCurrentPosition);
     setpointVisualizer.update(positionSetpoint);
-    Logger.recordOutput("Ground/positionSetpointRadians", positionSetpoint.in(Radians));
-    Util.logSubsystem(this, "Ground");
+    Logger.recordOutput("Intake/positionSetpointRadians", positionSetpoint.in(Radians));
+    Util.logSubsystem(this, "Intake");
   }
 
   private void lower() {
@@ -66,15 +65,15 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersIn() {
-    io.runGroundRollers(rollersSpeed.get());
+    io.runRollers(rollersSpeed.get());
   }
 
   private void rollersOut() {
-    io.runGroundRollers(-rollersSpeed.get());
+    io.runRollers(-rollersSpeed.get());
   }
 
   private void rollersStop() {
-    io.runGroundRollers(0);
+    io.runRollers(0);
   }
 
   public Command raiseAndStopCmd() {
@@ -91,7 +90,7 @@ public class Intake extends SubsystemBase {
           rollersIn();
         })
         .until(this::algaeHeld)
-        .withName("ground");
+        .withName("intake");
   }
 
   public Command poopCmd() {
@@ -112,7 +111,4 @@ public class Intake extends SubsystemBase {
             && (filteredStatorCurrent >= algaeCurrentThreshold.get())
         || filteredStatorCurrent <= -2);
   }
-
-  // In percent output
-
 }
