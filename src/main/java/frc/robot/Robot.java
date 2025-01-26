@@ -354,7 +354,6 @@ public class Robot extends LoggedRobot {
 
     driver
         .leftBumper()
-        // .and(() -> !carriage.hasCoral())
         .whileTrue(
             switch (intakeState) {
               case Source -> drive.headingDrive(
