@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static frc.robot.RobotCommands.IntakeState.*;
 import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -43,11 +45,7 @@ public final class RobotCommands {
   public static boolean dealgifyAfterPlacing = false;
 
   public static Command fullScore(
-      Drive drive,
-      Elevator elevator,
-      Carriage carriage,
-      Ground ground,
-      PoseManager poseManager) {
+      Drive drive, Elevator elevator, Carriage carriage, Ground ground, PoseManager poseManager) {
     return drive
         .fullAutoDrive(goalPose(poseManager))
         .alongWith(
@@ -63,14 +61,13 @@ public final class RobotCommands {
                                 .alongWith(Commands.print("Running elevator and carriage score")))
                         .andThen(
                             dealgifyAfterPlacing
-                                ? Commands.runOnce(() -> {scoreState = Dealgify; dealgifyAfterPlacing = false;})
+                                ? Commands.runOnce(
+                                        () -> {
+                                          scoreState = Dealgify;
+                                          dealgifyAfterPlacing = false;
+                                        })
                                     .andThen(
-                                        fullScore(
-                                            drive,
-                                            elevator,
-                                            carriage,
-                                            ground,
-                                            poseManager))
+                                        fullScore(drive, elevator, carriage, ground, poseManager))
                                 : Commands.none()),
                     Dealgify,
                     dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
@@ -110,6 +107,34 @@ public final class RobotCommands {
     Dealgify,
     ProcessorFront,
     ProcessorBack
+  }
+
+  public static IntakeState intakeState = Source;
+
+  public static Command fullIntake(
+      Drive drive, Carriage carriage, Ground ground, PoseManager poseManager) {
+    return Commands.select(
+        Map.of(
+            Source,
+                drive
+                    .headingDrive(
+                        () -> {
+                          final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+                          final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
+                          Pose2d closerStation;
+
+                          if (poseManager.getDistanceTo(leftFaceFlipped)
+                              < poseManager.getDistanceTo(rightFaceFlipped)) {
+                            closerStation = leftFaceFlipped;
+                          } else {
+                            closerStation = rightFaceFlipped;
+                          }
+                          return closerStation.getRotation();
+                        })
+                    .withDeadline(carriage.intakeCoral()),
+            Ground, ground.intakeCmd(),
+            Ice_Cream, carriage.lowDealgify()),
+        () -> intakeState);
   }
 
   public static enum IntakeState {

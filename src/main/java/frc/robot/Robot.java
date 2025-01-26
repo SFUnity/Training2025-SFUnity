@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarriageIOSim;
@@ -60,7 +59,6 @@ import frc.robot.subsystems.ground.GroundIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
-import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -314,7 +312,6 @@ public class Robot extends LoggedRobot {
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
-  private IntakeState intakeState = Source;
   private boolean allowAutoRotation = true;
 
   // Consider moving to its own file if/when it gets big
@@ -350,36 +347,8 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
-    driver
-        .leftBumper()
-        .whileTrue(
-            Commands.select(
-                Map.of(
-                    Source,
-                        drive
-                            .headingDrive(
-                                () -> {
-                                  final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
-                                  final Pose2d rightFaceFlipped =
-                                      apply(CoralStation.rightCenterFace);
-                                  Pose2d closerStation;
-
-                                  if (poseManager.getDistanceTo(leftFaceFlipped)
-                                      < poseManager.getDistanceTo(rightFaceFlipped)) {
-                                    closerStation = leftFaceFlipped;
-                                  } else {
-                                    closerStation = rightFaceFlipped;
-                                  }
-                                  return closerStation.getRotation();
-                                })
-                            .withDeadline(carriage.intakeCoral()),
-                    Ground, ground.intakeCmd(),
-                    Ice_Cream, carriage.lowDealgify()),
-                () -> intakeState));
-    driver
-        .rightBumper()
-        .whileTrue(
-            fullScore(drive, elevator, carriage, ground, poseManager));
+    driver.leftBumper().whileTrue(fullIntake(drive, carriage, ground, poseManager));
+    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, ground, poseManager));
 
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
