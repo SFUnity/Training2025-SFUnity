@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarriageIOSim;
@@ -384,7 +385,8 @@ public class Robot extends LoggedRobot {
                                   poseManager.getDistanceTo(goalPose().get())
                                       < ElevatorConstants.subsystemExtentionLimit)
                           .andThen(score(elevator, carriage));
-
+                      case Dealgify -> RobotCommands.dealgify(elevator, carriage, dealgifyAfterPlacing);
+                      case ProcessorFront -> carriage.scoreProcessor();
                       case ProcessorBack -> ground.poopCmd().until(() -> !ground.algaeHeld());
                     })
                 .withName("Score/Dealgify"));
