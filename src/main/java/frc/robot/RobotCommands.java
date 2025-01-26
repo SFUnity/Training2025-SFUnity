@@ -29,6 +29,7 @@ public final class RobotCommands {
         .enableElevator()
         .until(elevator::atGoalHeight)
         .andThen(carriage.placeCoral())
+        .until(() -> carriage.coralHeld() == false)
         .andThen(elevator.disableElevator())
         .withName("score");
   }
