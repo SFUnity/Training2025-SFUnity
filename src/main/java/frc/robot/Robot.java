@@ -392,7 +392,7 @@ public class Robot extends LoggedRobot {
                     })
                 .withName("Score/Dealgify"));
 
-    new Trigger(carriage::coralHeld)
+    new Trigger(carriage::coralHeld).and(() -> allowAutoRotation)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld)
         .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
