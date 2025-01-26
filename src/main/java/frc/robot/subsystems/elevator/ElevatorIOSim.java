@@ -29,16 +29,14 @@ public class ElevatorIOSim implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     sim.update(Constants.loopPeriodSecs);
     inputs.position = Units.metersToInches(sim.getPositionMeters());
-    inputs.velocityInchesPerSec = 39.3701 * sim.getVelocityMetersPerSecond();
+    inputs.velocityInchesPerSec = Units.metersToInches(sim.getVelocityMetersPerSecond());
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = sim.getCurrentDrawAmps();
   }
 
   @Override
   public void runVolts(double volts) {
-
     appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
-    ;
     sim.setInputVoltage(appliedVolts);
   }
 }
