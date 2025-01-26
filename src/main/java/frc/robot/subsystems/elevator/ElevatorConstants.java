@@ -7,8 +7,9 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorConstants {
   public static final int elevatorMotorID = 0;
-  public static final double maxElevatorSpeed = 10;
-  public static final double maxElevatorAcceleration = 5;
+  public static final double maxElevatorSpeed = 72;
+  public static final double maxElevatorAcceleration = 353;
+  public static final double elevatorDistanceToleranceInches = 0.3;
 
   public static enum ElevatorHeights {
     L3(desiredHeightL3.get()),
@@ -46,7 +47,7 @@ public class ElevatorConstants {
 
   public static final Translation2d elevatorOrigin = new Translation2d(0, 0);
 
-  public static final int currentLimit = 0;
+  public static final int currentLimit = 60;
 
   public static final double subsystemExtentionLimit = 2; // Meters
 
@@ -57,6 +58,8 @@ public class ElevatorConstants {
 
   public static final double elevatorPIDMinInput = 0;
   public static final double elevatorPIDMaxInput = 2 * Math.PI;
+
+  public static final double pidTolerance = .3;
 
   public static final double turnMotorReduction = 150 / 7;
   public static final double encoderPositionFactor =
@@ -109,8 +112,6 @@ public class ElevatorConstants {
     L1(new LoggedTunableNumber("Elevator/L1", 0)),
     AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 0)),
     AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", 0)),
-    Processor(new LoggedTunableNumber("Elevator/Processor", 0)),
-    Source(new LoggedTunableNumber("Elevator/Source", 0)),
     Stow(new LoggedTunableNumber("Elevator/Stow", minHeightInches));
 
     ElevatorHeight(LoggedTunableNumber height) {
