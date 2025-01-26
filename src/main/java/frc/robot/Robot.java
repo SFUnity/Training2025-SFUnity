@@ -413,7 +413,7 @@ public class Robot extends LoggedRobot {
                         .andThen(
                             () -> {
                               if (scoreState == ScoreState.Dealgify) {
-                                carriage.dealgify().withTimeout(1);
+                                carriage.lowDealgify().withTimeout(1);
                               } else if (scoreState == ScoreState.LeftBranch
                                   || scoreState == ScoreState.LeftBranch) {
                                 carriage.placeCoral().withTimeout(1);
