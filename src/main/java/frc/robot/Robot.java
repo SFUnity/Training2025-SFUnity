@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -51,10 +52,10 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
-import frc.robot.subsystems.ground.Ground;
-import frc.robot.subsystems.ground.GroundIO;
-import frc.robot.subsystems.ground.GroundIOSim;
-import frc.robot.subsystems.ground.GroundIOSparkMax;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -98,7 +99,7 @@ public class Robot extends LoggedRobot {
   private final Drive drive;
   private final Elevator elevator;
   private final Carriage carriage;
-  private final Ground ground;
+  private final Intake intake;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -197,7 +198,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
         carriage = new Carriage(new CarriageIOSparkMax());
-        ground = new Ground(new GroundIOSparkMax());
+        intake = new Intake(new IntakeIOSparkMax());
         break;
 
       case SIM:
@@ -213,7 +214,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim());
         carriage = new Carriage(new CarriageIOSim());
-        ground = new Ground(new GroundIOSim());
+        intake = new Intake(new IntakeIOSim());
         break;
 
       default:
@@ -229,7 +230,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
         carriage = new Carriage(new CarriageIO() {});
-        ground = new Ground(new GroundIO() {});
+        intake = new Intake(new IntakeIO() {});
         break;
     }
 
@@ -317,14 +318,14 @@ public class Robot extends LoggedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     // Setup rumble
-    new Trigger(() -> ground.algaeHeld())
+    new Trigger(() -> intake.algaeHeld())
         .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
 
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
     elevator.setDefaultCommand(elevator.disableElevator());
     carriage.setDefaultCommand(carriage.stop());
-    ground.setDefaultCommand(ground.raiseAndStopCmd());
+    intake.setDefaultCommand(intake.raiseAndStopCmd());
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -346,14 +347,14 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
-    driver.leftBumper().whileTrue(fullIntake(drive, carriage, ground, poseManager));
-    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, ground, poseManager));
+    driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, intake, poseManager));
 
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
-    new Trigger(ground::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -364,7 +365,7 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  if (ground.algaeHeld()) {
+                  if (intake.algaeHeld()) {
                     scoreState = ProcessorBack;
                   } else if (carriage.algaeHeld()) {
                     scoreState = ProcessorFront;
@@ -378,8 +379,14 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
-    operator.start().onTrue(Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
-    operator.back().onTrue(Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+    SmartDashboard.putData(
+        "Toggle Coral in Carriage",
+        Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
+    SmartDashboard.putData(
+        "Toggle Algae in Carriage",
+        Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+    SmartDashboard.putData(
+        "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
   }
 
   /** This function is called once when the robot is disabled. */
