@@ -56,10 +56,10 @@ public class Elevator extends SubsystemBase {
     }
 
     io.runVolts(
-        pid.calculate(inputs.position.in(Inches))
+        pid.calculate(inputs.position)
             + ffController.calculate(pid.getSetpoint().velocity));
 
-    meausedVisualizer.update(inputs.position.in(Meters));
+    meausedVisualizer.update(inputs.position);
     setpointVisualizer.update(Units.inchesToMeters(pid.getGoal().position));
 
     Logger.recordOutput("Elevator/goal", Units.inchesToMeters(pid.getGoal().position));
@@ -81,7 +81,7 @@ public class Elevator extends SubsystemBase {
   @AutoLogOutput
   public boolean atGoalHeight() {
     return Util.equalsWithTolerance(
-        goalHeightInches, inputs.position.in(Inches), elevatorDistanceToleranceInches);
+        goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
   }
 
   public Command enableElevator() {

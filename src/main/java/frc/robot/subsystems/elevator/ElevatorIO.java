@@ -10,9 +10,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
-    public Distance position = Distance.ofBaseUnits(0, Inches);
+    public double position = 0.0;
 
-    public LinearVelocity velocityInchesPerSec = LinearVelocity.ofBaseUnits(0, InchesPerSecond);
+    public double velocityInchesPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
   }
