@@ -25,13 +25,10 @@ import java.util.function.Supplier;
 /** Put high level commands here */
 public final class RobotCommands {
   public static Command score(Elevator elevator, Carriage carriage) {
-    return elevator
-        .enableElevator()
-        .until(elevator::atGoalHeight)
-        .andThen(carriage.placeCoral())
-        .until(() -> carriage.coralHeld() == false)
-        .andThen(elevator.disableElevator())
-        .withName("score");
+    return Commands.sequence(
+        elevator.enableElevator().until(elevator::atGoalHeight),
+        carriage.placeCoral().until(() -> carriage.coralHeld() == false).andThen(carriage.stop()),
+        elevator.disableElevator());
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, boolean high) {
