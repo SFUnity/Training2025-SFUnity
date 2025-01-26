@@ -368,6 +368,8 @@ public class Robot extends LoggedRobot {
                     }
                     return closerStation.getRotation();
                   });
+                case Ground -> 
+                    ground.intakeCmd().until(ground::algaeHeld);
               default -> Commands.none();
             });
     driver
@@ -376,17 +378,23 @@ public class Robot extends LoggedRobot {
             drive
                 .fullAutoDrive(goalPose())
                 .alongWith(
-                    new WaitUntilCommand(
-                            () ->
-                                poseManager.getDistanceTo(goalPose().get())
-                                    < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(score(elevator, carriage)))
+                    switch (scoreState) {
+                      default -> new WaitUntilCommand(
+                              () ->
+                                  poseManager.getDistanceTo(goalPose().get())
+                                      < ElevatorConstants.subsystemExtentionLimit)
+                          .andThen(score(elevator, carriage));
+
+                      case ProcessorBack -> ground.poopCmd().until(() -> !ground.algaeHeld());
+                    })
                 .withName("Score/Dealgify"));
 
     new Trigger(carriage::coralHeld)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld)
         .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
+    new Trigger(ground::algaeHeld)
+        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorBack));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
