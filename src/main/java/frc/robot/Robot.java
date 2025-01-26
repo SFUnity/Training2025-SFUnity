@@ -22,7 +22,6 @@ import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -33,7 +32,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
@@ -63,7 +61,6 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
 import java.util.Map;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -308,7 +305,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
     Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
     Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
-    Logger.recordOutput("Controls/goalPose", goalPose().get());
+    Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
@@ -318,7 +315,6 @@ public class Robot extends LoggedRobot {
   }
 
   private IntakeState intakeState = Source;
-  private ScoreState scoreState = ProcessorBack;
   private boolean dealgifyAfterPlacing = false;
   private boolean allowAutoRotation = true;
 
@@ -384,33 +380,7 @@ public class Robot extends LoggedRobot {
     driver
         .rightBumper()
         .whileTrue(
-            drive
-                .fullAutoDrive(goalPose())
-                .alongWith(
-                    Commands.select(
-                        Map.of(
-                            RightBranch,
-                            new WaitUntilCommand(
-                                    () ->
-                                        poseManager.getDistanceTo(goalPose().get())
-                                            < ElevatorConstants.subsystemExtentionLimit)
-                                .andThen(
-                                    score(elevator, carriage)
-                                        .alongWith(
-                                            Commands.print("Running elevator and carriage score")))
-                                .andThen(
-                                    Commands.runOnce(
-                                        () -> {
-                                          if (dealgifyAfterPlacing) scoreState = Dealgify;
-                                        })),
-                            Dealgify,
-                            dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
-                            ProcessorFront,
-                            carriage.scoreProcessor(),
-                            ProcessorBack,
-                            ground.poopCmd().until(() -> !ground.algaeHeld())),
-                        () -> scoreState))
-                .withName("Score/Dealgify"));
+            fullScore(drive, elevator, carriage, ground, poseManager, () -> dealgifyAfterPlacing));
 
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
@@ -428,7 +398,7 @@ public class Robot extends LoggedRobot {
                 .request(L3)
                 .until(
                     () ->
-                        poseManager.getDistanceTo(goalPose().get())
+                        poseManager.getDistanceTo(goalPose(poseManager).get())
                             < ElevatorConstants.subsystemExtentionLimit)
                 .andThen(
                     elevator
@@ -462,28 +432,6 @@ public class Robot extends LoggedRobot {
 
     operator.start().onTrue(Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
     operator.back().onTrue(Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
-  }
-
-  private Supplier<Pose2d> goalPose() {
-    return () -> {
-      switch (scoreState) {
-        case LeftBranch:
-          return apply(poseManager.closestFace().leftBranch.pose);
-        case RightBranch:
-          return apply(poseManager.closestFace().rightBranch.pose);
-        case Dealgify:
-          return apply(poseManager.closestFace().pose);
-        case ProcessorFront:
-          return apply(processorScore);
-        case ProcessorBack:
-          return apply(processorScore).transformBy(new Transform2d(0, 0, new Rotation2d(Math.PI)));
-        default:
-          {
-            System.out.println("Invalid score state");
-            return poseManager.getPose();
-          }
-      }
-    };
   }
 
   /** This function is called once when the robot is disabled. */
