@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import static frc.robot.util.AllianceFlipUtil.apply;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,6 +12,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.robot.constantsGlobal.FieldConstants.Face;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -114,5 +117,18 @@ public class PoseManager {
   @AutoLogOutput(key = "Odometry/RobotVelocity")
   public Twist2d robotVelocity() {
     return robotVelocity;
+  }
+
+  public Face closestFace() {
+    Face closestFace = Face.One;
+    double distanceToClosestFace = Double.MAX_VALUE;
+    for (Face face : Face.values()) {
+      double distance = getDistanceTo(apply(face.pose));
+      if (distance < distanceToClosestFace) {
+        distanceToClosestFace = distance;
+        closestFace = face;
+      }
+    }
+    return closestFace;
   }
 }
