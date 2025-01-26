@@ -55,8 +55,7 @@ public final class RobotCommands {
                                 poseManager.getDistanceTo(goalPose(poseManager).get())
                                     < ElevatorConstants.subsystemExtentionLimit)
                         .andThen(
-                            score(elevator, carriage)
-                                .alongWith(Commands.print("Running elevator and carriage score")))
+                            score(elevator, carriage))
                         .andThen(
                             dealgifyAfterPlacing
                                 ? Commands.runOnce(
