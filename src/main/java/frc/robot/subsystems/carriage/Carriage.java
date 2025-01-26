@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -24,6 +25,8 @@ public class Carriage extends SubsystemBase {
 
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
+
+  private static LoggedTunableNumber highDealgifyTime = new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
 
   public Carriage(CarriageIO io) {
     this.io = io;
@@ -69,7 +72,7 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command highDelagifiy() {
-    return run(() -> io.runVolts(dealgifyingSpeed.get())).withName("placeCoralRollers");
+    return run(() -> io.runVolts(dealgifyingSpeed.get())).withTimeout(highDealgifyTime.get()).withName("placeCoralRollers");
   }
 
   public Command lowDealgaefy() {
