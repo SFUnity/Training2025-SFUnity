@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -378,8 +379,18 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
-    operator.start().onTrue(Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
-    operator.back().onTrue(Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+    SmartDashboard.putData(
+        "Toggle Coral Carriage",
+        Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
+    SmartDashboard.putData(
+        "Toggle Algae Carriage",
+        Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+    SmartDashboard.putData(
+        "Toggle Algae Ground",
+        Commands.runOnce(
+            () ->
+                frc.robot.subsystems.ground.Ground.simHasAlgae =
+                    !frc.robot.subsystems.ground.Ground.simHasAlgae));
   }
 
   /** This function is called once when the robot is disabled. */
