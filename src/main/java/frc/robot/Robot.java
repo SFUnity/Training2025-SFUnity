@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.constantsGlobal.FieldConstants.Face;
+import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarriageIOSim;
@@ -385,11 +385,31 @@ public class Robot extends LoggedRobot {
             drive
                 .fullAutoDrive(goalPose())
                 .alongWith(
-                    new WaitUntilCommand(
-                            () ->
-                                poseManager.getDistanceTo(goalPose().get())
-                                    < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(score(elevator, carriage)))
+                    Commands.select(
+                        Map.of(
+                            ScoreState.RightBranch,
+                            new WaitUntilCommand(
+                                    () ->
+                                        poseManager.getDistanceTo(goalPose().get())
+                                            < ElevatorConstants.subsystemExtentionLimit)
+                                .andThen(
+                                    score(elevator, carriage)
+                                        .alongWith(
+                                            Commands.print("Running elevator and carriage score")))
+                                .andThen(
+                                    Commands.runOnce(
+                                        () -> {
+                                          if (dealgifyAfterPlacing)
+                                            scoreState = ScoreState.Dealgify;
+                                        })),
+                            ScoreState.Dealgify,
+                            RobotCommands.dealgify(
+                                elevator, carriage, poseManager.closestFace().highAlgae),
+                            ScoreState.ProcessorFront,
+                            carriage.scoreProcessor(),
+                            ScoreState.ProcessorBack,
+                            ground.poopCmd().until(() -> !ground.algaeHeld())),
+                        () -> scoreState))
                 .withName("Score/Dealgify"));
 
     new Trigger(carriage::coralHeld)
