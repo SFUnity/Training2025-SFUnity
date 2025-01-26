@@ -1,7 +1,7 @@
-package frc.robot.subsystems.ground;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.subsystems.ground.GroundConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.constantsGlobal.Constants;
 
-public class GroundIOSim implements GroundIO {
+public class IntakeIOSim implements IntakeIO {
 
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
@@ -27,7 +27,7 @@ public class GroundIOSim implements GroundIO {
   private double pivotAppliedVolts = 0.0;
   private double rollersAppliedVolts = 0.0;
 
-  public GroundIOSim() {
+  public IntakeIOSim() {
     controller = new PIDController(0.0, 0.0, 0.0);
     sim.setState(maxAngleRads, 0.0);
   }

@@ -17,7 +17,7 @@ import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.ground.Ground;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -45,7 +45,7 @@ public final class RobotCommands {
   public static boolean dealgifyAfterPlacing = false;
 
   public static Command fullScore(
-      Drive drive, Elevator elevator, Carriage carriage, Ground ground, PoseManager poseManager) {
+      Drive drive, Elevator elevator, Carriage carriage, Intake ground, PoseManager poseManager) {
     return drive
         .fullAutoDrive(goalPose(poseManager))
         .alongWith(
@@ -112,7 +112,7 @@ public final class RobotCommands {
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive, Carriage carriage, Ground ground, PoseManager poseManager) {
+      Drive drive, Carriage carriage, Intake ground, PoseManager poseManager) {
     return Commands.select(
         Map.of(
             Source,

@@ -52,10 +52,10 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
-import frc.robot.subsystems.ground.Ground;
-import frc.robot.subsystems.ground.GroundIO;
-import frc.robot.subsystems.ground.GroundIOSim;
-import frc.robot.subsystems.ground.GroundIOSparkMax;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -99,7 +99,7 @@ public class Robot extends LoggedRobot {
   private final Drive drive;
   private final Elevator elevator;
   private final Carriage carriage;
-  private final Ground ground;
+  private final Intake ground;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -198,7 +198,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
         carriage = new Carriage(new CarriageIOSparkMax());
-        ground = new Ground(new GroundIOSparkMax());
+        ground = new Intake(new IntakeIOSparkMax());
         break;
 
       case SIM:
@@ -214,7 +214,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim());
         carriage = new Carriage(new CarriageIOSim());
-        ground = new Ground(new GroundIOSim());
+        ground = new Intake(new IntakeIOSim());
         break;
 
       default:
@@ -230,7 +230,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
         carriage = new Carriage(new CarriageIO() {});
-        ground = new Ground(new GroundIO() {});
+        ground = new Intake(new IntakeIO() {});
         break;
     }
 
@@ -389,8 +389,8 @@ public class Robot extends LoggedRobot {
         "Toggle Algae Ground",
         Commands.runOnce(
             () ->
-                frc.robot.subsystems.ground.Ground.simHasAlgae =
-                    !frc.robot.subsystems.ground.Ground.simHasAlgae));
+                frc.robot.subsystems.intake.Intake.simHasAlgae =
+                    !frc.robot.subsystems.intake.Intake.simHasAlgae));
   }
 
   /** This function is called once when the robot is disabled. */

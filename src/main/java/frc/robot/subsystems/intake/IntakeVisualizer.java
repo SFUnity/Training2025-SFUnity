@@ -1,8 +1,8 @@
-package frc.robot.subsystems.ground;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.subsystems.ground.GroundConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
-public class GroundVisualizer {
+public class IntakeVisualizer {
   private final LoggedMechanism2d mechanism;
   private final LoggedMechanismRoot2d root;
   private final LoggedMechanismLigament2d ground;
@@ -26,7 +26,7 @@ public class GroundVisualizer {
   private final LoggedTunableNumber yOffset = new LoggedTunableNumber("Ground/yOffset", -8);
   private final LoggedTunableNumber zOffset = new LoggedTunableNumber("Ground/zOffset", 9);
 
-  public GroundVisualizer(String key, Color color) {
+  public IntakeVisualizer(String key, Color color) {
     this.key = key;
     mechanism = new LoggedMechanism2d(1, 1, new Color8Bit(Color.kBlack));
     root = mechanism.getRoot("Ground Root", 0, Units.inchesToMeters(9.063));

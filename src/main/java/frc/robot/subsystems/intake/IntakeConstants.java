@@ -1,10 +1,10 @@
-package frc.robot.subsystems.ground;
+package frc.robot.subsystems.intake;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 
-public class GroundConstants {
+public class IntakeConstants {
   public static final LoggedTunableNumber kP;
   public static final double pivotPositionFactor = 0;
   public static final double minAngleRads = Units.degreesToRadians(18.39);

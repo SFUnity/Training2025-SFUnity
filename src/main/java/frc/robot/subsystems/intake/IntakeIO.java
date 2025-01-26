@@ -1,11 +1,11 @@
-package frc.robot.subsystems.ground;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface GroundIO {
+public interface IntakeIO {
   @AutoLog
   public static class GroundIOInputs {
     public Angle pivotCurrentPosition = Rotations.zero();

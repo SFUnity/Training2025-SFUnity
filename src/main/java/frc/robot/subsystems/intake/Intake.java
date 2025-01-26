@@ -1,23 +1,23 @@
-package frc.robot.subsystems.ground;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.subsystems.ground.GroundConstants.*;
-import static frc.robot.subsystems.ground.GroundConstants.kP;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.ground.GroundIOInputsAutoLogged;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Ground extends SubsystemBase {
-  private final GroundVisualizer measuredVisualizer = new GroundVisualizer("Measured", Color.kRed);
-  private final GroundVisualizer setpointVisualizer = new GroundVisualizer("Setpoint", Color.kBlue);
+public class Intake extends SubsystemBase {
+  private final IntakeVisualizer measuredVisualizer = new IntakeVisualizer("Measured", Color.kRed);
+  private final IntakeVisualizer setpointVisualizer = new IntakeVisualizer("Setpoint", Color.kBlue);
   private double filteredVelocity;
   private double filteredStatorCurrent;
   public static boolean simHasAlgae = false;
@@ -32,10 +32,10 @@ public class Ground extends SubsystemBase {
 
   private Angle positionSetpoint = Degrees.zero();
 
-  private final GroundIO io;
+  private final IntakeIO io;
   private final GroundIOInputsAutoLogged inputs = new GroundIOInputsAutoLogged();
 
-  public Ground(GroundIO io) {
+  public Intake(IntakeIO io) {
     this.io = io;
 
     io.setPID(kP.get());
