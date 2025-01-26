@@ -386,11 +386,7 @@ public class Robot extends LoggedRobot {
         "Toggle Algae in Carriage",
         Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
     SmartDashboard.putData(
-        "Toggle Algae in Intake",
-        Commands.runOnce(
-            () ->
-                frc.robot.subsystems.intake.Intake.simHasAlgae =
-                    !frc.robot.subsystems.intake.Intake.simHasAlgae));
+        "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
   }
 
   /** This function is called once when the robot is disabled. */
