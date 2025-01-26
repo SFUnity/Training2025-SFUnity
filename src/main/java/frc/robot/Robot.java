@@ -60,6 +60,7 @@ import frc.robot.subsystems.ground.GroundIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.util.Map;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -354,25 +355,30 @@ public class Robot extends LoggedRobot {
 
     driver
         .leftBumper()
-        // .and(() -> !carriage.hasCoral())
         .whileTrue(
-            switch (intakeState) {
-              case Source -> drive.headingDrive(
-                  () -> {
-                    final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
-                    final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
-                    Pose2d closerStation;
+            Commands.select(
+                Map.of(
+                    IntakeState.Source,
+                        drive
+                            .headingDrive(
+                                () -> {
+                                  final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+                                  final Pose2d rightFaceFlipped =
+                                      apply(CoralStation.rightCenterFace);
+                                  Pose2d closerStation;
 
-                    if (poseManager.getDistanceTo(leftFaceFlipped)
-                        < poseManager.getDistanceTo(rightFaceFlipped)) {
-                      closerStation = leftFaceFlipped;
-                    } else {
-                      closerStation = rightFaceFlipped;
-                    }
-                    return closerStation.getRotation();
-                  });
-              default -> Commands.none();
-            });
+                                  if (poseManager.getDistanceTo(leftFaceFlipped)
+                                      < poseManager.getDistanceTo(rightFaceFlipped)) {
+                                    closerStation = leftFaceFlipped;
+                                  } else {
+                                    closerStation = rightFaceFlipped;
+                                  }
+                                  return closerStation.getRotation();
+                                })
+                            .withDeadline(carriage.intakeCoral()),
+                    IntakeState.Ground, ground.intakeCmd(),
+                    IntakeState.Ice_Cream, carriage.lowDealgify()),
+                () -> intakeState));
     driver
         .rightBumper()
         .whileTrue(
