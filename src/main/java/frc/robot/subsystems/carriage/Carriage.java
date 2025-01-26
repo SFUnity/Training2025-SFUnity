@@ -67,31 +67,31 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command placeCoral() {
-    return run(() -> io.runVolts(placeSpeed.get()))
+    return run(() -> io.runVolts(placeSpeedVolts.get()))
         .until(() -> !coralHeld())
         .withName("placeCoral");
   }
 
   public Command highDealgify() {
-    return run(() -> io.runVolts(dealgifyingSpeed.get()))
+    return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
         .withTimeout(highDealgifyTime.get())
         .withName("highDealgify");
   }
 
   public Command lowDealgify() {
-    return run(() -> io.runVolts(dealgifyingSpeed.get()))
+    return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
         .until(() -> algaeHeld())
         .withName("lowDealgify");
   }
 
   public Command intakeCoral() {
-    return run(() -> io.runVolts(intakingSpeed.get()))
+    return run(() -> io.runVolts(intakingSpeedVolts.get()))
         .until(() -> coralHeld())
         .withName("intakeCoral");
   }
 
   public Command scoreProcessor() {
-    return run(() -> io.runVolts(intakingSpeed.get()))
+    return run(() -> io.runVolts(intakingSpeedVolts.get()))
         .until(() -> !algaeHeld())
         .withName("scoreProcessor");
   }

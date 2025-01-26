@@ -99,6 +99,7 @@ public class Ground extends SubsystemBase {
           raise();
           rollersOut();
         })
+        .until(() -> !algaeHeld())
         .withName("poop");
   }
 

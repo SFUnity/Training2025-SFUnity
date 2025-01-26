@@ -14,13 +14,14 @@
 package frc.robot;
 
 import static frc.robot.RobotCommands.*;
+import static frc.robot.RobotCommands.IntakeState.*;
+import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -31,12 +32,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarriageIOSim;
@@ -60,7 +59,6 @@ import frc.robot.subsystems.ground.GroundIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -305,7 +303,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
     Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
     Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
-    Logger.recordOutput("Controls/goalPose", goalPose().get());
+    Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
@@ -314,9 +312,6 @@ public class Robot extends LoggedRobot {
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
-  private IntakeState intakeState = IntakeState.Source;
-  private ScoreState scoreState = ScoreState.ProcessorBack;
-  private boolean dealgifyAfterPlacing = false;
   private boolean allowAutoRotation = true;
 
   // Consider moving to its own file if/when it gets big
@@ -352,61 +347,14 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
-    driver
-        .leftBumper()
-        .whileTrue(
-            switch (intakeState) {
-              case Source -> drive
-                  .headingDrive(
-                      () -> {
-                        final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
-                        final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
-                        Pose2d closerStation;
-
-                        if (poseManager.getDistanceTo(leftFaceFlipped)
-                            < poseManager.getDistanceTo(rightFaceFlipped)) {
-                          closerStation = leftFaceFlipped;
-                        } else {
-                          closerStation = rightFaceFlipped;
-                        }
-                        return closerStation.getRotation();
-                      })
-                  .withDeadline(carriage.intakeCoral());
-              case Ground -> ground.intakeCmd();
-              case Ice_Cream -> carriage.lowDealgify();
-              default -> Commands.none();
-            });
-    driver
-        .rightBumper()
-        .whileTrue(
-            drive
-                .fullAutoDrive(goalPose())
-                .alongWith(
-                    switch (scoreState) {
-                      default -> new WaitUntilCommand(
-                              () ->
-                                  poseManager.getDistanceTo(goalPose().get())
-                                      < ElevatorConstants.subsystemExtentionLimit)
-                          .andThen(score(elevator, carriage))
-                          .andThen(
-                              Commands.runOnce(
-                                  () -> {
-                                    if (dealgifyAfterPlacing) scoreState = ScoreState.Dealgify;
-                                  }));
-                      case Dealgify -> RobotCommands.dealgify(
-                          elevator, carriage, poseManager.closestFace().highAlgae);
-                      case ProcessorFront -> carriage.scoreProcessor();
-                      case ProcessorBack -> ground.poopCmd().until(() -> !ground.algaeHeld());
-                    })
-                .withName("Score/Dealgify"));
+    driver.leftBumper().whileTrue(fullIntake(drive, carriage, ground, poseManager));
+    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, ground, poseManager));
 
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(carriage::algaeHeld)
-        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
-    new Trigger(ground::algaeHeld)
-        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorBack));
+    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(ground::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -418,57 +366,40 @@ public class Robot extends LoggedRobot {
                 .request(L3)
                 .until(
                     () ->
-                        poseManager.getDistanceTo(goalPose().get())
+                        poseManager.getDistanceTo(goalPose(poseManager).get())
                             < ElevatorConstants.subsystemExtentionLimit)
-                .andThen(score(elevator, carriage)));
+                .andThen(
+                    elevator
+                        .enableElevator()
+                        .until(elevator::atGoalHeight)
+                        .andThen(
+                            () -> {
+                              if (scoreState == Dealgify) {
+                                carriage.lowDealgify().withTimeout(1);
+                              } else if (scoreState == LeftBranch || scoreState == LeftBranch) {
+                                carriage.placeCoral().withTimeout(1);
+                              } else if (scoreState == ProcessorFront) {
+                                carriage.scoreProcessor().withTimeout(1);
+                              } else if (scoreState == ProcessorBack) {
+                                ground.poopCmd();
+                              }
+                            })
+
+                        // .until(() -> carriage.coralHeld() == false)
+                        .andThen(elevator.disableElevator())
+                        .withName("score")));
     operator.a().onTrue(elevator.request(L1));
     operator.x().whileTrue(ground.intakeCmd());
-    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
-    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
+    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
+    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
     operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
 
-    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Source));
-    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
-    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
+    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
+    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
+    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
     operator.start().onTrue(Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
     operator.back().onTrue(Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
-  }
-
-  private enum ScoreState {
-    LeftBranch,
-    RightBranch,
-    Dealgify,
-    ProcessorFront,
-    ProcessorBack
-  }
-
-  private enum IntakeState {
-    Source,
-    Ice_Cream,
-    Ground
-  }
-
-  private Supplier<Pose2d> goalPose() {
-    return () -> {
-      switch (scoreState) {
-        case LeftBranch:
-          return apply(poseManager.closestFace().leftBranch.pose);
-        case RightBranch:
-          return apply(poseManager.closestFace().rightBranch.pose);
-        case Dealgify:
-          return apply(poseManager.closestFace().pose);
-        case ProcessorFront:
-          return apply(processorScore);
-        case ProcessorBack:
-          return apply(processorScore).transformBy(new Transform2d(0, 0, new Rotation2d(Math.PI)));
-        default:
-          {
-            System.out.println("Invalid score state");
-            return poseManager.getPose();
-          }
-      }
-    };
   }
 
   /** This function is called once when the robot is disabled. */

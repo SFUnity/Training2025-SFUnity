@@ -13,14 +13,14 @@ public class CarriageConstants {
   public static final LoggedTunableNumber algaeCurrentThreshold =
       new LoggedTunableNumber("Carriage/algaeCurrentThreshold");
 
-  public static final LoggedTunableNumber intakingSpeed =
-      new LoggedTunableNumber("Carriage/intakingSpeed", 1);
-  public static final LoggedTunableNumber placeSpeed =
-      new LoggedTunableNumber("Carriage/placeSpeed", 1);
-  public static final LoggedTunableNumber dealgifyingSpeed =
-      new LoggedTunableNumber("Carriage/dealgifyingSpeed", 1);
-  public static final LoggedTunableNumber processorSpeed =
-      new LoggedTunableNumber("Carriage/processorSpeed", -1);
+  public static final LoggedTunableNumber intakingSpeedVolts =
+      new LoggedTunableNumber("Carriage/intakingSpeedVolts", 10);
+  public static final LoggedTunableNumber placeSpeedVolts =
+      new LoggedTunableNumber("Carriage/placeSpeedVolts", 10);
+  public static final LoggedTunableNumber dealgifyingSpeedVolts =
+      new LoggedTunableNumber("Carriage/dealgifyingSpeedVolts", 10);
+  public static final LoggedTunableNumber processorSpeedVolts =
+      new LoggedTunableNumber("Carriage/processorSpeedVolts", -10);
 
   public static final int beamBreakNumber = 0;
 }
