@@ -25,4 +25,18 @@ public final class RobotCommands {
         .alongWith(high ? carriage.highDealgify() : carriage.lowDealgify())
         .withName("dealgify");
   }
+
+  public static enum ScoreState {
+    LeftBranch,
+    RightBranch,
+    Dealgify,
+    ProcessorFront,
+    ProcessorBack
+  }
+
+  public static enum IntakeState {
+    Source,
+    Ice_Cream,
+    Ground
+  }
 }

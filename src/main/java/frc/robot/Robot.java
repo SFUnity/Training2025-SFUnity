@@ -14,6 +14,8 @@
 package frc.robot;
 
 import static frc.robot.RobotCommands.*;
+import static frc.robot.RobotCommands.IntakeState.*;
+import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
@@ -315,8 +317,8 @@ public class Robot extends LoggedRobot {
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
-  private IntakeState intakeState = IntakeState.Source;
-  private ScoreState scoreState = ScoreState.ProcessorBack;
+  private IntakeState intakeState = Source;
+  private ScoreState scoreState = ProcessorBack;
   private boolean dealgifyAfterPlacing = false;
   private boolean allowAutoRotation = true;
 
@@ -358,7 +360,7 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             Commands.select(
                 Map.of(
-                    IntakeState.Source,
+                    Source,
                         drive
                             .headingDrive(
                                 () -> {
@@ -376,8 +378,8 @@ public class Robot extends LoggedRobot {
                                   return closerStation.getRotation();
                                 })
                             .withDeadline(carriage.intakeCoral()),
-                    IntakeState.Ground, ground.intakeCmd(),
-                    IntakeState.Ice_Cream, carriage.lowDealgify()),
+                    Ground, ground.intakeCmd(),
+                    Ice_Cream, carriage.lowDealgify()),
                 () -> intakeState));
     driver
         .rightBumper()
@@ -387,7 +389,7 @@ public class Robot extends LoggedRobot {
                 .alongWith(
                     Commands.select(
                         Map.of(
-                            ScoreState.RightBranch,
+                            RightBranch,
                             new WaitUntilCommand(
                                     () ->
                                         poseManager.getDistanceTo(goalPose().get())
@@ -399,15 +401,13 @@ public class Robot extends LoggedRobot {
                                 .andThen(
                                     Commands.runOnce(
                                         () -> {
-                                          if (dealgifyAfterPlacing)
-                                            scoreState = ScoreState.Dealgify;
+                                          if (dealgifyAfterPlacing) scoreState = Dealgify;
                                         })),
-                            ScoreState.Dealgify,
-                            RobotCommands.dealgify(
-                                elevator, carriage, poseManager.closestFace().highAlgae),
-                            ScoreState.ProcessorFront,
+                            Dealgify,
+                            dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
+                            ProcessorFront,
                             carriage.scoreProcessor(),
-                            ScoreState.ProcessorBack,
+                            ProcessorBack,
                             ground.poopCmd().until(() -> !ground.algaeHeld())),
                         () -> scoreState))
                 .withName("Score/Dealgify"));
@@ -415,10 +415,8 @@ public class Robot extends LoggedRobot {
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(carriage::algaeHeld)
-        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
-    new Trigger(ground::algaeHeld)
-        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorBack));
+    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(ground::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -438,14 +436,13 @@ public class Robot extends LoggedRobot {
                         .until(elevator::atGoalHeight)
                         .andThen(
                             () -> {
-                              if (scoreState == ScoreState.Dealgify) {
+                              if (scoreState == Dealgify) {
                                 carriage.lowDealgify().withTimeout(1);
-                              } else if (scoreState == ScoreState.LeftBranch
-                                  || scoreState == ScoreState.LeftBranch) {
+                              } else if (scoreState == LeftBranch || scoreState == LeftBranch) {
                                 carriage.placeCoral().withTimeout(1);
-                              } else if (scoreState == ScoreState.ProcessorFront) {
+                              } else if (scoreState == ProcessorFront) {
                                 carriage.scoreProcessor().withTimeout(1);
-                              } else if (scoreState == ScoreState.ProcessorBack) {
+                              } else if (scoreState == ProcessorBack) {
                                 ground.poopCmd();
                               }
                             })
@@ -455,30 +452,16 @@ public class Robot extends LoggedRobot {
                         .withName("score")));
     operator.a().onTrue(elevator.request(L1));
     operator.x().whileTrue(ground.intakeCmd());
-    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.LeftBranch));
-    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = ScoreState.RightBranch));
+    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
+    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
     operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
 
-    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Source));
-    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ice_Cream));
-    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = IntakeState.Ground));
+    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
+    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
+    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
     operator.start().onTrue(Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
     operator.back().onTrue(Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
-  }
-
-  private enum ScoreState {
-    LeftBranch,
-    RightBranch,
-    Dealgify,
-    ProcessorFront,
-    ProcessorBack
-  }
-
-  private enum IntakeState {
-    Source,
-    Ice_Cream,
-    Ground
   }
 
   private Supplier<Pose2d> goalPose() {
