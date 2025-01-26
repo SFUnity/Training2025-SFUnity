@@ -315,7 +315,6 @@ public class Robot extends LoggedRobot {
   }
 
   private IntakeState intakeState = Source;
-  private boolean dealgifyAfterPlacing = false;
   private boolean allowAutoRotation = true;
 
   // Consider moving to its own file if/when it gets big
@@ -380,7 +379,7 @@ public class Robot extends LoggedRobot {
     driver
         .rightBumper()
         .whileTrue(
-            fullScore(drive, elevator, carriage, ground, poseManager, () -> dealgifyAfterPlacing));
+            fullScore(drive, elevator, carriage, ground, poseManager));
 
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)

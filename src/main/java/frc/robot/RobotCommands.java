@@ -18,7 +18,6 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.ground.Ground;
 import frc.robot.util.PoseManager;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /** Put high level commands here */
@@ -41,14 +40,14 @@ public final class RobotCommands {
   }
 
   public static ScoreState scoreState = ProcessorBack;
+  public static boolean dealgifyAfterPlacing = false;
 
   public static Command fullScore(
       Drive drive,
       Elevator elevator,
       Carriage carriage,
       Ground ground,
-      PoseManager poseManager,
-      BooleanSupplier dealgifyAfterPlacing) {
+      PoseManager poseManager) {
     return drive
         .fullAutoDrive(goalPose(poseManager))
         .alongWith(
@@ -63,16 +62,15 @@ public final class RobotCommands {
                             score(elevator, carriage)
                                 .alongWith(Commands.print("Running elevator and carriage score")))
                         .andThen(
-                            dealgifyAfterPlacing.getAsBoolean()
-                                ? Commands.runOnce(() -> scoreState = Dealgify)
+                            dealgifyAfterPlacing
+                                ? Commands.runOnce(() -> {scoreState = Dealgify; dealgifyAfterPlacing = false;})
                                     .andThen(
                                         fullScore(
                                             drive,
                                             elevator,
                                             carriage,
                                             ground,
-                                            poseManager,
-                                            () -> false))
+                                            poseManager))
                                 : Commands.none()),
                     Dealgify,
                     dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
