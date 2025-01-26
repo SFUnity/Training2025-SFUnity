@@ -385,7 +385,7 @@ public class Robot extends LoggedRobot {
                                   poseManager.getDistanceTo(goalPose().get())
                                       < ElevatorConstants.subsystemExtentionLimit)
                           .andThen(score(elevator, carriage));
-                      case Dealgify -> RobotCommands.dealgify(elevator, carriage, dealgifyAfterPlacing);
+                      case Dealgify -> RobotCommands.dealgify(elevator, carriage, poseManager.closestFace().highAlgae);
                       case ProcessorFront -> carriage.scoreProcessor();
                       case ProcessorBack -> ground.poopCmd().until(() -> !ground.algaeHeld());
                     })
