@@ -357,38 +357,19 @@ public class Robot extends LoggedRobot {
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
-    // TODO: remove after testing
+    operator.x().onTrue(elevator.request(L2));
+    operator.a().onTrue(elevator.request(L1));
     operator
         .b()
         .onTrue(
-            elevator
-                .request(L3)
-                .until(
-                    () ->
-                        poseManager.getDistanceTo(goalPose(poseManager).get())
-                            < ElevatorConstants.subsystemExtentionLimit)
-                .andThen(
-                    elevator
-                        .enableElevator()
-                        .until(elevator::atGoalHeight)
-                        .andThen(
-                            () -> {
-                              if (scoreState == Dealgify) {
-                                carriage.lowDealgify().withTimeout(1);
-                              } else if (scoreState == LeftBranch || scoreState == LeftBranch) {
-                                carriage.placeCoral().withTimeout(1);
-                              } else if (scoreState == ProcessorFront) {
-                                carriage.scoreProcessor().withTimeout(1);
-                              } else if (scoreState == ProcessorBack) {
-                                ground.poopCmd();
-                              }
-                            })
-
-                        // .until(() -> carriage.coralHeld() == false)
-                        .andThen(elevator.disableElevator())
-                        .withName("score")));
-    operator.a().onTrue(elevator.request(L1));
-    operator.x().whileTrue(ground.intakeCmd());
+            Commands.runOnce(
+                () -> {
+                  if (ground.algaeHeld()) {
+                    scoreState = ProcessorBack;
+                  } else if (carriage.algaeHeld()) {
+                    scoreState = ProcessorFront;
+                  }
+                }));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
     operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
