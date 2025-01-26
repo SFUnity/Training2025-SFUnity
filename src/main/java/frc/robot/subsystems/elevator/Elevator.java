@@ -56,7 +56,7 @@ public class Elevator extends SubsystemBase {
     io.runVolts(
         pid.calculate(inputs.position) + ffController.calculate(pid.getSetpoint().velocity));
 
-    meausedVisualizer.update(inputs.position);
+    meausedVisualizer.update(Units.inchesToMeters(inputs.position));
     setpointVisualizer.update(Units.inchesToMeters(pid.getGoal().position));
 
     Logger.recordOutput("Elevator/goal", Units.inchesToMeters(pid.getGoal().position));
