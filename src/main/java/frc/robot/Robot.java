@@ -387,9 +387,12 @@ public class Robot extends LoggedRobot {
                 .withName("Score/Dealgify"));
 
     new Trigger(carriage::coralHeld)
+        .and(() -> allowAutoRotation)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld)
         .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
+    new Trigger(ground::algaeHeld)
+        .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorBack));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
