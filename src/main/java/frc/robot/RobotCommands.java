@@ -7,11 +7,12 @@ import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 
 /** Put high level commands here */
 public final class RobotCommands {
-  public Command setCoralIntake(Elevator elevator, Carriage carriage) {
+  public Command coralIntake(Elevator elevator, Carriage carriage) {
     return elevator
-        .request(ElevatorHeight.Source)
-        .withDeadline(carriage.intakeCoral())
-        .until(elevator::atDesiredHeight)
+        .request(Source)
+        .andThen(elevator.enableElevator())
+        .until(elevator::atGoalHeight)
+        .andThen(carriage.intakeCoral())
         .withName("intakeCoral");
   }
 
