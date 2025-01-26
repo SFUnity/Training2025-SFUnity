@@ -369,7 +369,7 @@ public class Robot extends LoggedRobot {
                       closerStation = rightFaceFlipped;
                     }
                     return closerStation.getRotation();
-                  });
+                  }).withDeadline(carriage.intakeCoral());
               case Ground -> ground.intakeCmd();
               case Ice_Cream -> carriage.lowDealgify();
               default -> Commands.none();
