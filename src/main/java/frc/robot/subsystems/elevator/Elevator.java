@@ -59,7 +59,7 @@ public class Elevator extends SubsystemBase {
     meausedVisualizer.update(Units.inchesToMeters(inputs.position));
     setpointVisualizer.update(Units.inchesToMeters(pid.getGoal().position));
 
-    Logger.recordOutput("Elevator/goal", Units.inchesToMeters(pid.getGoal().position));
+    Logger.recordOutput("Elevator/goal", pid.getGoal().position);
     Logger.recordOutput("Elevator/setHeight", setHeight);
     Util.logSubsystem(this, "Elevator");
   }
