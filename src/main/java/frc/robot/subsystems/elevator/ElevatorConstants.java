@@ -7,8 +7,8 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorConstants {
   public static final int elevatorMotorID = 0;
-  public static final double maxElevatorSpeed = 72;
-  public static final double maxElevatorAcceleration = 353;
+  public static final double maxElevatorSpeed = 725;
+  public static final double maxElevatorAcceleration = 300;
   public static final double elevatorDistanceToleranceInches = 0.3;
 
   public static enum ElevatorHeights {
