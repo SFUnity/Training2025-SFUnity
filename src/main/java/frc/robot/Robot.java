@@ -328,6 +328,8 @@ public class Robot extends LoggedRobot {
 
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
+    elevator.setDefaultCommand(elevator.disableElevator());
+    carriage.setDefaultCommand(carriage.stop());
     ground.setDefaultCommand(ground.raiseAndStopCmd());
 
     // Driver controls
