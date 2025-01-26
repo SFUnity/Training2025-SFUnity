@@ -35,13 +35,13 @@ public class Autos {
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
   private static final boolean isChoreoAuto = true;
 
-  public Autos(Drive drive, Carriage carriage, Elevator elevator, Ground ground, PoseManager poseManager) {
+  public Autos(
+      Drive drive, Carriage carriage, Elevator elevator, Ground ground, PoseManager poseManager) {
     this.drive = drive;
     this.carriage = carriage;
     this.elevator = elevator;
     this.ground = ground;
     this.poseManager = poseManager;
-   
 
     factory =
         new AutoFactory(
