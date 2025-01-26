@@ -14,7 +14,7 @@ public final class RobotCommands {
     return elevator
         .request(Source)
         .andThen(elevator.enableElevator())
-        .until(elevator::atDesiredHeight)
+        .until(elevator::atGoalHeight)
         .andThen(carriage.intakeCoral())
         .withName("intakeCoral");
   }
@@ -31,7 +31,7 @@ public final class RobotCommands {
   public static Command dealgify(Elevator elevator, Carriage carriage, boolean high) {
     return elevator
         .request(high ? AlgaeHigh : AlgaeLow)
-        .andThen(elevator.enableElevator().until(elevator::atDesiredHeight))
+        .andThen(elevator.enableElevator().until(elevator::atGoalHeight))
         .alongWith(high ? carriage.highDealgify() : carriage.lowDealgify())
         .withName("dealgify");
   }
