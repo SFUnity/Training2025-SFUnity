@@ -2,19 +2,25 @@ package frc.robot.subsystems.ground;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
+import static frc.robot.subsystems.ground.GroundConstants.*;
 import static frc.robot.subsystems.ground.GroundConstants.kP;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Ground extends SubsystemBase {
   private final GroundVisualizer measuredVisualizer = new GroundVisualizer("Measured", Color.kRed);
   private final GroundVisualizer setpointVisualizer = new GroundVisualizer("Setpoint", Color.kBlue);
+  private double filteredVelocity;
+  private double filteredStatorCurrent;
+  public static boolean simHasAlgae = false;
   // In rotations
   private static final LoggedTunableNumber loweredAngle =
       new LoggedTunableNumber("Ground/Angles/lowered", 19);
@@ -47,11 +53,6 @@ public class Ground extends SubsystemBase {
     setpointVisualizer.update(positionSetpoint);
     Logger.recordOutput("Ground/positionSetpointRadians", positionSetpoint.in(Radians));
     Util.logSubsystem(this, "Ground");
-  }
-
-  public boolean hasAlgae() {
-    // TODO: Implement
-    return true;
   }
 
   private void lower() {
@@ -89,6 +90,7 @@ public class Ground extends SubsystemBase {
           lower();
           rollersIn();
         })
+        .until(this::algaeHeld)
         .withName("ground");
   }
 
@@ -97,7 +99,18 @@ public class Ground extends SubsystemBase {
           raise();
           rollersOut();
         })
+        .until(() -> !algaeHeld())
         .withName("poop");
+  }
+
+  @AutoLogOutput
+  public boolean algaeHeld() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      return simHasAlgae;
+    }
+    return (filteredVelocity <= algaeVelocityThreshold.get()
+            && (filteredStatorCurrent >= algaeCurrentThreshold.get())
+        || filteredStatorCurrent <= -2);
   }
 
   // In percent output
