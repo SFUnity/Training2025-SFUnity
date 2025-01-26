@@ -31,8 +31,6 @@ public class Carriage extends SubsystemBase {
 
   public Carriage(CarriageIO io) {
     this.io = io;
-
-    setDefaultCommand(stop());
   }
 
   @Override
