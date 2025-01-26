@@ -1,8 +1,8 @@
-package frc.robot.subsystems.ground;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.subsystems.ground.GroundConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -16,36 +16,36 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
-public class GroundVisualizer {
+public class IntakeVisualizer {
   private final LoggedMechanism2d mechanism;
   private final LoggedMechanismRoot2d root;
-  private final LoggedMechanismLigament2d ground;
+  private final LoggedMechanismLigament2d intake;
   private final String key;
 
-  private final LoggedTunableNumber xOffset = new LoggedTunableNumber("Ground/xOffset", -10.2);
-  private final LoggedTunableNumber yOffset = new LoggedTunableNumber("Ground/yOffset", -8);
-  private final LoggedTunableNumber zOffset = new LoggedTunableNumber("Ground/zOffset", 9);
+  private final LoggedTunableNumber xOffset = new LoggedTunableNumber("Intake/xOffset", -10.2);
+  private final LoggedTunableNumber yOffset = new LoggedTunableNumber("Intake/yOffset", -8);
+  private final LoggedTunableNumber zOffset = new LoggedTunableNumber("Intake/zOffset", 9);
 
-  public GroundVisualizer(String key, Color color) {
+  public IntakeVisualizer(String key, Color color) {
     this.key = key;
     mechanism = new LoggedMechanism2d(1, 1, new Color8Bit(Color.kBlack));
-    root = mechanism.getRoot("Ground Root", 0, Units.inchesToMeters(9.063));
-    ground =
+    root = mechanism.getRoot("Intake Root", 0, Units.inchesToMeters(9.063));
+    intake =
         new LoggedMechanismLigament2d(
-            "Ground",
+            "Intake",
             armLengthMeters,
             Units.radiansToDegrees(maxAngleRads),
             8,
             new Color8Bit(color));
 
-    root.append(ground);
+    root.append(intake);
   }
 
   /** Update intake visualizer with current intake angle */
   public void update(Angle angle) {
     // Log Mechanism2d
-    ground.setAngle(angle.in(Degrees));
-    Logger.recordOutput("Ground/Mechanism2d/" + key, mechanism);
+    intake.setAngle(angle.in(Degrees));
+    Logger.recordOutput("Intake/Mechanism2d/" + key, mechanism);
 
     // Log 3D poses
     // The inches to meters stuff here will have to be changed
@@ -55,6 +55,6 @@ public class GroundVisualizer {
             Units.inchesToMeters(yOffset.get()),
             Units.inchesToMeters(zOffset.get()),
             new Rotation3d(0.0, angle.in(Radians), 0.0));
-    Logger.recordOutput("Ground/Mechanism3d/" + key, carriagePose);
+    Logger.recordOutput("Intake/Mechanism3d/" + key, carriagePose);
   }
 }
