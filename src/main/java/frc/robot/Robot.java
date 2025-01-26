@@ -323,7 +323,7 @@ public class Robot extends LoggedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     // Setup rumble
-    new Trigger(() -> ground.hasAlgae())
+    new Trigger(() -> ground.algaeHeld())
         .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
 
     // Default cmds
