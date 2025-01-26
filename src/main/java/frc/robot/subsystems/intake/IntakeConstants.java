@@ -15,8 +15,8 @@ public class IntakeConstants {
   public static final LoggedTunableNumber algaeCurrentThreshold;
 
   static {
-    algaeVelocityThreshold = new LoggedTunableNumber("ground/algaeVelocityThreshold");
-    algaeCurrentThreshold = new LoggedTunableNumber("ground/algaeCurrentThreshold");
+    algaeVelocityThreshold = new LoggedTunableNumber("Intake/algaeVelocityThreshold");
+    algaeCurrentThreshold = new LoggedTunableNumber("Intake/algaeCurrentThreshold");
     switch (Constants.currentMode) {
       default:
         kP = new LoggedTunableNumber("Intake/kP", 2.0);

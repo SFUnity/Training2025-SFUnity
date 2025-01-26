@@ -45,7 +45,7 @@ public final class RobotCommands {
   public static boolean dealgifyAfterPlacing = false;
 
   public static Command fullScore(
-      Drive drive, Elevator elevator, Carriage carriage, Intake ground, PoseManager poseManager) {
+      Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager) {
     return drive
         .fullAutoDrive(goalPose(poseManager))
         .alongWith(
@@ -67,14 +67,14 @@ public final class RobotCommands {
                                           dealgifyAfterPlacing = false;
                                         })
                                     .andThen(
-                                        fullScore(drive, elevator, carriage, ground, poseManager))
+                                        fullScore(drive, elevator, carriage, intake, poseManager))
                                 : Commands.none()),
                     Dealgify,
                     dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
                     ProcessorFront,
                     carriage.scoreProcessor(),
                     ProcessorBack,
-                    ground.poopCmd().until(() -> !ground.algaeHeld())),
+                    intake.poopCmd().until(() -> !intake.algaeHeld())),
                 () -> scoreState == RightBranch ? LeftBranch : scoreState))
         .withName("Score/Dealgify");
   }
@@ -112,7 +112,7 @@ public final class RobotCommands {
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive, Carriage carriage, Intake ground, PoseManager poseManager) {
+      Drive drive, Carriage carriage, Intake intake, PoseManager poseManager) {
     return Commands.select(
         Map.of(
             Source,
@@ -132,7 +132,7 @@ public final class RobotCommands {
                           return closerStation.getRotation();
                         })
                     .withDeadline(carriage.intakeCoral()),
-            Ground, ground.intakeCmd(),
+            Ground, intake.intakeCmd(),
             Ice_Cream, carriage.lowDealgify()),
         () -> intakeState);
   }

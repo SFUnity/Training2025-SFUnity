@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 public class IntakeVisualizer {
   private final LoggedMechanism2d mechanism;
   private final LoggedMechanismRoot2d root;
-  private final LoggedMechanismLigament2d ground;
+  private final LoggedMechanismLigament2d intake;
   private final String key;
 
   private final LoggedTunableNumber xOffset = new LoggedTunableNumber("Intake/xOffset", -10.2);
@@ -29,22 +29,22 @@ public class IntakeVisualizer {
   public IntakeVisualizer(String key, Color color) {
     this.key = key;
     mechanism = new LoggedMechanism2d(1, 1, new Color8Bit(Color.kBlack));
-    root = mechanism.getRoot("Ground Root", 0, Units.inchesToMeters(9.063));
-    ground =
+    root = mechanism.getRoot("Intake Root", 0, Units.inchesToMeters(9.063));
+    intake =
         new LoggedMechanismLigament2d(
-            "Ground",
+            "Intake",
             armLengthMeters,
             Units.radiansToDegrees(maxAngleRads),
             8,
             new Color8Bit(color));
 
-    root.append(ground);
+    root.append(intake);
   }
 
   /** Update intake visualizer with current intake angle */
   public void update(Angle angle) {
     // Log Mechanism2d
-    ground.setAngle(angle.in(Degrees));
+    intake.setAngle(angle.in(Degrees));
     Logger.recordOutput("Intake/Mechanism2d/" + key, mechanism);
 
     // Log 3D poses

@@ -99,7 +99,7 @@ public class Robot extends LoggedRobot {
   private final Drive drive;
   private final Elevator elevator;
   private final Carriage carriage;
-  private final Intake ground;
+  private final Intake intake;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -198,7 +198,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
         carriage = new Carriage(new CarriageIOSparkMax());
-        ground = new Intake(new IntakeIOSparkMax());
+        intake = new Intake(new IntakeIOSparkMax());
         break;
 
       case SIM:
@@ -214,7 +214,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim());
         carriage = new Carriage(new CarriageIOSim());
-        ground = new Intake(new IntakeIOSim());
+        intake = new Intake(new IntakeIOSim());
         break;
 
       default:
@@ -230,7 +230,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
         carriage = new Carriage(new CarriageIO() {});
-        ground = new Intake(new IntakeIO() {});
+        intake = new Intake(new IntakeIO() {});
         break;
     }
 
@@ -318,14 +318,14 @@ public class Robot extends LoggedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     // Setup rumble
-    new Trigger(() -> ground.algaeHeld())
+    new Trigger(() -> intake.algaeHeld())
         .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
 
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
     elevator.setDefaultCommand(elevator.disableElevator());
     carriage.setDefaultCommand(carriage.stop());
-    ground.setDefaultCommand(ground.raiseAndStopCmd());
+    intake.setDefaultCommand(intake.raiseAndStopCmd());
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -347,14 +347,14 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
-    driver.leftBumper().whileTrue(fullIntake(drive, carriage, ground, poseManager));
-    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, ground, poseManager));
+    driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, intake, poseManager));
 
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
-    new Trigger(ground::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -365,7 +365,7 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  if (ground.algaeHeld()) {
+                  if (intake.algaeHeld()) {
                     scoreState = ProcessorBack;
                   } else if (carriage.algaeHeld()) {
                     scoreState = ProcessorFront;
@@ -380,13 +380,13 @@ public class Robot extends LoggedRobot {
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
     SmartDashboard.putData(
-        "Toggle Coral Carriage",
+        "Toggle Coral in Carriage",
         Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
     SmartDashboard.putData(
-        "Toggle Algae Carriage",
+        "Toggle Algae in Carriage",
         Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
     SmartDashboard.putData(
-        "Toggle Algae Ground",
+        "Toggle Algae in Intake",
         Commands.runOnce(
             () ->
                 frc.robot.subsystems.intake.Intake.simHasAlgae =
