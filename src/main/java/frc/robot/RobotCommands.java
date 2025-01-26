@@ -27,7 +27,7 @@ public final class RobotCommands {
   public static Command score(Elevator elevator, Carriage carriage) {
     return Commands.sequence(
         elevator.enableElevator().until(elevator::atGoalHeight),
-        carriage.placeCoral().until(() -> carriage.coralHeld() == false).andThen(carriage.stop()),
+        carriage.placeCoral(),
         elevator.disableElevator());
   }
 
@@ -54,8 +54,7 @@ public final class RobotCommands {
                             () ->
                                 poseManager.getDistanceTo(goalPose(poseManager).get())
                                     < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(
-                            score(elevator, carriage))
+                        .andThen(score(elevator, carriage))
                         .andThen(
                             dealgifyAfterPlacing
                                 ? Commands.runOnce(
