@@ -7,24 +7,20 @@ public class CarriageConstants {
 
   public static final int currentLimit = 0;
 
-  // Unit: volts
-  public static final LoggedTunableNumber intakingSpeed;
-  public static final LoggedTunableNumber placeSpeed;
-  public static final LoggedTunableNumber dealgifyingSpeed;
-  public static final LoggedTunableNumber processorSpeed;
+  // TODO put in values velocity and current thresholds based off example
+  public static final LoggedTunableNumber algaeVelocityThreshold =
+      new LoggedTunableNumber("Carriage/algaeVelocityThreshold");
+  public static final LoggedTunableNumber algaeCurrentThreshold =
+      new LoggedTunableNumber("Carriage/algaeCurrentThreshold");
 
-  public static final LoggedTunableNumber algaeVelocityThreshold;
-  public static final LoggedTunableNumber algaeCurrentThreshold;
+  public static final LoggedTunableNumber intakingSpeed =
+      new LoggedTunableNumber("Carriage/intakingSpeed", 1);
+  public static final LoggedTunableNumber placeSpeed =
+      new LoggedTunableNumber("Carriage/placeSpeed", 1);
+  public static final LoggedTunableNumber dealgifyingSpeed =
+      new LoggedTunableNumber("Carriage/dealgifyingSpeed", 1);
+  public static final LoggedTunableNumber processorSpeed =
+      new LoggedTunableNumber("Carriage/processorSpeed", -1);
 
   public static final int beamBreakNumber = 0;
-
-  static {
-    algaeVelocityThreshold = new LoggedTunableNumber("Carriage/algaeVelocityThreshold");
-    algaeCurrentThreshold = new LoggedTunableNumber("Carriage/algaeCurrentThreshold");
-
-    intakingSpeed = new LoggedTunableNumber("Carriage/intakingSpeed", 1);
-    placeSpeed = new LoggedTunableNumber("Carriage/placeSpeed", 1);
-    dealgifyingSpeed = new LoggedTunableNumber("Carriage/dealgifyingSpeed", 1);
-    processorSpeed = new LoggedTunableNumber("Carriage/processorSpeed", -1);
-  }
 }
