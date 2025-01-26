@@ -89,7 +89,8 @@ public class Ground extends SubsystemBase {
     return run(() -> {
           lower();
           rollersIn();
-        }).until(this::algaeHeld)
+        })
+        .until(this::algaeHeld)
         .withName("ground");
   }
 

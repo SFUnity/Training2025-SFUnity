@@ -356,20 +356,22 @@ public class Robot extends LoggedRobot {
         .leftBumper()
         .whileTrue(
             switch (intakeState) {
-              case Source -> drive.headingDrive(
-                  () -> {
-                    final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
-                    final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
-                    Pose2d closerStation;
+              case Source -> drive
+                  .headingDrive(
+                      () -> {
+                        final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+                        final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
+                        Pose2d closerStation;
 
-                    if (poseManager.getDistanceTo(leftFaceFlipped)
-                        < poseManager.getDistanceTo(rightFaceFlipped)) {
-                      closerStation = leftFaceFlipped;
-                    } else {
-                      closerStation = rightFaceFlipped;
-                    }
-                    return closerStation.getRotation();
-                  }).withDeadline(carriage.intakeCoral());
+                        if (poseManager.getDistanceTo(leftFaceFlipped)
+                            < poseManager.getDistanceTo(rightFaceFlipped)) {
+                          closerStation = leftFaceFlipped;
+                        } else {
+                          closerStation = rightFaceFlipped;
+                        }
+                        return closerStation.getRotation();
+                      })
+                  .withDeadline(carriage.intakeCoral());
               case Ground -> ground.intakeCmd();
               case Ice_Cream -> carriage.lowDealgify();
               default -> Commands.none();
@@ -385,7 +387,12 @@ public class Robot extends LoggedRobot {
                               () ->
                                   poseManager.getDistanceTo(goalPose().get())
                                       < ElevatorConstants.subsystemExtentionLimit)
-                          .andThen(score(elevator, carriage));
+                          .andThen(score(elevator, carriage))
+                          .andThen(
+                              Commands.runOnce(
+                                  () -> {
+                                    if (dealgifyAfterPlacing) scoreState = ScoreState.Dealgify;
+                                  }));
                       case Dealgify -> RobotCommands.dealgify(
                           elevator, carriage, poseManager.closestFace().highAlgae);
                       case ProcessorFront -> carriage.scoreProcessor();
@@ -393,7 +400,8 @@ public class Robot extends LoggedRobot {
                     })
                 .withName("Score/Dealgify"));
 
-    new Trigger(carriage::coralHeld).and(() -> allowAutoRotation)
+    new Trigger(carriage::coralHeld)
+        .and(() -> allowAutoRotation)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld)
         .onTrue(Commands.runOnce(() -> scoreState = ScoreState.ProcessorFront));
