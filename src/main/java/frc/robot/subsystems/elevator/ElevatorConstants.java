@@ -112,8 +112,6 @@ public class ElevatorConstants {
     L1(new LoggedTunableNumber("Elevator/L1", 0)),
     AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 0)),
     AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", 0)),
-    Processor(new LoggedTunableNumber("Elevator/Processor", 0)),
-    Source(new LoggedTunableNumber("Elevator/Source", 0)),
     Stow(new LoggedTunableNumber("Elevator/Stow", minHeightInches));
 
     ElevatorHeight(LoggedTunableNumber height) {
