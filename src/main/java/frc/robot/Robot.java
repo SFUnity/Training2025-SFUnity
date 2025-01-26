@@ -459,11 +459,11 @@ public class Robot extends LoggedRobot {
     return () -> {
       switch (scoreState) {
         case LeftBranch:
-          return apply(closestFace().leftBranch.pose);
+          return apply(poseManager.closestFace().leftBranch.pose);
         case RightBranch:
-          return apply(closestFace().rightBranch.pose);
+          return apply(poseManager.closestFace().rightBranch.pose);
         case Dealgify:
-          return apply(closestFace().pose);
+          return apply(poseManager.closestFace().pose);
         case ProcessorFront:
           return apply(processorScore);
         case ProcessorBack:
@@ -475,19 +475,6 @@ public class Robot extends LoggedRobot {
           }
       }
     };
-  }
-
-  private Face closestFace() {
-    Face closestFace = Face.One;
-    double distanceToClosestFace = Double.MAX_VALUE;
-    for (Face face : Face.values()) {
-      double distance = poseManager.getDistanceTo(apply(face.pose));
-      if (distance < distanceToClosestFace) {
-        distanceToClosestFace = distance;
-        closestFace = face;
-      }
-    }
-    return closestFace;
   }
 
   /** This function is called once when the robot is disabled. */
