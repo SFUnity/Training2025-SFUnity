@@ -1,17 +1,19 @@
 package frc.robot;
 
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.Source;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 
 /** Put high level commands here */
 public final class RobotCommands {
-  public Command setCoralIntake(Elevator elevator, Carriage carriage) {
+  public Command coralIntake(Elevator elevator, Carriage carriage) {
     return elevator
-        .request(ElevatorHeight.Source)
-        .withDeadline(carriage.intakeCoral())
+        .request(Source)
+        .andThen(elevator.enableElevator())
         .until(elevator::atDesiredHeight)
+        .andThen(carriage.intakeCoral())
         .withName("intakeCoral");
   }
 
