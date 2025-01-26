@@ -26,9 +26,7 @@ import java.util.function.Supplier;
 public final class RobotCommands {
   public static Command score(Elevator elevator, Carriage carriage) {
     return Commands.sequence(
-        elevator.enableElevator().until(elevator::atGoalHeight),
-        carriage.placeCoral(),
-        elevator.disableElevator());
+        elevator.enableElevator().until(elevator::atGoalHeight), carriage.placeCoral());
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, boolean high) {
