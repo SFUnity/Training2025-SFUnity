@@ -5,7 +5,7 @@ import frc.robot.util.LoggedTunableNumber;
 public class CarriageConstants {
   public static final int rollerMotorID = 0;
 
-  public static final int currentLimit = 0;
+  public static final int currentLimit = 60;
 
   // TODO put in values velocity and current thresholds based off example
   public static final LoggedTunableNumber algaeVelocityThreshold =
