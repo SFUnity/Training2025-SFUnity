@@ -46,7 +46,7 @@ public class ElevatorConstants {
 
   public static final Translation2d elevatorOrigin = new Translation2d(0, 0);
 
-  public static final int currentLimit = 0;
+  public static final int currentLimit = 60;
 
   public static final double subsystemExtentionLimit = 2; // Meters
 
