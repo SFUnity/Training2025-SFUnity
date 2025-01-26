@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.InchesPerSecond;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -30,7 +28,7 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     sim.update(Constants.loopPeriodSecs);
-    inputs.position = sim.getPositionMeters();
+    inputs.position = Units.metersToInches(sim.getPositionMeters());
     inputs.velocityInchesPerSec = 39.3701 * sim.getVelocityMetersPerSecond();
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = sim.getCurrentDrawAmps();

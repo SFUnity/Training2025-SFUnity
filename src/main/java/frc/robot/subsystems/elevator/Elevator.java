@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -56,8 +54,7 @@ public class Elevator extends SubsystemBase {
     }
 
     io.runVolts(
-        pid.calculate(inputs.position)
-            + ffController.calculate(pid.getSetpoint().velocity));
+        pid.calculate(inputs.position) + ffController.calculate(pid.getSetpoint().velocity));
 
     meausedVisualizer.update(inputs.position);
     setpointVisualizer.update(Units.inchesToMeters(pid.getGoal().position));
