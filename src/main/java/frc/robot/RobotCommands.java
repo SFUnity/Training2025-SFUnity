@@ -32,7 +32,7 @@ public final class RobotCommands {
     return elevator
         .request(high ? AlgaeHigh : AlgaeLow)
         .andThen(elevator.enableElevator().until(elevator::atDesiredHeight))
-        .alongWith(high ? carriage.highDelagifiy() : carriage.lowDealgaefy())
+        .alongWith(high ? carriage.highDealgify() : carriage.lowDealgify())
         .withName("dealgify");
   }
 }
