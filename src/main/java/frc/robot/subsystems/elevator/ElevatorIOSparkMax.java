@@ -61,7 +61,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     inputs.position = Meters.of(encoder.getPosition());
     deltaPosition = inputs.position.in(Meters) - prevoiusPosition;
     deltaTime = (currentTime - prevoiusTime) / 1e9;
-    inputs.velocityMetersPerSec = MetersPerSecond.of(deltaPosition / deltaTime);
+    inputs.velocityInchesPerSec = MetersPerSecond.of(deltaPosition / deltaTime);
 
     inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
     inputs.currentAmps = elevatorMotor.getOutputCurrent();
