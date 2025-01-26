@@ -369,8 +369,7 @@ public class Robot extends LoggedRobot {
                     }
                     return closerStation.getRotation();
                   });
-                case Ground -> 
-                    ground.intakeCmd().until(ground::algaeHeld);
+              case Ground -> ground.intakeCmd().until(ground::algaeHeld);
               default -> Commands.none();
             });
     driver
@@ -385,7 +384,8 @@ public class Robot extends LoggedRobot {
                                   poseManager.getDistanceTo(goalPose().get())
                                       < ElevatorConstants.subsystemExtentionLimit)
                           .andThen(score(elevator, carriage));
-                      case Dealgify -> RobotCommands.dealgify(elevator, carriage, poseManager.closestFace().highAlgae);
+                      case Dealgify -> RobotCommands.dealgify(
+                          elevator, carriage, poseManager.closestFace().highAlgae);
                       case ProcessorFront -> carriage.scoreProcessor();
                       case ProcessorBack -> ground.poopCmd().until(() -> !ground.algaeHeld());
                     })

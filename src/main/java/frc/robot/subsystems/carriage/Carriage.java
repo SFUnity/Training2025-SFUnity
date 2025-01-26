@@ -26,7 +26,8 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
-  private static LoggedTunableNumber highDealgifyTime = new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
+  private static LoggedTunableNumber highDealgifyTime =
+      new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
 
   public Carriage(CarriageIO io) {
     this.io = io;
@@ -68,11 +69,15 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command placeCoral() {
-    return run(() -> io.runVolts(placeSpeed.get())).until(() -> !coralHeld()).withName("placeCoralRollers");
+    return run(() -> io.runVolts(placeSpeed.get()))
+        .until(() -> !coralHeld())
+        .withName("placeCoralRollers");
   }
 
   public Command highDelagifiy() {
-    return run(() -> io.runVolts(dealgifyingSpeed.get())).withTimeout(highDealgifyTime.get()).withName("placeCoralRollers");
+    return run(() -> io.runVolts(dealgifyingSpeed.get()))
+        .withTimeout(highDealgifyTime.get())
+        .withName("placeCoralRollers");
   }
 
   public Command lowDealgaefy() {
@@ -88,6 +93,8 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command scoreProcessor() {
-    return run(() -> io.runVolts(intakingSpeed.get())).until(() -> !algaeHeld()).withName("scoreProcessor");
+    return run(() -> io.runVolts(intakingSpeed.get()))
+        .until(() -> !algaeHeld())
+        .withName("scoreProcessor");
   }
 }

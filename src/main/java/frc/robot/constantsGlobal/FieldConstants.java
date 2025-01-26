@@ -145,7 +145,8 @@ public final class FieldConstants {
             .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
         Branch.K,
         Branch.L,
-        false),;
+        false),
+    ;
 
     Face(Pose2d pose, Branch lefBranch, Branch rightBranch, boolean highAlgae) {
       this.pose = pose;
