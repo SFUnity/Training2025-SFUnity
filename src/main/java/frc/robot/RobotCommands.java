@@ -42,34 +42,31 @@ public final class RobotCommands {
 
   public static Command fullScore(
       Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager) {
-    return drive
-        .fullAutoDrive(goalPose(poseManager))
-        .alongWith(
-            Commands.select(
-                Map.of(
-                    LeftBranch,
-                    new WaitUntilCommand(
-                            () ->
-                                poseManager.getDistanceTo(goalPose(poseManager).get())
-                                    < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(score(elevator, carriage))
-                        .andThen(
-                            dealgifyAfterPlacing
-                                ? Commands.runOnce(
-                                        () -> {
-                                          scoreState = Dealgify;
-                                          dealgifyAfterPlacing = false;
-                                        })
-                                    .andThen(
-                                        fullScore(drive, elevator, carriage, intake, poseManager))
-                                : Commands.none()),
-                    Dealgify,
-                    dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
-                    ProcessorFront,
-                    carriage.scoreProcessor(),
-                    ProcessorBack,
-                    intake.poopCmd().until(() -> !intake.algaeHeld())),
-                () -> scoreState == RightBranch ? LeftBranch : scoreState))
+    return Commands.select(
+            Map.of(
+                LeftBranch,
+                new WaitUntilCommand(
+                        () ->
+                            poseManager.getDistanceTo(goalPose(poseManager).get())
+                                < ElevatorConstants.subsystemExtentionLimit)
+                    .andThen(score(elevator, carriage))
+                    .andThen(
+                        dealgifyAfterPlacing
+                            ? Commands.runOnce(
+                                    () -> {
+                                      scoreState = Dealgify;
+                                      dealgifyAfterPlacing = false;
+                                    })
+                                .andThen(fullScore(drive, elevator, carriage, intake, poseManager))
+                            : Commands.none()),
+                Dealgify,
+                dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
+                ProcessorFront,
+                carriage.scoreProcessor(),
+                ProcessorBack,
+                intake.poopCmd().until(() -> !intake.algaeHeld())),
+            () -> scoreState == RightBranch ? LeftBranch : scoreState)
+        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
         .withName("Score/Dealgify");
   }
 
