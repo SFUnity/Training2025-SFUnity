@@ -1,9 +1,9 @@
-package frc.robot.subsystems.ground;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.subsystems.drive.DriveConstants.odometryFrequency;
-import static frc.robot.subsystems.ground.GroundConstants.*;
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.RelativeEncoder;
@@ -17,14 +17,14 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Angle;
 
-public class GroundIOSparkMax implements GroundIO {
+public class IntakeIOSparkMax implements IntakeIO {
   private static final double GEAR_RATIO = 1;
   private final SparkMax pivot = new SparkMax(0, null);
   private final SparkMax rollers = new SparkMax(0, null);
   private final RelativeEncoder encoder = pivot.getEncoder();
   private final SparkClosedLoopController pid = pivot.getClosedLoopController();
 
-  public GroundIOSparkMax() {
+  public IntakeIOSparkMax() {
     var pivotConfig = new SparkMaxConfig();
     pivotConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
     pivotConfig.encoder.positionConversionFactor(pivotPositionFactor).uvwAverageDepth(2);
@@ -72,7 +72,7 @@ public class GroundIOSparkMax implements GroundIO {
   }
 
   @Override
-  public void updateInputs(GroundIOInputs inputs) {
+  public void updateInputs(IntakeIOInputs inputs) {
     inputs.pivotCurrentPosition = Rotations.of(encoder.getPosition() / GEAR_RATIO);
     inputs.pivotAppliedVolts = pivot.getAppliedOutput() * pivot.getBusVoltage();
     inputs.pivotCurrentAmps = pivot.getOutputCurrent();
@@ -82,7 +82,7 @@ public class GroundIOSparkMax implements GroundIO {
   }
 
   @Override
-  public void runGroundRollers(double percentOutput) {
+  public void runRollers(double percentOutput) {
     rollers.set(percentOutput);
   }
 
