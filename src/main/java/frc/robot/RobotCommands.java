@@ -35,7 +35,7 @@ public final class RobotCommands {
         .withName("dealgify");
   }
 
-  public static ScoreState scoreState = ProcessorBack;
+  public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
   private static double elevatorSafeExtensionDistanceMeters = 1;
@@ -73,6 +73,7 @@ public final class RobotCommands {
                     intake.poopCmd()),
                 () -> scoreState == RightBranch ? LeftBranch : scoreState))
         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+        .finallyDo(() -> scoreState = Dealgify)
         .withName("Score/Dealgify");
   }
 
