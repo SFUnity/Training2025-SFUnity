@@ -354,33 +354,40 @@ public class Autos {
             Commands.sequence(
                 centerToJI.resetOdometry(), centerToJI.cmd() // start traj
                 ));
-
     centerToJI
         .done()
         .onTrue(
             Commands.sequence(
-                // SCORE CORAL L1 JI
-                // REMOVE ALGAE L3 JI
+                drive.fullAutoDrive(
+                    () ->
+                        AllianceFlipUtil.apply(
+                            poseManager.closestFace().rightBranch.pose)), // get closest branch
+                elevator
+                    .request(L1)
+                    .andThen(RobotCommands.score(elevator, carriage)), // score on L1
+                // //Tell next pos (L3)
+                drive.fullAutoDrive(() -> poseManager.closestFace().pose),
+                elevator
+                    .request(AlgaeHigh)
+                    .andThen(elevator.enableElevator()) // delagify pt1
+                    .andThen(carriage.highDelagifiy())
+                    .andThen(elevator.disableElevator()), // delgify pt2
                 JIToStationHigh.cmd()));
     JIToStationHigh.done()
         .onTrue(
             Commands.sequence(
-                // INTAKE CORAL
-                StationHighToJI.cmd()));
+                carriage.intakeCoral().until(carriage::coralHeld),
+                StationHighToJI.cmd().alongWith(elevator.request(L3))));
     StationHighToJI.done()
         .onTrue(
             Commands.sequence(
-                // SCORE CORAL L2/3 JI
-                JIToStationHigh.cmd()));
-    JIToStationHigh.done()
-        .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL
-                StationHighToJI.cmd()));
-    StationHighToJI.done()
-        .onTrue(
-            Commands.sequence(
-                // SCORE JI
+                drive.fullAutoDrive(
+                    () ->
+                        AllianceFlipUtil.apply(
+                            poseManager.closestFace().rightBranch.pose)), // get closest branch
+                elevator
+                    .request(L3)
+                    .andThen(RobotCommands.score(elevator, carriage)), // score on L3
                 JIToStationHigh.cmd()));
     return routine;
   }
