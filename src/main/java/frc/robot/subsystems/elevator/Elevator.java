@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -82,7 +83,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command enableElevator() {
-    return run(() -> setHeight = true).withName("enableElevator");
+    return run(() -> setHeight = true).until(this::atGoalHeight).withName("enableElevator");
   }
 
   public Command disableElevator() {
