@@ -16,7 +16,7 @@ public class Carriage extends SubsystemBase {
   private final CarriageIO io;
   private final CarrageIOInputsAutoLogged inputs = new CarrageIOInputsAutoLogged();
 
-  private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
+  
 
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
@@ -49,7 +49,7 @@ public class Carriage extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasCoral;
     }
-    return !beamBreak.get();
+    return inputs.pieceHeld;
   }
 
   @AutoLogOutput

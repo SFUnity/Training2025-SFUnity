@@ -9,10 +9,13 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+
 public class CarriageIOSparkMax implements CarriageIO {
   private final SparkMax rollerMotor = new SparkMax(rollerMotorID, MotorType.kBrushless);
   private final SparkMaxConfig config = new SparkMaxConfig();
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
+  private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
 
   public CarriageIOSparkMax() {
     config
@@ -38,10 +41,12 @@ public class CarriageIOSparkMax implements CarriageIO {
     inputs.velocityRotsPerSec = encoder.getVelocity();
     inputs.appliedVolts = rollerMotor.getAppliedOutput() * rollerMotor.getBusVoltage();
     inputs.currentAmps = rollerMotor.getOutputCurrent();
+    inputs.pieceHeld = !beamBreak.get();
   }
 
   @Override
   public void runVolts(double volts) {
     rollerMotor.setVoltage(volts);
   }
+
 }
