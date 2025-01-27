@@ -373,7 +373,9 @@ public class Robot extends LoggedRobot {
                 }));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
-    operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
+    operator
+        .rightTrigger()
+        .onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
     operator.leftTrigger().onTrue(Commands.runOnce(() -> scoreState = Dealgify));
 
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
