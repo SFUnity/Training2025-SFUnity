@@ -374,6 +374,7 @@ public class Robot extends LoggedRobot {
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
     operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
+    operator.leftTrigger().onTrue(Commands.runOnce(() -> scoreState = Dealgify));
 
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
