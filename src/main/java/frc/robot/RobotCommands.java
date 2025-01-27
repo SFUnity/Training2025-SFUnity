@@ -16,7 +16,6 @@ import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
@@ -40,32 +39,40 @@ public final class RobotCommands {
   public static ScoreState scoreState = ProcessorBack;
   public static boolean dealgifyAfterPlacing = false;
 
+  private static double elevatorSafeExtensionDistanceMeters = 1;
+  private static double processorScoreDistanceMeters = 0.1;
+
   public static Command fullScore(
       Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager) {
-    return Commands.select(
-            Map.of(
-                LeftBranch,
-                new WaitUntilCommand(
-                        () ->
-                            poseManager.getDistanceTo(goalPose(poseManager).get())
-                                < ElevatorConstants.subsystemExtentionLimit)
-                    .andThen(score(elevator, carriage))
-                    .andThen(
-                        dealgifyAfterPlacing
-                            ? Commands.runOnce(
-                                    () -> {
-                                      scoreState = Dealgify;
-                                      dealgifyAfterPlacing = false;
-                                    })
-                                .andThen(fullScore(drive, elevator, carriage, intake, poseManager))
-                            : Commands.none()),
-                Dealgify,
-                dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
-                ProcessorFront,
-                carriage.scoreProcessor(),
-                ProcessorBack,
-                intake.poopCmd().until(() -> !intake.algaeHeld())),
-            () -> scoreState == RightBranch ? LeftBranch : scoreState)
+    return new WaitUntilCommand(
+            () ->
+                poseManager.getDistanceTo(goalPose(poseManager).get())
+                    < switch (scoreState) {
+                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters;
+                      case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters;
+                    })
+        .andThen(
+            Commands.select(
+                Map.of(
+                    LeftBranch,
+                    score(elevator, carriage)
+                        .andThen(
+                            dealgifyAfterPlacing
+                                ? Commands.runOnce(
+                                        () -> {
+                                          scoreState = Dealgify;
+                                          dealgifyAfterPlacing = false;
+                                        })
+                                    .andThen(
+                                        fullScore(drive, elevator, carriage, intake, poseManager))
+                                : Commands.none()),
+                    Dealgify,
+                    dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
+                    ProcessorFront,
+                    carriage.scoreProcessor(),
+                    ProcessorBack,
+                    intake.poopCmd()),
+                () -> scoreState == RightBranch ? LeftBranch : scoreState))
         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
         .withName("Score/Dealgify");
   }
