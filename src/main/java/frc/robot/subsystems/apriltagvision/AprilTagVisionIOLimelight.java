@@ -1,11 +1,12 @@
 package frc.robot.subsystems.apriltagvision;
 
+import static frc.robot.util.LimelightHelpers.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
-import frc.robot.util.LimelightHelpers;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 import frc.robot.util.PoseManager;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
@@ -21,20 +22,18 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   public AprilTagVisionIOLimelight(String camName) {
     name = camName;
-    double[] position;
     switch (name) {
-      case AprilTagVisionConstants.reefName:
-        position = AprilTagVisionConstants.reefPosition;
+      case reefName:
+        position = reefPosition;
         break;
-      case AprilTagVisionConstants.sourceName:
-        position = AprilTagVisionConstants.sourcePosition;
+      case sourceName:
+        position = sourcePosition;
         break;
       default:
         position = new double[0];
-    }
-    ;
+    };
 
-    LimelightHelpers.setLEDMode_PipelineControl(name);
+    setLEDMode_PipelineControl(name);
 
     disconnectedAlert = new Alert("No data from: " + name, AlertType.kError);
 
@@ -44,10 +43,10 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   @Override
   public void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {
-    LimelightHelpers.SetRobotOrientation( // TODO do these have to be changed based on the camera
+    SetRobotOrientation( // TODO do these have to be changed based on the camera
         name, poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    LimelightHelpers.PoseEstimate observation =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+    PoseEstimate observation =
+        getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
     inputs.estimatedPose = observation.pose;
     inputs.timestamp = observation.timestampSeconds;
@@ -55,8 +54,8 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     inputs.avgTagDist = observation.avgTagDist;
     inputs.avgTagArea = observation.avgTagArea;
 
-    inputs.pipeline = LimelightHelpers.getCurrentPipelineIndex(name);
-    inputs.ledMode = LimelightHelpers.getLimelightNTDouble(name, "ledMode");
+    inputs.pipeline = getCurrentPipelineIndex(name);
+    inputs.ledMode = getLimelightNTDouble(name, "ledMode");
 
     // Update disconnected alert
     if (observation.timestampSeconds != 0) {
@@ -64,22 +63,22 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     }
     disconnectedAlert.set(Timer.getFPGATimestamp() - lastTimestamp < disconnectedTimeout);
 
-    dynamicCropping();
+    //dynamicCropping();
   }
 
   @Override
   public void setPipeline(int pipelineIndex) {
-    LimelightHelpers.setPipelineIndex(name, pipelineIndex);
+    setPipelineIndex(name, pipelineIndex);
   }
 
   @Override
   public void setPipeline(Pipelines pipelineEnum) {
-    LimelightHelpers.setPipelineIndex(name, Pipelines.getIndexFor(pipelineEnum));
+    setPipelineIndex(name, Pipelines.getIndexFor(pipelineEnum));
   }
 
   @Override
   public void setPosition(double[] position) {
-    LimelightHelpers.setCameraPose_RobotSpace(
+    setCameraPose_RobotSpace(
         name,
         position[0], // Forward offset (meters)
         position[1], // Side offset (meters)
@@ -91,40 +90,40 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   }
 
   // function crops the limelight window to only include the apriltags the robot can see
-  private void dynamicCropping() {
-    double[] tcornxy = LimelightHelpers.getLimelightNTDoubleArray(name, "tcornxy");
-    if (tcornxy.length == 0) {
-      resetCropping();
-      return;
-    }
+  // private void dynamicCropping() {
+  //   double[] tcornxy = getLimelightNTDoubleArray(name, "tcornxy");
+  //   if (tcornxy.length == 0) {
+  //     resetCropping();
+  //     return;
+  //   }
 
-    double minX = tcornxy[0];
-    double maxX = tcornxy[0];
-    double minY = tcornxy[1];
-    double maxY = tcornxy[1];
+  //   double minX = tcornxy[0];
+  //   double maxX = tcornxy[0];
+  //   double minY = tcornxy[1];
+  //   double maxY = tcornxy[1];
 
-    // Iterate over all tag corners
-    if (tcornxy.length > 2) {
-      for (int i = 2; i < tcornxy.length - 1; i += 2) {
-        minX = Math.min(minX, tcornxy[i]);
-        maxX = Math.max(maxX, tcornxy[i]);
-      }
-      for (int i = 3; i < tcornxy.length; i += 2) {
-        minY = Math.min(minY, tcornxy[i]);
-        maxY = Math.max(maxY, tcornxy[i]);
-      }
-    }
+  //   // Iterate over all tag corners
+  //   if (tcornxy.length > 2) {
+  //     for (int i = 2; i < tcornxy.length - 1; i += 2) {
+  //       minX = Math.min(minX, tcornxy[i]);
+  //       maxX = Math.max(maxX, tcornxy[i]);
+  //     }
+  //     for (int i = 3; i < tcornxy.length; i += 2) {
+  //       minY = Math.min(minY, tcornxy[i]);
+  //       maxY = Math.max(maxY, tcornxy[i]);
+  //     }
+  //   }
 
-    // Apply crop buffer and clamp to default crop size
-    double cropXMin = MathUtil.clamp(minX - CROP_BUFFER, -DEFAUlT_CROP, DEFAUlT_CROP);
-    double cropXMax = MathUtil.clamp(maxX + CROP_BUFFER, -DEFAUlT_CROP, DEFAUlT_CROP);
-    double cropYMin = MathUtil.clamp(minY - CROP_BUFFER, -DEFAUlT_CROP, DEFAUlT_CROP);
-    double cropYMax = MathUtil.clamp(maxY + CROP_BUFFER, -DEFAUlT_CROP, DEFAUlT_CROP);
+  //   // Apply crop buffer and clamp to default crop size
+  //   double cropXMin = MathUtil.clamp(minX - CROP_BUFFER, -DEFAUlT_CROP, DEFAUlT_CROP);
+  //   double cropXMax = MathUtil.clamp(maxX + CROP_BUFFER, -DEFAUlT_CROP, DEFAUlT_CROP);
+  //   double cropYMin = MathUtil.clamp(minY - CROP_BUFFER, -DEFAUlT_CROP, DEFAUlT_CROP);
+  //   double cropYMax = MathUtil.clamp(maxY + CROP_BUFFER, -DEFAUlT_CROP, DEFAUlT_CROP);
 
-    LimelightHelpers.setCropWindow(name, cropXMin, cropXMax, cropYMin, cropYMax);
-  }
+  //   setCropWindow(name, cropXMin, cropXMax, cropYMin, cropYMax);
+  // }
 
   private void resetCropping() {
-    LimelightHelpers.setCropWindow(name, -DEFAUlT_CROP, DEFAUlT_CROP, -DEFAUlT_CROP, DEFAUlT_CROP);
+    setCropWindow(name, -DEFAUlT_CROP, DEFAUlT_CROP, -DEFAUlT_CROP, DEFAUlT_CROP);
   }
 }

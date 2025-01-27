@@ -29,11 +29,11 @@ public class AprilTagVisionConstants {
 
   public static enum Pipelines {
     // TODO Add more pipelines
-    APRILTAGHM;
+    HUMAN_MADE;
 
     public static int getIndexFor(Pipelines pipeline) {
       switch (pipeline) {
-        case APRILTAGHM:
+        case HUMAN_MADE:
           return 0;
         default:
           return 0;

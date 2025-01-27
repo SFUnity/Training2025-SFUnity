@@ -30,12 +30,12 @@ public class AprilTagVision extends VirtualSubsystem {
     this.poseManager = poseManager;
     // TODO pipelines are the setting configured in the limelight software. download the correct
     // pipelines and add them to the code
-    io.setPipeline(Pipelines.BLUE_SPEAKER);
+    io.setPipeline(Pipelines.HUMAN_MADE);
   }
 
   public void periodic() {
-    io.updateInputs(inputs, poseManager);
-    Logger.processInputs("AprilTagVision", inputs);
+    // io.updateInputs(inputs, poseManager);
+    // Logger.processInputs("AprilTagVision", inputs);
 
     // TODO when testing these start with no checks and then slowly add in to make sure I don't lose
     // too much data
