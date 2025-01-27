@@ -24,14 +24,13 @@ import java.util.function.Supplier;
 /** Put high level commands here */
 public final class RobotCommands {
   public static Command score(Elevator elevator, Carriage carriage) {
-    return Commands.sequence(
-        elevator.enableElevator().until(elevator::atGoalHeight), carriage.placeCoral());
+    return Commands.sequence(elevator.enableElevator(), carriage.placeCoral());
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, boolean high) {
     return elevator
         .request(high ? AlgaeHigh : AlgaeLow)
-        .andThen(elevator.enableElevator().until(elevator::atGoalHeight))
+        .andThen(elevator.enableElevator())
         .alongWith(high ? carriage.highDealgify() : carriage.lowDealgify())
         .withName("dealgify");
   }
