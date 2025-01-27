@@ -73,7 +73,6 @@ public final class RobotCommands {
                     intake.poopCmd()),
                 () -> scoreState == RightBranch ? LeftBranch : scoreState))
         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
-        .finallyDo(() -> scoreState = Dealgify)
         .withName("Score/Dealgify");
   }
 
