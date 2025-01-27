@@ -55,11 +55,6 @@ public class Ground extends SubsystemBase {
     Util.logSubsystem(this, "Ground");
   }
 
-  public boolean hasAlgae() {
-    // TODO: Implement
-    return true;
-  }
-
   private void lower() {
     positionSetpoint = Degrees.of(loweredAngle.get());
     io.setPivotPosition(positionSetpoint);
@@ -95,6 +90,7 @@ public class Ground extends SubsystemBase {
           lower();
           rollersIn();
         })
+        .until(this::algaeHeld)
         .withName("ground");
   }
 
@@ -103,6 +99,7 @@ public class Ground extends SubsystemBase {
           raise();
           rollersOut();
         })
+        .until(() -> !algaeHeld())
         .withName("poop");
   }
 

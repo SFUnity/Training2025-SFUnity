@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -33,12 +31,12 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   public boolean setHeight = false;
-  public double goalHeight = 0;
+  public double goalHeightInches = 0;
 
   public Elevator(ElevatorIO io) {
     this.io = io;
 
-    pid.setTolerance(0.15); // should prob be decreased
+    pid.setTolerance(elevatorDistanceToleranceInches);
   }
 
   @Override
@@ -49,16 +47,16 @@ public class Elevator extends SubsystemBase {
     updateTunables();
 
     if (setHeight) {
-      pid.setGoal(goalHeight);
+      pid.setGoal(goalHeightInches);
+
     } else {
       pid.setGoal(0);
     }
 
     io.runVolts(
-        pid.calculate(inputs.position.in(Inches))
-            + ffController.calculate(pid.getSetpoint().velocity));
+        pid.calculate(inputs.position) + ffController.calculate(pid.getSetpoint().velocity));
 
-    meausedVisualizer.update(inputs.position.in(Meters));
+    meausedVisualizer.update(Units.inchesToMeters(inputs.position));
     setpointVisualizer.update(Units.inchesToMeters(pid.getGoal().position));
 
     Logger.recordOutput("Elevator/goal", Units.inchesToMeters(pid.getGoal().position));
@@ -74,12 +72,13 @@ public class Elevator extends SubsystemBase {
 
   @AutoLogOutput
   public boolean atDesiredHeight() {
-    return pid.atGoal();
+    return pid.atSetpoint();
   }
 
   @AutoLogOutput
   public boolean atGoalHeight() {
-    return Util.equalsWithTolerance(goalHeight, inputs.position.in(Meters), 0.15);
+    return Util.equalsWithTolerance(
+        goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
   }
 
   public Command enableElevator() {
@@ -91,6 +90,6 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command request(ElevatorHeight height) {
-    return runOnce(() -> goalHeight = height.get()).withName("request" + height.toString());
+    return runOnce(() -> goalHeightInches = height.get()).withName("request" + height.toString());
   }
 }

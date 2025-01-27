@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -25,10 +26,11 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
+  private static LoggedTunableNumber highDealgifyTime =
+      new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
+
   public Carriage(CarriageIO io) {
     this.io = io;
-
-    setDefaultCommand(stop());
   }
 
   @Override
@@ -61,30 +63,36 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command stop() {
-    return run(() -> io.runVolts(0)).withName("stopRollers");
+    return run(() -> io.runVolts(0)).withName("stop");
   }
 
   public Command placeCoral() {
-    return run(() -> io.runVolts(placeSpeed.get())).withName("placeCoralRollers");
+    return run(() -> io.runVolts(placeSpeedVolts.get()))
+        .until(() -> !coralHeld())
+        .withName("placeCoral");
   }
 
-  public Command highDelagifiy() {
-    return run(() -> io.runVolts(dealgifyingSpeed.get())).withName("placeCoralRollers");
+  public Command highDealgify() {
+    return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
+        .withTimeout(highDealgifyTime.get())
+        .withName("highDealgify");
   }
 
-  public Command lowDealgaefy() {
-    return run(() -> io.runVolts(dealgifyingSpeed.get()))
+  public Command lowDealgify() {
+    return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
         .until(() -> algaeHeld())
-        .withName("dealgaefy");
+        .withName("lowDealgify");
   }
 
   public Command intakeCoral() {
-    return run(() -> io.runVolts(intakingSpeed.get()))
+    return run(() -> io.runVolts(intakingSpeedVolts.get()))
         .until(() -> coralHeld())
-        .withName("intakeCoralRollers");
+        .withName("intakeCoral");
   }
 
   public Command scoreProcessor() {
-    return run(() -> io.runVolts(intakingSpeed.get())).withName("scoreProcessor");
+    return run(() -> io.runVolts(intakingSpeedVolts.get()))
+        .until(() -> !algaeHeld())
+        .withName("scoreProcessor");
   }
 }

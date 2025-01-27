@@ -114,42 +114,51 @@ public final class FieldConstants {
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180))
             .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
         Branch.A,
-        Branch.B),
+        Branch.B,
+        true),
     Two(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 1)))
             .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
         Branch.C,
-        Branch.D),
+        Branch.D,
+        false),
     Three(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 2)))
             .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
         Branch.E,
-        Branch.F),
+        Branch.F,
+        true),
     Four(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 3)))
             .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
         Branch.G,
-        Branch.H),
+        Branch.H,
+        false),
     Five(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 4)))
             .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
         Branch.I,
-        Branch.J),
+        Branch.J,
+        true),
     Six(
         new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 5)))
             .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
         Branch.K,
-        Branch.L);
+        Branch.L,
+        false),
+    ;
 
-    Face(Pose2d pose, Branch lefBranch, Branch rightBranch) {
+    Face(Pose2d pose, Branch lefBranch, Branch rightBranch, boolean highAlgae) {
       this.pose = pose;
       this.leftBranch = lefBranch;
       this.rightBranch = rightBranch;
+      this.highAlgae = highAlgae;
     }
 
     public final Pose2d pose;
     public final Branch leftBranch;
     public final Branch rightBranch;
+    public final boolean highAlgae;
   }
 
   // TODO replace with robot heights instead

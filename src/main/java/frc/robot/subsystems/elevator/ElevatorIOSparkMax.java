@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 import static frc.robot.util.SparkUtil.configureSpark;
 
@@ -57,11 +55,12 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     prevoiusTime = currentTime;
     currentTime = System.nanoTime();
 
-    prevoiusPosition = inputs.position.in(Meters);
-    inputs.position = Meters.of(encoder.getPosition());
-    deltaPosition = inputs.position.in(Meters) - prevoiusPosition;
+    prevoiusPosition = inputs.position;
+    inputs.position =
+        encoder.getPosition() * .8; // how much the elevator moves per rotation (from otis)
+    deltaPosition = inputs.position - prevoiusPosition;
     deltaTime = (currentTime - prevoiusTime) / 1e9;
-    inputs.velocityMetersPerSec = MetersPerSecond.of(deltaPosition / deltaTime);
+    inputs.velocityInchesPerSec = deltaPosition / deltaTime;
 
     inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
     inputs.currentAmps = elevatorMotor.getOutputCurrent();
