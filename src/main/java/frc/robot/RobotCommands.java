@@ -19,6 +19,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /** Put high level commands here */
@@ -27,11 +28,10 @@ public final class RobotCommands {
     return Commands.sequence(elevator.enableElevator(), carriage.placeCoral());
   }
 
-  public static Command dealgify(Elevator elevator, Carriage carriage, boolean high) {
-    return elevator
-        .request(high ? AlgaeHigh : AlgaeLow)
+  public static Command dealgify(Elevator elevator, Carriage carriage, BooleanSupplier high) {
+    return Commands.either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), high)
         .andThen(elevator.enableElevator())
-        .alongWith(high ? carriage.highDealgify() : carriage.lowDealgify())
+        .alongWith(Commands.either(carriage.highDealgify(), carriage.lowDealgify(), high))
         .withName("dealgify");
   }
 
@@ -56,17 +56,18 @@ public final class RobotCommands {
                     LeftBranch,
                     score(elevator, carriage)
                         .andThen(
-                            dealgifyAfterPlacing
-                                ? Commands.runOnce(
+                            Commands.either(
+                                Commands.runOnce(
                                         () -> {
                                           scoreState = Dealgify;
                                           dealgifyAfterPlacing = false;
                                         })
                                     .andThen(
-                                        fullScore(drive, elevator, carriage, intake, poseManager))
-                                : Commands.none()),
+                                        fullScore(drive, elevator, carriage, intake, poseManager)),
+                                Commands.none(),
+                                () -> dealgifyAfterPlacing)),
                     Dealgify,
-                    dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
+                    dealgify(elevator, carriage, () -> poseManager.closestFace().highAlgae),
                     ProcessorFront,
                     carriage.scoreProcessor(),
                     ProcessorBack,
