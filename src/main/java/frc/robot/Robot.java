@@ -378,7 +378,6 @@ public class Robot extends LoggedRobot {
     operator
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
-    operator.leftTrigger().onTrue(Commands.runOnce(() -> scoreState = Dealgify));
 
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
