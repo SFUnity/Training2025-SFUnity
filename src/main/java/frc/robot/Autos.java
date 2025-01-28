@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
@@ -10,12 +12,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.constantsGlobal.Constants;
-import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.ground.Ground;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.Logger;
@@ -25,7 +25,7 @@ public class Autos {
   private final Drive drive;
   private final Carriage carriage;
   private final Elevator elevator;
-  private final Ground ground;
+  private final Intake intake;
   private final PoseManager poseManager;
 
   private final AutoFactory factory;
@@ -36,11 +36,11 @@ public class Autos {
   private static final boolean isChoreoAuto = true;
 
   public Autos(
-      Drive drive, Carriage carriage, Elevator elevator, Ground ground, PoseManager poseManager) {
+      Drive drive, Carriage carriage, Elevator elevator, Intake intake, PoseManager poseManager) {
     this.drive = drive;
     this.carriage = carriage;
     this.elevator = elevator;
-    this.ground = ground;
+    this.intake = intake;
     this.poseManager = poseManager;
 
     factory =
@@ -89,10 +89,7 @@ public class Autos {
       // SysID & non-choreo routines
       if (!isChoreoAuto) {
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
-        if (Constants.currentMode == Mode.SIM) {
-          // Use Phoenix Tuner for real robot
-          nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
-        }
+        nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
@@ -370,7 +367,7 @@ public class Autos {
                 elevator
                     .request(AlgaeHigh)
                     .andThen(elevator.enableElevator()) // delagify pt1
-                    .andThen(carriage.highDelagifiy())
+                    .andThen(carriage.highDealgify())
                     .andThen(elevator.disableElevator()), // delgify pt2
                 JIToStationHigh.cmd()));
     JIToStationHigh.done()

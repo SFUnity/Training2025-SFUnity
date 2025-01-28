@@ -1,10 +1,10 @@
-package frc.robot.subsystems.ground;
+package frc.robot.subsystems.intake;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 
-public class GroundConstants {
+public class IntakeConstants {
   public static final LoggedTunableNumber kP;
   public static final double pivotPositionFactor = 0;
   public static final double minAngleRads = Units.degreesToRadians(18.39);
@@ -15,14 +15,14 @@ public class GroundConstants {
   public static final LoggedTunableNumber algaeCurrentThreshold;
 
   static {
-    algaeVelocityThreshold = new LoggedTunableNumber("ground/algaeVelocityThreshold");
-    algaeCurrentThreshold = new LoggedTunableNumber("ground/algaeCurrentThreshold");
+    algaeVelocityThreshold = new LoggedTunableNumber("Intake/algaeVelocityThreshold");
+    algaeCurrentThreshold = new LoggedTunableNumber("Intake/algaeCurrentThreshold");
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Ground/kP", 2.0);
+        kP = new LoggedTunableNumber("Intake/kP", 2.0);
         break;
       case SIM:
-        kP = new LoggedTunableNumber("Ground/simkP", 4.82);
+        kP = new LoggedTunableNumber("Intake/simkP", 4.82);
         break;
     }
   }
