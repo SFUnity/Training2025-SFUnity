@@ -350,7 +350,13 @@ public class Robot extends LoggedRobot {
     driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
     driver
         .rightBumper()
-        .whileTrue(fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper()));
+        .whileTrue(
+            fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
+                .beforeStarting(
+                    () -> {
+                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
+                        scoreState = Dealgify;
+                    }));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
