@@ -45,20 +45,20 @@ public class DriveConstants {
       new SwerveDriveKinematics(moduleTranslations);
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(2.451);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.301);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(-0.902);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(2.542);
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(-2.186);
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(-2.140);
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(1.993);
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(-0.031);
 
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = false;
-  public static final boolean frontRightDriveInverted = false;
+  public static final boolean frontRightDriveInverted = true;
   public static final boolean backLeftDriveInverted = false;
-  public static final boolean backRightDriveInverted = false;
+  public static final boolean backRightDriveInverted = true;
 
   public static final boolean frontLeftTurnInverted = true;
   public static final boolean frontRightTurnInverted = true;
-  public static final boolean backLeftTurnInverted = false;
+  public static final boolean backLeftTurnInverted = true;
   public static final boolean backRightTurnInverted = true;
 
   public static final boolean frontLeftTurnEncoderInverted = false;
@@ -136,7 +136,7 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", 0.0);
+        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", 0.32);
         turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnKd", 0.0);
         break;
       case SIM:
