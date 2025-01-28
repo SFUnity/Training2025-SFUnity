@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.*;
+import static frc.robot.RobotCommands.*;
+import static frc.robot.RobotCommands.ScoreState.LeftBranch;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 
 import choreo.auto.AutoChooser;
@@ -171,48 +174,35 @@ public class Autos {
                 ));
     centerToLK
         .done()
-        .onTrue( // WHEN WE FINISH LAST PATH
-            Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-                // SCORE CORAL L1 KL
-                // REMOVE ALGAE L2 KL
-                lKToStationHigh.cmd() // START NEXT PATH
-                ));
+        .onTrue( // When centerToLK is done
+            elevator
+                .request(L1) // Set the elevator to go to L1
+                .alongWith(
+                    runOnce(() -> scoreState = LeftBranch), // Get ready to score on the left branch
+                    runOnce(
+                        () -> dealgifyAfterPlacing = true)) // Make the robot dealgify after scoring
+                .andThen(
+                    fullScore(drive, elevator, carriage, intake, poseManager)) // Run score command
+                .andThen(lKToStationHigh.cmd()) // START NEXT PATH
+            );
     lKToStationHigh
         .done()
         .onTrue(
             Commands.sequence(
-                // INTAKE CORAL
+                // INTAKE CORAL, you should use a binding here so that when as the robot approaches
+                // the station it starts intaking
                 stationHighToLKL2.cmd()));
     stationHighToLKL2
         .done()
         .onTrue(
-            Commands.sequence(
-                // SCORE CORAL L2/3 KL
-                lKToStationHigh.cmd()));
-    lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // intake("high"),
-                stationHighToLKL2.cmd()));
-    stationHighToLKL2
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // SCORE CORAL L2/3 KL
-                lKToStationHigh.cmd()));
-    lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL
-                stationHighToLKL2.cmd()));
-    stationHighToLKL2
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // SCORE CORAL L2/3 KL
-                lKToStationHigh.cmd()));
+            elevator
+                .request(L3) // Set the elevator to go to L3 (the robot still knows to score on the
+                // LeftBranch from last time)
+                .andThen(fullScore(drive, elevator, carriage, intake, poseManager))
+                .andThen(lKToStationHigh.cmd()));
+
+    // I'm not quite sure how to make it loop given you want the same thing to happen multiple
+    // times. I'm going to ask on the Sleipnir discord
     return routine;
   }
 
