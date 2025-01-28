@@ -90,6 +90,11 @@ public final class RobotCommands {
         .withName("Score/Dealgify");
   }
 
+  public static Command fullScore(
+      Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager) {
+    return fullScore(drive, elevator, carriage, intake, poseManager, new Trigger(() -> true));
+  }
+
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
     return () -> {
       switch (scoreState) {
