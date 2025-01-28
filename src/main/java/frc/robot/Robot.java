@@ -348,7 +348,9 @@ public class Robot extends LoggedRobot {
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
     driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
-    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, intake, poseManager));
+    driver
+        .rightBumper()
+        .whileTrue(fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper()));
 
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)

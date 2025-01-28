@@ -10,8 +10,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
@@ -42,7 +44,12 @@ public final class RobotCommands {
   private static double processorScoreDistanceMeters = 0.1;
 
   public static Command fullScore(
-      Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager) {
+      Drive drive,
+      Elevator elevator,
+      Carriage carriage,
+      Intake intake,
+      PoseManager poseManager,
+      Trigger scoreTrigger) {
     return new WaitUntilCommand(
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
@@ -55,17 +62,23 @@ public final class RobotCommands {
                 Map.of(
                     LeftBranch,
                     score(elevator, carriage)
-                        .andThen(
-                            Commands.either(
-                                Commands.runOnce(
-                                        () -> {
-                                          scoreState = Dealgify;
-                                          dealgifyAfterPlacing = false;
-                                        })
-                                    .andThen(
-                                        fullScore(drive, elevator, carriage, intake, poseManager)),
-                                Commands.none(),
-                                () -> dealgifyAfterPlacing)),
+                        .finallyDo(
+                            () -> {
+                              if (dealgifyAfterPlacing) {
+                                scoreState = Dealgify;
+                                dealgifyAfterPlacing = false;
+                              }
+                              CommandScheduler.getInstance()
+                                  .schedule(
+                                      fullScore(
+                                              drive,
+                                              elevator,
+                                              carriage,
+                                              intake,
+                                              poseManager,
+                                              scoreTrigger)
+                                          .onlyWhile(() -> scoreTrigger.getAsBoolean()));
+                            }),
                     Dealgify,
                     dealgify(elevator, carriage, () -> poseManager.closestFace().highAlgae),
                     ProcessorFront,
