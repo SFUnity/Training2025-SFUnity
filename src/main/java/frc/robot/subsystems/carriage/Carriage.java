@@ -46,7 +46,7 @@ public class Carriage extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasCoral;
     }
-    return inputs.pieceHeld;
+    return inputs.coralHeld;
   }
 
   @AutoLogOutput
