@@ -329,10 +329,18 @@ public class Robot extends LoggedRobot {
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    driver.y().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)));
-    driver.b().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)));
-    driver.a().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)));
-    driver.x().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)));
+    driver
+        .y()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
+    driver
+        .b()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
+    driver
+        .a()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
+    driver
+        .x()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
     driver
         .start()
         .onTrue(
