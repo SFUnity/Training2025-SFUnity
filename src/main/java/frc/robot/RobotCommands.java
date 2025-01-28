@@ -10,72 +10,83 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /** Put high level commands here */
 public final class RobotCommands {
   public static Command score(Elevator elevator, Carriage carriage) {
-    return elevator
-        .enableElevator()
-        .until(elevator::atGoalHeight)
-        .andThen(carriage.placeCoral())
-        .andThen(elevator.disableElevator())
-        .withName("score");
+    return Commands.sequence(elevator.enableElevator(), carriage.placeCoral());
   }
 
-  public static Command dealgify(Elevator elevator, Carriage carriage, boolean high) {
-    return elevator
-        .request(high ? AlgaeHigh : AlgaeLow)
-        .andThen(elevator.enableElevator().until(elevator::atGoalHeight))
-        .alongWith(high ? carriage.highDealgify() : carriage.lowDealgify())
+  public static Command dealgify(Elevator elevator, Carriage carriage, BooleanSupplier high) {
+    return Commands.either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), high)
+        .andThen(elevator.enableElevator())
+        .alongWith(Commands.either(carriage.highDealgify(), carriage.lowDealgify(), high))
         .withName("dealgify");
   }
 
-  public static ScoreState scoreState = ProcessorBack;
+  public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
+  private static double elevatorSafeExtensionDistanceMeters = 1;
+  private static double processorScoreDistanceMeters = 0.1;
+
   public static Command fullScore(
-      Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager) {
-    return drive
-        .fullAutoDrive(goalPose(poseManager))
-        .alongWith(
+      Drive drive,
+      Elevator elevator,
+      Carriage carriage,
+      Intake intake,
+      PoseManager poseManager,
+      Trigger scoreTrigger) {
+    return new WaitUntilCommand(
+            () ->
+                poseManager.getDistanceTo(goalPose(poseManager).get())
+                    < switch (scoreState) {
+                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters;
+                      case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters;
+                    })
+        .andThen(
             Commands.select(
                 Map.of(
                     LeftBranch,
-                    new WaitUntilCommand(
-                            () ->
-                                poseManager.getDistanceTo(goalPose(poseManager).get())
-                                    < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(
-                            score(elevator, carriage)
-                                .alongWith(Commands.print("Running elevator and carriage score")))
-                        .andThen(
-                            dealgifyAfterPlacing
-                                ? Commands.runOnce(
-                                        () -> {
-                                          scoreState = Dealgify;
-                                          dealgifyAfterPlacing = false;
-                                        })
-                                    .andThen(
-                                        fullScore(drive, elevator, carriage, intake, poseManager))
-                                : Commands.none()),
+                    score(elevator, carriage)
+                        .finallyDo(
+                            () -> {
+                              if (dealgifyAfterPlacing) {
+                                scoreState = Dealgify;
+                                dealgifyAfterPlacing = false;
+                                CommandScheduler.getInstance()
+                                    .schedule(
+                                        fullScore(
+                                                drive,
+                                                elevator,
+                                                carriage,
+                                                intake,
+                                                poseManager,
+                                                scoreTrigger)
+                                            .onlyWhile(() -> scoreTrigger.getAsBoolean()));
+                              }
+                            }),
                     Dealgify,
-                    dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
+                    dealgify(elevator, carriage, () -> poseManager.closestFace().highAlgae),
                     ProcessorFront,
                     carriage.scoreProcessor(),
                     ProcessorBack,
-                    intake.poopCmd().until(() -> !intake.algaeHeld())),
+                    intake.poopCmd()),
                 () -> scoreState == RightBranch ? LeftBranch : scoreState))
+        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
         .withName("Score/Dealgify");
   }
 

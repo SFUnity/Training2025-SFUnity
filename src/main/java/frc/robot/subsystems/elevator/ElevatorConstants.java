@@ -7,8 +7,8 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorConstants {
   public static final int elevatorMotorID = 0;
-  public static final double maxElevatorSpeed = 72;
-  public static final double maxElevatorAcceleration = 353;
+  public static final double maxElevatorSpeed = 725;
+  public static final double maxElevatorAcceleration = 300;
   public static final double elevatorDistanceToleranceInches = 0.3;
 
   public static enum ElevatorHeights {
@@ -70,10 +70,10 @@ public class ElevatorConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Elevator/kP", 150.0);
-        kD = new LoggedTunableNumber("Elevator/kD", 17.53);
-        kG = new LoggedTunableNumber("Elevator/kG", 0.11591);
-        kV = new LoggedTunableNumber("Elevator/kV", 11.3);
+        kP = new LoggedTunableNumber("Elevator/kP", 0.15);
+        kD = new LoggedTunableNumber("Elevator/kD", 0);
+        kG = new LoggedTunableNumber("Elevator/kG", 1.215);
+        kV = new LoggedTunableNumber("Elevator/kV", 0.127);
 
         desiredHeightL1 = new LoggedTunableNumber("Reef/Elevator/L1");
         desiredHeightL2 = new LoggedTunableNumber("Reef/Elevator/L2");
@@ -84,10 +84,10 @@ public class ElevatorConstants {
         desiredHeightProcessor = new LoggedTunableNumber("Reef/Elevator/Processor");
         break;
       case SIM:
-        kP = new LoggedTunableNumber("Elevator/kP", 6.0);
+        kP = new LoggedTunableNumber("Elevator/kP", 0.15);
         kD = new LoggedTunableNumber("Elevator/kD", 0.0);
-        kG = new LoggedTunableNumber("Elevator/kG", 0.06);
-        kV = new LoggedTunableNumber("Elevator/kV", 12.6);
+        kG = new LoggedTunableNumber("Elevator/kG", 1.215);
+        kV = new LoggedTunableNumber("Elevator/kV", 0.127);
         desiredHeightL1 = new LoggedTunableNumber("Reef/Elevator/L1", Units.inchesToMeters(18));
         desiredHeightL2 = new LoggedTunableNumber("Reef/Elevator/L2", Units.inchesToMeters(31.875));
         desiredHeightL3 = new LoggedTunableNumber("Reef/Elevator/L3", Units.inchesToMeters(47.625));
@@ -108,10 +108,10 @@ public class ElevatorConstants {
   /** In inches */
   public static enum ElevatorHeight {
     L3(new LoggedTunableNumber("Elevator/L3", maxHeightInches)),
-    L2(new LoggedTunableNumber("Elevator/L2", 0)),
+    L2(new LoggedTunableNumber("Elevator/L2", 10)),
     L1(new LoggedTunableNumber("Elevator/L1", 0)),
-    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 0)),
-    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", 0)),
+    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 15)),
+    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", 5)),
     Stow(new LoggedTunableNumber("Elevator/Stow", minHeightInches));
 
     ElevatorHeight(LoggedTunableNumber height) {

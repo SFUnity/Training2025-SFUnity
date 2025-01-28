@@ -348,7 +348,9 @@ public class Robot extends LoggedRobot {
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
     driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
-    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, intake, poseManager));
+    driver
+        .rightBumper()
+        .whileTrue(fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper()));
 
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
@@ -373,7 +375,10 @@ public class Robot extends LoggedRobot {
                 }));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
-    operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
+    operator
+        .rightTrigger()
+        .onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
+    operator.leftTrigger().onTrue(Commands.runOnce(() -> scoreState = Dealgify));
 
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
