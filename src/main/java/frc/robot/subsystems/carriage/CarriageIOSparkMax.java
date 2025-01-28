@@ -40,7 +40,7 @@ public class CarriageIOSparkMax implements CarriageIO {
     inputs.velocityRotsPerSec = encoder.getVelocity();
     inputs.appliedVolts = rollerMotor.getAppliedOutput() * rollerMotor.getBusVoltage();
     inputs.currentAmps = rollerMotor.getOutputCurrent();
-    inputs.pieceHeld = !beamBreak.get();
+    inputs.coralHeld = !beamBreak.get();
   }
 
   @Override

@@ -578,10 +578,7 @@ public class Drive extends SubsystemBase {
   /** Returns true if within tolerance of aiming at speaker */
   @AutoLogOutput(key = "Drive/Commands/ThetaAtGoal")
   public boolean thetaAtGoal() {
-    return Util.equalsWithTolerance(
-        thetaController.getSetpoint().position,
-        thetaController.getGoal().position,
-        Units.degreesToRadians(thetaToleranceDeg.get()));
+    return thetaController.atGoal();
   }
 
   // Autos

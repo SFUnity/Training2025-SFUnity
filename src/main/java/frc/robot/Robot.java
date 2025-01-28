@@ -329,10 +329,18 @@ public class Robot extends LoggedRobot {
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    driver.y().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)));
-    driver.b().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)));
-    driver.a().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)));
-    driver.x().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)));
+    driver
+        .y()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
+    driver
+        .b()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
+    driver
+        .a()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
+    driver
+        .x()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
     driver
         .start()
         .onTrue(
@@ -350,13 +358,13 @@ public class Robot extends LoggedRobot {
     driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
     driver
         .rightBumper()
-        .whileTrue(fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper()));
-
-    new Trigger(carriage::coralHeld)
-        .and(() -> allowAutoRotation)
-        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
-    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+        .whileTrue(
+            fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
+                .beforeStarting(
+                    () -> {
+                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
+                        scoreState = Dealgify;
+                    }));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -378,12 +386,19 @@ public class Robot extends LoggedRobot {
     operator
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
-    operator.leftTrigger().onTrue(Commands.runOnce(() -> scoreState = Dealgify));
 
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
+    // State-Based Triggers
+    new Trigger(carriage::coralHeld)
+        .and(() -> allowAutoRotation)
+        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+
+    // Sim fake gamepieces
     SmartDashboard.putData(
         "Toggle Coral in Carriage",
         Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
