@@ -67,17 +67,17 @@ public final class RobotCommands {
                               if (dealgifyAfterPlacing) {
                                 scoreState = Dealgify;
                                 dealgifyAfterPlacing = false;
+                                CommandScheduler.getInstance()
+                                    .schedule(
+                                        fullScore(
+                                                drive,
+                                                elevator,
+                                                carriage,
+                                                intake,
+                                                poseManager,
+                                                scoreTrigger)
+                                            .onlyWhile(() -> scoreTrigger.getAsBoolean()));
                               }
-                              CommandScheduler.getInstance()
-                                  .schedule(
-                                      fullScore(
-                                              drive,
-                                              elevator,
-                                              carriage,
-                                              intake,
-                                              poseManager,
-                                              scoreTrigger)
-                                          .onlyWhile(() -> scoreTrigger.getAsBoolean()));
                             }),
                     Dealgify,
                     dealgify(elevator, carriage, () -> poseManager.closestFace().highAlgae),
