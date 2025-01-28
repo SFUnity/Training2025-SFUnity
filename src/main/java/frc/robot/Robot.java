@@ -352,12 +352,6 @@ public class Robot extends LoggedRobot {
         .rightBumper()
         .whileTrue(fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper()));
 
-    new Trigger(carriage::coralHeld)
-        .and(() -> allowAutoRotation)
-        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
-    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
-
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     operator.x().onTrue(elevator.request(L2));
@@ -384,6 +378,14 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
+    // State-Based Triggers
+    new Trigger(carriage::coralHeld)
+        .and(() -> allowAutoRotation)
+        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+
+    // Sim fake gamepieces
     SmartDashboard.putData(
         "Toggle Coral in Carriage",
         Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
