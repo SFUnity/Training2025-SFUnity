@@ -41,8 +41,11 @@ public class AprilTagVision extends VirtualSubsystem {
     // TODO when testing these start with no checks and then slowly add in to make sure I don't lose
     // too much data
     Pose2d estimatedPose = inputs.estimatedPose.toPose2d();
-    // Exit if there are no tags in sight or the pose is blank
-    if (inputs.tagCount == 0 || estimatedPose.equals(new Pose2d())) return;
+    // Exit if there are no tags in sight or the pose is blank or the robot is spinning too fast
+    // These are the basic checks LL recommends
+    if (inputs.tagCount == 0
+        || estimatedPose.equals(new Pose2d())
+        || Math.abs(poseManager.robotVelocity().dtheta) > 720) return;
 
     // TODO add check for if the robot is off the ground
 
