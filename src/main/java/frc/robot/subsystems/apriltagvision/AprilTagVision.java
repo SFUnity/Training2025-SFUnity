@@ -47,7 +47,8 @@ public class AprilTagVision extends VirtualSubsystem {
         || estimatedPose.equals(new Pose2d())
         || Math.abs(poseManager.robotVelocity().dtheta) > 720) return;
 
-    // TODO add check for if the robot is off the ground
+    // Exit if the robot is off the ground
+    if (inputs.estimatedPose.getY() > 0.15) return;
 
     // Exit if the estimated pose is off the field
     if (estimatedPose.getX() < -fieldBorderMargin
