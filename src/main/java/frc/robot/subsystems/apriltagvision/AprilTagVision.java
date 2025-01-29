@@ -59,6 +59,7 @@ public class AprilTagVision extends VirtualSubsystem {
     double allowableDistance = inputs.tagCount; // In meters
     if (poseManager.getDistanceTo(estimatedPose) > allowableDistance) return;
 
+    // Smaller number = more trust
     double trust = .2;
 
     // Scale trust based on number of tags
