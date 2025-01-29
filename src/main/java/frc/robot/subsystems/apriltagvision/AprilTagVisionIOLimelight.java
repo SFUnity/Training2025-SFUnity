@@ -38,7 +38,15 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     disconnectedAlert = new Alert("No data from: " + name, AlertType.kError);
 
     resetCropping();
-    setPosition(position);
+    setCameraPose_RobotSpace(
+        name,
+        position[0], // Forward offset (meters)
+        position[1], // Side offset (meters)
+        position[2], // Height offset (meters)
+        position[3], // Roll (degrees)
+        position[4], // Pitch (degrees)
+        position[5] // Yaw (degrees)
+        );
   }
 
   @Override
@@ -72,19 +80,6 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   @Override
   public void setPipeline(Pipelines pipelineEnum) {
     setPipelineIndex(name, Pipelines.getIndexFor(pipelineEnum));
-  }
-
-  @Override
-  public void setPosition(double[] position) {
-    setCameraPose_RobotSpace(
-        name,
-        position[0], // Forward offset (meters)
-        position[1], // Side offset (meters)
-        position[2], // Height offset (meters)
-        position[3], // Roll (degrees)
-        position[4], // Pitch (degrees)
-        position[5] // Yaw (degrees)
-        );
   }
 
   // function crops the limelight window to only include the apriltags the robot can see
