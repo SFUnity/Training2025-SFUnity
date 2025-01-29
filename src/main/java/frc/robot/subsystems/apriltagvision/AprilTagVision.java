@@ -2,8 +2,6 @@ package frc.robot.subsystems.apriltagvision;
 
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -20,6 +18,7 @@ import frc.robot.util.GeomUtil;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
 import frc.robot.util.VirtualSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends VirtualSubsystem {
   private final AprilTagVisionIO io;
