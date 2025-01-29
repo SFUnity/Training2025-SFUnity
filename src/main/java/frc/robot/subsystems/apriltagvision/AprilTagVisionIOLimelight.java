@@ -1,12 +1,11 @@
 package frc.robot.subsystems.apriltagvision;
 
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 import static frc.robot.util.LimelightHelpers.*;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 import frc.robot.util.PoseManager;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
@@ -31,7 +30,8 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         break;
       default:
         position = new double[0];
-    };
+    }
+    ;
 
     setLEDMode_PipelineControl(name);
 
@@ -43,10 +43,8 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   @Override
   public void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {
-    SetRobotOrientation(
-        name, poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    PoseEstimate observation =
-        getBotPoseEstimate_wpiBlue_MegaTag2(name);
+    SetRobotOrientation(name, poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    PoseEstimate observation = getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
     inputs.estimatedPose = observation.pose;
     inputs.timestamp = observation.timestampSeconds;
@@ -63,7 +61,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     }
     disconnectedAlert.set(Timer.getFPGATimestamp() - lastTimestamp < disconnectedTimeout);
 
-    //dynamicCropping();
+    // dynamicCropping();
   }
 
   @Override

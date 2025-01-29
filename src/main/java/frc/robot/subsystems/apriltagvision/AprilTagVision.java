@@ -18,7 +18,6 @@ import frc.robot.util.GeomUtil;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
 import frc.robot.util.VirtualSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends VirtualSubsystem {
   private final AprilTagVisionIO io;
