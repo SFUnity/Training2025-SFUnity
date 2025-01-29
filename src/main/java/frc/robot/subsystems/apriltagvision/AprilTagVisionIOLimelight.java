@@ -52,7 +52,14 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   @Override
   public void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {
-    SetRobotOrientation(name, poseManager.getRotation().getDegrees(), Units.degreesToRadians(poseManager.robotVelocity().dtheta), 0, 0, 0, 0);
+    SetRobotOrientation(
+        name,
+        poseManager.getRotation().getDegrees(),
+        Units.degreesToRadians(poseManager.robotVelocity().dtheta),
+        0,
+        0,
+        0,
+        0);
     PoseEstimate observation = getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
     inputs.estimatedPose = observation.pose;

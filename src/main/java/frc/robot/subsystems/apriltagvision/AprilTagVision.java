@@ -2,6 +2,8 @@ package frc.robot.subsystems.apriltagvision;
 
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -33,8 +35,8 @@ public class AprilTagVision extends VirtualSubsystem {
   }
 
   public void periodic() {
-    // io.updateInputs(inputs, poseManager);
-    // Logger.processInputs("AprilTagVision", inputs);
+    io.updateInputs(inputs, poseManager);
+    Logger.processInputs("AprilTagVision", inputs);
 
     // TODO when testing these start with no checks and then slowly add in to make sure I don't lose
     // too much data

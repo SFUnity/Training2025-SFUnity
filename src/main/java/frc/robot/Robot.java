@@ -13,8 +13,14 @@
 
 package frc.robot;
 
+import static frc.robot.RobotCommands.*;
+import static frc.robot.RobotCommands.IntakeState.*;
+import static frc.robot.RobotCommands.ScoreState.*;
+import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.reefName;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.sourceName;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,17 +28,24 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.apriltagvision.AprilTagVision;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIO;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIOLimelight;
+import frc.robot.subsystems.carriage.Carriage;
+import frc.robot.subsystems.carriage.CarriageIO;
+import frc.robot.subsystems.carriage.CarriageIOSim;
+import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
@@ -40,6 +53,14 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -81,6 +102,9 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
+  private final Elevator elevator;
+  private final Carriage carriage;
+  private final Intake intake;
   private final AprilTagVision reefVision;
   private final AprilTagVision sourceVision;
 
@@ -179,6 +203,9 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
+        elevator = new Elevator(new ElevatorIOSparkMax());
+        carriage = new Carriage(new CarriageIOSparkMax());
+        intake = new Intake(new IntakeIOSparkMax());
         reefVision = new AprilTagVision(new AprilTagVisionIOLimelight(reefName), poseManager);
         sourceVision = new AprilTagVision(new AprilTagVisionIOLimelight(sourceName), poseManager);
         break;
@@ -194,6 +221,9 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
+        elevator = new Elevator(new ElevatorIOSim());
+        carriage = new Carriage(new CarriageIOSim());
+        intake = new Intake(new IntakeIOSim());
         reefVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         sourceVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
@@ -209,12 +239,15 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
+        elevator = new Elevator(new ElevatorIO() {});
+        carriage = new Carriage(new CarriageIO() {});
+        intake = new Intake(new IntakeIO() {});
         reefVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         sourceVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
         break;
     }
 
-    autos = new Autos(drive, poseManager);
+    autos = new Autos(drive, poseManager, elevator, carriage);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -228,34 +261,12 @@ public class Robot extends LoggedRobot {
 
     // For tuning visualizations
     // Logger.recordOutput("ZeroedPose2d", new Pose2d());
-    // Logger.recordOutput("ZeroedPose3d", new Pose3d());
+    // Logger.recordOutput("ZeroedPose3d", new Pose3d[] {new Pose3d(), new Pose3d()});
 
     // Set up port forwarding for limelights so we can connect to them through the RoboRIO USB port
     for (int port = 5800; port <= 5809; port++) {
       PortForwarder.add(port, "limelight.local", port);
     }
-  }
-
-  // Consider moving to its own file if/when it gets big
-  /** Use this method to define your button->command mappings. */
-  private void configureButtonBindings() {
-    // Default cmds
-    drive.setDefaultCommand(drive.joystickDrive());
-
-    // Driver controls
-    driver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    driver
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        poseManager.setPose(
-                            new Pose2d(poseManager.getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
-    driver.leftBumper().onTrue(Commands.runOnce(() -> slowMode = !slowMode, drive));
-
-    // Operator controls
   }
 
   /** This function is called periodically during all modes. */
@@ -299,12 +310,116 @@ public class Robot extends LoggedRobot {
         && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
       lowBatteryAlert.set(true);
     }
+
+    // Logs
+    Logger.recordOutput("Controls/intakeState", intakeState.toString());
+    Logger.recordOutput("Controls/scoreState", scoreState.toString());
+    Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
+    Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
+    Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
-    return !DriverStation.isJoystickConnected(controller.getHID().getPort())
-        || !DriverStation.getJoystickIsXbox(
+    return controller.isConnected()
+        && DriverStation.getJoystickIsXbox(
             controller.getHID().getPort()); // Should be an XBox controller
+  }
+
+  private boolean allowAutoRotation = true;
+
+  // Consider moving to its own file if/when it gets big
+  /** Use this method to define your button->command mappings. */
+  private void configureButtonBindings() {
+    // Setup rumble
+    new Trigger(() -> intake.algaeHeld())
+        .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
+
+    // Default cmds
+    drive.setDefaultCommand(drive.joystickDrive());
+    elevator.setDefaultCommand(elevator.disableElevator());
+    carriage.setDefaultCommand(carriage.stop());
+    intake.setDefaultCommand(intake.raiseAndStopCmd());
+
+    // Driver controls
+    driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver
+        .y()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
+    driver
+        .b()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
+    driver
+        .a()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
+    driver
+        .x()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
+    driver
+        .start()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        poseManager.setPose(
+                            new Pose2d(poseManager.getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
+    driver
+        .back()
+        .onTrue(
+            Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
+
+    driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver
+        .rightBumper()
+        .whileTrue(
+            fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
+                .beforeStarting(
+                    () -> {
+                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
+                        scoreState = Dealgify;
+                    }));
+
+    // Operator controls
+    operator.y().onTrue(elevator.request(L3));
+    operator.x().onTrue(elevator.request(L2));
+    operator.a().onTrue(elevator.request(L1));
+    operator
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  if (intake.algaeHeld()) {
+                    scoreState = ProcessorBack;
+                  } else if (carriage.algaeHeld()) {
+                    scoreState = ProcessorFront;
+                  }
+                }));
+    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
+    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
+    operator
+        .rightTrigger()
+        .onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
+
+    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
+    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
+    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
+
+    // State-Based Triggers
+    new Trigger(carriage::coralHeld)
+        .and(() -> allowAutoRotation)
+        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+
+    // Sim fake gamepieces
+    SmartDashboard.putData(
+        "Toggle Coral in Carriage",
+        Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
+    SmartDashboard.putData(
+        "Toggle Algae in Carriage",
+        Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+    SmartDashboard.putData(
+        "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
   }
 
   /** This function is called once when the robot is disabled. */

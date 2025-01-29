@@ -111,8 +111,7 @@ public class ModuleIOSim implements ModuleIO {
   @Override
   public void setDriveVelocity(double velocityRadPerSec) {
     driveClosedLoop = true;
-    driveFFVolts =
-        driveKv.get() * Math.signum(velocityRadPerSec) + driveKv.get() * velocityRadPerSec;
+    driveFFVolts = driveKv * Math.signum(velocityRadPerSec) + driveKv * velocityRadPerSec;
     driveController.setSetpoint(velocityRadPerSec);
   }
 
@@ -120,5 +119,17 @@ public class ModuleIOSim implements ModuleIO {
   public void setTurnPosition(Rotation2d rotation) {
     turnClosedLoop = true;
     turnController.setSetpoint(rotation.getRadians());
+  }
+
+  @Override
+  public void setDrivePIDF(double drivekP, double drivekD) {
+    driveController.setP(drivekP);
+    driveController.setD(drivekD);
+  }
+
+  @Override
+  public void setTurnPIDF(double turnkP, double turnkD) {
+    turnController.setP(turnkP);
+    turnController.setD(turnkD);
   }
 }
