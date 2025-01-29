@@ -3,6 +3,7 @@ package frc.robot.subsystems.apriltagvision;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 import static frc.robot.util.LimelightHelpers.*;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
@@ -51,7 +52,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   @Override
   public void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {
-    SetRobotOrientation(name, poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    SetRobotOrientation(name, poseManager.getRotation().getDegrees(), Units.degreesToRadians(poseManager.robotVelocity().dtheta), 0, 0, 0, 0);
     PoseEstimate observation = getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
     inputs.estimatedPose = observation.pose;
