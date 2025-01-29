@@ -44,6 +44,8 @@ public class AprilTagVision extends VirtualSubsystem {
     // Exit if there are no tags in sight or the pose is blank
     if (inputs.tagCount == 0 || estimatedPose.equals(new Pose2d())) return;
 
+    // TODO add check for if the robot is off the ground
+
     // Exit if the estimated pose is off the field
     if (estimatedPose.getX() < -fieldBorderMargin
         || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
