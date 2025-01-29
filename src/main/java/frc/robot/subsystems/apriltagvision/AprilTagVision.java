@@ -28,8 +28,8 @@ public class AprilTagVision extends VirtualSubsystem {
   public AprilTagVision(AprilTagVisionIO io, PoseManager poseManager) {
     this.io = io;
     this.poseManager = poseManager;
-    // TODO pipelines are the setting configured in the limelight software. download the correct
-    // pipelines and add them to the code
+    // TODO download the correct pipelines and add them to the code
+    // pipelines are the setting configured in the limelight software
     io.setPipeline(Pipelines.HUMAN_MADE);
   }
 
