@@ -215,7 +215,7 @@ public class Drive extends SubsystemBase {
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
-    // Add velocity data to pose manager
+    // Add velocity data to pose manager, use gyro if possible
     ChassisSpeeds robotRelativeVelocity = getChassisSpeeds();
     robotRelativeVelocity.omegaRadiansPerSecond =
         gyroInputs.connected
