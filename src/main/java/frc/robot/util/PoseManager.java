@@ -133,6 +133,32 @@ public class PoseManager {
     return closestFace;
   }
 
+  public Branch closestLeftBranch() {
+    Branch closestBranch = Face.One.leftBranch;
+    double distanceToClosestLeftBranch = Double.MAX_VALUE;
+    for (Face face : Face.values()) {
+      double distance = getDistanceTo(apply(face.leftBranch.getPose()));
+      if (distance < distanceToClosestLeftBranch) {
+        distanceToClosestLeftBranch = distance;
+        closestBranch = face.leftBranch;
+      }
+    }
+    return closestBranch;
+  }
+
+  public Branch closestRightBranch() {
+    Branch closestBranch = Face.One.rightBranch;
+    double distanceToClosestRightBranch = Double.MAX_VALUE;
+    for (Face face : Face.values()) {
+      double distance = getDistanceTo(apply(face.rightBranch.getPose()));
+      if (distance < distanceToClosestRightBranch) {
+        distanceToClosestRightBranch = distance;
+        closestBranch = face.rightBranch;
+      }
+    }
+    return closestBranch;
+  }
+
   public Pose2d closestStation() {
     final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
     final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
