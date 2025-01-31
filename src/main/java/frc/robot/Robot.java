@@ -398,6 +398,10 @@ public class Robot extends LoggedRobot {
     new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
     new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
+    new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
+        .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .whileTrue(carriage.intakeCoral());
+
     // Sim fake gamepieces
     SmartDashboard.putData(
         "Toggle Coral in Carriage",
