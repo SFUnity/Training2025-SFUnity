@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.util.AllianceFlipUtil.apply;
 
 import edu.wpi.first.math.Matrix;
@@ -12,7 +13,6 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import static frc.robot.constantsGlobal.FieldConstants.*;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

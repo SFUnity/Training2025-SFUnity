@@ -50,7 +50,8 @@ public final class RobotCommands {
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
                     < switch (scoreState) {
-                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters.get();
+                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters
+                          .get();
                       case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters.get();
                     })
         .andThen(

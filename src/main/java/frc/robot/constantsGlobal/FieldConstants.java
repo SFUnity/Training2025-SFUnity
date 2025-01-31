@@ -60,9 +60,12 @@ public final class FieldConstants {
         new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
   }
 
-  public static final LoggedTunableNumber elevatorSafeExtensionDistanceMeters = new LoggedTunableNumber("Distances/elevatorExtension", 1);
-  public static final LoggedTunableNumber processorScoreDistanceMeters = new LoggedTunableNumber("Distances/processorScore", 0.1);
-  public static final LoggedTunableNumber intakeDistanceMeters = new LoggedTunableNumber("Distances/intake", 1);
+  public static final LoggedTunableNumber elevatorSafeExtensionDistanceMeters =
+      new LoggedTunableNumber("Distances/elevatorExtension", 1);
+  public static final LoggedTunableNumber processorScoreDistanceMeters =
+      new LoggedTunableNumber("Distances/processorScore", 0.1);
+  public static final LoggedTunableNumber intakeDistanceMeters =
+      new LoggedTunableNumber("Distances/intake", 1);
 
   public static final Translation2d reefCenter =
       new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
