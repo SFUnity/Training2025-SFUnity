@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.constantsGlobal.FieldConstants.Face;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
@@ -141,5 +142,15 @@ public class PoseManager {
     } else {
       return rightFaceFlipped;
     }
+  }
+
+  @AutoLogOutput
+  public double distanceToStationFace(double intakeDistanceOffsetMeters) {
+    Pose2d station = closestStation();
+    Rotation2d angleToStation = getHorizontalAngleTo(station);
+    Rotation2d stationAngle = station.getRotation();
+    double hypotenuse = getDistanceTo(station);
+    double angleDiff = angleToStation.minus(stationAngle).getRadians();
+    return -Math.cos(angleDiff) * hypotenuse + intakeDistanceOffsetMeters;
   }
 }

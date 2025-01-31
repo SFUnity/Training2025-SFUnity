@@ -41,6 +41,7 @@ public final class RobotCommands {
 
   private static double elevatorSafeExtensionDistanceMeters = 1;
   private static double processorScoreDistanceMeters = 0.1;
+  private static double intakeDistanceMeters = 1;
 
   public static Command fullScore(
       Drive drive,
