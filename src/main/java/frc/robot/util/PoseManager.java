@@ -124,7 +124,7 @@ public class PoseManager {
     Face closestFace = Face.One;
     double distanceToClosestFace = Double.MAX_VALUE;
     for (Face face : Face.values()) {
-      double distance = getDistanceTo(apply(face.pose));
+      double distance = getDistanceTo(apply(face.getPose()));
       if (distance < distanceToClosestFace) {
         distanceToClosestFace = distance;
         closestFace = face;
