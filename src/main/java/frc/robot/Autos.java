@@ -187,8 +187,7 @@ public class Autos {
         .done()
         .onTrue(
             Commands.sequence(
-                // INTAKE CORAL, you should use a binding here so that when as the robot approaches
-                // the station it starts intaking
+                // INTAKE CORAL, see robot.configureBindings
                 stationHighToLKL2.cmd()));
     stationHighToLKL2
         .done()
