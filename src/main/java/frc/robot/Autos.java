@@ -178,7 +178,9 @@ public class Autos {
             elevator
                 .request(L1) // Set the elevator to go to L1
                 .andThen(score(elevator, carriage)) // Run score command
-                .andThen(runOnce(() -> scoreState = Dealgify), fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
+                .andThen(
+                    runOnce(() -> scoreState = Dealgify),
+                    fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
                 .andThen(lKToStationHigh.cmd()) // START NEXT PATH
             );
     lKToStationHigh
