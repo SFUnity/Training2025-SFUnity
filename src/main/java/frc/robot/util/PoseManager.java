@@ -7,6 +7,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -123,7 +124,7 @@ public class PoseManager {
     Face closestFace = Face.One;
     double distanceToClosestFace = Double.MAX_VALUE;
     for (Face face : Face.values()) {
-      double distance = getDistanceTo(apply(face.pose));
+      double distance = getDistanceTo(apply(face.getPose()));
       if (distance < distanceToClosestFace) {
         distanceToClosestFace = distance;
         closestFace = face;
@@ -145,11 +146,13 @@ public class PoseManager {
 
   @AutoLogOutput
   public double distanceToStationFace() {
-    Pose2d station = closestStation();
+    Pose2d station =
+        closestStation()
+            .transformBy(new Transform2d(intakeDistanceMeters.get(), 0, Rotation2d.kZero));
     Rotation2d angleToStation = getHorizontalAngleTo(station);
     Rotation2d stationAngle = station.getRotation();
     double hypotenuse = getDistanceTo(station);
     double angleDiff = angleToStation.minus(stationAngle).getRadians();
-    return -Math.cos(angleDiff) * hypotenuse + intakeDistanceMeters.get();
+    return -Math.cos(angleDiff) * hypotenuse;
   }
 }
