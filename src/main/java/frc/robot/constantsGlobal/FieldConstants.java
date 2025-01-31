@@ -65,7 +65,7 @@ public final class FieldConstants {
   public static final LoggedTunableNumber processorScoreDistanceMeters =
       new LoggedTunableNumber("Distances/processorScore", 0.1);
   public static final LoggedTunableNumber intakeDistanceMeters =
-      new LoggedTunableNumber("Distances/intake", 1);
+      new LoggedTunableNumber("Distances/intake", .5);
 
   public static final Translation2d reefCenter =
       new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
