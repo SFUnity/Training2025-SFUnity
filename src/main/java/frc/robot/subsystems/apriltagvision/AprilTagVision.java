@@ -38,7 +38,7 @@ public class AprilTagVision extends VirtualSubsystem {
     Logger.processInputs("AprilTagVision", inputs);
 
     // TODO when testing start with no checks, then slowly add in order to not lose too much data
-    
+
     Pose2d estimatedPose = inputs.estimatedPose.toPose2d();
 
     // Exit if there are no tags in sight or the pose is blank or the robot is spinning too fast
