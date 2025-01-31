@@ -183,12 +183,8 @@ public class Autos {
                     fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
                 .andThen(lKToStationHigh.cmd()) // START NEXT PATH
             );
-    lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL, see robot.configureBindings
-                stationHighToLKL2.cmd()));
+    lKToStationHigh.done().onTrue(stationHighToLKL2.cmd());
+    // For intaking coral see robot.configureBindings, state-based triggers, all the time
     stationHighToLKL2
         .done()
         .onTrue(
