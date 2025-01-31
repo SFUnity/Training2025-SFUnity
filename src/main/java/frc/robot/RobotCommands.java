@@ -130,17 +130,7 @@ public final class RobotCommands {
                 drive
                     .headingDrive(
                         () -> {
-                          final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
-                          final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
-                          Pose2d closerStation;
-
-                          if (poseManager.getDistanceTo(leftFaceFlipped)
-                              < poseManager.getDistanceTo(rightFaceFlipped)) {
-                            closerStation = leftFaceFlipped;
-                          } else {
-                            closerStation = rightFaceFlipped;
-                          }
-                          return closerStation.getRotation();
+                          return poseManager.closestStation().getRotation();
                         })
                     .withDeadline(carriage.intakeCoral()),
             Ground, intake.intakeCmd(),

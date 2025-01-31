@@ -131,4 +131,16 @@ public class PoseManager {
     }
     return closestFace;
   }
+
+  public Pose2d closestStation() {
+    final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+    final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
+
+    if (getDistanceTo(leftFaceFlipped)
+        < getDistanceTo(rightFaceFlipped)) {
+      return leftFaceFlipped;
+    } else {
+      return rightFaceFlipped;
+    }
+  }
 }
