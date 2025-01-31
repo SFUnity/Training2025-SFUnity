@@ -355,9 +355,9 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
-    driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
     driver
-        .rightBumper()
+        .leftBumper()
         .whileTrue(
             fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
                 .beforeStarting(
