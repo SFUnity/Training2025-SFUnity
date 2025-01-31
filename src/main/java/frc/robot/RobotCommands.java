@@ -39,10 +39,6 @@ public final class RobotCommands {
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
-  private static double elevatorSafeExtensionDistanceMeters = 1;
-  private static double processorScoreDistanceMeters = 0.1;
-  private static double intakeDistanceMeters = 1;
-
   public static Command fullScore(
       Drive drive,
       Elevator elevator,
@@ -54,8 +50,8 @@ public final class RobotCommands {
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
                     < switch (scoreState) {
-                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters;
-                      case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters;
+                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters.get();
+                      case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters.get();
                     })
         .andThen(
             Commands.select(

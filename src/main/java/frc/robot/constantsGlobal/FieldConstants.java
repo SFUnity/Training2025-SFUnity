@@ -9,6 +9,7 @@ package frc.robot.constantsGlobal;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import frc.robot.util.LoggedTunableNumber;
 
 /**
  * Contains various field dimensions and useful reference points. All units are in meters and poses
@@ -58,6 +59,10 @@ public final class FieldConstants {
     public static final Pose2d rightIceCream =
         new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
   }
+
+  public static final LoggedTunableNumber elevatorSafeExtensionDistanceMeters = new LoggedTunableNumber("Distances/elevatorExtension", 1);
+  public static final LoggedTunableNumber processorScoreDistanceMeters = new LoggedTunableNumber("Distances/processorScore", 0.1);
+  public static final LoggedTunableNumber intakeDistanceMeters = new LoggedTunableNumber("Distances/intake", 1);
 
   public static final Translation2d reefCenter =
       new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
