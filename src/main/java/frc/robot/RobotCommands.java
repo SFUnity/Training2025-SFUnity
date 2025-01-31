@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -27,7 +26,7 @@ import java.util.function.Supplier;
 /** Put high level commands here */
 public final class RobotCommands {
   public static Command score(Elevator elevator, Carriage carriage) {
-    return Commands.sequence(elevator.enableElevator(), carriage.placeCoral());
+    return elevator.enableElevator().andThen(carriage.placeCoral()).withName("score");
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, BooleanSupplier high) {
@@ -40,9 +39,6 @@ public final class RobotCommands {
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
-  private static double elevatorSafeExtensionDistanceMeters = 1;
-  private static double processorScoreDistanceMeters = 0.1;
-
   public static Command fullScore(
       Drive drive,
       Elevator elevator,
@@ -54,8 +50,9 @@ public final class RobotCommands {
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
                     < switch (scoreState) {
-                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters;
-                      case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters;
+                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters
+                          .get();
+                      case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters.get();
                     })
         .andThen(
             Commands.select(
@@ -99,11 +96,11 @@ public final class RobotCommands {
     return () -> {
       switch (scoreState) {
         case LeftBranch:
-          return apply(poseManager.closestFace().leftBranch.pose);
+          return apply(poseManager.closestFace().leftBranch.getPose());
         case RightBranch:
-          return apply(poseManager.closestFace().rightBranch.pose);
+          return apply(poseManager.closestFace().rightBranch.getPose());
         case Dealgify:
-          return apply(poseManager.closestFace().pose);
+          return apply(poseManager.closestFace().getPose());
         case ProcessorFront:
           return apply(processorScore);
         case ProcessorBack:
@@ -135,19 +132,9 @@ public final class RobotCommands {
                 drive
                     .headingDrive(
                         () -> {
-                          final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
-                          final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
-                          Pose2d closerStation;
-
-                          if (poseManager.getDistanceTo(leftFaceFlipped)
-                              < poseManager.getDistanceTo(rightFaceFlipped)) {
-                            closerStation = leftFaceFlipped;
-                          } else {
-                            closerStation = rightFaceFlipped;
-                          }
-                          return closerStation.getRotation();
+                          return poseManager.closestStation().getRotation();
                         })
-                    .withDeadline(carriage.intakeCoral()),
+                    .until(carriage::coralHeld),
             Ground, intake.intakeCmd(),
             Ice_Cream, carriage.lowDealgify()),
         () -> intakeState);

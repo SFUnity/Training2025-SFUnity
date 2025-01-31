@@ -355,9 +355,9 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
-    driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
     driver
-        .rightBumper()
+        .leftBumper()
         .whileTrue(
             fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
                 .beforeStarting(
@@ -392,11 +392,22 @@ public class Robot extends LoggedRobot {
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
     // State-Based Triggers
+    // Teleop Only
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
+        .and(() -> DriverStation.isTeleop())
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
-    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+    new Trigger(carriage::algaeHeld)
+        .and(() -> DriverStation.isTeleop())
+        .onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(intake::algaeHeld)
+        .and(() -> DriverStation.isTeleop())
+        .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+
+    // All the time
+    new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
+        .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces
     SmartDashboard.putData(
