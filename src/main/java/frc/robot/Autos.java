@@ -181,17 +181,22 @@ public class Autos {
                 .andThen(
                     runOnce(() -> scoreState = Dealgify),
                     fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
-                .andThen(lKToStationHigh.cmd()) // START NEXT PATH
             );
-    lKToStationHigh.done().onTrue(stationHighToLKL2.cmd());
+    centerToLK
+        .done()
+        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(lKToStationHigh.cmd()));
+    lKToStationHigh.done().onTrue( // may need to add a small wait command here depending on how mechanical works
+        stationHighToLKL2.cmd());
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
     stationHighToLKL2
         .done()
         .onTrue(
             elevator
                 .request(L3) // Set the elevator to go to L3
-                .andThen(score(elevator, carriage)) // Run score command
-                .andThen(lKToStationHigh.cmd()));
+                .andThen(score(elevator, carriage))); // Run score command
+    stationHighToLKL2
+        .done()
+        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(lKToStationHigh.cmd()));
 
     return routine;
   }
