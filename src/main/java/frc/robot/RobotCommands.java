@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 /** Put high level commands here */
 public final class RobotCommands {
   public static Command score(Elevator elevator, Carriage carriage) {
-    return Commands.sequence(elevator.enableElevator(), carriage.placeCoral());
+    return elevator.enableElevator().andThen(carriage.placeCoral()).withName("score");
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, BooleanSupplier high) {
