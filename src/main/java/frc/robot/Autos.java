@@ -197,8 +197,6 @@ public class Autos {
                 .andThen(score(elevator, carriage)) // Run score command
                 .andThen(lKToStationHigh.cmd()));
 
-    // I'm not quite sure how to make it loop given you want the same thing to happen multiple
-    // times. I'm going to ask on the Sleipnir discord
     return routine;
   }
 
