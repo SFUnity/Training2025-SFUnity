@@ -185,8 +185,10 @@ public class Autos {
     centerToLK
         .done()
         .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(lKToStationHigh.cmd()));
-    lKToStationHigh.done().onTrue( // may need to add a small wait command here depending on how mechanical works
-        stationHighToLKL2.cmd());
+    lKToStationHigh
+        .done()
+        .onTrue( // may need to add a small wait command here depending on how mechanical works
+            stationHighToLKL2.cmd());
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
     stationHighToLKL2
         .done()
