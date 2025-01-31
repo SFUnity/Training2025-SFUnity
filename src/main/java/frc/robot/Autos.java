@@ -2,7 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static frc.robot.RobotCommands.*;
-import static frc.robot.RobotCommands.ScoreState.LeftBranch;
+import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 
 import choreo.auto.AutoChooser;
@@ -177,12 +177,8 @@ public class Autos {
         .onTrue( // When centerToLK is done
             elevator
                 .request(L1) // Set the elevator to go to L1
-                .alongWith(
-                    runOnce(() -> scoreState = LeftBranch), // Get ready to score on the left branch
-                    runOnce(
-                        () -> dealgifyAfterPlacing = true)) // Make the robot dealgify after scoring
-                .andThen(
-                    fullScore(drive, elevator, carriage, intake, poseManager)) // Run score command
+                .andThen(score(elevator, carriage)) // Run score command
+                .andThen(runOnce(() -> scoreState = Dealgify), fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
                 .andThen(lKToStationHigh.cmd()) // START NEXT PATH
             );
     lKToStationHigh
@@ -196,9 +192,8 @@ public class Autos {
         .done()
         .onTrue(
             elevator
-                .request(L3) // Set the elevator to go to L3 (the robot still knows to score on the
-                // LeftBranch from last time)
-                .andThen(fullScore(drive, elevator, carriage, intake, poseManager))
+                .request(L3) // Set the elevator to go to L3
+                .andThen(score(elevator, carriage)) // Run score command
                 .andThen(lKToStationHigh.cmd()));
 
     // I'm not quite sure how to make it loop given you want the same thing to happen multiple
