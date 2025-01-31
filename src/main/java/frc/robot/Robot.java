@@ -355,9 +355,9 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
-    driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
     driver
-        .rightBumper()
+        .leftBumper()
         .whileTrue(
             fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
                 .beforeStarting(
@@ -397,6 +397,10 @@ public class Robot extends LoggedRobot {
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
     new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+
+    new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
+        .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces
     SmartDashboard.putData(
