@@ -129,7 +129,7 @@ public final class RobotCommands {
                         () -> {
                           return poseManager.closestStation().getRotation();
                         })
-                    .withDeadline(carriage.intakeCoral()),
+                    .until(carriage::coralHeld),
             Ground, intake.intakeCmd(),
             Ice_Cream, carriage.lowDealgify()),
         () -> intakeState);
