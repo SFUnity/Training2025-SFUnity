@@ -136,8 +136,7 @@ public class PoseManager {
     final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
     final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
 
-    if (getDistanceTo(leftFaceFlipped)
-        < getDistanceTo(rightFaceFlipped)) {
+    if (getDistanceTo(leftFaceFlipped) < getDistanceTo(rightFaceFlipped)) {
       return leftFaceFlipped;
     } else {
       return rightFaceFlipped;
