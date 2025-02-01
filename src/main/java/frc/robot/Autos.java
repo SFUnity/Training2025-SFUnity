@@ -142,7 +142,10 @@ public class Autos {
     CenterWallToLK.done()
         .onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-                // SCORE CORAL L1 KL
+            elevator
+            .request(L2)
+            .andThen(score(elevator, carriage))
+            .andThen(runOnce(() -> {scoreState = Dealgify;}), fullScore(drive, elevator, carriage, intake, poseManager)), // Dealgify
                 lKToStationHigh.cmd() // START NEXT PATH
                 ));
     lKToStationHigh
@@ -223,21 +226,26 @@ public class Autos {
     routine
         .active()
         .onTrue(
-            Commands.sequence(
-                Commands.print("Performing WallLKAlgaeL2L3 Auto!"),
-                centerWallToJI.resetOdometry(),
-                centerWallToJI.cmd()));
+
+        Commands.sequence(
+            centerWallToJI.resetOdometry(), centerWallToJI.cmd() // start traj
+            )
+        );
+        
     centerWallToJI
         .done()
         .onTrue(
             Commands.sequence(
-                // SCORE CORAL L2 IJ
+                elevator
+                .request(L2)
+                .andThen(score(elevator, carriage))
+                .andThen(runOnce(() -> {scoreState = Dealgify;}), fullScore(drive, elevator, carriage, intake, poseManager)), // Dealgify
                 jIToKLAlgae.cmd()));
     jIToKLAlgae
         .done()
         .onTrue(
             Commands.sequence(
-                // REMOVE ALGAE L2 LK
+                runOnce(() -> {scoreState = Dealgify;}), fullScore(drive, elevator, carriage, intake, poseManager),
                 lKToStationHigh.cmd()));
     lKToStationHigh
         .done()
@@ -249,39 +257,10 @@ public class Autos {
         .done()
         .onTrue(
             Commands.sequence(
-                // SCORE CORAL L2/3
+                elevator
+                .request(L3)
+                .andThen(score(elevator, carriage)),
                 lKToStationHigh.cmd()));
-    lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL
-                stationHighToLKL2.cmd()));
-
-    stationHighToLKL2
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // SCORE CORAL L2/3
-                lKToStationHigh.cmd()));
-    lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL
-                stationHighToLKL2.cmd()));
-    stationHighToLKL2
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // SCORE CORAL L2/3
-                lKToStationHigh.cmd()));
-    lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL
-                stationHighToLKL2.cmd()));
     return routine;
   }
 
@@ -298,33 +277,36 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.print("Performing CenterGHProcessorEFProcessorCDProcessorAlgaeIL2 Auto!"),
                 centerToGH.resetOdometry(),
                 centerToGH.cmd()));
     centerToGH
         .done()
         .onTrue(
             Commands.sequence(
-                // SCORE CORAL L1 GH
-                // REMOVE ALGAE L2 GH KEEP
+                elevator
+                .request(L2)
+                .andThen(score(elevator, carriage))
+                .andThen(runOnce(() -> {scoreState = Dealgify;}), fullScore(drive, elevator, carriage, intake, poseManager)), // Dealgify
                 gHToProcessorScore.cmd()));
     gHToProcessorScore
         .done()
         .onTrue(
             Commands.sequence(
-                // SCORE ALGAE
-                processorScoreToEFAlgae.cmd()));
+                //score algae
+                ));
     processorScoreToEFAlgae
         .done()
         .onTrue(
             Commands.sequence(
-                // REMOVE ALGAE L3 EF
+                runOnce(() -> {scoreState = Dealgify;}), 
+                fullScore(drive, elevator, carriage, intake, poseManager),
                 eFToCD.cmd()));
     eFToCD
         .done()
         .onTrue(
             Commands.sequence(
-                // REMOVE ALGAE L2 CD KEEP
+                runOnce(() -> {scoreState = Dealgify;}), 
+                fullScore(drive, elevator, carriage, intake, poseManager),
                 cDprocessorScore.cmd()));
 
     return routine;
@@ -406,8 +388,10 @@ public class Autos {
         .done()
         .onTrue(
             Commands.sequence(
-                // SCORE CORAL L1 GH
-                // REMOVE ALGAE L2 GH KEEP
+                elevator
+                .request(L2)
+                .andThen(score(elevator, carriage))
+                .andThen(runOnce(() -> {scoreState = Dealgify;}), fullScore(drive, elevator, carriage, intake, poseManager)),
                 jIToGH.cmd()));
     jIToGH
         .done()
@@ -419,7 +403,9 @@ public class Autos {
         .done()
         .onTrue(
             Commands.sequence(
-                // REMOVE ALGAE L3 EF
+                elevator
+                    .request(L3)
+                    .andThen(RobotCommands.score(elevator, carriage)),
                 processorScoreToEFAlgae.cmd()));
     processorScoreToEFAlgae.done().onTrue(Commands.sequence(eFToProcessorScore.cmd()));
     return routine;
