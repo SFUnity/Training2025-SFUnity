@@ -20,6 +20,8 @@ import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
 
+import java.util.Map;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
@@ -359,7 +361,17 @@ public class Robot extends LoggedRobot {
     driver
         .leftBumper()
         .whileTrue(
-            fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
+            Commands.select(Map.of(
+              LeftBranch,
+              scoreCoral(elevator, carriage, poseManager),
+              Dealgify,
+              dealgify(elevator, carriage, poseManager),
+              ProcessorFront,
+              scoreProcessor(carriage, intake, poseManager, true),
+              ProcessorBack,
+              scoreProcessor(carriage, intake, poseManager, false)
+            ), () -> scoreState == RightBranch ? LeftBranch : scoreState)
+            .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
                 .beforeStarting(
                     () -> {
                       if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())

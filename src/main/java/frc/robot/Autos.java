@@ -171,16 +171,15 @@ public class Autos {
     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
     // When the routine begins, reset odometry and start the first trajectory
-    routine.active().onTrue(CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd()));
-    // TODO make it so that the elevator will extend as soon as the robot is nearby
+    routine
+        .active()
+        .onTrue(
+            CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd().alongWith(null)));
     CenterWallToLKAlgae.done()
         .onTrue( // When CenterWallToLKAlgae is done
             elevator
                 .request(L1) // Set the elevator to go to L1
                 .andThen(score(elevator, carriage)) // Run score command
-                .andThen(
-                    runOnce(() -> scoreState = Dealgify),
-                    fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
             );
     CenterWallToLKAlgae.done()
         .onTrue(Commands.waitUntil(() -> carriage.algaeHeld()).andThen(LKToStationHigh.cmd()));
