@@ -62,9 +62,9 @@ public final class RobotCommands {
     return () -> {
       switch (scoreState) {
         case LeftBranch:
-          return apply(poseManager.closestFace().leftBranch.getPose());
+          return apply(poseManager.closestLeftBranch().getPose());
         case RightBranch:
-          return apply(poseManager.closestFace().rightBranch.getPose());
+          return apply(poseManager.closestRightBranch().getPose());
         case Dealgify:
           return apply(poseManager.closestFace().getPose());
         case ProcessorFront:
