@@ -124,7 +124,7 @@ public class Autos {
 
     // Load the routine's trajectories
     AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
-    AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
+    AutoTrajectory CenterWallToLK = routine.trajectory("CenterWallToLK");
     AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
     AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
 
@@ -133,10 +133,10 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                centerToLK.resetOdometry(), centerToLK.cmd() // start traj
+                CenterWallToLK.resetOdometry(), CenterWallToLK.cmd() // start traj
                 ));
 
-    centerToLK
+    CenterWallToLK
         .done()
         .onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
@@ -160,21 +160,23 @@ public class Autos {
   }
 
   public AutoRoutine WallLKAlgaeL2L3() {
-    AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
-    AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
-    AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
-    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
+    AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
+    AutoTrajectory CenterWallToLK = routine.trajectory("CenterWallToLK");
+    AutoTrajectory LKToStationHigh = routine.trajectory("LKToStationHigh");
+    AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
+    AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
+
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                centerToLK.resetOdometry(), centerToLK.cmd() // start traj
+                CenterWallToLK.resetOdometry(), CenterWallToLK.cmd() // start traj
                 ));
-    centerToLK
+    CenterWallToLK
         .done()
-        .onTrue( // When centerToLK is done
+        .onTrue( // When CenterWallToLK is done
             elevator
                 .request(L1) // Set the elevator to go to L1
                 .andThen(score(elevator, carriage)) // Run score command
@@ -182,23 +184,23 @@ public class Autos {
                     runOnce(() -> scoreState = Dealgify),
                     fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
             );
-    centerToLK
+    CenterWallToLK
         .done()
-        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(lKToStationHigh.cmd()));
-    lKToStationHigh
+        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(LKToStationHigh.cmd()));
+    LKToStationHigh
         .done()
         .onTrue( // may need to add a small wait command here depending on how mechanical works
-            stationHighToLKL2.cmd());
+            StationHighToK.cmd());
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
-    stationHighToLKL2
+    StationHighToK
         .done()
         .onTrue(
             elevator
                 .request(L3) // Set the elevator to go to L3
                 .andThen(score(elevator, carriage))); // Run score command
-    stationHighToLKL2
+    StationHighToK
         .done()
-        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(lKToStationHigh.cmd()));
+        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(LKToStationHigh.cmd()));
 
     return routine;
   }
