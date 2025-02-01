@@ -38,6 +38,9 @@ public class Autos {
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
   private static final boolean isChoreoAuto = true;
 
+  private int coralOnL3 = 0;
+  private int coralOnL2 = 0;
+
   public Autos(
       Drive drive, Carriage carriage, Elevator elevator, Intake intake, PoseManager poseManager) {
     this.drive = drive;
@@ -124,7 +127,7 @@ public class Autos {
 
     // Load the routine's trajectories
     AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
-    AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
+    AutoTrajectory CenterWallToLK = routine.trajectory("CenterWallToLK");
     AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
     AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
 
@@ -133,11 +136,10 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                centerToLK.resetOdometry(), centerToLK.cmd() // start traj
+                CenterWallToLK.resetOdometry(), CenterWallToLK.cmd() // start traj
                 ));
 
-    centerToLK
-        .done()
+    CenterWallToLK.done()
         .onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
                 // SCORE CORAL L1 KL
@@ -160,21 +162,16 @@ public class Autos {
   }
 
   public AutoRoutine WallLKAlgaeL2L3() {
-    AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
-    AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
-    AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
-    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
+    AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
+    AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToLKAlgae");
+    AutoTrajectory LKToStationHigh = routine.trajectory("LKToStationHigh");
+    AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
+    AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
 
     // When the routine begins, reset odometry and start the first trajectory
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                centerToLK.resetOdometry(), centerToLK.cmd() // start traj
-                ));
-    centerToLK
-        .done()
-        .onTrue( // When centerToLK is done
+    routine.active().onTrue(CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd()));
+    CenterWallToLKAlgae.done()
+        .onTrue( // When CenterWallToLKAlgae is done
             elevator
                 .request(L1) // Set the elevator to go to L1
                 .andThen(score(elevator, carriage)) // Run score command
@@ -182,23 +179,20 @@ public class Autos {
                     runOnce(() -> scoreState = Dealgify),
                     fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
             );
-    centerToLK
-        .done()
-        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(lKToStationHigh.cmd()));
-    lKToStationHigh
-        .done()
+    CenterWallToLKAlgae.done()
+        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(LKToStationHigh.cmd()));
+    // Add binding in choreo to shoot out the algae
+    LKToStationHigh.done()
         .onTrue( // may need to add a small wait command here depending on how mechanical works
-            stationHighToLKL2.cmd());
+            StationHighToK.cmd());
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
-    stationHighToLKL2
-        .done()
+    StationHighToK.done()
         .onTrue(
-            elevator
-                .request(L3) // Set the elevator to go to L3
-                .andThen(score(elevator, carriage))); // Run score command
-    stationHighToLKL2
-        .done()
-        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(lKToStationHigh.cmd()));
+            Commands.either(elevator.request(L2), elevator.request(L3), () -> coralOnL3 >= 2)
+                .andThen(
+                    score(elevator, carriage), runOnce(() -> coralOnL3 += 1))); // Run score command
+    StationHighToK.done()
+        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(LKToStationHigh.cmd()));
 
     return routine;
   }
@@ -345,12 +339,12 @@ public class Autos {
                 drive.fullAutoDrive(
                     () ->
                         AllianceFlipUtil.apply(
-                            poseManager.closestFace().rightBranch.pose)), // get closest branch
+                            poseManager.closestFace().rightBranch.getPose())), // get closest branch
                 elevator
                     .request(L1)
                     .andThen(RobotCommands.score(elevator, carriage)), // score on L1
                 // //Tell next pos (L3)
-                drive.fullAutoDrive(() -> poseManager.closestFace().pose),
+                drive.fullAutoDrive(() -> poseManager.closestFace().getPose()),
                 elevator
                     .request(AlgaeHigh)
                     .andThen(elevator.enableElevator()) // delagify pt1
@@ -368,7 +362,7 @@ public class Autos {
                 drive.fullAutoDrive(
                     () ->
                         AllianceFlipUtil.apply(
-                            poseManager.closestFace().rightBranch.pose)), // get closest branch
+                            poseManager.closestFace().rightBranch.getPose())), // get closest branch
                 elevator
                     .request(L3)
                     .andThen(RobotCommands.score(elevator, carriage)), // score on L3
