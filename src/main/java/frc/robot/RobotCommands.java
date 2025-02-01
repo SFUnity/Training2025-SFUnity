@@ -17,6 +17,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /** Put high level commands here */
@@ -35,23 +36,25 @@ public final class RobotCommands {
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
+    BooleanSupplier highAlgae = () -> poseManager.closestFace().highAlgae;
     return Commands.either(
             elevator.request(AlgaeHigh),
             elevator.request(AlgaeLow),
-            () -> poseManager.closestFace().highAlgae)
+            highAlgae)
         .andThen(elevator.enableElevator())
         .alongWith(
             Commands.either(
                 carriage.highDealgify(),
                 carriage.lowDealgify(),
-                () -> poseManager.closestFace().highAlgae))
+                highAlgae))
         .onlyIf(
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
                     < elevatorSafeExtensionDistanceMeters.get());
   }
 
-  public static Command scoreProcessor(Carriage carriage, Intake intake, PoseManager poseManager, boolean front) {
+  public static Command scoreProcessor(
+      Carriage carriage, Intake intake, PoseManager poseManager, boolean front) {
     return Commands.either(carriage.scoreProcessor(), intake.poopCmd(), () -> front)
         .onlyIf(
             () ->
