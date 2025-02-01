@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -52,6 +53,9 @@ public class Intake extends SubsystemBase {
     setpointVisualizer.update(positionSetpoint);
     Logger.recordOutput("Intake/positionSetpointRadians", positionSetpoint.in(Radians));
     Util.logSubsystem(this, "Intake");
+
+    Leds.getInstance().intakeAlgaeHeld = algaeHeld();
+    
   }
 
   private void lower() {

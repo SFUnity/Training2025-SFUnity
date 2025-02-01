@@ -6,6 +6,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -39,6 +40,8 @@ public class Carriage extends SubsystemBase {
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
     Util.logSubsystem(this, "Carriage");
+    Leds.getInstance().coralHeld = coralHeld();
+    Leds.getInstance().carriageAlgaeHeld = algaeHeld();
   }
 
   @AutoLogOutput

@@ -2,17 +2,19 @@
 
 package frc.robot.subsystems.leds;
 
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.wpilibj.LEDPattern.*;
+
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
-
-import static edu.wpi.first.units.Units.InchesPerSecond;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.wpilibj.LEDPattern.*;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.LEDPattern.GradientType;
@@ -20,6 +22,8 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.util.VirtualSubsystem;
+
+import java.util.Map;
 import java.util.Optional;
 
 public class Leds extends VirtualSubsystem {
@@ -36,12 +40,17 @@ public class Leds extends VirtualSubsystem {
   // TODO change these to be what you need for the season
   public int loopCycleCount = 0;
   public boolean intakeWorking = true;
-  public boolean noteInShooter = false;
+  
+  public boolean coralHeld = false;
+  public boolean carriageAlgaeHeld = false;
+  public boolean intakeAlgaeHeld = false;
   public boolean tagsDetected = false;
-  public boolean alignedWithTarget = false;
   public boolean autoFinished = false;
   public double autoFinishedTime = 0.0;
   public boolean lowBatteryAlert = false;
+  public boolean autoAllignActivated = false;
+  public boolean alignedWithTarget = false;
+
 
   private Optional<Alliance> alliance = Optional.empty();
   private Color allianceColor = Color.kOrange;
@@ -66,6 +75,8 @@ public class Leds extends VirtualSubsystem {
   private static final double autoFadeTime = 2.5; // 3s nominal
   private static final double autoFadeMaxTime = 5.0; // Return to normal
 
+  private LEDPattern pattern = solid(Color.kBlack); // Default to off
+
   // ! May have lost something when copying into our code
   private Leds() {
     leds = new AddressableLED(9);
@@ -77,7 +88,10 @@ public class Leds extends VirtualSubsystem {
         new Notifier(
             () -> {
               synchronized (this) {
-                gradient(GradientType.kDiscontinuous, Color.kWhite, Color.kBlack).breathe(breathDuration).applyTo(buffer);;
+                gradient(GradientType.kDiscontinuous, Color.kWhite, Color.kBlack)
+                    .breathe(breathDuration)
+                    .applyTo(buffer);
+                ;
                 leds.setData(buffer);
               }
             });
@@ -118,13 +132,18 @@ public class Leds extends VirtualSubsystem {
     loadingNotifier.stop();
 
     // Select LED mode
-    LEDPattern pattern = solid(Color.kBlack); // Default to off
+    
     if (estopped) {
       pattern = solid(Color.kDarkRed);
     } else if (DriverStation.isDisabled()) {
+      
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
         // Auto fade
-        pattern = solid(Color.kGreen).mask(progressMaskLayer(() -> 1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime)));
+        pattern =
+            solid(Color.kGreen)
+                .mask(
+                    progressMaskLayer(
+                        () -> 1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime)));
       } else if (lowBatteryAlert) {
         pattern = solid(Color.kOrangeRed);
       } else if (prideLeds) {
@@ -132,31 +151,68 @@ public class Leds extends VirtualSubsystem {
         rainbow(255, 128).scrollAtAbsoluteSpeed(InchesPerSecond.of(1), ledSpacing);
       } else {
         // Default pattern
-        pattern = gradient(GradientType.kContinuous, allianceColor, secondaryDisabledColor).scrollAtAbsoluteSpeed(waveAllianceCycleLength, ledSpacing);
+        pattern =
+            gradient(GradientType.kContinuous, allianceColor, secondaryDisabledColor)
+                .scrollAtAbsoluteSpeed(waveAllianceCycleLength, ledSpacing);
       }
     } else if (DriverStation.isAutonomous()) {
-      pattern = gradient(GradientType.kContinuous, Color.kOrangeRed, Color.kDarkBlue).scrollAtAbsoluteSpeed(waveFastCycleLength, ledSpacing);
+      pattern =
+          gradient(GradientType.kContinuous, Color.kOrangeRed, Color.kDarkBlue)
+              .scrollAtAbsoluteSpeed(waveFastCycleLength, ledSpacing);
       if (autoFinished) {
-        pattern = solid(Color.kGreen).mask(progressMaskLayer(() -> Timer.getFPGATimestamp() - autoFinishedTime));
+        pattern =
+            solid(Color.kGreen)
+                .mask(progressMaskLayer(() -> Timer.getFPGATimestamp() - autoFinishedTime));
       }
     } else { // Enabled
-      if (!noteInShooter) {
-        if (intakeWorking) {
-          pattern = solid(Color.kRed);
-        } else {
-          pattern = solid(Color.kYellow);
-        }
-      } else if (!tagsDetected) {
-        pattern = solid(Color.kBlue);
-      } else if (!alignedWithTarget) {
-        pattern = solid(Color.kPurple);
-      } else if (alignedWithTarget) {
+      if(alignedWithTarget){
         pattern = solid(Color.kGreen);
       }
+      else if(autoAllignActivated){
+        blink(Color.kGreen, Seconds.of(0.5));
+      }
+      if(coralHeld){
+        pattern = solid(Color.kWhite);
+      }
+      else if(intakeAlgaeHeld){
+        pattern = solid(Color.kSeaGreen);
+      }
+      else if(carriageAlgaeHeld){
+        pattern = solid(Color.kPurple);
+      }
+      else{
+        teamColors();
+      }
+
+      
+      // if (!coralHeld) {
+      //   if (intakeWorking) {
+      //     pattern = solid(Color.kRed);
+      //   } else {
+      //     pattern = solid(Color.kYellow);
+      //   }
+      // } else if (!tagsDetected) {
+      //   pattern = solid(Color.kBlue);
+      // } else if (!alignedWithTarget) {
+      //   pattern = solid(Color.kPurple);
+      // } else if (alignedWithTarget) {
+      //   pattern = solid(Color.kGreen);
+      // }
     }
 
     // Update LEDs
     pattern.applyTo(buffer);
     leds.setData(buffer);
+  }
+
+
+  private void blink(Color color, Time blink){
+    LEDPattern base = solid(color);
+    pattern =  base.blink(blink);
+  }
+
+  private void teamColors(){
+    LEDPattern base = LEDPattern.steps(Map.of(0, Color.kOrange, 0.5, Color.kBlue));
+    pattern = base.scrollAtAbsoluteSpeed(Centimeters.per(Second).of(12.5), ledSpacing);
   }
 }

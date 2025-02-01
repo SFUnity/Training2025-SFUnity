@@ -476,11 +476,13 @@ public class Drive extends SubsystemBase {
         .beforeStarting(
             () -> {
               resetControllers(goalPose.get());
+              Leds.getInstance().autoAllignActivated = true;
             })
         .finallyDo(
             () -> {
               stop();
               Leds.getInstance().alignedWithTarget = false;
+              Leds.getInstance().autoAllignActivated = false;
             })
         .withName("Full Auto Drive");
   }
