@@ -20,8 +20,6 @@ import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
 
-import java.util.Map;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
@@ -61,6 +59,7 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -361,22 +360,34 @@ public class Robot extends LoggedRobot {
     driver
         .leftBumper()
         .whileTrue(
-            Commands.select(Map.of(
-              LeftBranch,
-              scoreCoral(elevator, carriage, poseManager),
-              Dealgify,
-              dealgify(elevator, carriage, poseManager),
-              ProcessorFront,
-              scoreProcessor(carriage, intake, poseManager, true),
-              ProcessorBack,
-              scoreProcessor(carriage, intake, poseManager, false)
-            ), () -> scoreState == RightBranch ? LeftBranch : scoreState)
-            .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+            Commands.select(
+                    Map.of(
+                        LeftBranch,
+                        scoreCoral(elevator, carriage, poseManager),
+                        Dealgify,
+                        dealgify(elevator, carriage, poseManager),
+                        ProcessorFront,
+                        scoreProcessor(carriage, intake, poseManager, true),
+                        ProcessorBack,
+                        scoreProcessor(carriage, intake, poseManager, false)),
+                    () -> scoreState == RightBranch ? LeftBranch : scoreState)
+                .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
                 .beforeStarting(
                     () -> {
                       if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
-                    }));
+                    })
+                .andThen(
+                    Commands.either(
+                        dealgify(elevator, carriage, poseManager)
+                            .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                            .beforeStarting(
+                                () -> {
+                                  scoreState = Dealgify;
+                                  dealgifyAfterPlacing = false;
+                                }),
+                        Commands.none(),
+                        () -> dealgifyAfterPlacing)));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));

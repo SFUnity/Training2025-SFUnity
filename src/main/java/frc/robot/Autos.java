@@ -174,15 +174,15 @@ public class Autos {
     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
     // When the routine begins, reset odometry and start the first trajectory
-    routine
-        .active()
-        .onTrue(
-            CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd().alongWith(null)));
+    // routine
+    //     .active()
+    //     .onTrue(
+    //
+    // CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd().alongWith(null)));
     CenterWallToLKAlgae.done()
         .onTrue( // When CenterWallToLKAlgae is done
-            elevator
-                .request(L1) // Set the elevator to go to L1
-                .andThen(score(elevator, carriage)) // Run score command
+            elevator.request(L1) // Set the elevator to go to L1
+            // .andThen(score(elevator, carriage)) // Run score command
             );
     CenterWallToLKAlgae.done()
         .onTrue(Commands.waitUntil(() -> carriage.algaeHeld()).andThen(LKToStationHigh.cmd()));
@@ -195,10 +195,11 @@ public class Autos {
     StationHighToK.done()
         .onTrue(
             Commands.either(
-                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
-                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
-                    () -> coralOnL3 >= 2)
-                .andThen(score(elevator, carriage))); // Run score command
+                elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
+                elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
+                () -> coralOnL3 >= 2)
+            // .andThen(score(elevator, carriage))
+            ); // Run score command
     StationHighToK.done()
         .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
     StationHighToL.done().onTrue(getAutonomousCommand());
@@ -328,9 +329,9 @@ public class Autos {
                     () ->
                         AllianceFlipUtil.apply(
                             poseManager.closestFace().rightBranch.getPose())), // get closest branch
-                elevator
-                    .request(L1)
-                    .andThen(RobotCommands.score(elevator, carriage)), // score on L1
+                // elevator
+                //     .request(L1)
+                //     .andThen(RobotCommands.score(elevator, carriage)), // score on L1
                 // //Tell next pos (L3)
                 drive.fullAutoDrive(() -> poseManager.closestFace().getPose()),
                 elevator
@@ -351,9 +352,9 @@ public class Autos {
                     () ->
                         AllianceFlipUtil.apply(
                             poseManager.closestFace().rightBranch.getPose())), // get closest branch
-                elevator
-                    .request(L3)
-                    .andThen(RobotCommands.score(elevator, carriage)), // score on L3
+                // elevator
+                //     .request(L3)
+                //     .andThen(RobotCommands.score(elevator, carriage)), // score on L3
                 JIToStationHigh.cmd()));
     return routine;
   }
