@@ -39,6 +39,46 @@ public final class RobotCommands {
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
+  public static Command scoreWithoutDrive(Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager, Trigger scoreTrigger) {
+    return new WaitUntilCommand(
+      () ->
+          poseManager.getDistanceTo(goalPose(poseManager).get())
+              < switch (scoreState) {
+                case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters
+                    .get();
+                case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters.get();
+              })
+  .andThen(
+      Commands.select(
+          Map.of(
+              LeftBranch,
+              score(elevator, carriage)
+                  .finallyDo(
+                      () -> {
+                        if (dealgifyAfterPlacing) {
+                          scoreState = Dealgify;
+                          dealgifyAfterPlacing = false;
+                          CommandScheduler.getInstance()
+                              .schedule(
+                                  fullScore(
+                                          drive,
+                                          elevator,
+                                          carriage,
+                                          intake,
+                                          poseManager,
+                                          scoreTrigger)
+                                      .onlyWhile(() -> scoreTrigger.getAsBoolean()));
+                        }
+                      }),
+              Dealgify,
+              dealgify(elevator, carriage, () -> poseManager.closestFace().highAlgae),
+              ProcessorFront,
+              carriage.scoreProcessor(),
+              ProcessorBack,
+              intake.poopCmd()),
+          () -> scoreState == RightBranch ? LeftBranch : scoreState)).withName("Score/Dealgify - No drive");
+  }
+
   public static Command fullScore(
       Drive drive,
       Elevator elevator,
@@ -46,43 +86,7 @@ public final class RobotCommands {
       Intake intake,
       PoseManager poseManager,
       Trigger scoreTrigger) {
-    return new WaitUntilCommand(
-            () ->
-                poseManager.getDistanceTo(goalPose(poseManager).get())
-                    < switch (scoreState) {
-                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters
-                          .get();
-                      case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters.get();
-                    })
-        .andThen(
-            Commands.select(
-                Map.of(
-                    LeftBranch,
-                    score(elevator, carriage)
-                        .finallyDo(
-                            () -> {
-                              if (dealgifyAfterPlacing) {
-                                scoreState = Dealgify;
-                                dealgifyAfterPlacing = false;
-                                CommandScheduler.getInstance()
-                                    .schedule(
-                                        fullScore(
-                                                drive,
-                                                elevator,
-                                                carriage,
-                                                intake,
-                                                poseManager,
-                                                scoreTrigger)
-                                            .onlyWhile(() -> scoreTrigger.getAsBoolean()));
-                              }
-                            }),
-                    Dealgify,
-                    dealgify(elevator, carriage, () -> poseManager.closestFace().highAlgae),
-                    ProcessorFront,
-                    carriage.scoreProcessor(),
-                    ProcessorBack,
-                    intake.poopCmd()),
-                () -> scoreState == RightBranch ? LeftBranch : scoreState))
+    return scoreWithoutDrive(drive, elevator, carriage, intake, poseManager, scoreTrigger)
         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
         .withName("Score/Dealgify");
   }
