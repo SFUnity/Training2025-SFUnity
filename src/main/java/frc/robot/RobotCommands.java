@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
@@ -49,7 +49,7 @@ public final class RobotCommands {
     return drive
         .fullAutoDrive(goalPose(poseManager))
         .alongWith(
-            Commands.select(
+            select(
                 Map.of(
                     LeftBranch,
                     new WaitUntilCommand(
@@ -58,17 +58,17 @@ public final class RobotCommands {
                                     < ElevatorConstants.subsystemExtentionLimit)
                         .andThen(
                             score(elevator, carriage)
-                                .alongWith(Commands.print("Running elevator and carriage score")))
+                                .alongWith(print("Running elevator and carriage score")))
                         .andThen(
                             dealgifyAfterPlacing
-                                ? Commands.runOnce(
+                                ? runOnce(
                                         () -> {
                                           scoreState = Dealgify;
                                           dealgifyAfterPlacing = false;
                                         })
                                     .andThen(
                                         fullScore(drive, elevator, carriage, intake, poseManager))
-                                : Commands.none()),
+                                : none()),
                     Dealgify,
                     dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
                     ProcessorFront,
@@ -113,7 +113,7 @@ public final class RobotCommands {
 
   public static Command fullIntake(
       Drive drive, Carriage carriage, Intake intake, PoseManager poseManager) {
-    return Commands.select(
+    return select(
         Map.of(
             Source,
                 drive
