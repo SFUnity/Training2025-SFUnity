@@ -361,14 +361,15 @@ public class Robot extends LoggedRobot {
     driver
         .leftBumper()
         .whileTrue(
-            Commands.select(Map.of(
-              LeftBranch,
-              scoreCoral(elevator, carriage, poseManager),
-              Dealgify,
-              dealgify(elevator, carriage, poseManager),
-              ProcessorFront,
-              scoreProcessor(carriage, intake, poseManager, true),
-              ProcessorBack,
+            Commands.select(
+                    Map.of(
+                        LeftBranch,
+                        scoreCoral(elevator, carriage, poseManager),
+                        Dealgify,
+                        dealgify(elevator, carriage, poseManager),
+                        ProcessorFront,
+                        scoreProcessor(carriage, intake, poseManager, true),
+                        ProcessorBack,
               scoreProcessor(carriage, intake, poseManager, false)
             ), () -> scoreState == RightBranch ? LeftBranch : scoreState)
             .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
