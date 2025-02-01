@@ -55,7 +55,6 @@ public class Intake extends SubsystemBase {
     Util.logSubsystem(this, "Intake");
 
     Leds.getInstance().intakeAlgaeHeld = algaeHeld();
-    
   }
 
   private void lower() {

@@ -2,11 +2,11 @@
 
 package frc.robot.subsystems.leds;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj.LEDPattern.*;
 
 import edu.wpi.first.units.measure.Distance;
@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.util.VirtualSubsystem;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,7 +39,7 @@ public class Leds extends VirtualSubsystem {
   // TODO change these to be what you need for the season
   public int loopCycleCount = 0;
   public boolean intakeWorking = true;
-  
+
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
   public boolean intakeAlgaeHeld = false;
@@ -50,7 +49,6 @@ public class Leds extends VirtualSubsystem {
   public boolean lowBatteryAlert = false;
   public boolean autoAllignActivated = false;
   public boolean alignedWithTarget = false;
-
 
   private Optional<Alliance> alliance = Optional.empty();
   private Color allianceColor = Color.kOrange;
@@ -132,11 +130,11 @@ public class Leds extends VirtualSubsystem {
     loadingNotifier.stop();
 
     // Select LED mode
-    
+
     if (estopped) {
       pattern = solid(Color.kDarkRed);
     } else if (DriverStation.isDisabled()) {
-      
+
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
         // Auto fade
         pattern =
@@ -165,26 +163,21 @@ public class Leds extends VirtualSubsystem {
                 .mask(progressMaskLayer(() -> Timer.getFPGATimestamp() - autoFinishedTime));
       }
     } else { // Enabled
-      if(alignedWithTarget){
+      if (alignedWithTarget) {
         pattern = solid(Color.kGreen);
-      }
-      else if(autoAllignActivated){
+      } else if (autoAllignActivated) {
         blink(Color.kGreen, Seconds.of(0.5));
       }
-      if(coralHeld){
+      if (coralHeld) {
         pattern = solid(Color.kWhite);
-      }
-      else if(intakeAlgaeHeld){
+      } else if (intakeAlgaeHeld) {
         pattern = solid(Color.kSeaGreen);
-      }
-      else if(carriageAlgaeHeld){
+      } else if (carriageAlgaeHeld) {
         pattern = solid(Color.kPurple);
-      }
-      else{
+      } else {
         teamColors();
       }
 
-      
       // if (!coralHeld) {
       //   if (intakeWorking) {
       //     pattern = solid(Color.kRed);
@@ -205,13 +198,12 @@ public class Leds extends VirtualSubsystem {
     leds.setData(buffer);
   }
 
-
-  private void blink(Color color, Time blink){
+  private void blink(Color color, Time blink) {
     LEDPattern base = solid(color);
-    pattern =  base.blink(blink);
+    pattern = base.blink(blink);
   }
 
-  private void teamColors(){
+  private void teamColors() {
     LEDPattern base = LEDPattern.steps(Map.of(0, Color.kOrange, 0.5, Color.kBlue));
     pattern = base.scrollAtAbsoluteSpeed(Centimeters.per(Second).of(12.5), ledSpacing);
   }
