@@ -376,7 +376,18 @@ public class Robot extends LoggedRobot {
                     () -> {
                       if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
-                    }));
+                    })
+                .andThen(
+                    Commands.either(
+                        dealgify(elevator, carriage, poseManager)
+                            .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                            .beforeStarting(
+                                () -> {
+                                  scoreState = Dealgify;
+                                  dealgifyAfterPlacing = false;
+                                }),
+                        Commands.none(),
+                        () -> dealgifyAfterPlacing)));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
