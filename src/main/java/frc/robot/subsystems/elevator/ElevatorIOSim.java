@@ -39,4 +39,9 @@ public class ElevatorIOSim implements ElevatorIO {
     appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
     sim.setInputVoltage(appliedVolts);
   }
+
+  @Override
+  public void resetEncoder(final double position) {
+    sim.setState(position, 0.0);
+  }
 }

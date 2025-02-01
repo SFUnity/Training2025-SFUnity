@@ -1,14 +1,19 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
@@ -30,6 +35,7 @@ public class Elevator extends SubsystemBase {
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+  private final SysIdRoutine elevatorRoutine;
 
   public boolean setHeight = false;
   public double goalHeightInches = 0;
@@ -38,6 +44,15 @@ public class Elevator extends SubsystemBase {
     this.io = io;
 
     pid.setTolerance(elevatorDistanceToleranceInches);
+    elevatorRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null, // Default ramp rate is acceptable
+                Volts.of(4),
+                null, // Default timeout is acceptable
+                // Log state with Phoenix SignalLogger class
+                (state) -> SignalLogger.writeString("state", state.toString())),
+            new SysIdRoutine.Mechanism(null, null, this, "Elevator"));
   }
 
   @Override
@@ -88,10 +103,40 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command disableElevator() {
+
     return runOnce(() -> setHeight = false).withName("disableElevator");
   }
 
   public Command request(ElevatorHeight height) {
     return runOnce(() -> goalHeightInches = height.get()).withName("request" + height.toString());
+  }
+
+  public Command runCurrentZeroing() {
+    return this.run(() -> io.runVolts(-1.0))
+        .until(() -> inputs.currentAmps > 40.0)
+        .finallyDo(() -> io.resetEncoder(0.0));
+  }
+
+  public Command runSysidCmd() {
+    return Commands.sequence(
+        runCurrentZeroing(),
+        // Stop when we get close to max to avoid hitting hard stop
+        elevatorRoutine
+            .quasistatic(Direction.kForward)
+            .until(() -> inputs.position > maxHeightInches - 5),
+        this.runOnce(() -> io.runVolts(0.0)),
+        Commands.waitSeconds(1.0),
+        // Stop when we get close to max to avoid hitting hard stop
+        elevatorRoutine.quasistatic(Direction.kReverse).until(() -> inputs.position < 5),
+        this.runOnce(() -> io.runVolts(0.0)),
+        Commands.waitSeconds(1.0),
+        // Stop when we get close to max to avoid hitting hard stop
+        elevatorRoutine
+            .dynamic(Direction.kForward)
+            .until(() -> inputs.position > maxHeightInches - 5),
+        this.runOnce(() -> io.runVolts(0.0)),
+        Commands.waitSeconds(1.0),
+        // Stop when we get close to max to avoid hitting hard stop
+        elevatorRoutine.dynamic(Direction.kReverse).until(() -> inputs.position < 5));
   }
 }

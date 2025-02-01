@@ -441,6 +441,8 @@ public class Robot extends LoggedRobot {
         Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
     SmartDashboard.putData(
         "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
+
+    SmartDashboard.putData("Run Elevator Sysid", elevator.runSysidCmd());
   }
 
   /** This function is called once when the robot is disabled. */
