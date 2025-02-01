@@ -1,18 +1,19 @@
 package frc.robot.util;
 
+import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.util.AllianceFlipUtil.apply;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import frc.robot.constantsGlobal.FieldConstants.Face;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -123,12 +124,35 @@ public class PoseManager {
     Face closestFace = Face.One;
     double distanceToClosestFace = Double.MAX_VALUE;
     for (Face face : Face.values()) {
-      double distance = getDistanceTo(apply(face.pose));
+      double distance = getDistanceTo(apply(face.getPose()));
       if (distance < distanceToClosestFace) {
         distanceToClosestFace = distance;
         closestFace = face;
       }
     }
     return closestFace;
+  }
+
+  public Pose2d closestStation() {
+    final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+    final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
+
+    if (getDistanceTo(leftFaceFlipped) < getDistanceTo(rightFaceFlipped)) {
+      return leftFaceFlipped;
+    } else {
+      return rightFaceFlipped;
+    }
+  }
+
+  @AutoLogOutput
+  public double distanceToStationFace() {
+    Pose2d station =
+        closestStation()
+            .transformBy(new Transform2d(intakeDistanceMeters.get(), 0, Rotation2d.kZero));
+    Rotation2d angleToStation = getHorizontalAngleTo(station);
+    Rotation2d stationAngle = station.getRotation();
+    double hypotenuse = getDistanceTo(station);
+    double angleDiff = angleToStation.minus(stationAngle).getRadians();
+    return -Math.cos(angleDiff) * hypotenuse;
   }
 }

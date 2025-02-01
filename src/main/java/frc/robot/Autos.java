@@ -38,6 +38,9 @@ public class Autos {
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
   private static final boolean isChoreoAuto = true;
 
+  private int coralOnL3 = 0;
+  private int coralOnL2 = 0;
+
   public Autos(
       Drive drive, Carriage carriage, Elevator elevator, Intake intake, PoseManager poseManager) {
     this.drive = drive;
@@ -124,7 +127,7 @@ public class Autos {
 
     // Load the routine's trajectories
     AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
-    AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
+    AutoTrajectory CenterWallToLK = routine.trajectory("CenterWallToLK");
     AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
     AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
 
@@ -133,11 +136,10 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                centerToLK.resetOdometry(), centerToLK.cmd() // start traj
+                CenterWallToLK.resetOdometry(), CenterWallToLK.cmd() // start traj
                 ));
 
-    centerToLK
-        .done()
+    CenterWallToLK.done()
         .onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
             elevator
@@ -163,50 +165,44 @@ public class Autos {
   }
 
   public AutoRoutine WallLKAlgaeL2L3() {
-    AutoRoutine routine = factory.newRoutine("CenterWallLKAlgaeL1");
-    AutoTrajectory centerToLK = routine.trajectory("CenterWallToLK");
-    AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
-    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
+    AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
+    AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToLKAlgae");
+    AutoTrajectory LKToStationHigh = routine.trajectory("LKToStationHigh");
+    AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
+    AutoTrajectory KToStationHigh = routine.trajectory("KToStationHigh");
+    AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
+    AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
         .onTrue(
-            Commands.sequence(
-                centerToLK.resetOdometry(), centerToLK.cmd() // start traj
-                ));
-    centerToLK
-        .done()
-        .onTrue( // When centerToLK is done
+            CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd().alongWith(null)));
+    CenterWallToLKAlgae.done()
+        .onTrue( // When CenterWallToLKAlgae is done
             elevator
                 .request(L1) // Set the elevator to go to L1
                 .andThen(score(elevator, carriage)) // Run score command
-                .andThen(runOnce(() -> scoreState = Dealgify), fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
-                .andThen(lKToStationHigh.cmd()) // START NEXT PATH
             );
-    lKToStationHigh
-        .done()
+    CenterWallToLKAlgae.done()
+        .onTrue(Commands.waitUntil(() -> carriage.algaeHeld()).andThen(LKToStationHigh.cmd()));
+    // Add binding in choreo to shoot out the algae
+    LKToStationHigh.done()
+        .or(KToStationHigh.done())
+        .onTrue( // may need to add a small wait command here depending on how mechanical works
+            Commands.either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1));
+    // For intaking coral see robot.configureBindings, state-based triggers, all the time
+    StationHighToK.done()
         .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL, you should use a binding here so that when as the robot approaches
-                // the station it starts intaking
-                
-                stationHighToLKL2.cmd()));
+            Commands.either(
+                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
+                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
+                    () -> coralOnL3 >= 2)
+                .andThen(score(elevator, carriage))); // Run score command
+    StationHighToK.done()
+        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
+    StationHighToL.done().onTrue(getAutonomousCommand());
 
-               // routine.anyActive(lKToStationHigh).onTrue(Commands.sequence());
-
-    stationHighToLKL2
-        .done()
-        .onTrue(
-            elevator
-                .request(L3) // Set the elevator to go to L3
-                .andThen(score(elevator, carriage)) // Run score command
-                .andThen(lKToStationHigh.cmd()));
-
-    // I'm not quite sure how to make it loop given you want the same thing to happen multiple
-    // times. I'm going to ask on the Sleipnir discord
-    //new Trigger (() -> {});
-    //routine.anyActive(stationHighToLKL2, null).onTrue(Commands.sequence());
     return routine;
   }
 
@@ -331,12 +327,12 @@ public class Autos {
                 drive.fullAutoDrive(
                     () ->
                         AllianceFlipUtil.apply(
-                            poseManager.closestFace().rightBranch.pose)), // get closest branch
+                            poseManager.closestFace().rightBranch.getPose())), // get closest branch
                 elevator
                     .request(L1)
                     .andThen(RobotCommands.score(elevator, carriage)), // score on L1
                 // //Tell next pos (L3)
-                drive.fullAutoDrive(() -> poseManager.closestFace().pose),
+                drive.fullAutoDrive(() -> poseManager.closestFace().getPose()),
                 elevator
                     .request(AlgaeHigh)
                     .andThen(elevator.enableElevator()) // delagify pt1
@@ -354,7 +350,7 @@ public class Autos {
                 drive.fullAutoDrive(
                     () ->
                         AllianceFlipUtil.apply(
-                            poseManager.closestFace().rightBranch.pose)), // get closest branch
+                            poseManager.closestFace().rightBranch.getPose())), // get closest branch
                 elevator
                     .request(L3)
                     .andThen(RobotCommands.score(elevator, carriage)), // score on L3
