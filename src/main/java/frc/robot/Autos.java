@@ -38,6 +38,9 @@ public class Autos {
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
   private static final boolean isChoreoAuto = true;
 
+  private int coralOnL3 = 0;
+  private int coralOnL2 = 0;
+
   public Autos(
       Drive drive, Carriage carriage, Elevator elevator, Intake intake, PoseManager poseManager) {
     this.drive = drive;
@@ -136,8 +139,7 @@ public class Autos {
                 CenterWallToLK.resetOdometry(), CenterWallToLK.cmd() // start traj
                 ));
 
-    CenterWallToLK
-        .done()
+    CenterWallToLK.done()
         .onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
                 // SCORE CORAL L1 KL
@@ -166,11 +168,9 @@ public class Autos {
     AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
 
-
     // When the routine begins, reset odometry and start the first trajectory
     routine.active().onTrue(CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd()));
-    CenterWallToLKAlgae
-        .done()
+    CenterWallToLKAlgae.done()
         .onTrue( // When CenterWallToLKAlgae is done
             elevator
                 .request(L1) // Set the elevator to go to L1
@@ -179,22 +179,19 @@ public class Autos {
                     runOnce(() -> scoreState = Dealgify),
                     fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
             );
-    CenterWallToLKAlgae
-        .done()
+    CenterWallToLKAlgae.done()
         .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(LKToStationHigh.cmd()));
-    LKToStationHigh
-        .done()
+    // Add binding in choreo to shoot out the algae
+    LKToStationHigh.done()
         .onTrue( // may need to add a small wait command here depending on how mechanical works
             StationHighToK.cmd());
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
-    StationHighToK
-        .done()
+    StationHighToK.done()
         .onTrue(
-            elevator
-                .request(L3) // Set the elevator to go to L3
-                .andThen(score(elevator, carriage))); // Run score command
-    StationHighToK
-        .done()
+            Commands.either(elevator.request(L2), elevator.request(L3), () -> coralOnL3 >= 2)
+                .andThen(
+                    score(elevator, carriage), runOnce(() -> coralOnL3 += 1))); // Run score command
+    StationHighToK.done()
         .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(LKToStationHigh.cmd()));
 
     return routine;
