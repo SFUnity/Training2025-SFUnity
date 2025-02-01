@@ -345,12 +345,12 @@ public class Autos {
                 drive.fullAutoDrive(
                     () ->
                         AllianceFlipUtil.apply(
-                            poseManager.closestFace().rightBranch.pose)), // get closest branch
+                            poseManager.closestFace().rightBranch.getPose())), // get closest branch
                 elevator
                     .request(L1)
                     .andThen(RobotCommands.score(elevator, carriage)), // score on L1
                 // //Tell next pos (L3)
-                drive.fullAutoDrive(() -> poseManager.closestFace().pose),
+                drive.fullAutoDrive(() -> poseManager.closestFace().getPose()),
                 elevator
                     .request(AlgaeHigh)
                     .andThen(elevator.enableElevator()) // delagify pt1
@@ -368,7 +368,7 @@ public class Autos {
                 drive.fullAutoDrive(
                     () ->
                         AllianceFlipUtil.apply(
-                            poseManager.closestFace().rightBranch.pose)), // get closest branch
+                            poseManager.closestFace().rightBranch.getPose())), // get closest branch
                 elevator
                     .request(L3)
                     .andThen(RobotCommands.score(elevator, carriage)), // score on L3
