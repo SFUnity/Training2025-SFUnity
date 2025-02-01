@@ -161,22 +161,17 @@ public class Autos {
 
   public AutoRoutine WallLKAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
-    AutoTrajectory CenterWallToLK = routine.trajectory("CenterWallToLK");
+    AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToLKAlgae");
     AutoTrajectory LKToStationHigh = routine.trajectory("LKToStationHigh");
     AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
 
 
     // When the routine begins, reset odometry and start the first trajectory
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                CenterWallToLK.resetOdometry(), CenterWallToLK.cmd() // start traj
-                ));
-    CenterWallToLK
+    routine.active().onTrue(CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd()));
+    CenterWallToLKAlgae
         .done()
-        .onTrue( // When CenterWallToLK is done
+        .onTrue( // When CenterWallToLKAlgae is done
             elevator
                 .request(L1) // Set the elevator to go to L1
                 .andThen(score(elevator, carriage)) // Run score command
@@ -184,7 +179,7 @@ public class Autos {
                     runOnce(() -> scoreState = Dealgify),
                     fullScore(drive, elevator, carriage, intake, poseManager)) // Dealgify
             );
-    CenterWallToLK
+    CenterWallToLKAlgae
         .done()
         .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(LKToStationHigh.cmd()));
     LKToStationHigh
