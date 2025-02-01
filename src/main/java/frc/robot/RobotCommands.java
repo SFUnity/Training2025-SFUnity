@@ -19,6 +19,7 @@ import frc.robot.util.PoseManager;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
@@ -26,40 +27,35 @@ public final class RobotCommands {
   public static boolean dealgifyAfterPlacing = false;
 
   public static Command scoreCoral(Elevator elevator, Carriage carriage, PoseManager poseManager) {
-    return elevator
-        .enableElevator()
-        .andThen(carriage.placeCoral())
-        .onlyIf(
+    return Commands.waitUntil(
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
-                    < elevatorSafeExtensionDistanceMeters.get());
+                    < elevatorSafeExtensionDistanceMeters.get())
+        .andThen(elevator.enableElevator().andThen(carriage.placeCoral()));
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
     BooleanSupplier highAlgae = () -> poseManager.closestFace().highAlgae;
-    return Commands.either(
-            elevator.request(AlgaeHigh),
-            elevator.request(AlgaeLow),
-            highAlgae)
-        .andThen(elevator.enableElevator())
-        .alongWith(
-            Commands.either(
-                carriage.highDealgify(),
-                carriage.lowDealgify(),
-                highAlgae))
-        .onlyIf(
+    return Commands.waitUntil(
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
-                    < elevatorSafeExtensionDistanceMeters.get());
+                    < elevatorSafeExtensionDistanceMeters.get())
+        .andThen(
+            Commands.either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
+                .andThen(elevator.enableElevator())
+                .alongWith(
+                    Commands.either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
+        .alongWith(
+            Commands.runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
   }
 
   public static Command scoreProcessor(
       Carriage carriage, Intake intake, PoseManager poseManager, boolean front) {
-    return Commands.either(carriage.scoreProcessor(), intake.poopCmd(), () -> front)
-        .onlyIf(
+    return Commands.waitUntil(
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
-                    < processorScoreDistanceMeters.get());
+                    < processorScoreDistanceMeters.get())
+        .andThen(Commands.either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
