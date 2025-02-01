@@ -164,7 +164,7 @@ public class Autos {
   public AutoRoutine WallLKAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToLKAlgae");
-    AutoTrajectory LKToStationHigh = routine.trajectory("LKToStationHigh");
+    AutoTrajectory LKToStationHigh = routine.trajectory("LKAlgaeToStationHigh");
     AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
     AutoTrajectory KToStationHigh = routine.trajectory("KToStationHigh");
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
