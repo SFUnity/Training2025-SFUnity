@@ -171,35 +171,42 @@ public class Autos {
     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
     // When the routine begins, reset odometry and start the first trajectory
-    // routine
-    //     .active()
-    //     .onTrue(
-    //
-    // CenterWallToLKAlgae.resetOdometry().andThen(CenterWallToLKAlgae.cmd().alongWith(null)));
+    routine
+        .active()
+        .onTrue(
+            CenterWallToLKAlgae.resetOdometry()
+                .andThen(CenterWallToLKAlgae.cmd())
+                .withName("ResetOdometryAndStartFirstTrajectory"));
+    CenterWallToLKAlgae.active()
+        .onTrue(
+            elevator
+                .request(L1)
+                .andThen(
+                    runOnce(() -> scoreState = Dealgify),
+                    scoreCoral(elevator, carriage, poseManager),
+                    dealgify(elevator, carriage, poseManager)));
     CenterWallToLKAlgae.done()
-        .onTrue( // When CenterWallToLKAlgae is done
-            elevator.request(L1) // Set the elevator to go to L1
-            // .andThen(score(elevator, carriage)) // Run score command
-            );
-    CenterWallToLKAlgae.done()
-        .onTrue(Commands.waitUntil(() -> carriage.algaeHeld()).andThen(LKToStationHigh.cmd()));
-    // Add binding in choreo to shoot out the algae
+        .onTrue(
+            waitUntil(() -> carriage.algaeHeld())
+                .andThen(LKToStationHigh.cmd())
+                .withName("waitUntilAlgaeHeldThenLKCmd"));
+    // TODO Add binding in choreo to shoot out the algae
     LKToStationHigh.done()
         .or(KToStationHigh.done())
+        .or(LToStationHigh.done())
         .onTrue( // may need to add a small wait command here depending on how mechanical works
-            Commands.either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1));
+            either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1));
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
     StationHighToK.done()
         .onTrue(
-            Commands.either(
-                elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
-                elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
-                () -> coralOnL3 >= 2)
-            // .andThen(score(elevator, carriage))
-            ); // Run score command
+            either(
+                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
+                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
+                    () -> coralOnL3 >= 1)
+                .andThen(scoreCoral(elevator, carriage, poseManager)));
     StationHighToK.done()
-        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
-    StationHighToL.done().onTrue(getAutonomousCommand());
+        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
+    // StationHighToL.done().onTrue(getAutonomousCommand());
 
     return routine;
   }
