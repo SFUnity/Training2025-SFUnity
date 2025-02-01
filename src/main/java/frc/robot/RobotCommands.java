@@ -10,10 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -22,74 +19,43 @@ import frc.robot.util.PoseManager;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
-  public static Command score(Elevator elevator, Carriage carriage) {
-    return elevator.enableElevator().andThen(carriage.placeCoral()).withName("score");
-  }
-
-  public static Command dealgify(Elevator elevator, Carriage carriage, BooleanSupplier high) {
-    return Commands.either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), high)
-        .andThen(elevator.enableElevator())
-        .alongWith(Commands.either(carriage.highDealgify(), carriage.lowDealgify(), high))
-        .withName("dealgify");
-  }
-
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
-  public static Command fullScore(
-      Drive drive,
-      Elevator elevator,
-      Carriage carriage,
-      Intake intake,
-      PoseManager poseManager,
-      Trigger scoreTrigger) {
-    return new WaitUntilCommand(
+  public static Command scoreCoral(Elevator elevator, Carriage carriage, PoseManager poseManager) {
+    return Commands.waitUntil(
             () ->
                 poseManager.getDistanceTo(goalPose(poseManager).get())
-                    < switch (scoreState) {
-                      case LeftBranch, RightBranch, Dealgify -> elevatorSafeExtensionDistanceMeters
-                          .get();
-                      case ProcessorFront, ProcessorBack -> processorScoreDistanceMeters.get();
-                    })
-        .andThen(
-            Commands.select(
-                Map.of(
-                    LeftBranch,
-                    score(elevator, carriage)
-                        .finallyDo(
-                            () -> {
-                              if (dealgifyAfterPlacing) {
-                                scoreState = Dealgify;
-                                dealgifyAfterPlacing = false;
-                                CommandScheduler.getInstance()
-                                    .schedule(
-                                        fullScore(
-                                                drive,
-                                                elevator,
-                                                carriage,
-                                                intake,
-                                                poseManager,
-                                                scoreTrigger)
-                                            .onlyWhile(() -> scoreTrigger.getAsBoolean()));
-                              }
-                            }),
-                    Dealgify,
-                    dealgify(elevator, carriage, () -> poseManager.closestFace().highAlgae),
-                    ProcessorFront,
-                    carriage.scoreProcessor(),
-                    ProcessorBack,
-                    intake.poopCmd()),
-                () -> scoreState == RightBranch ? LeftBranch : scoreState))
-        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
-        .withName("Score/Dealgify");
+                    < elevatorSafeExtensionDistanceMeters.get())
+        .andThen(elevator.enableElevator().andThen(carriage.placeCoral()));
   }
 
-  public static Command fullScore(
-      Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager) {
-    return fullScore(drive, elevator, carriage, intake, poseManager, new Trigger(() -> true));
+  public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
+    BooleanSupplier highAlgae = () -> poseManager.closestFace().highAlgae;
+    return Commands.waitUntil(
+            () ->
+                poseManager.getDistanceTo(goalPose(poseManager).get())
+                    < elevatorSafeExtensionDistanceMeters.get())
+        .andThen(
+            Commands.either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
+                .andThen(elevator.enableElevator())
+                .alongWith(
+                    Commands.either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
+        .alongWith(
+            Commands.runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
+  }
+
+  public static Command scoreProcessor(
+      Carriage carriage, Intake intake, PoseManager poseManager, boolean front) {
+    return Commands.waitUntil(
+            () ->
+                poseManager.getDistanceTo(goalPose(poseManager).get())
+                    < processorScoreDistanceMeters.get())
+        .andThen(Commands.either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {

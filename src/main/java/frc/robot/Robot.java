@@ -59,6 +59,7 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -234,7 +235,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    autos = new Autos(drive, poseManager, elevator, carriage);
+    autos = new Autos(drive, carriage, elevator, intake, poseManager);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -359,12 +360,34 @@ public class Robot extends LoggedRobot {
     driver
         .leftBumper()
         .whileTrue(
-            fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
+            Commands.select(
+                    Map.of(
+                        LeftBranch,
+                        scoreCoral(elevator, carriage, poseManager),
+                        Dealgify,
+                        dealgify(elevator, carriage, poseManager),
+                        ProcessorFront,
+                        scoreProcessor(carriage, intake, poseManager, true),
+                        ProcessorBack,
+                        scoreProcessor(carriage, intake, poseManager, false)),
+                    () -> scoreState == RightBranch ? LeftBranch : scoreState)
+                .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
                 .beforeStarting(
                     () -> {
                       if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
-                    }));
+                    })
+                .andThen(
+                    Commands.either(
+                        dealgify(elevator, carriage, poseManager)
+                            .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                            .beforeStarting(
+                                () -> {
+                                  scoreState = Dealgify;
+                                  dealgifyAfterPlacing = false;
+                                }),
+                        Commands.none(),
+                        () -> dealgifyAfterPlacing)));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -392,12 +415,19 @@ public class Robot extends LoggedRobot {
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
     // State-Based Triggers
+    // Teleop Only
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoRotation)
+        .and(() -> DriverStation.isTeleop())
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
-    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+    new Trigger(carriage::algaeHeld)
+        .and(() -> DriverStation.isTeleop())
+        .onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(intake::algaeHeld)
+        .and(() -> DriverStation.isTeleop())
+        .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
+    // All the time
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
         .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
         .whileTrue(carriage.intakeCoral());

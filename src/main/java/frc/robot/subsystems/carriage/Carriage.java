@@ -23,7 +23,7 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
-  private static LoggedTunableNumber highDealgifyTime =
+  private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
 
   public Carriage(CarriageIO io) {
