@@ -414,6 +414,8 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
+    operator.back().onTrue(elevator.runCurrentZeroing());
+
     // State-Based Triggers
     // Teleop Only
     new Trigger(carriage::coralHeld)
