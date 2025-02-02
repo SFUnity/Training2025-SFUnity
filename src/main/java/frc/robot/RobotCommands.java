@@ -1,11 +1,11 @@
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static frc.robot.RobotCommands.IntakeState.*;
 import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.apply;
-import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -43,10 +43,8 @@ public final class RobotCommands {
         .andThen(
             either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
                 .andThen(elevator.enableElevator())
-                .alongWith(
-                    either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
-        .alongWith(
-            runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
+                .alongWith(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
+        .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
   }
 
   public static Command scoreProcessor(
