@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static frc.robot.RobotCommands.IntakeState.*;
 import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
@@ -12,8 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -49,34 +46,16 @@ public final class RobotCommands {
                 .alongWith(
                     Commands.either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
         .alongWith(
-            select(
-                Map.of(
-                    LeftBranch,
-                    new WaitUntilCommand(
-                            () ->
-                                poseManager.getDistanceTo(goalPose(poseManager).get())
-                                    < ElevatorConstants.subsystemExtentionLimit)
-                        .andThen(
-                            score(elevator, carriage)
-                                .alongWith(print("Running elevator and carriage score")))
-                        .andThen(
-                            dealgifyAfterPlacing
-                                ? runOnce(
-                                        () -> {
-                                          scoreState = Dealgify;
-                                          dealgifyAfterPlacing = false;
-                                        })
-                                    .andThen(
-                                        fullScore(drive, elevator, carriage, intake, poseManager))
-                                : none()),
-                    Dealgify,
-                    dealgify(elevator, carriage, poseManager.closestFace().highAlgae),
-                    ProcessorFront,
-                    carriage.scoreProcessor(),
-                    ProcessorBack,
-                    intake.poopCmd().until(() -> !intake.algaeHeld())),
-                () -> scoreState == RightBranch ? LeftBranch : scoreState))
-        .withName("Score/Dealgify");
+            Commands.runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
+  }
+
+  public static Command scoreProcessor(
+      Carriage carriage, Intake intake, PoseManager poseManager, boolean front) {
+    return Commands.waitUntil(
+            () ->
+                poseManager.getDistanceTo(goalPose(poseManager).get())
+                    < processorScoreDistanceMeters.get())
+        .andThen(Commands.either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
@@ -113,7 +92,7 @@ public final class RobotCommands {
 
   public static Command fullIntake(
       Drive drive, Carriage carriage, Intake intake, PoseManager poseManager) {
-    return select(
+    return Commands.select(
         Map.of(
             Source,
                 drive
