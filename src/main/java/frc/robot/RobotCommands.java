@@ -72,6 +72,10 @@ public final class RobotCommands {
         .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 
+  public static BooleanSupplier atGoal(Drive drive) {
+    return () -> drive.linearAtGoal() && drive.thetaAtGoal();
+  }
+
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
     return () -> {
       switch (scoreState) {
