@@ -70,4 +70,9 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   public void runVolts(double volts) {
     elevatorMotor.setVoltage(volts);
   }
+
+  @Override
+  public void resetEncoder(double position) {
+    encoder.setPosition(position);
+  }
 }

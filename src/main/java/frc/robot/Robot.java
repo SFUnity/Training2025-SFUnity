@@ -414,6 +414,8 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
+    operator.back().onTrue(elevator.runCurrentZeroing());
+
     // State-Based Triggers
     // Teleop Only
     new Trigger(carriage::coralHeld)
@@ -441,6 +443,8 @@ public class Robot extends LoggedRobot {
         Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
     SmartDashboard.putData(
         "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
+
+    SmartDashboard.putData("Run Elevator Sysid", elevator.runSysidCmd());
   }
 
   /** This function is called once when the robot is disabled. */
