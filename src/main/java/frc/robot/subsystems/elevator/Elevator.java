@@ -3,7 +3,6 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 
-import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -44,15 +43,18 @@ public class Elevator extends SubsystemBase {
     this.io = io;
 
     pid.setTolerance(elevatorDistanceToleranceInches);
+    // Create the SysId routine
     elevatorRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(
-                null, // Default ramp rate is acceptable
-                Volts.of(4),
-                null, // Default timeout is acceptable
-                // Log state with Phoenix SignalLogger class
-                (state) -> SignalLogger.writeString("state", state.toString())),
-            new SysIdRoutine.Mechanism(null, null, this, "Elevator"));
+                null,
+                null,
+                null, // Use default config
+                (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> io.runVolts(voltage.in(Volts)),
+                null, // No log consumer, since data is recorded by AdvantageKit
+                this));
   }
 
   @Override
