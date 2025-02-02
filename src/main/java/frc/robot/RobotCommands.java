@@ -27,18 +27,28 @@ public final class RobotCommands {
   public static boolean dealgifyAfterPlacing = false;
 
   public static Command scoreCoral(Elevator elevator, Carriage carriage, PoseManager poseManager) {
+    return scoreCoral(elevator, carriage, poseManager, goalPose(poseManager));
+  }
+
+  public static Command scoreCoral(
+      Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
     return waitUntil(
             () ->
-                poseManager.getDistanceTo(goalPose(poseManager).get())
+                poseManager.getDistanceTo(goalPose.get())
                     < elevatorSafeExtensionDistanceMeters.get())
         .andThen(elevator.enableElevator().andThen(carriage.placeCoral()));
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
+    return dealgify(elevator, carriage, poseManager, goalPose(poseManager));
+  }
+
+  public static Command dealgify(
+      Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
     BooleanSupplier highAlgae = () -> poseManager.closestFace().highAlgae;
     return waitUntil(
             () ->
-                poseManager.getDistanceTo(goalPose(poseManager).get())
+                poseManager.getDistanceTo(goalPose.get())
                     < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
             either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
