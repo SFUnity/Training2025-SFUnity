@@ -210,7 +210,8 @@ public class Autos {
         .onTrue( // may need to add a small wait command here depending on how mechanical works
             either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1));
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
-    StationHighToK.done()
+    StationHighToK.active()
+        .and(carriage::coralHeld)
         .onTrue(
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
