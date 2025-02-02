@@ -82,8 +82,8 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
-  public void runRollers(double percentOutput) {
-    rollers.set(percentOutput);
+  public void runRollers(double volts) {
+    rollers.setVoltage(volts);
   }
 
   @Override

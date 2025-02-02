@@ -47,8 +47,8 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   @Override
-  public void runRollers(double percentOutput) {
-    rollersAppliedVolts = 12 * percentOutput;
+  public void runRollers(double volts) {
+    rollersAppliedVolts = volts;
   }
 
   @Override

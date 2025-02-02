@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase {
       new LoggedTunableNumber("Intake/raisedAngle", 86);
   // In percent output
   private static final LoggedTunableNumber rollersSpeed =
-      new LoggedTunableNumber("Intake/rollerSpeed", 1);
+      new LoggedTunableNumber("Intake/rollerSpeedVolts", 10);
 
   private Angle positionSetpoint = Degrees.zero();
 

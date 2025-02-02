@@ -18,7 +18,7 @@ public interface IntakeIO {
 
   default void updateInputs(IntakeIOInputs inputs) {}
 
-  default void runRollers(double percentOutput) {}
+  default void runRollers(double volts) {}
 
   default void setPivotPosition(Angle angle) {}
 
