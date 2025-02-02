@@ -11,43 +11,43 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
-  public static Command score(Elevator elevator, Carriage carriage) {
-    return elevator
-        .enableElevator()
-        .until(elevator::atGoalHeight)
-        .andThen(carriage.placeCoral())
-        .andThen(elevator.disableElevator())
-        .withName("score");
-  }
-
-  public static Command dealgify(Elevator elevator, Carriage carriage, boolean high) {
-    return elevator
-        .request(high ? AlgaeHigh : AlgaeLow)
-        .andThen(elevator.enableElevator().until(elevator::atGoalHeight))
-        .alongWith(high ? carriage.highDealgify() : carriage.lowDealgify())
-        .withName("dealgify");
-  }
-
-  public static ScoreState scoreState = ProcessorBack;
+  public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
-  public static Command fullScore(
-      Drive drive, Elevator elevator, Carriage carriage, Intake intake, PoseManager poseManager) {
-    return drive
-        .fullAutoDrive(goalPose(poseManager))
+  public static Command scoreCoral(Elevator elevator, Carriage carriage, PoseManager poseManager) {
+    return Commands.waitUntil(
+            () ->
+                poseManager.getDistanceTo(goalPose(poseManager).get())
+                    < elevatorSafeExtensionDistanceMeters.get())
+        .andThen(elevator.enableElevator().andThen(carriage.placeCoral()));
+  }
+
+  public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
+    BooleanSupplier highAlgae = () -> poseManager.closestFace().highAlgae;
+    return Commands.waitUntil(
+            () ->
+                poseManager.getDistanceTo(goalPose(poseManager).get())
+                    < elevatorSafeExtensionDistanceMeters.get())
+        .andThen(
+            Commands.either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
+                .andThen(elevator.enableElevator())
+                .alongWith(
+                    Commands.either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
         .alongWith(
             select(
                 Map.of(
@@ -83,11 +83,11 @@ public final class RobotCommands {
     return () -> {
       switch (scoreState) {
         case LeftBranch:
-          return apply(poseManager.closestFace().leftBranch.pose);
+          return apply(poseManager.closestLeftBranch().getPose());
         case RightBranch:
-          return apply(poseManager.closestFace().rightBranch.pose);
+          return apply(poseManager.closestRightBranch().getPose());
         case Dealgify:
-          return apply(poseManager.closestFace().pose);
+          return apply(poseManager.closestFace().getPose());
         case ProcessorFront:
           return apply(processorScore);
         case ProcessorBack:
@@ -119,21 +119,12 @@ public final class RobotCommands {
                 drive
                     .headingDrive(
                         () -> {
-                          final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
-                          final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
-                          Pose2d closerStation;
-
-                          if (poseManager.getDistanceTo(leftFaceFlipped)
-                              < poseManager.getDistanceTo(rightFaceFlipped)) {
-                            closerStation = leftFaceFlipped;
-                          } else {
-                            closerStation = rightFaceFlipped;
-                          }
-                          return closerStation.getRotation();
+                          return poseManager.closestStation().getRotation();
                         })
-                    .withDeadline(carriage.intakeCoral()),
-            Ground, intake.intakeCmd(),
-            Ice_Cream, carriage.lowDealgify()),
+                    .until(carriage::coralHeld)
+                    .asProxy(),
+            Ground, intake.intakeCmd().asProxy(),
+            Ice_Cream, carriage.lowDealgify().asProxy()),
         () -> intakeState);
   }
 

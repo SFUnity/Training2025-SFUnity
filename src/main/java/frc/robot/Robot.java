@@ -59,6 +59,7 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -234,7 +235,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    autos = new Autos(drive, poseManager, elevator, carriage);
+    autos = new Autos(drive, carriage, elevator, intake, poseManager);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -329,10 +330,18 @@ public class Robot extends LoggedRobot {
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    driver.y().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)));
-    driver.b().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)));
-    driver.a().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)));
-    driver.x().onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)));
+    driver
+        .y()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
+    driver
+        .b()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
+    driver
+        .a()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
+    driver
+        .x()
+        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
     driver
         .start()
         .onTrue(
@@ -347,14 +356,38 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
 
-    driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
-    driver.rightBumper().whileTrue(fullScore(drive, elevator, carriage, intake, poseManager));
-
-    new Trigger(carriage::coralHeld)
-        .and(() -> allowAutoRotation)
-        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
-    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver
+        .leftBumper()
+        .whileTrue(
+            Commands.select(
+                    Map.of(
+                        LeftBranch,
+                        scoreCoral(elevator, carriage, poseManager),
+                        Dealgify,
+                        dealgify(elevator, carriage, poseManager),
+                        ProcessorFront,
+                        scoreProcessor(carriage, intake, poseManager, true),
+                        ProcessorBack,
+                        scoreProcessor(carriage, intake, poseManager, false)),
+                    () -> scoreState == RightBranch ? LeftBranch : scoreState)
+                .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                .beforeStarting(
+                    () -> {
+                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
+                        scoreState = Dealgify;
+                    })
+                .andThen(
+                    Commands.either(
+                        dealgify(elevator, carriage, poseManager)
+                            .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                            .beforeStarting(
+                                () -> {
+                                  scoreState = Dealgify;
+                                  dealgifyAfterPlacing = false;
+                                }),
+                        Commands.none(),
+                        () -> dealgifyAfterPlacing)));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -373,12 +406,33 @@ public class Robot extends LoggedRobot {
                 }));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
-    operator.rightTrigger().onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = true));
+    operator
+        .rightTrigger()
+        .onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
 
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
+    // State-Based Triggers
+    // Teleop Only
+    new Trigger(carriage::coralHeld)
+        .and(() -> allowAutoRotation)
+        .and(() -> DriverStation.isTeleop())
+        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+    new Trigger(carriage::algaeHeld)
+        .and(() -> DriverStation.isTeleop())
+        .onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(intake::algaeHeld)
+        .and(() -> DriverStation.isTeleop())
+        .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+
+    // All the time
+    new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
+        .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .whileTrue(carriage.intakeCoral());
+
+    // Sim fake gamepieces
     SmartDashboard.putData(
         "Toggle Coral in Carriage",
         Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));

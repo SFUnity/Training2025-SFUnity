@@ -45,6 +45,7 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
@@ -214,6 +215,14 @@ public class Drive extends SubsystemBase {
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
+    // Add velocity data to pose manager, use gyro if possible
+    ChassisSpeeds robotRelativeVelocity = getChassisSpeeds();
+    robotRelativeVelocity.omegaRadiansPerSecond =
+        gyroInputs.connected
+            ? gyroInputs.yawVelocityRadPerSec
+            : robotRelativeVelocity.omegaRadiansPerSecond;
+    poseManager.addVelocityData(GeomUtil.toTwist2d(robotRelativeVelocity));
+
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
 
@@ -328,7 +337,7 @@ public class Drive extends SubsystemBase {
     } else if (DriverStation.isDisabled()) {
       boolean stillMoving = false;
       double velocityLimit = 0.05; // In meters per second
-      ChassisSpeeds measuredChassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+      ChassisSpeeds measuredChassisSpeeds = getChassisSpeeds();
       if (Math.abs(measuredChassisSpeeds.vxMetersPerSecond) > velocityLimit
           || Math.abs(measuredChassisSpeeds.vyMetersPerSecond) > velocityLimit) {
         stillMoving = true;
@@ -578,10 +587,7 @@ public class Drive extends SubsystemBase {
   /** Returns true if within tolerance of aiming at speaker */
   @AutoLogOutput(key = "Drive/Commands/ThetaAtGoal")
   public boolean thetaAtGoal() {
-    return Util.equalsWithTolerance(
-        thetaController.getSetpoint().position,
-        thetaController.getGoal().position,
-        Units.degreesToRadians(thetaToleranceDeg.get()));
+    return thetaController.atGoal();
   }
 
   // Autos
