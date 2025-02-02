@@ -26,7 +26,7 @@ public class IntakeIOSparkMax implements IntakeIO {
 
   public IntakeIOSparkMax() {
     var pivotConfig = new SparkMaxConfig();
-    pivotConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(10.0);
+    pivotConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
     pivotConfig.encoder.positionConversionFactor(pivotPositionFactor).uvwAverageDepth(2);
     pivotConfig
         .closedLoop
