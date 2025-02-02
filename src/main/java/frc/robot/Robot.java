@@ -105,8 +105,7 @@ public class Robot extends LoggedRobot {
   private final Elevator elevator;
   private final Carriage carriage;
   private final Intake intake;
-  private final AprilTagVision reefVision;
-  private final AprilTagVision sourceVision;
+  private final AprilTagVision vision;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -206,8 +205,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSparkMax());
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
-        reefVision = new AprilTagVision(new AprilTagVisionIOLimelight(reefName), poseManager);
-        sourceVision = new AprilTagVision(new AprilTagVisionIOLimelight(sourceName), poseManager);
+        vision = new AprilTagVision(poseManager, new AprilTagVisionIOLimelight(reefName), new AprilTagVisionIOLimelight(sourceName));
         break;
 
       case SIM:
@@ -224,8 +222,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSim());
         carriage = new Carriage(new CarriageIOSim());
         intake = new Intake(new IntakeIOSim());
-        reefVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
-        sourceVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        vision = new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
 
       default:
@@ -242,8 +239,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIO() {});
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
-        reefVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
-        sourceVision = new AprilTagVision(new AprilTagVisionIO() {}, poseManager);
+        vision = new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
     }
 

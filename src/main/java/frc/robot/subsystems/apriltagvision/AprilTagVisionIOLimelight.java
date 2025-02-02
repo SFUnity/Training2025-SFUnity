@@ -127,4 +127,9 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private void resetCropping() {
     setCropWindow(name, -DEFAUlT_CROP, DEFAUlT_CROP, -DEFAUlT_CROP, DEFAUlT_CROP);
   }
+
+  @Override
+  public String getName() {
+    return name;
+  }
 }

@@ -27,4 +27,6 @@ public interface AprilTagVisionIO {
 
   /** Sets the pipeline through enum. */
   public default void setPipeline(AprilTagVisionConstants.Pipelines pipeline) {}
+
+  public default String getName() { return "";}
 }
