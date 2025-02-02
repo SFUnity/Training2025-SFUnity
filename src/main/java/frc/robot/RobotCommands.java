@@ -100,9 +100,10 @@ public final class RobotCommands {
                         () -> {
                           return poseManager.closestStation().getRotation();
                         })
-                    .until(carriage::coralHeld),
-            Ground, intake.intakeCmd(),
-            Ice_Cream, carriage.lowDealgify()),
+                    .until(carriage::coralHeld)
+                    .asProxy(),
+            Ground, intake.intakeCmd().asProxy(),
+            Ice_Cream, carriage.lowDealgify().asProxy()),
         () -> intakeState);
   }
 
