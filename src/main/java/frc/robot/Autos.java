@@ -190,8 +190,13 @@ public class Autos {
             elevator
                 .request(L1)
                 .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWallToLKAlgae.getFinalPose().get(),
+                        CenterWallToLKAlgae.done()),
                     runOnce(() -> scoreState = Dealgify),
-                    scoreCoral(elevator, carriage, poseManager),
                     dealgify(elevator, carriage, poseManager)));
     CenterWallToLKAlgae.done()
         .onTrue(
@@ -211,7 +216,13 @@ public class Autos {
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
                     elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
                     () -> coralOnL3 >= 1)
-                .andThen(scoreCoral(elevator, carriage, poseManager)));
+                .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> StationHighToK.getFinalPose().get(),
+                        StationHighToK.done())));
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
     // StationHighToL.done().onTrue(getAutonomousCommand());
