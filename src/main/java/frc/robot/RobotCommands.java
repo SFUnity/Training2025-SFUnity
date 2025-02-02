@@ -26,17 +26,22 @@ public final class RobotCommands {
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
-  public static Command scoreCoral(Elevator elevator, Carriage carriage, PoseManager poseManager) {
-    return scoreCoral(elevator, carriage, poseManager, goalPose(poseManager));
+  public static Command scoreCoral(
+      Elevator elevator, Carriage carriage, PoseManager poseManager, BooleanSupplier atPose) {
+    return scoreCoral(elevator, carriage, poseManager, goalPose(poseManager), atPose);
   }
 
   public static Command scoreCoral(
-      Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
+      Elevator elevator,
+      Carriage carriage,
+      PoseManager poseManager,
+      Supplier<Pose2d> goalPose,
+      BooleanSupplier atPose) {
     return waitUntil(
             () ->
                 poseManager.getDistanceTo(goalPose.get())
                     < elevatorSafeExtensionDistanceMeters.get())
-        .andThen(elevator.enableElevator().andThen(carriage.placeCoral()));
+        .andThen(elevator.enableElevator(), waitUntil(atPose), carriage.placeCoral());
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
@@ -58,11 +63,12 @@ public final class RobotCommands {
   }
 
   public static Command scoreProcessor(
-      Carriage carriage, Intake intake, PoseManager poseManager, boolean front) {
-    return waitUntil(
-            () ->
-                poseManager.getDistanceTo(goalPose(poseManager).get())
-                    < processorScoreDistanceMeters.get())
+      Carriage carriage,
+      Intake intake,
+      PoseManager poseManager,
+      boolean front,
+      BooleanSupplier atPose) {
+    return waitUntil(atPose)
         .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 

@@ -68,8 +68,6 @@ public final class FieldConstants {
       new LoggedTunableNumber("Distances/extraY", 0);
   public static final LoggedTunableNumber elevatorSafeExtensionDistanceMeters =
       new LoggedTunableNumber("Distances/elevatorExtension", 1);
-  public static final LoggedTunableNumber processorScoreDistanceMeters =
-      new LoggedTunableNumber("Distances/processorScore", 0.1);
   public static final LoggedTunableNumber intakeDistanceMeters =
       new LoggedTunableNumber("Distances/intake", .5);
 

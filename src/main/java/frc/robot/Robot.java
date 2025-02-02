@@ -363,13 +363,27 @@ public class Robot extends LoggedRobot {
             Commands.select(
                     Map.of(
                         LeftBranch,
-                        scoreCoral(elevator, carriage, poseManager),
+                        scoreCoral(
+                            elevator,
+                            carriage,
+                            poseManager,
+                            () -> drive.linearAtGoal() && drive.thetaAtGoal()),
                         Dealgify,
                         dealgify(elevator, carriage, poseManager),
                         ProcessorFront,
-                        scoreProcessor(carriage, intake, poseManager, true),
+                        scoreProcessor(
+                            carriage,
+                            intake,
+                            poseManager,
+                            true,
+                            () -> drive.linearAtGoal() && drive.thetaAtGoal()),
                         ProcessorBack,
-                        scoreProcessor(carriage, intake, poseManager, false)),
+                        scoreProcessor(
+                            carriage,
+                            intake,
+                            poseManager,
+                            false,
+                            () -> drive.linearAtGoal() && drive.thetaAtGoal())),
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
                 .beforeStarting(
