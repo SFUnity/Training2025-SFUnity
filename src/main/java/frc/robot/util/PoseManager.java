@@ -170,7 +170,6 @@ public class PoseManager {
     }
   }
 
-  @AutoLogOutput
   public double distanceToStationFace() {
     Pose2d station =
         closestStation()
