@@ -69,7 +69,7 @@ public class Drive extends SubsystemBase {
 
   private final PoseManager poseManager;
   private final DriveCommandsConfig config;
-  private static final double DEADBAND = 0.05;
+  private static final double DEADBAND = 0.1;
 
   private static final LoggedTunableNumber linearkP =
       new LoggedTunableNumber("Drive/Commands/Linear/kP", 3.5);
