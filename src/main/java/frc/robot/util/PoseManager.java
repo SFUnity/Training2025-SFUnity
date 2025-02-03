@@ -153,17 +153,20 @@ public class PoseManager {
         secondClosest = face;
       }
     }
-    Rotation2d robotVelocityAngle = new Rotation2d(robotVelocity.dx, robotVelocity.dy);
-    double toClosestAngleDiff =
-        Math.abs(
-            getHorizontalAngleTo(apply(closest.getPose())).minus(robotVelocityAngle).getDegrees());
-    Logger.recordOutput("toClosestAngleDiff", toClosestAngleDiff);
-    double to2ndClosestAngleDiff =
-        Math.abs(
-            getHorizontalAngleTo(apply(secondClosest.getPose()))
-                .minus(robotVelocityAngle)
-                .getDegrees());
-    Logger.recordOutput("to2ndClosestAngleDiff", to2ndClosestAngleDiff);
+    double robotVelocityAngle = new Rotation2d(robotVelocity.dx, robotVelocity.dy).getDegrees();
+    if (robotVelocityAngle < 0) {
+      robotVelocityAngle = robotVelocityAngle + 360;
+    }
+    double angleToClosest = getHorizontalAngleTo(apply(closest.getPose())).getDegrees();
+    if (angleToClosest < 0) {
+      angleToClosest = angleToClosest + 360;
+    }
+    double toClosestAngleDiff = Math.abs(robotVelocityAngle - angleToClosest);
+    double angleTo2ndClosest = getHorizontalAngleTo(apply(secondClosest.getPose())).getDegrees();
+    if (angleTo2ndClosest < 0) {
+      angleTo2ndClosest = angleTo2ndClosest + 360;
+    }
+    double to2ndClosestAngleDiff = Math.abs(robotVelocityAngle - angleTo2ndClosest);
     if (toClosestAngleDiff > to2ndClosestAngleDiff
         && (robotVelocity.dx > 0.1 || robotVelocity.dy > 0.1)) {
       lockedFace = secondClosest;
