@@ -123,7 +123,13 @@ public class PoseManager {
     return robotVelocity;
   }
 
+  public boolean lockClosest = false;
+  private Face lockedFace = Face.One;
+
   private Face closestFace(ScoreState scoreState) {
+    if (lockClosest) {
+      return lockedFace;
+    }
     Face closest = Face.One;
     Face secondClosest = Face.Two;
     double distanceToClosest = Double.MAX_VALUE;
@@ -158,10 +164,13 @@ public class PoseManager {
                 .minus(robotVelocityAngle)
                 .getDegrees());
     Logger.recordOutput("to2ndClosestAngleDiff", to2ndClosestAngleDiff);
-    if (toClosestAngleDiff < to2ndClosestAngleDiff) {
-      return closest;
-    } else {
+    if (toClosestAngleDiff > to2ndClosestAngleDiff
+        && (robotVelocity.dx > 0.1 || robotVelocity.dy > 0.1)) {
+      lockedFace = secondClosest;
       return secondClosest;
+    } else {
+      lockedFace = closest;
+      return closest;
     }
   }
 
