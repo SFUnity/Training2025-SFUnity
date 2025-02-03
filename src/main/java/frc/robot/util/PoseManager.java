@@ -20,6 +20,7 @@ import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class PoseManager {
   static final Lock odometryLock = new ReentrantLock();
@@ -124,7 +125,9 @@ public class PoseManager {
 
   private Face closestFace(ScoreState scoreState) {
     Face closest = Face.One;
+    Face secondClosest = Face.Two;
     double distanceToClosest = Double.MAX_VALUE;
+    double distanceTo2ndClosest = Double.MAX_VALUE;
     for (Face face : Face.values()) {
       double distance =
           getDistanceTo(
@@ -135,8 +138,13 @@ public class PoseManager {
                     default -> face.getPose();
                   }));
       if (distance < distanceToClosest) {
+        secondClosest = closest;
+        distanceTo2ndClosest = distanceToClosest;
         distanceToClosest = distance;
         closest = face;
+      } else if (distance < distanceTo2ndClosest) {
+        distanceTo2ndClosest = distance;
+        secondClosest = face;
       }
     }
     return closest;
