@@ -23,8 +23,6 @@ public class ElevatorConstants {
 
   public static final Translation2d elevatorOrigin = new Translation2d(0, 0);
 
-  public static final int currentLimit = 60;
-
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
   public static final LoggedTunableNumber kG;
@@ -44,10 +42,10 @@ public class ElevatorConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Elevator/kP", 0.15);
+        kP = new LoggedTunableNumber("Elevator/kP", 0);
         kD = new LoggedTunableNumber("Elevator/kD", 0);
-        kG = new LoggedTunableNumber("Elevator/kG", 1.215);
-        kV = new LoggedTunableNumber("Elevator/kV", 0.127);
+        kG = new LoggedTunableNumber("Elevator/kG", 0);
+        kV = new LoggedTunableNumber("Elevator/kV", 0);
         break;
       case SIM:
         kP = new LoggedTunableNumber("Elevator/kP", 0.15);

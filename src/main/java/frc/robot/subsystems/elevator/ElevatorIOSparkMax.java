@@ -25,7 +25,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     motorConfig
         .inverted(false)
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(currentLimit)
+        .smartCurrentLimit(60)
         .voltageCompensation(12.0);
     motorConfig
         .closedLoop

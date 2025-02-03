@@ -12,20 +12,19 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class CarriageIOSparkMax implements CarriageIO {
   private final SparkMax rollerMotor = new SparkMax(rollerMotorID, MotorType.kBrushless);
-  private final SparkMaxConfig config = new SparkMaxConfig();
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
   private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
 
   public CarriageIOSparkMax() {
+    var config = new SparkMaxConfig();
     config
         .inverted(false)
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(currentLimit)
+        .smartCurrentLimit(60)
         .voltageCompensation(12.0);
     config
         .signals
         .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs((int) (1000.0 / 100))
         .primaryEncoderVelocityAlwaysOn(true)
         .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
