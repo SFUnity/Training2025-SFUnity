@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import static frc.robot.RobotCommands.ScoreState.Dealgify;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.util.AllianceFlipUtil.apply;
 
@@ -14,6 +15,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.robot.RobotCommands.ScoreState;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -120,43 +122,37 @@ public class PoseManager {
     return robotVelocity;
   }
 
-  public Face closestFace() {
-    Face closestFace = Face.One;
-    double distanceToClosestFace = Double.MAX_VALUE;
+  private Face closestFace(ScoreState scoreState) {
+    Face closest = Face.One;
+    double distanceToClosest = Double.MAX_VALUE;
     for (Face face : Face.values()) {
-      double distance = getDistanceTo(apply(face.getPose()));
-      if (distance < distanceToClosestFace) {
-        distanceToClosestFace = distance;
-        closestFace = face;
+      double distance =
+          getDistanceTo(
+              apply(
+                  switch (scoreState) {
+                    case LeftBranch -> face.leftBranch.getPose();
+                    case RightBranch -> face.rightBranch.getPose();
+                    default -> face.getPose();
+                  }));
+      if (distance < distanceToClosest) {
+        distanceToClosest = distance;
+        closest = face;
       }
     }
-    return closestFace;
+    return closest;
   }
 
-  public Branch closestLeftBranch() {
-    Branch closestBranch = Face.One.leftBranch;
-    double distanceToClosestLeftBranch = Double.MAX_VALUE;
-    for (Face face : Face.values()) {
-      double distance = getDistanceTo(apply(face.leftBranch.getPose()));
-      if (distance < distanceToClosestLeftBranch) {
-        distanceToClosestLeftBranch = distance;
-        closestBranch = face.leftBranch;
-      }
-    }
-    return closestBranch;
+  public Pose2d closest(ScoreState scoreState) {
+    Face closest = closestFace(scoreState);
+    return switch (scoreState) {
+      case LeftBranch -> closest.leftBranch.getPose();
+      case RightBranch -> closest.rightBranch.getPose();
+      default -> closest.getPose();
+    };
   }
 
-  public Branch closestRightBranch() {
-    Branch closestBranch = Face.One.rightBranch;
-    double distanceToClosestRightBranch = Double.MAX_VALUE;
-    for (Face face : Face.values()) {
-      double distance = getDistanceTo(apply(face.rightBranch.getPose()));
-      if (distance < distanceToClosestRightBranch) {
-        distanceToClosestRightBranch = distance;
-        closestBranch = face.rightBranch;
-      }
-    }
-    return closestBranch;
+  public boolean closestFaceHighAlgae() {
+    return closestFace(Dealgify).highAlgae;
   }
 
   public Pose2d closestStation() {

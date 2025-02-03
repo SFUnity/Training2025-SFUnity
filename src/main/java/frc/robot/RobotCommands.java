@@ -50,7 +50,7 @@ public final class RobotCommands {
 
   public static Command dealgify(
       Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
-    BooleanSupplier highAlgae = () -> poseManager.closestFace().highAlgae;
+    BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
     return waitUntil(
             () ->
                 poseManager.getDistanceTo(goalPose.get())
@@ -79,21 +79,12 @@ public final class RobotCommands {
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
     return () -> {
       switch (scoreState) {
-        case LeftBranch:
-          return apply(poseManager.closestLeftBranch().getPose());
-        case RightBranch:
-          return apply(poseManager.closestRightBranch().getPose());
-        case Dealgify:
-          return apply(poseManager.closestFace().getPose());
+        default:
+          return apply(poseManager.closest(scoreState));
         case ProcessorFront:
           return apply(processorScore);
         case ProcessorBack:
           return apply(processorScore).transformBy(new Transform2d(0, 0, new Rotation2d(Math.PI)));
-        default:
-          {
-            System.out.println("Invalid score state");
-            return poseManager.getPose();
-          }
       }
     };
   }
