@@ -20,7 +20,6 @@ import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class PoseManager {
   static final Lock odometryLock = new ReentrantLock();
