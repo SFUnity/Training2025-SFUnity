@@ -147,7 +147,22 @@ public class PoseManager {
         secondClosest = face;
       }
     }
-    return closest;
+    Rotation2d robotVelocityAngle = new Rotation2d(robotVelocity.dx, robotVelocity.dy);
+    double toClosestAngleDiff =
+        Math.abs(
+            getHorizontalAngleTo(apply(closest.getPose())).minus(robotVelocityAngle).getDegrees());
+    Logger.recordOutput("toClosestAngleDiff", toClosestAngleDiff);
+    double to2ndClosestAngleDiff =
+        Math.abs(
+            getHorizontalAngleTo(apply(secondClosest.getPose()))
+                .minus(robotVelocityAngle)
+                .getDegrees());
+    Logger.recordOutput("to2ndClosestAngleDiff", to2ndClosestAngleDiff);
+    if (toClosestAngleDiff < to2ndClosestAngleDiff) {
+      return closest;
+    } else {
+      return secondClosest;
+    }
   }
 
   public Pose2d closest(ScoreState scoreState) {
