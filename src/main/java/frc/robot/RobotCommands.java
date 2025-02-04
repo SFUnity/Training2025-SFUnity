@@ -109,10 +109,17 @@ public final class RobotCommands {
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive, Carriage carriage, Intake intake, PoseManager poseManager) {
+      Drive drive,
+      Carriage carriage,
+      Intake intake,
+      PoseManager poseManager,
+      BooleanSupplier allowAutoDrive) {
     return select(
         Map.of(
             Source,
+            // Maybe should change so that even if most of poseEstimation isn't working, this still
+            // will
+            either(
                 drive
                     .headingDrive(
                         () -> {
@@ -120,8 +127,12 @@ public final class RobotCommands {
                         })
                     .until(carriage::coralHeld)
                     .asProxy(),
-            Ground, intake.intakeCmd().asProxy(),
-            Ice_Cream, carriage.lowDealgify().asProxy()),
+                carriage.intakeCoral().asProxy(),
+                allowAutoDrive),
+            Ground,
+            intake.intakeCmd().asProxy(),
+            Ice_Cream,
+            carriage.lowDealgify().asProxy()),
         () -> intakeState);
   }
 
