@@ -199,7 +199,7 @@ public class ModuleIOMixed implements ModuleIO {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
-        .pidf(turnKp.get(), 0.0, turnKd.get(), 0.0);
+        .pidf(turnKp.get(), 0.0, 0, 0.0);
     turnConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
