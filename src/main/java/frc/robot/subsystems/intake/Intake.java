@@ -36,16 +36,11 @@ public class Intake extends SubsystemBase {
 
   public Intake(IntakeIO io) {
     this.io = io;
-
-    io.setPID(kP.get());
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
-
-    // Update controllers
-    LoggedTunableNumber.ifChanged(hashCode(), () -> io.setPID(kP.get()), kP);
 
     // Logs
     measuredVisualizer.update(inputs.pivotCurrentPosition);

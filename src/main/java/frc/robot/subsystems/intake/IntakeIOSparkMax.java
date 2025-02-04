@@ -55,11 +55,6 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
-  public void stop() {
-    pivot.stopMotor();
-  }
-
-  @Override
   public void updateInputs(IntakeIOInputs inputs) {
     inputs.pivotCurrentPosition = Rotations.of(encoder.getPosition());
     inputs.pivotAppliedVolts = pivot.getAppliedOutput() * pivot.getBusVoltage();
