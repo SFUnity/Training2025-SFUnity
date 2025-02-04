@@ -335,9 +335,9 @@ public class ModuleIOMixed implements ModuleIO {
   }
 
   @Override
-  public void setTurnPIDF(double turnkP, double turnkD) {
+  public void setTurnPIDF(double turnkP) {
     SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pidf(turnkP, 0, turnkD, 0);
+    config.closedLoop.pidf(turnkP, 0, 0, 0);
     configureSpark(turnSpark, config, false);
   }
 

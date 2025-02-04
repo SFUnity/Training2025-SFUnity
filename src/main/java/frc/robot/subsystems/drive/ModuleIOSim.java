@@ -128,8 +128,7 @@ public class ModuleIOSim implements ModuleIO {
   }
 
   @Override
-  public void setTurnPIDF(double turnkP, double turnkD) {
+  public void setTurnPIDF(double turnkP) {
     turnController.setP(turnkP);
-    turnController.setD(turnkD);
   }
 }

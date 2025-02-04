@@ -678,7 +678,7 @@ public class Drive extends SubsystemBase {
                             startRun(
                                     () -> {
                                       for (var module : modules)
-                                        module.setTurnPIDF(turnKp.get(), turnKd.get());
+                                        module.setTurnPIDF(turnKp.get());
                                     },
                                     () ->
                                         setAllModuleSetpointsToSame(
@@ -687,7 +687,6 @@ public class Drive extends SubsystemBase {
                                 .finallyDo(this::stop));
                   },
                   turnKp,
-                  turnKd,
                   tuningTurnDelta);
             })
         .withName("tuneModuleTurn");
