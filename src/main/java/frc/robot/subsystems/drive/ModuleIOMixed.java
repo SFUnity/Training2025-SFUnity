@@ -191,9 +191,7 @@ public class ModuleIOMixed implements ModuleIO {
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
         .pidf(turnKp.get(), 0.0, 0, 0.0);
-    turnConfig
-        .signals
-        .primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency));
+    turnConfig.signals.primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency));
     configureSpark(turnSpark, turnConfig, true);
 
     // Configure CANCoder

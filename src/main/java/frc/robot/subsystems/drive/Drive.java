@@ -677,8 +677,7 @@ public class Drive extends SubsystemBase {
                         .schedule(
                             startRun(
                                     () -> {
-                                      for (var module : modules)
-                                        module.setTurnPIDF(turnKp.get());
+                                      for (var module : modules) module.setTurnPIDF(turnKp.get());
                                     },
                                     () ->
                                         setAllModuleSetpointsToSame(
