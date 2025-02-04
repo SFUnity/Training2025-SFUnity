@@ -24,7 +24,7 @@ public class IntakeIOSparkMax implements IntakeIO {
   public IntakeIOSparkMax() {
     var pivotConfig = new SparkMaxConfig();
     pivotConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
-    pivotConfig.encoder.positionConversionFactor(pivotPositionFactor).uvwAverageDepth(2);
+    pivotConfig.encoder.positionConversionFactor(pivotPositionFactor).velocityConversionFactor(pivotPositionFactor).uvwAverageDepth(2);
     pivotConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -42,7 +42,7 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     var rollerConfig = new SparkMaxConfig();
     rollerConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
-    rollerConfig.encoder.positionConversionFactor(rollersPositionFactor).uvwAverageDepth(2);
+    rollerConfig.encoder.positionConversionFactor(rollersPositionFactor).velocityConversionFactor(rollersPositionFactor).uvwAverageDepth(2);
     rollerConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)

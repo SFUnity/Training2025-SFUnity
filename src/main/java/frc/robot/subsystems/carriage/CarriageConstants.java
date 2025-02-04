@@ -6,6 +6,8 @@ public class CarriageConstants {
   public static final int rollerMotorID = 0;
   public static final int beamBreakNumber = 0;
 
+  public static final double positionFactor = 5;
+
   // TODO put in values velocity and current thresholds based off example
   public static final LoggedTunableNumber algaeVelocityThreshold =
       new LoggedTunableNumber("Carriage/algaeVelocityThreshold");
