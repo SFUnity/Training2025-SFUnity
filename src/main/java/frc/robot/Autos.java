@@ -3,7 +3,10 @@ package frc.robot;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static frc.robot.RobotCommands.*;
 import static frc.robot.RobotCommands.ScoreState.*;
+import static frc.robot.constantsGlobal.FieldConstants.processorScore;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+
+import java.util.function.BooleanSupplier;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -85,7 +88,7 @@ public class Autos {
     chooser.addRoutine(
         "CenterJIProcessorGHProcessorEFProcessorAlgaeIL2",
         this::CenterJIProcessorGHProcessorEFProcessorAlgaeIL2);
-    chooser.addRoutine("WallJILKAlgaeL2L3", this::WallJILKAlgaeL2L3);
+    chooser.addRoutine("WallCDAlgaeProcessorScoreL2L3", this::WallCDAlgaeProcessorScoreL2L3);
     chooser.addRoutine("WallJIL2AlgaeL2L1", this::WallJIL2AlgaeL2L1);
     chooser.addRoutine("CenterWallL1", this::CenterWallL1);
 
@@ -142,15 +145,10 @@ public class Autos {
     CenterWallToLK.done()
         .onTrue( // WHEN WE FINISH LAST PATH
             Commands.sequence( // RUN THESE COMMANDS IN SEQUENTIAL ORDER
-                elevator
-                    .request(L2)
-                    .andThen(score(elevator, carriage))
-                    .andThen(
-                        runOnce(
-                            () -> {
-                              scoreState = Dealgify;
-                            }),
-                        fullScore(drive, elevator, carriage, intake, poseManager)), // Dealgify
+            elevator
+            .request(L2)
+            .andThen(score(elevator, carriage))
+            .andThen(runOnce(() -> {scoreState = Dealgify;}), fullScore(drive, elevator, carriage, intake, poseManager)), // Dealgify
                 lKToStationHigh.cmd() // START NEXT PATH
                 ));
     lKToStationHigh
@@ -190,13 +188,8 @@ public class Autos {
             elevator
                 .request(L1)
                 .andThen(
-                    scoreCoral(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.done()),
                     runOnce(() -> scoreState = Dealgify),
+                    scoreCoral(elevator, carriage, poseManager, null),
                     dealgify(elevator, carriage, poseManager)));
     CenterWallToLKAlgae.done()
         .onTrue(
@@ -210,20 +203,13 @@ public class Autos {
         .onTrue( // may need to add a small wait command here depending on how mechanical works
             either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1));
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
-    StationHighToK.active()
-        .and(carriage::coralHeld)
+    StationHighToK.done()
         .onTrue(
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
                     elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
                     () -> coralOnL3 >= 1)
-                .andThen(
-                    scoreCoral(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.done())));
+                .andThen(scoreCoral(elevator, carriage, poseManager, null)));
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
     // StationHighToL.done().onTrue(getAutonomousCommand());
@@ -231,57 +217,53 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine WallJILKAlgaeL2L3() {
+  public AutoRoutine WallCDAlgaeProcessorScoreL2L3() {
 
-    AutoRoutine routine = factory.newRoutine("WallJILKAlgaeL2L3");
+    AutoRoutine routine = factory.newRoutine("WallCDAlgaeProcessorScoreL2L3");
 
-    AutoTrajectory centerWallToJI = routine.trajectory("CenterWallToJIAlgae");
-    AutoTrajectory lKToStationHigh = routine.trajectory("KLEjectToStationHigh");
-    AutoTrajectory stationHighToLKL2 = routine.trajectory("StationHighToKLL2");
-    AutoTrajectory jIToKLAlgae = routine.trajectory("JIToKLAlgae");
+    AutoTrajectory centerWallToCD = routine.trajectory("CenterWallToCD");
+    AutoTrajectory cDToProcessorScore = routine.trajectory("CDToProcessorScore");
+    AutoTrajectory processorScoreToCD = routine.trajectory("ProcessorScoreToCD");
+    AutoTrajectory cDToStationLow = routine.trajectory("CDToStationLow");
+    AutoTrajectory stationLowToCD = routine.trajectory("StationLowToCD");
 
     routine
         .active()
         .onTrue(
-            Commands.sequence(
-                centerWallToJI.resetOdometry(), centerWallToJI.cmd() // start traj
-                ));
+            centerWallToCD.resetOdometry()
+            .andThen(
+                elevator.request(L2),
+                scoreCoral(elevator, carriage, poseManager, null))
+            .andThen(cDToProcessorScore.cmd())
+        );
+        cDToProcessorScore.active()
+            .onTrue(
+                elevator.request(AlgaeHigh)
+                .andThen(runOnce(() -> scoreState = Dealgify),
+                dealgify(elevator, carriage, poseManager),
+                processorScoreToCD.cmd())
+        );
+        processorScoreToCD.active()
+        .onTrue(
+            scoreProcessor(carriage, intake, poseManager, dealgifyAfterPlacing, null)
+            .andThen(cDToStationLow.cmd())
+        );
 
-    centerWallToJI
-        .done()
+        cDToStationLow.active()
         .onTrue(
-            Commands.sequence(
-                elevator
-                    .request(L2)
-                    .andThen(score(elevator, carriage))
-                    .andThen(
-                        runOnce(
-                            () -> {
-                              scoreState = Dealgify;
-                            }),
-                        fullScore(drive, elevator, carriage, intake, poseManager)), // Dealgify
-                jIToKLAlgae.cmd()));
-    jIToKLAlgae
-        .done()
+            fullIntake(drive, carriage, intake, poseManager)
+            .andThen(stationLowToCD.cmd())
+        );
+
+        stationLowToCD.active()
         .onTrue(
-            Commands.sequence(
-                runOnce(
-                    () -> {
-                      scoreState = Dealgify;
-                    }),
-                fullScore(drive, elevator, carriage, intake, poseManager),
-                lKToStationHigh.cmd()));
-    lKToStationHigh
-        .done()
-        .onTrue(
-            Commands.sequence(
-                // INTAKE CORAL
-                stationHighToLKL2.cmd()));
-    stationHighToLKL2
-        .done()
-        .onTrue(
-            Commands.sequence(
-                elevator.request(L3).andThen(score(elevator, carriage)), lKToStationHigh.cmd()));
+            elevator.request(L3)
+            .andThen(scoreCoral(elevator, carriage, poseManager, null))
+            
+        );
+
+        
+
     return routine;
   }
 
@@ -294,45 +276,40 @@ public class Autos {
     AutoTrajectory eFToCD = routine.trajectory("EFToCDAlgae");
     AutoTrajectory processorScoreToEFAlgae = routine.trajectory("ProcessorScoreToEFAlgae");
 
-    routine.active().onTrue(Commands.sequence(centerToGH.resetOdometry(), centerToGH.cmd()));
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                centerToGH.resetOdometry(),
+                centerToGH.cmd()));
     centerToGH
         .done()
         .onTrue(
             Commands.sequence(
                 elevator
-                    .request(L2)
-                    .andThen(score(elevator, carriage))
-                    .andThen(
-                        runOnce(
-                            () -> {
-                              scoreState = Dealgify;
-                            }),
-                        fullScore(drive, elevator, carriage, intake, poseManager)), // Dealgify
-                gHToProcessorScore.cmd()));
+                .request(L1)
+                .andThen(
+                    runOnce(() -> scoreState = Dealgify),
+                    scoreCoral(elevator, carriage, poseManager),
+                    dealgify(elevator, carriage, poseManager))));
     gHToProcessorScore
         .done()
         .onTrue(
             Commands.sequence(
-                // score algae
+                
                 ));
     processorScoreToEFAlgae
         .done()
         .onTrue(
             Commands.sequence(
-                runOnce(
-                    () -> {
-                      scoreState = Dealgify;
-                    }),
+                runOnce(() -> {scoreState = Dealgify;}), 
                 fullScore(drive, elevator, carriage, intake, poseManager),
                 eFToCD.cmd()));
     eFToCD
         .done()
         .onTrue(
             Commands.sequence(
-                runOnce(
-                    () -> {
-                      scoreState = Dealgify;
-                    }),
+                runOnce(() -> {scoreState = Dealgify;}), 
                 fullScore(drive, elevator, carriage, intake, poseManager),
                 cDprocessorScore.cmd()));
 
@@ -416,14 +393,9 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 elevator
-                    .request(L2)
-                    .andThen(score(elevator, carriage))
-                    .andThen(
-                        runOnce(
-                            () -> {
-                              scoreState = Dealgify;
-                            }),
-                        fullScore(drive, elevator, carriage, intake, poseManager)),
+                .request(L2)
+                .andThen(score(elevator, carriage))
+                .andThen(runOnce(() -> {scoreState = Dealgify;}), fullScore(drive, elevator, carriage, intake, poseManager)),
                 jIToGH.cmd()));
     jIToGH
         .done()
@@ -435,7 +407,9 @@ public class Autos {
         .done()
         .onTrue(
             Commands.sequence(
-                elevator.request(L3).andThen(RobotCommands.score(elevator, carriage)),
+                elevator
+                    .request(L3)
+                    .andThen(RobotCommands.score(elevator, carriage)),
                 processorScoreToEFAlgae.cmd()));
     processorScoreToEFAlgae.done().onTrue(Commands.sequence(eFToProcessorScore.cmd()));
     return routine;
