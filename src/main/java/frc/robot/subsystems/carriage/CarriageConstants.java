@@ -22,5 +22,6 @@ public class CarriageConstants {
       new LoggedTunableNumber("Carriage/dealgifyingSpeedVolts", 10);
   public static final LoggedTunableNumber processorSpeedVolts =
       new LoggedTunableNumber("Carriage/processorSpeedVolts", -10);
-
+  public static final LoggedTunableNumber holdSpeedVolts =
+      new LoggedTunableNumber("Carriage/holdSpeedVolts", 0.5);
 }

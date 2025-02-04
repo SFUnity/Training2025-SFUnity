@@ -59,8 +59,8 @@ public class Carriage extends SubsystemBase {
         || filteredStatorCurrent <= -2);
   }
 
-  public Command stop() {
-    return run(() -> io.runVolts(0)).withName("stop");
+  public Command stopOrHold() {
+    return run(() -> io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0)).withName("stop");
   }
 
   public Command placeCoral() {

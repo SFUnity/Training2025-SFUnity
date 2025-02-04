@@ -22,7 +22,11 @@ public class CarriageIOSparkMax implements CarriageIO {
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(60)
         .voltageCompensation(12.0);
-    config.encoder.positionConversionFactor(positionFactor).velocityConversionFactor(positionFactor).uvwAverageDepth(2);
+    config
+        .encoder
+        .positionConversionFactor(positionFactor)
+        .velocityConversionFactor(positionFactor)
+        .uvwAverageDepth(2);
     config
         .signals
         .primaryEncoderPositionAlwaysOn(true)
