@@ -12,8 +12,10 @@ public class IntakeConstants {
   public static final double maxAngleRads = Units.degreesToRadians(87.39);
   public static final double armLengthMeters = Units.inchesToMeters(15);
 
-  public static final LoggedTunableNumber algaeVelocityThreshold = new LoggedTunableNumber("Intake/algaeVelocityThreshold");
-  public static final LoggedTunableNumber algaeCurrentThreshold = new LoggedTunableNumber("Intake/algaeCurrentThreshold");
+  public static final LoggedTunableNumber algaeVelocityThreshold =
+      new LoggedTunableNumber("Intake/algaeVelocityThreshold");
+  public static final LoggedTunableNumber algaeCurrentThreshold =
+      new LoggedTunableNumber("Intake/algaeCurrentThreshold");
 
   static {
     switch (Constants.currentMode) {
