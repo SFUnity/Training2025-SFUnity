@@ -65,6 +65,7 @@ public class ModuleIOMixed implements ModuleIO {
   private final boolean turnInverted;
   private final boolean turnEncoderInverted;
   private final int index;
+  private final SparkMaxConfig turnConfig;
 
   // Hardware objects
   private final TalonFX driveTalon;
@@ -183,17 +184,7 @@ public class ModuleIOMixed implements ModuleIO {
     tryUntilOk(5, () -> driveTalon.setPosition(0.0, 0.25));
 
     // Configure turn motor
-    var turnConfig = new SparkMaxConfig();
-    turnConfig
-        .inverted(turnInverted)
-        .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(turnMotorCurrentLimit)
-        .voltageCompensation(12.0);
-    turnConfig
-        .encoder
-        .positionConversionFactor(turnEncoderPositionFactor)
-        .velocityConversionFactor(turnEncoderVelocityFactor)
-        .uvwAverageDepth(2);
+    turnConfig = sparkConfig(turnInverted, turnMotorReduction);
     turnConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -202,13 +193,7 @@ public class ModuleIOMixed implements ModuleIO {
         .pidf(turnKp.get(), 0.0, 0, 0.0);
     turnConfig
         .signals
-        .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency))
-        .primaryEncoderVelocityAlwaysOn(true)
-        .primaryEncoderVelocityPeriodMs(20)
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+        .primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency));
     configureSpark(turnSpark, turnConfig, true);
 
     // Configure CANCoder
@@ -348,8 +333,7 @@ public class ModuleIOMixed implements ModuleIO {
 
   @Override
   public void setTurnBrakeMode(boolean brake) {
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.idleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
-    configureSpark(turnSpark, config, false);
+    turnConfig.idleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
+    configureSpark(turnSpark, turnConfig, false);
   }
 }

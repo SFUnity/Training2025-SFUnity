@@ -121,12 +121,6 @@ public class DriveConstants {
   public static final double turnMotorReduction = 150 / 7;
   public static final DCMotor turnGearbox = DCMotor.getNEO(1);
 
-  // Turn encoder configuration
-  public static final double turnEncoderPositionFactor =
-      2 * Math.PI / turnMotorReduction; // Rotations -> Radians
-  public static final double turnEncoderVelocityFactor =
-      (2 * Math.PI) / 60.0 / turnMotorReduction; // RPM -> Rad/Sec
-
   // Turn PID configuration
   public static final LoggedTunableNumber turnKp;
   public static final double turnPIDMinInput = 0; // Radians
