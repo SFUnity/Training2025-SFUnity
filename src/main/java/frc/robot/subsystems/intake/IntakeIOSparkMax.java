@@ -4,15 +4,13 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.util.SparkUtil.configureSpark;
+import static frc.robot.util.SparkUtil.sparkConfig;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Angle;
 
 public class IntakeIOSparkMax implements IntakeIO {
@@ -22,43 +20,10 @@ public class IntakeIOSparkMax implements IntakeIO {
   private final SparkClosedLoopController pid = pivot.getClosedLoopController();
 
   public IntakeIOSparkMax() {
-    var pivotConfig = new SparkMaxConfig();
-    pivotConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
-    pivotConfig
-        .encoder
-        .positionConversionFactor(pivotPositionFactor)
-        .velocityConversionFactor(pivotPositionFactor)
-        .uvwAverageDepth(2);
-    pivotConfig
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .positionWrappingEnabled(true)
-        .pidf(kP.get(), 0.0, 0, 0.0);
-    pivotConfig
-        .signals
-        .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderVelocityAlwaysOn(true)
-        .primaryEncoderVelocityPeriodMs(20)
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+    var pivotConfig = sparkConfig(pivotInverted, pivotPositionFactor);
     configureSpark(pivot, pivotConfig, true);
 
-    var rollerConfig = new SparkMaxConfig();
-    rollerConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
-    rollerConfig
-        .encoder
-        .positionConversionFactor(rollersPositionFactor)
-        .velocityConversionFactor(rollersPositionFactor)
-        .uvwAverageDepth(2);
-    rollerConfig
-        .signals
-        .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderVelocityAlwaysOn(true)
-        .primaryEncoderVelocityPeriodMs(20)
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+    var rollerConfig = sparkConfig(rollersInverted, rollersPositionFactor);
     configureSpark(rollers, rollerConfig, true);
   }
 

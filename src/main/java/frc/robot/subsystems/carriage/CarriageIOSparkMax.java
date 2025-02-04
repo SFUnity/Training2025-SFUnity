@@ -2,12 +2,11 @@ package frc.robot.subsystems.carriage;
 
 import static frc.robot.subsystems.carriage.CarriageConstants.*;
 import static frc.robot.util.SparkUtil.configureSpark;
+import static frc.robot.util.SparkUtil.sparkConfig;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class CarriageIOSparkMax implements CarriageIO {
@@ -16,25 +15,7 @@ public class CarriageIOSparkMax implements CarriageIO {
   private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
 
   public CarriageIOSparkMax() {
-    var config = new SparkMaxConfig();
-    config
-        .inverted(false)
-        .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(60)
-        .voltageCompensation(12.0);
-    config
-        .encoder
-        .positionConversionFactor(positionFactor)
-        .velocityConversionFactor(positionFactor)
-        .uvwAverageDepth(2);
-    config
-        .signals
-        .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderVelocityAlwaysOn(true)
-        .primaryEncoderVelocityPeriodMs(20)
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+    var config = sparkConfig(inverted, positionFactor);
     configureSpark(rollerMotor, config, true);
   }
 

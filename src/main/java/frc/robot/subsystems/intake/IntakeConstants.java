@@ -6,8 +6,12 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class IntakeConstants {
   public static final LoggedTunableNumber kP;
+
+  public static final boolean pivotInverted = false;
+  public static final boolean rollersInverted = false;
   public static final double pivotPositionFactor = 25;
   public static final double rollersPositionFactor = 5;
+
   public static final double minAngleRads = Units.degreesToRadians(18.39);
   public static final double maxAngleRads = Units.degreesToRadians(87.39);
   public static final double armLengthMeters = Units.inchesToMeters(15);
