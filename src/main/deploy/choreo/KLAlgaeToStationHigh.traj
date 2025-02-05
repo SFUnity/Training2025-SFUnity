@@ -93,5 +93,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Marker", "from":{"target":1, "targetTimestamp":0.39744, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
+   {"name":"EjectAlgae", "from":{"target":1, "targetTimestamp":0.39744, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
