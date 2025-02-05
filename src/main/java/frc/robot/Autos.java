@@ -1,12 +1,23 @@
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.*;
-import static frc.robot.RobotCommands.*;
-import static frc.robot.RobotCommands.ScoreState.*;
-import static frc.robot.constantsGlobal.FieldConstants.processorScore;
-import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+import static edu.wpi.first.wpilibj2.command.Commands.either;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
+import static frc.robot.RobotCommands.dealgify;
+import static frc.robot.RobotCommands.dealgifyAfterPlacing;
+import static frc.robot.RobotCommands.fullIntake;
+import static frc.robot.RobotCommands.scoreCoral;
+import static frc.robot.RobotCommands.scoreProcessor;
+import static frc.robot.RobotCommands.scoreState;
+import static frc.robot.RobotCommands.ScoreState.Dealgify;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.AlgaeHigh;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.AlgaeLow;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L1;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L2;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
-import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -24,8 +35,6 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.PoseManager;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class Autos {
   private final Drive drive;
@@ -91,6 +100,7 @@ public class Autos {
     chooser.addRoutine("WallCDAlgaeProcessorScoreL2L3", this::WallCDAlgaeProcessorScoreL2L3);
     chooser.addRoutine("WallJIL2AlgaeL2L1", this::WallJIL2AlgaeL2L1);
     chooser.addRoutine("CenterWallL1", this::CenterWallL1);
+    chooser.addRoutine("L1HGAlgae", this::L1HGAlgae);
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
@@ -148,7 +158,7 @@ public class Autos {
             elevator
             .request(L2)
             .andThen(score(elevator, carriage))
-            .andThen(runOnce(() -> {scoreState = Dealgify;}), fullScore(drive, elevator, carriage, intake, poseManager)), // Dealgify
+            .andThen(runOnce(() -> {scoreState = Dealgify;}), scoreAlgae(drive, elevator, carriage, intake, poseManager)), // Dealgify
                 lKToStationHigh.cmd() // START NEXT PATH
                 ));
     lKToStationHigh
@@ -190,6 +200,8 @@ public class Autos {
                 .andThen(
                     runOnce(() -> scoreState = Dealgify),
                     scoreCoral(elevator, carriage, poseManager, null),
+                    elevator.request(AlgaeLow),
+                    scoreState
                     dealgify(elevator, carriage, poseManager)));
     CenterWallToLKAlgae.done()
         .onTrue(
@@ -197,8 +209,6 @@ public class Autos {
                 .andThen(LKToStationHigh.cmd())
                 .withName("waitUntilAlgaeHeldThenLKCmd"));
     // TODO Add binding in choreo to shoot out the algae
-    LKToStationHigh.atTime("EjectAlgae").onTrue( carriage.scoreProcessor());
-
     LKToStationHigh.done()
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
@@ -240,7 +250,7 @@ public class Autos {
         );
         cDToProcessorScore.active()
             .onTrue(
-                elevator.request(AlgaeHigh)
+                elevator.request(AlgaeLow)
                 .andThen(runOnce(() -> scoreState = Dealgify),
                 dealgify(elevator, carriage, poseManager),
                 processorScoreToCD.cmd())
@@ -416,4 +426,34 @@ public class Autos {
     processorScoreToEFAlgae.done().onTrue(Commands.sequence(eFToProcessorScore.cmd()));
     return routine;
   }
+
+  public AutoRoutine L1HGAlgae() {
+
+    AutoRoutine routine = factory.newRoutine("L1HGalgae");
+
+    AutoTrajectory centerWallToHG = routine.trajectory("CenterWallToHG");
+    AutoTrajectory hGToProcessorScore = routine.trajectory("HGToProcessorScore");
+
+    routine.active().onTrue(
+        centerWallToHG.resetOdometry()
+        .andThen(centerWallToHG.cmd())
+    );
+    centerWallToHG.done().onTrue(
+        elevator.request(L1)
+        .andThen(scoreCoral(elevator, carriage, poseManager, null))
+        .andThen(elevator.request(AlgaeLow),
+        runOnce(() -> {scoreState = Dealgify;}),
+        dealgify(elevator, carriage, poseManager)
+        )
+        .andThen(hGToProcessorScore.cmd())
+    );
+    hGToProcessorScore.done().onTrue(
+        scoreProcessor(carriage, intake, poseManager, dealgifyAfterPlacing, null)
+    );
+
+    return routine;
+
+  }
+
+
 }
