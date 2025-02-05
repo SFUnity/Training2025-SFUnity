@@ -202,6 +202,8 @@ public class Autos {
                 .andThen(LKToStationHigh.cmd())
                 .withName("waitUntilAlgaeHeldThenLKCmd"));
     // TODO Add binding in choreo to shoot out the algae
+    LKToStationHigh.atTime("EjectAlgae").onTrue( carriage.scoreProcessor());
+    
     LKToStationHigh.done()
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
