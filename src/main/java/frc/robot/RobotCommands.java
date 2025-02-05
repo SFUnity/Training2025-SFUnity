@@ -23,6 +23,7 @@ import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
+  public static boolean allowAutoDrive = true;
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
@@ -39,8 +40,9 @@ public final class RobotCommands {
       BooleanSupplier atPose) {
     return waitUntil(
             () ->
-                poseManager.getDistanceTo(goalPose.get())
-                    < elevatorSafeExtensionDistanceMeters.get())
+                !allowAutoDrive
+                    || poseManager.getDistanceTo(goalPose.get())
+                        < elevatorSafeExtensionDistanceMeters.get())
         .andThen(elevator.enableElevator(), waitUntil(atPose), carriage.placeCoral());
   }
 
@@ -53,8 +55,9 @@ public final class RobotCommands {
     BooleanSupplier highAlgae = () -> poseManager.closestFace().highAlgae;
     return waitUntil(
             () ->
-                poseManager.getDistanceTo(goalPose.get())
-                    < elevatorSafeExtensionDistanceMeters.get())
+                !allowAutoDrive
+                    || poseManager.getDistanceTo(goalPose.get())
+                        < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
             either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
                 .andThen(elevator.enableElevator())
@@ -73,7 +76,7 @@ public final class RobotCommands {
   }
 
   public static BooleanSupplier atGoal(Drive drive) {
-    return () -> drive.linearAtGoal() && drive.thetaAtGoal();
+    return () -> !allowAutoDrive || (drive.linearAtGoal() && drive.thetaAtGoal());
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
@@ -117,8 +120,7 @@ public final class RobotCommands {
     return select(
         Map.of(
             Source,
-            // Maybe should change so that even if most of poseEstimation isn't working, this still
-            // will
+            // Maybe should change so that even if most of poseEstimation isn't working, this does
             either(
                 drive
                     .headingDrive(

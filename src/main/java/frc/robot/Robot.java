@@ -313,8 +313,6 @@ public class Robot extends LoggedRobot {
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
-  private boolean allowAutoDrive = true;
-
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
@@ -372,7 +370,11 @@ public class Robot extends LoggedRobot {
                         ProcessorBack,
                         scoreProcessor(carriage, intake, poseManager, false, atGoal(drive))),
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
-                .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                .deadlineFor(
+                    Commands.either(
+                        drive.fullAutoDrive(goalPose(poseManager)),
+                        Commands.none(),
+                        () -> allowAutoDrive))
                 .beforeStarting(
                     () -> {
                       if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
@@ -381,7 +383,11 @@ public class Robot extends LoggedRobot {
                 .andThen(
                     Commands.either(
                         dealgify(elevator, carriage, poseManager)
-                            .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                            .deadlineFor(
+                                Commands.either(
+                                    drive.fullAutoDrive(goalPose(poseManager)),
+                                    Commands.none(),
+                                    () -> allowAutoDrive))
                             .beforeStarting(
                                 () -> {
                                   scoreState = Dealgify;
