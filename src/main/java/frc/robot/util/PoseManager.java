@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import frc.robot.RobotCommands.ScoreState;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
@@ -154,7 +155,8 @@ public class PoseManager {
     }
 
     // Get angles
-    double fieldVelocityAngle = new Rotation2d(fieldVelocity().dx, fieldVelocity().dy).getDegrees();
+    double fieldVelocityAngle =
+        Units.radiansToDegrees(Math.atan2(fieldVelocity().dy, fieldVelocity().dx));
     double angleToClosest = getHorizontalAngleTo(apply(closest.getPose())).getDegrees();
     double angleTo2ndClosest = getHorizontalAngleTo(apply(secondClosest.getPose())).getDegrees();
 
@@ -163,9 +165,19 @@ public class PoseManager {
     if (angleToClosest < 0) angleToClosest += 360;
     if (angleTo2ndClosest < 0) angleTo2ndClosest += 360;
 
+    // Logger.recordOutput("FieldVelocityAngle", fieldVelocityAngle);
+    // Logger.recordOutput("AngleToClosest", angleToClosest);
+    // Logger.recordOutput("AngleTo2ndClosest", angleTo2ndClosest);
+
     // Find angle differences
     double toClosestAngleDiff = Math.abs(fieldVelocityAngle - angleToClosest);
     double to2ndClosestAngleDiff = Math.abs(fieldVelocityAngle - angleTo2ndClosest);
+
+    if (toClosestAngleDiff > 180) toClosestAngleDiff = 360 - toClosestAngleDiff;
+    if (to2ndClosestAngleDiff > 180) to2ndClosestAngleDiff = 360 - to2ndClosestAngleDiff;
+
+    // Logger.recordOutput("ToClosestAngleDiff", toClosestAngleDiff);
+    // Logger.recordOutput("To2ndClosestAngleDiff", to2ndClosestAngleDiff);
 
     // Find closest angle
     if (toClosestAngleDiff > to2ndClosestAngleDiff
