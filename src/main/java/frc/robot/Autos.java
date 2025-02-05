@@ -188,30 +188,42 @@ public class Autos {
             elevator
                 .request(L1)
                 .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWallToLKAlgae.getFinalPose().get(),
+                        CenterWallToLKAlgae.done()),
                     runOnce(() -> scoreState = Dealgify),
-                    scoreCoral(elevator, carriage, poseManager, null),
                     dealgify(elevator, carriage, poseManager)));
     CenterWallToLKAlgae.done()
         .onTrue(
             waitUntil(() -> carriage.algaeHeld())
                 .andThen(LKToStationHigh.cmd())
                 .withName("waitUntilAlgaeHeldThenLKCmd"));
-    // TODO Add binding in choreo to shoot out the algae
-    LKToStationHigh.atTime("EjectAlgae").onTrue( carriage.scoreProcessor());
 
+    LKToStationHigh.atTime("EjectAlgae").onTrue( carriage.scoreProcessor());
+    
     LKToStationHigh.done()
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
         .onTrue( // may need to add a small wait command here depending on how mechanical works
             either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1));
     // For intaking coral see robot.configureBindings, state-based triggers, all the time
-    StationHighToK.done()
+    StationHighToK.active()
+        .and(carriage::coralHeld)
         .onTrue(
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
                     elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
                     () -> coralOnL3 >= 1)
-                .andThen(scoreCoral(elevator, carriage, poseManager, null)));
+                .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> StationHighToK.getFinalPose().get(),
+                        StationHighToK.done())));
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
     // StationHighToL.done().onTrue(getAutonomousCommand());
