@@ -20,6 +20,7 @@ import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class PoseManager {
   static final Lock odometryLock = new ReentrantLock();
@@ -152,20 +153,23 @@ public class PoseManager {
         secondClosest = face;
       }
     }
+
     double robotVelocityAngle = new Rotation2d(robotVelocity.dx, robotVelocity.dy).getDegrees();
     if (robotVelocityAngle < 0) {
       robotVelocityAngle = robotVelocityAngle + 360;
     }
+    Logger.recordOutput(
+        "RobotVelocityAngle",
+        new Pose2d(getTranslation(), Rotation2d.fromDegrees(robotVelocityAngle)));
+
     double angleToClosest = getHorizontalAngleTo(apply(closest.getPose())).getDegrees();
-    if (angleToClosest < 0) {
-      angleToClosest = angleToClosest + 360;
-    }
+    if (angleToClosest < 0) angleToClosest += 360;
     double toClosestAngleDiff = Math.abs(robotVelocityAngle - angleToClosest);
+
     double angleTo2ndClosest = getHorizontalAngleTo(apply(secondClosest.getPose())).getDegrees();
-    if (angleTo2ndClosest < 0) {
-      angleTo2ndClosest = angleTo2ndClosest + 360;
-    }
+    if (angleTo2ndClosest < 0) angleTo2ndClosest += 360;
     double to2ndClosestAngleDiff = Math.abs(robotVelocityAngle - angleTo2ndClosest);
+
     if (toClosestAngleDiff > to2ndClosestAngleDiff
         && (robotVelocity.dx > 0.1 || robotVelocity.dy > 0.1)) {
       lockedFace = secondClosest;
