@@ -146,17 +146,21 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.done()),
-                    // Dealgify
-                    runOnce(() -> scoreState = Dealgify),
-                    dealgify(elevator, carriage, poseManager)
-                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))));
-    // Start next path once algae is held
+                        CenterWallToLKAlgae.done()))
+                .withName("ScoreCoralOnL1"));
     CenterWallToLKAlgae.done()
         .onTrue(
-            waitUntil(() -> carriage.algaeHeld())
-                .andThen(LKToStationHigh.cmd())
-                .withName("waitUntilAlgaeHeldThenLKCmd"));
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(
+                    // Dealgify
+                    runOnce(() -> scoreState = Dealgify),
+                    // TODO make sure this dealgify doesn't block the atTime trigger
+                    dealgify(elevator, carriage, poseManager)
+                        .asProxy()
+                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    // Start next path once algae is held
+                    LKToStationHigh.cmd())
+                .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
     LKToStationHigh.atTime("EjectAlgae").onTrue(carriage.scoreProcessor());
