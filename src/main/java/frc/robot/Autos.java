@@ -162,7 +162,7 @@ public class Autos {
     LKToStationHigh.atTime("EjectAlgae").onTrue(carriage.scoreProcessor());
 
     // Drive back from the station to our next scoring location
-    // We're intaking coral using a trigger in Robot.configureBindings so we don't need to do it here
+    // We're intaking coral with a trigger in Robot.java so we don't need to do it here
     LKToStationHigh.done()
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
