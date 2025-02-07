@@ -78,13 +78,6 @@ public class Autos {
                   traj.getInitialPose(AllianceFlipUtil.shouldFlip()).get());
             });
 
-    // TODO:
-    // factory
-    // .bind("scoreCoral", SCORECMD())
-    // .bind("RemoveAlgae", RemoveAlageCMD())
-
-    // .bind("scoreAlgae", ScoreAlgaeCMD())
-
     /* Set up main choreo routines */
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
