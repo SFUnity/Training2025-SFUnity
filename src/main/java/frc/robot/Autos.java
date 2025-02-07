@@ -6,6 +6,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import static frc.robot.RobotCommands.dealgify;
 import static frc.robot.RobotCommands.dealgifyAfterPlacing;
 import static frc.robot.RobotCommands.fullIntake;
+import static frc.robot.RobotCommands.goalPose;
 import static frc.robot.RobotCommands.scoreCoral;
 import static frc.robot.RobotCommands.scoreProcessor;
 import static frc.robot.RobotCommands.scoreState;
@@ -207,10 +208,7 @@ public class Autos {
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
                         CenterWallToLKAlgae.done()),
                     runOnce(() -> scoreState = Dealgify),
-                    scoreCoral(elevator, carriage, poseManager, null),
-                    elevator.request(AlgaeLow),
-                    scoreState
-                    dealgify(elevator, carriage, poseManager)));
+                    dealgify(elevator, carriage, poseManager).deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))));
     CenterWallToLKAlgae.done()
         .onTrue(
             waitUntil(() -> carriage.algaeHeld())
