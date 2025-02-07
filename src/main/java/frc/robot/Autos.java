@@ -154,7 +154,6 @@ public class Autos {
                 .andThen(
                     // Dealgify
                     runOnce(() -> scoreState = Dealgify),
-                    // TODO make sure this dealgify doesn't block the atTime trigger
                     dealgify(elevator, carriage, poseManager)
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
