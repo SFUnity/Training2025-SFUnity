@@ -122,7 +122,7 @@ public class Autos {
   public AutoRoutine WallLKAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToLKAlgae");
-    AutoTrajectory LKToStationHigh = routine.trajectory("LKAlgaeToStationHigh");
+    AutoTrajectory KLToStationHigh = routine.trajectory("KLAlgaeToStationHigh");
     AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
     AutoTrajectory KToStationHigh = routine.trajectory("KToStationHigh");
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
@@ -159,15 +159,15 @@ public class Autos {
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     // Start next path once algae is held
-                    LKToStationHigh.cmd())
+                    KLToStationHigh.cmd())
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
-    LKToStationHigh.atTime("EjectAlgae").onTrue(carriage.scoreProcessor());
+    KLToStationHigh.atTime("EjectAlgae").onTrue(carriage.scoreProcessor());
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
-    LKToStationHigh.done()
+    KLToStationHigh.done()
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
         .onTrue( // may need to add a small wait command here depending on how mechanical works
