@@ -137,6 +137,7 @@ public class Autos {
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWallToLKAlgae.active()
         .onTrue(
+            // Score coral on L1
             elevator
                 .request(L1)
                 .andThen(
@@ -146,26 +147,31 @@ public class Autos {
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
                         CenterWallToLKAlgae.done()),
+                    // Dealgify
                     runOnce(() -> scoreState = Dealgify),
                     dealgify(elevator, carriage, poseManager)
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))));
+    // Start next path once algae is held
     CenterWallToLKAlgae.done()
         .onTrue(
             waitUntil(() -> carriage.algaeHeld())
                 .andThen(LKToStationHigh.cmd())
                 .withName("waitUntilAlgaeHeldThenLKCmd"));
 
+    // Eject algae while driving
     LKToStationHigh.atTime("EjectAlgae").onTrue(carriage.scoreProcessor());
 
+    // Drive back from the station to our next scoring location
+    // For how we're intaking coral see Robot.configureBindings, state-based triggers, all the time
     LKToStationHigh.done()
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
         .onTrue( // may need to add a small wait command here depending on how mechanical works
             either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1));
-    // For intaking coral see robot.configureBindings, state-based triggers, all the time
     StationHighToK.active()
-        .and(carriage::coralHeld)
+        .and(carriage::coralHeld) // Make sure we don't raise elevator before coral is held
         .onTrue(
+            // Score either L2 or L3 depending on where we've scored previously
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
                     elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
@@ -177,6 +183,7 @@ public class Autos {
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
                         StationHighToK.done())));
+    // Go back to source once we've scored the coral
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
     // StationHighToL.done().onTrue(getAutonomousCommand());
