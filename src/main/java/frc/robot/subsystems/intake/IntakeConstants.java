@@ -15,6 +15,8 @@ public class IntakeConstants {
   public static final double minAngleRads = Units.degreesToRadians(18.39);
   public static final double maxAngleRads = Units.degreesToRadians(87.39);
   public static final double armLengthMeters = Units.inchesToMeters(15);
+  public static final double intakePIDMinInput = 0;
+  public static final double intakePIDMaxInput = 2 * Math.PI;
 
   public static final LoggedTunableNumber algaeVelocityThreshold =
       new LoggedTunableNumber("Intake/algaeVelocityThreshold");
