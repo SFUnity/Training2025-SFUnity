@@ -4,7 +4,7 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class CarriageConstants {
   public static final int rollerMotorID = 10;
-  public static final int beamBreakPort = 9;
+  public static final int beamBreakPort = 6;
 
   public static final boolean inverted = false;
   public static final double positionFactor = 5;
