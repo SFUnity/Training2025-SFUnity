@@ -377,6 +377,7 @@ public class Robot extends LoggedRobot {
                         () -> allowAutoDrive))
                 .beforeStarting(
                     () -> {
+                      poseManager.lockClosest = true;
                       if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
                     })
@@ -394,7 +395,8 @@ public class Robot extends LoggedRobot {
                                   dealgifyAfterPlacing = false;
                                 }),
                         Commands.none(),
-                        () -> dealgifyAfterPlacing)));
+                        () -> dealgifyAfterPlacing))
+                .finallyDo(() -> poseManager.lockClosest = false));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
