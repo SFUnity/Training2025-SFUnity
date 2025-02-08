@@ -5,6 +5,9 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 
 public class IntakeConstants {
+  public static final int rollersID = 18;
+  public static final int pivotID = 15;
+
   public static final LoggedTunableNumber kP;
 
   public static final boolean pivotInverted = false;

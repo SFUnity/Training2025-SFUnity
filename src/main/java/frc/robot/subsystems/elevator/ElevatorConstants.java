@@ -6,7 +6,7 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorConstants {
-  public static final int elevatorMotorID = 0;
+  public static final int elevatorMotorID = 16;
   // Profiled PID values
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;

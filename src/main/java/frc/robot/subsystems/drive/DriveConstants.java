@@ -74,10 +74,10 @@ public class DriveConstants {
   public static final int frontRightDriveCanId = 10;
   public static final int backRightDriveCanId = 9;
 
-  public static final int frontLeftTurnCanId = 19;
-  public static final int backLeftTurnCanId = 2;
-  public static final int frontRightTurnCanId = 11;
-  public static final int backRightTurnCanId = 1;
+  public static final int frontLeftTurnCanId = 8;
+  public static final int backLeftTurnCanId = 13;
+  public static final int frontRightTurnCanId = 6;
+  public static final int backRightTurnCanId = 17;
 
   public static final int frontLeftTurnEncoderCanId = 18;
   public static final int backLeftTurnEncoderCanId = 4;
