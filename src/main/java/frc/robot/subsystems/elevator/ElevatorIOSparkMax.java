@@ -19,7 +19,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private double deltaTime = 0;
 
   public ElevatorIOSparkMax() {
-    var motorConfig = sparkConfig(false, carrageMassKg);
+    var motorConfig = sparkConfig(false, gearRatio);
     configureSpark(elevatorMotor, motorConfig, true);
   }
 
