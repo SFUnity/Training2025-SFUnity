@@ -25,6 +25,7 @@ import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -171,7 +172,8 @@ public class Autos {
         .or(LToStationHigh.done())
         .onTrue(
             waitUntil(() -> carriage.coralHeld())
-                .andThen(either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1)));
+                .andThen(either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1))
+                .withName("0"));
 
     StationHighToK.active()
         .and(carriage::coralHeld) // Make sure we don't raise elevator before coral is held
@@ -187,11 +189,36 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.done())));
+                        StationHighToK.done()))
+                .withName("01"));
+
     // Go back to source once we've scored the coral
     StationHighToK.done()
-        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
+        .onTrue(
+            Commands.sequence(
+                waitUntil(() -> carriage.coralHeld() == false),
+                KToStationHigh.cmd().withName("001")));
     // StationHighToL.done().onTrue(getAutonomousCommand());
+    StationHighToL.active()
+        .and(carriage::coralHeld) // Make sure we don't raise elevator before coral is held
+        .onTrue(
+            // Score either L2 or L3 depending on where we've scored previously
+            either(
+                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
+                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
+                    () -> coralOnL3 >= 1)
+                .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> StationHighToL.getFinalPose().get(),
+                        StationHighToL.done()))
+                .withName("0001"));
+    // Go back to source once we've scored the coral
+    StationHighToL.done()
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()).withName("0001"));
 
     return routine;
   }
