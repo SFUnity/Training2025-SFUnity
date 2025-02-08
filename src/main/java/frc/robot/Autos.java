@@ -170,10 +170,9 @@ public class Autos {
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
         .onTrue(
-        waitUntil(() -> carriage.coralHeld())
-        .andThen(
-            either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1)));
-        
+            waitUntil(() -> carriage.coralHeld())
+                .andThen(either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1)));
+
     StationHighToK.active()
         .and(carriage::coralHeld) // Make sure we don't raise elevator before coral is held
         .onTrue(
