@@ -10,8 +10,6 @@ public class ElevatorConstants {
   // Profiled PID values
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
-  public static final double elevatorPIDMinInput = 0;
-  public static final double elevatorPIDMaxInput = 2 * Math.PI;
   public static final double elevatorDistanceToleranceInches = 0.3;
   public static final double maxElevatorSpeed = 78.74; // inches/sec
   public static final double maxElevatorAcceleration = 394; // inches/sec^2
@@ -26,12 +24,6 @@ public class ElevatorConstants {
   public static final double maxHeightInches = 23.0;
   public static final double gearRatio = 9;
   public static final double wheelRadius = 1;
-  // Motor config values
-  public static final double turnMotorReduction = 150 / 7;
-  public static final double encoderPositionFactor =
-      2 * Math.PI / turnMotorReduction; // Rotations -> Radians
-  public static final double encoderVelocityFactor =
-      (2 * Math.PI) / 60.0 / turnMotorReduction; // RPM -> Rad/Sec
 
   static {
     switch (Constants.currentMode) {
