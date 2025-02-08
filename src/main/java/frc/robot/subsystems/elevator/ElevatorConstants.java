@@ -7,18 +7,18 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorConstants {
   public static final int elevatorMotorID = 0;
-  //Profiled PID values
+  // Profiled PID values
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
   public static final double elevatorPIDMinInput = 0;
   public static final double elevatorPIDMaxInput = 2 * Math.PI;
   public static final double elevatorDistanceToleranceInches = 0.3;
-  public static final double maxElevatorSpeed = 78.74; //inches
-  public static final double maxElevatorAcceleration = 394; //inches per second
-  //FF values
+  public static final double maxElevatorSpeed = 78.74; // inches/sec
+  public static final double maxElevatorAcceleration = 394; // inches/sec^2
+  // FF values
   public static final LoggedTunableNumber kG;
   public static final LoggedTunableNumber kV;
-  //Sim stuff
+  // Sim stuff
   public static final Translation2d elevatorOrigin = new Translation2d(0, 0);
   public static final double carrageMassKg = Units.lbsToKilograms(15);
   public static final double drumRadiusMeters = Units.inchesToMeters(1.4);
@@ -26,7 +26,7 @@ public class ElevatorConstants {
   public static final double maxHeightInches = 23.0;
   public static final double gearRatio = 9;
   public static final double wheelRadius = 1;
-  //Motor config values
+  // Motor config values
   public static final double turnMotorReduction = 150 / 7;
   public static final double encoderPositionFactor =
       2 * Math.PI / turnMotorReduction; // Rotations -> Radians
