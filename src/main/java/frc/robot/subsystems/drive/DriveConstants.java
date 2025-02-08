@@ -24,7 +24,7 @@ import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = Units.feetToMeters(17.1);
+  public static final double maxSpeedMetersPerSec = Constants.onCarpet ? Units.feetToMeters(17.1) : Units.feetToMeters(17.1);
   public static final double maxAccelerationMetersPerSec =
       Units.feetToMeters(75.0); // This is what 6328
   public static final double odometryFrequency = 100.0; // Hz
@@ -89,7 +89,7 @@ public class DriveConstants {
   // Drive motor configuration
   public static final int driveMotorSupplyCurrentLimit = 50;
   public static final int driveMotorStatorCurrentLimit = 80;
-  public static final double wheelRadiusMeters = Units.inchesToMeters(2);
+  public static final double wheelRadiusMeters = Constants.onCarpet ? Units.inchesToMeters(2) : Units.inchesToMeters(2);
   public static final double driveMotorReduction = 6.12;
   public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
 
@@ -102,10 +102,10 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.0);
-        driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = 0.0;
-        driveKv = 0.0;
+        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", Constants.onCarpet ? 0.0 : 0.0);
+        driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", Constants.onCarpet ? 0.0 : 0.0);
+        driveKs = Constants.onCarpet ? 0.0 : 0.0;
+        driveKv = Constants.onCarpet ? 0.0 : 0.0;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
@@ -129,7 +129,7 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", 0.32);
+        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", Constants.onCarpet ? 0.32 : 0.32);
         break;
       case SIM:
         turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 14.0);
