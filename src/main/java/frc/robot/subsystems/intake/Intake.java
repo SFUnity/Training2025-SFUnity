@@ -25,9 +25,11 @@ public class Intake extends SubsystemBase {
       new LoggedTunableNumber("Intake/loweredAngle", 19);
   private static final LoggedTunableNumber raisedAngle =
       new LoggedTunableNumber("Intake/raisedAngle", 86);
-  // In percent output
+  // In volts
   private static final LoggedTunableNumber rollersSpeed =
       new LoggedTunableNumber("Intake/rollerSpeedVolts", 10);
+  private static final LoggedTunableNumber holdSpeedVolts =
+      new LoggedTunableNumber("Carriage/holdSpeedVolts", 0.5);
 
   private Angle positionSetpoint = Degrees.zero();
 
@@ -36,16 +38,11 @@ public class Intake extends SubsystemBase {
 
   public Intake(IntakeIO io) {
     this.io = io;
-
-    io.setPID(kP.get());
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
-
-    // Update controllers
-    LoggedTunableNumber.ifChanged(hashCode(), () -> io.setPID(kP.get()), kP);
 
     // Logs
     measuredVisualizer.update(inputs.pivotCurrentPosition);
@@ -72,14 +69,14 @@ public class Intake extends SubsystemBase {
     io.runRollers(-rollersSpeed.get());
   }
 
-  private void rollersStop() {
-    io.runRollers(0);
+  private void rollersStopOrHold() {
+    io.runRollers(algaeHeld() ? holdSpeedVolts.get() : 0);
   }
 
-  public Command raiseAndStopCmd() {
+  public Command raiseAndStopOrHoldCmd() {
     return run(() -> {
           raise();
-          rollersStop();
+          rollersStopOrHold();
         })
         .withName("raise and stop");
   }

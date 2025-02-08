@@ -121,15 +121,8 @@ public class DriveConstants {
   public static final double turnMotorReduction = 150 / 7;
   public static final DCMotor turnGearbox = DCMotor.getNEO(1);
 
-  // Turn encoder configuration
-  public static final double turnEncoderPositionFactor =
-      2 * Math.PI / turnMotorReduction; // Rotations -> Radians
-  public static final double turnEncoderVelocityFactor =
-      (2 * Math.PI) / 60.0 / turnMotorReduction; // RPM -> Rad/Sec
-
   // Turn PID configuration
   public static final LoggedTunableNumber turnKp;
-  public static final LoggedTunableNumber turnKd;
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
@@ -137,11 +130,9 @@ public class DriveConstants {
     switch (Constants.currentMode) {
       default:
         turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", 0.32);
-        turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnKd", 0.0);
         break;
       case SIM:
         turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 14.0);
-        turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnKd", 0.0);
         break;
     }
   }

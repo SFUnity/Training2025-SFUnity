@@ -21,8 +21,4 @@ public interface IntakeIO {
   default void runRollers(double volts) {}
 
   default void setPivotPosition(Angle angle) {}
-
-  default void setPID(double p) {}
-
-  default void stop() {}
 }

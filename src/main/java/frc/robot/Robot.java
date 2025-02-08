@@ -303,7 +303,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Controls/intakeState", intakeState.toString());
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
     Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
-    Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
+    Logger.recordOutput("Controls/allowAutoRotation", allowAutoDrive);
     Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
@@ -312,8 +312,6 @@ public class Robot extends LoggedRobot {
         && DriverStation.getJoystickIsXbox(
             controller.getHID().getPort()); // Should be an XBox controller
   }
-
-  private boolean allowAutoRotation = true;
 
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
@@ -325,8 +323,8 @@ public class Robot extends LoggedRobot {
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
     elevator.setDefaultCommand(elevator.disableElevator());
-    carriage.setDefaultCommand(carriage.stop());
-    intake.setDefaultCommand(intake.raiseAndStopCmd());
+    carriage.setDefaultCommand(carriage.stopOrHold());
+    intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -353,10 +351,11 @@ public class Robot extends LoggedRobot {
                 .ignoringDisable(true));
     driver
         .back()
-        .onTrue(
-            Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
+        .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
-    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver
+        .rightBumper()
+        .whileTrue(fullIntake(drive, carriage, intake, poseManager, () -> allowAutoDrive));
     driver
         .leftBumper()
         .whileTrue(
@@ -371,7 +370,11 @@ public class Robot extends LoggedRobot {
                         ProcessorBack,
                         scoreProcessor(carriage, intake, poseManager, false, atGoal(drive))),
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
-                .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                .deadlineFor(
+                    Commands.either(
+                        drive.fullAutoDrive(goalPose(poseManager)),
+                        Commands.none(),
+                        () -> allowAutoDrive))
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
@@ -381,7 +384,11 @@ public class Robot extends LoggedRobot {
                 .andThen(
                     Commands.either(
                         dealgify(elevator, carriage, poseManager)
-                            .deadlineFor(drive.fullAutoDrive(goalPose(poseManager)))
+                            .deadlineFor(
+                                Commands.either(
+                                    drive.fullAutoDrive(goalPose(poseManager)),
+                                    Commands.none(),
+                                    () -> allowAutoDrive))
                             .beforeStarting(
                                 () -> {
                                   scoreState = Dealgify;
@@ -421,7 +428,8 @@ public class Robot extends LoggedRobot {
     // State-Based Triggers
     // Teleop Only
     new Trigger(carriage::coralHeld)
-        .and(() -> allowAutoRotation)
+        .and(() -> allowAutoDrive)
+        // Maybe should remove so that even if most of poseEstimation isn't working, this still will
         .and(() -> DriverStation.isTeleop())
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
     new Trigger(carriage::algaeHeld)
@@ -434,6 +442,7 @@ public class Robot extends LoggedRobot {
     // All the time
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
         .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .and(() -> allowAutoDrive)
         .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces

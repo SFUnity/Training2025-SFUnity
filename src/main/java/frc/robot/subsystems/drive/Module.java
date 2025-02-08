@@ -143,8 +143,8 @@ public class Module {
     io.setDrivePIDF(drivekP, drivekD);
   }
 
-  public void setTurnPIDF(double turnkP, double turnkD) {
-    io.setTurnPIDF(turnkP, turnkD);
+  public void setTurnPIDF(double turnkP) {
+    io.setTurnPIDF(turnkP);
   }
 
   /** Sets whether brake mode is enabled. */

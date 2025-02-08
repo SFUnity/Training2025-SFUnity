@@ -4,8 +4,10 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class CarriageConstants {
   public static final int rollerMotorID = 0;
+  public static final int beamBreakNumber = 0;
 
-  public static final int currentLimit = 60;
+  public static final boolean inverted = false;
+  public static final double positionFactor = 5;
 
   // TODO put in values velocity and current thresholds based off example
   public static final LoggedTunableNumber algaeVelocityThreshold =
@@ -21,6 +23,6 @@ public class CarriageConstants {
       new LoggedTunableNumber("Carriage/dealgifyingSpeedVolts", 10);
   public static final LoggedTunableNumber processorSpeedVolts =
       new LoggedTunableNumber("Carriage/processorSpeedVolts", -10);
-
-  public static final int beamBreakNumber = 0;
+  public static final LoggedTunableNumber holdSpeedVolts =
+      new LoggedTunableNumber("Carriage/holdSpeedVolts", 0.5);
 }

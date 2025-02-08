@@ -23,6 +23,7 @@ import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
+  public static boolean allowAutoDrive = true;
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
@@ -39,8 +40,9 @@ public final class RobotCommands {
       BooleanSupplier atPose) {
     return waitUntil(
             () ->
-                poseManager.getDistanceTo(goalPose.get())
-                    < elevatorSafeExtensionDistanceMeters.get())
+                !allowAutoDrive
+                    || poseManager.getDistanceTo(goalPose.get())
+                        < elevatorSafeExtensionDistanceMeters.get())
         .andThen(elevator.enableElevator(), waitUntil(atPose), carriage.placeCoral());
   }
 
@@ -53,8 +55,9 @@ public final class RobotCommands {
     BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
     return waitUntil(
             () ->
-                poseManager.getDistanceTo(goalPose.get())
-                    < elevatorSafeExtensionDistanceMeters.get())
+                !allowAutoDrive
+                    || poseManager.getDistanceTo(goalPose.get())
+                        < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
             either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
                 .andThen(elevator.enableElevator())
@@ -73,7 +76,7 @@ public final class RobotCommands {
   }
 
   public static BooleanSupplier atGoal(Drive drive) {
-    return () -> drive.linearAtGoal() && drive.thetaAtGoal();
+    return () -> !allowAutoDrive || (drive.linearAtGoal() && drive.thetaAtGoal());
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
@@ -100,10 +103,16 @@ public final class RobotCommands {
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive, Carriage carriage, Intake intake, PoseManager poseManager) {
+      Drive drive,
+      Carriage carriage,
+      Intake intake,
+      PoseManager poseManager,
+      BooleanSupplier allowAutoDrive) {
     return select(
         Map.of(
             Source,
+            // Maybe should change so that even if most of poseEstimation isn't working, this does
+            either(
                 drive
                     .headingDrive(
                         () -> {
@@ -111,8 +120,12 @@ public final class RobotCommands {
                         })
                     .until(carriage::coralHeld)
                     .asProxy(),
-            Ground, intake.intakeCmd().asProxy(),
-            Ice_Cream, carriage.lowDealgify().asProxy()),
+                carriage.intakeCoral().asProxy(),
+                allowAutoDrive),
+            Ground,
+            intake.intakeCmd().asProxy(),
+            Ice_Cream,
+            carriage.lowDealgify().asProxy()),
         () -> intakeState);
   }
 
