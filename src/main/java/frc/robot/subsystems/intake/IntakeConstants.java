@@ -21,10 +21,10 @@ public class IntakeConstants {
   public static final double intakePIDMinInput = 0;
   public static final double intakePIDMaxInput = 1 * 360;
 
-  public static final LoggedTunableNumber algaeVelocityThreshold =
-      new LoggedTunableNumber("Intake/algaeVelocityThreshold");
+  public static final LoggedTunableNumber algaeVelocityThreshold = 
+      new LoggedTunableNumber("Intake/algaeVelocityThreshold",200);
   public static final LoggedTunableNumber algaeCurrentThreshold =
-      new LoggedTunableNumber("Intake/algaeCurrentThreshold");
+      new LoggedTunableNumber("Intake/algaeCurrentThreshold",100);
 
   static {
     switch (Constants.currentMode) {
