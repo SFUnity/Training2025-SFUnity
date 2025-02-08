@@ -7,9 +7,6 @@ import static frc.robot.util.SparkUtil.sparkConfig;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
@@ -22,7 +19,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private double deltaTime = 0;
 
   public ElevatorIOSparkMax() {
-    var motorConfig = sparkConfig(false, carrageMassKg);
+    var motorConfig = sparkConfig(false, gearRatio);
     configureSpark(elevatorMotor, motorConfig, true);
   }
 
