@@ -172,7 +172,12 @@ public class Autos {
         .or(LToStationHigh.done())
         .onTrue(
             waitUntil(() -> carriage.coralHeld())
-                .andThen(either(StationHighToL.cmd(), StationHighToK.cmd(), () -> coralOnL2 >= 1))
+                .andThen(
+                    either(
+                        StationHighToL.cmd(),
+                        StationHighToK.cmd(),
+                        () -> (coralOnL2 + coralOnL3) % 2 == 0) // Alternate K and L
+                    )
                 .withName("0"));
 
     StationHighToK.active()
