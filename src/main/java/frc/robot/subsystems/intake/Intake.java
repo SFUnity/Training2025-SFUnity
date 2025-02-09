@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
   private static final LoggedTunableNumber holdSpeedVolts =
       new LoggedTunableNumber("Carriage/holdSpeedVolts", 0.5);
 
-  private Angle positionSetpoint = Degrees.zero();
+  private Angle positionSetpoint = Degrees.of(raisedAngle.get());
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
