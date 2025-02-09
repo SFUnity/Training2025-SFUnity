@@ -69,20 +69,20 @@ public class DriveConstants {
   // Device CAN IDs. Based off power port on PDH
   public static final int pigeonCanId = 20;
 
-  public static final int frontLeftDriveCanId = 15;
-  public static final int backLeftDriveCanId = 0;
-  public static final int frontRightDriveCanId = 10;
-  public static final int backRightDriveCanId = 9;
+  public static final int frontLeftDriveCanId = 3;
+  public static final int backLeftDriveCanId = 19;
+  public static final int frontRightDriveCanId = 4;
+  public static final int backRightDriveCanId = 13;
 
   public static final int frontLeftTurnCanId = 8;
   public static final int backLeftTurnCanId = 13;
   public static final int frontRightTurnCanId = 6;
   public static final int backRightTurnCanId = 17;
 
-  public static final int frontLeftTurnEncoderCanId = 18;
-  public static final int backLeftTurnEncoderCanId = 4;
-  public static final int frontRightTurnEncoderCanId = 19; // on same power as 18
-  public static final int backRightTurnEncoderCanId = 5; // on same power as 4
+  public static final int frontLeftTurnEncoderCanId = 19;
+  public static final int backLeftTurnEncoderCanId = 18;
+  public static final int frontRightTurnEncoderCanId = 4;
+  public static final int backRightTurnEncoderCanId = 5;
 
   public static final String CANBusName = "rio";
 
