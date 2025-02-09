@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class CarriageIOSparkMax implements CarriageIO {
   private final SparkMax rollerMotor = new SparkMax(rollerMotorID, MotorType.kBrushless);
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
-  private final DigitalInput beamBreak = new DigitalInput(beamBreakNumber);
+  private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
 
   public CarriageIOSparkMax() {
     var config = sparkConfig(inverted, positionFactor);
