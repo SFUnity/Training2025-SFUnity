@@ -12,10 +12,8 @@ public class IntakeConstants {
 
   public static final boolean pivotInverted = false;
   public static final boolean rollersInverted = false;
-  public static final double pivotPositionFactor =
-      25 * 360; // 25 rotations of the motor is 360 degrees of the arm
-  public static final double rollersPositionFactor =
-      5; // 5 rotations of the motor is 1 rotation of the rollers
+  public static final double pivotPositionFactor = 2.9;
+  public static final double rollersPositionFactor = .2;
 
   public static final double minAngleRads = Units.degreesToRadians(18.39);
   public static final double maxAngleRads = Units.degreesToRadians(87.39);
@@ -31,7 +29,7 @@ public class IntakeConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Intake/kP", 0.0);
+        kP = new LoggedTunableNumber("Intake/kP", 0.028);
         break;
       case SIM:
         kP = new LoggedTunableNumber("Intake/simkP", 4.82);
