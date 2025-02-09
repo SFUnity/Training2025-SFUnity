@@ -11,9 +11,9 @@ public class CarriageConstants {
 
   // TODO put in values velocity and current thresholds based off example
   public static final LoggedTunableNumber algaeVelocityThreshold =
-      new LoggedTunableNumber("Carriage/algaeVelocityThreshold",200);
+      new LoggedTunableNumber("Carriage/algaeVelocityThreshold", 200);
   public static final LoggedTunableNumber algaeCurrentThreshold =
-      new LoggedTunableNumber("Carriage/algaeCurrentThreshold",100);
+      new LoggedTunableNumber("Carriage/algaeCurrentThreshold", 100);
 
   public static final LoggedTunableNumber intakingSpeedVolts =
       new LoggedTunableNumber("Carriage/intakingSpeedVolts", 10);
