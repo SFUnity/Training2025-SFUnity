@@ -24,7 +24,7 @@ public class IntakeConstants {
   public static final LoggedTunableNumber algaeVelocityThreshold =
       new LoggedTunableNumber("Intake/algaeVelocityThreshold", 200);
   public static final LoggedTunableNumber algaeCurrentThreshold =
-      new LoggedTunableNumber("Intake/algaeCurrentThreshold", 100);
+      new LoggedTunableNumber("Intake/algaeCurrentThreshold", 40);
 
   static {
     switch (Constants.currentMode) {
