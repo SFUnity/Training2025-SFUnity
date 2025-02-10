@@ -26,6 +26,17 @@ public class IntakeConstants {
   public static final LoggedTunableNumber algaeCurrentThreshold =
       new LoggedTunableNumber("Intake/algaeCurrentThreshold", 40);
 
+  // In rotations
+  public static final LoggedTunableNumber loweredAngle =
+      new LoggedTunableNumber("Intake/loweredAngle", 55);
+  public static final LoggedTunableNumber raisedAngle =
+      new LoggedTunableNumber("Intake/raisedAngle", 0);
+  // In volts
+  public static final LoggedTunableNumber rollersSpeedIn =
+      new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
+  public static final LoggedTunableNumber rollersSpeedOut =
+      new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
+
   static {
     switch (Constants.currentMode) {
       default:

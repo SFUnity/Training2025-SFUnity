@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -22,17 +21,6 @@ public class Intake extends SubsystemBase {
   private double filteredVelocity;
   private double filteredStatorCurrent;
   public static boolean simHasAlgae = false;
-  // In rotations
-  private static final LoggedTunableNumber loweredAngle =
-      new LoggedTunableNumber("Intake/loweredAngle", 55);
-  private static final LoggedTunableNumber raisedAngle =
-      new LoggedTunableNumber("Intake/raisedAngle", 0);
-  // In volts
-  private static final LoggedTunableNumber rollersSpeedIn =
-      new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
-  private static final LoggedTunableNumber rollersSpeedOut =
-      new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
-
   private double positionSetpoint = raisedAngle.get();
 
   private final IntakeIO io;
