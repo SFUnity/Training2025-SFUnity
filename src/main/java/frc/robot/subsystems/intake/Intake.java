@@ -25,8 +25,10 @@ public class Intake extends SubsystemBase {
   private static final LoggedTunableNumber raisedAngle =
       new LoggedTunableNumber("Intake/raisedAngle", 0);
   // In volts
-  private static final LoggedTunableNumber rollersSpeed =
-      new LoggedTunableNumber("Intake/rollerSpeedVolts", 10);
+  private static final LoggedTunableNumber rollersSpeedIn =
+      new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
+  private static final LoggedTunableNumber rollersSpeedOut =
+      new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
   private static final LoggedTunableNumber holdSpeedVolts =
       new LoggedTunableNumber("Carriage/holdSpeedVolts", 0.5);
 
@@ -61,11 +63,11 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersIn() {
-    io.runRollers(rollersSpeed.get());
+    io.runRollers(rollersSpeedIn.get());
   }
 
   private void rollersOut() {
-    io.runRollers(-rollersSpeed.get());
+    io.runRollers(-rollersSpeedOut.get());
   }
 
   private void rollersStopOrHold() {
