@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +17,8 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends SubsystemBase {
   private final IntakeVisualizer measuredVisualizer = new IntakeVisualizer("Measured", Color.kRed);
   private final IntakeVisualizer setpointVisualizer = new IntakeVisualizer("Setpoint", Color.kBlue);
+  private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
+  private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
   private double filteredVelocity;
   private double filteredStatorCurrent;
   public static boolean simHasAlgae = false;
@@ -44,6 +47,9 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
+
+    filteredVelocity = velocityFilter.calculate(Math.abs(inputs.rollerVelocityRPM));
+    filteredStatorCurrent = currentFilter.calculate(inputs.rollersCurrentAmps);
 
     // Logs
     measuredVisualizer.update(Degrees.of(inputs.pivotCurrentPositionDeg));
