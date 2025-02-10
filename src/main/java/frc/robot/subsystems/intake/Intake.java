@@ -32,8 +32,6 @@ public class Intake extends SubsystemBase {
       new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
   private static final LoggedTunableNumber rollersSpeedOut =
       new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
-  private static final LoggedTunableNumber holdSpeedVolts =
-      new LoggedTunableNumber("Carriage/holdSpeedVolts", 0.5);
 
   private double positionSetpoint = raisedAngle.get();
 
@@ -77,7 +75,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersStopOrHold() {
-    io.runRollers(algaeHeld() ? holdSpeedVolts.get() : 0);
+    io.runRollers(0);
   }
 
   public Command raiseAndStopOrHoldCmd() {
