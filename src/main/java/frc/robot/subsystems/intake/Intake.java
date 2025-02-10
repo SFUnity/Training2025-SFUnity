@@ -1,10 +1,9 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,16 +21,16 @@ public class Intake extends SubsystemBase {
   public static boolean simHasAlgae = false;
   // In rotations
   private static final LoggedTunableNumber loweredAngle =
-      new LoggedTunableNumber("Intake/loweredAngle", 19);
+      new LoggedTunableNumber("Intake/loweredAngle", 55);
   private static final LoggedTunableNumber raisedAngle =
-      new LoggedTunableNumber("Intake/raisedAngle", 86);
+      new LoggedTunableNumber("Intake/raisedAngle", 0);
   // In volts
   private static final LoggedTunableNumber rollersSpeed =
       new LoggedTunableNumber("Intake/rollerSpeedVolts", 10);
   private static final LoggedTunableNumber holdSpeedVolts =
       new LoggedTunableNumber("Carriage/holdSpeedVolts", 0.5);
 
-  private Angle positionSetpoint = Degrees.of(raisedAngle.get());
+  private double positionSetpoint = raisedAngle.get();
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -45,19 +44,19 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
 
     // Logs
-    measuredVisualizer.update(inputs.pivotCurrentPosition);
-    setpointVisualizer.update(positionSetpoint);
-    Logger.recordOutput("Intake/positionSetpointRadians", positionSetpoint.in(Radians));
+    measuredVisualizer.update(Degrees.of(inputs.pivotCurrentPositionDeg));
+    setpointVisualizer.update(Degrees.of(positionSetpoint));
+    Logger.recordOutput("Intake/positionSetpointRadians", Units.degreesToRadians(positionSetpoint));
     Util.logSubsystem(this, "Intake");
   }
 
   private void lower() {
-    positionSetpoint = Degrees.of(loweredAngle.get());
+    positionSetpoint = loweredAngle.get();
     io.setPivotPosition(positionSetpoint);
   }
 
   private void raise() {
-    positionSetpoint = Degrees.of(raisedAngle.get());
+    positionSetpoint = raisedAngle.get();
     io.setPivotPosition(positionSetpoint);
   }
 

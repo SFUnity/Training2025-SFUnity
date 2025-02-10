@@ -10,7 +10,7 @@ public class IntakeConstants {
 
   public static final LoggedTunableNumber kP;
 
-  public static final boolean pivotInverted = false;
+  public static final boolean pivotInverted = true;
   public static final boolean rollersInverted = false;
   public static final double pivotPositionFactor = 2.9;
   public static final double rollersPositionFactor = .2;

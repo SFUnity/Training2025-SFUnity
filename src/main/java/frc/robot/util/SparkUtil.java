@@ -106,7 +106,7 @@ public class SparkUtil {
     SparkMaxConfig config = new SparkMaxConfig();
     config
         .inverted(inverted)
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(60)
         .voltageCompensation(12.0);
     config
