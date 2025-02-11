@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersStopOrHold() {
-    io.runRollers(algaeHeld() ? holdSpeedVolts.get() : 0);
+    io.runRollers(0);
   }
 
   public Command raiseAndStopOrHoldCmd() {
