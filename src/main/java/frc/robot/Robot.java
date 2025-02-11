@@ -318,7 +318,11 @@ public class Robot extends LoggedRobot {
   private void configureButtonBindings() {
     // Setup rumble
     new Trigger(() -> intake.algaeHeld())
-        .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
+        .onTrue(
+            Commands.runEnd(
+                    () -> driver.setRumble(RumbleType.kBothRumble, 0.5),
+                    () -> driver.setRumble(RumbleType.kBothRumble, 0.0))
+                .withTimeout(.5));
 
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
