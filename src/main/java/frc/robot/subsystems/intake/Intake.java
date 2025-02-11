@@ -20,18 +20,7 @@ public class Intake extends SubsystemBase {
   private double filteredVelocity;
   private double filteredStatorCurrent;
   public static boolean simHasAlgae = false;
-  // In rotations
-  private static final LoggedTunableNumber loweredAngle =
-      new LoggedTunableNumber("Intake/loweredAngle", 19);
-  private static final LoggedTunableNumber raisedAngle =
-      new LoggedTunableNumber("Intake/raisedAngle", 86);
-  // In volts
-  private static final LoggedTunableNumber rollersSpeed =
-      new LoggedTunableNumber("Intake/rollerSpeedVolts", 10);
-  private static final LoggedTunableNumber holdSpeedVolts =
-      new LoggedTunableNumber("Carriage/holdSpeedVolts", 0.5);
-
-  private Angle positionSetpoint = Degrees.zero();
+  private double positionSetpoint = raisedAngle.get();
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
