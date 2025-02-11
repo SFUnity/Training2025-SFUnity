@@ -1,7 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 import static frc.robot.util.SparkUtil.configureSpark;
 import static frc.robot.util.SparkUtil.sparkConfig;
@@ -12,7 +10,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import edu.wpi.first.units.measure.Angle;
 
 public class IntakeIOSparkMax implements IntakeIO {
   private final SparkMax pivot = new SparkMax(pivotID, MotorType.kBrushless);
@@ -26,8 +23,8 @@ public class IntakeIOSparkMax implements IntakeIO {
     pivotConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .positionWrappingEnabled(true)
-        .positionWrappingInputRange(intakePIDMinInput, intakePIDMaxInput);
+        .positionWrappingEnabled(false)
+        .p(kP.get());
     configureSpark(pivot, pivotConfig, true);
 
     var rollerConfig = sparkConfig(rollersInverted, rollersPositionFactor);
@@ -36,7 +33,7 @@ public class IntakeIOSparkMax implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    inputs.pivotCurrentPosition = Rotations.of(encoder.getPosition());
+    inputs.pivotCurrentPositionDeg = encoder.getPosition();
     inputs.pivotAppliedVolts = pivot.getAppliedOutput() * pivot.getBusVoltage();
     inputs.pivotCurrentAmps = pivot.getOutputCurrent();
 
@@ -51,7 +48,7 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
-  public void setPivotPosition(Angle setpointRots) {
-    pid.setReference(setpointRots.in(Degrees), ControlType.kPosition);
+  public void setPivotPosition(double setpointDeg) {
+    pid.setReference(setpointDeg, ControlType.kPosition);
   }
 }

@@ -1,14 +1,11 @@
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Rotations;
-
-import edu.wpi.first.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
   @AutoLog
   public static class IntakeIOInputs {
-    public Angle pivotCurrentPosition = Rotations.zero();
+    public double pivotCurrentPositionDeg = 0;
     public double pivotAppliedVolts = 0.0;
     public double pivotCurrentAmps = 0.0;
 
@@ -21,5 +18,5 @@ public interface IntakeIO {
 
   default void runRollers(double volts) {}
 
-  default void setPivotPosition(Angle angle) {}
+  default void setPivotPosition(double setpointDeg) {}
 }

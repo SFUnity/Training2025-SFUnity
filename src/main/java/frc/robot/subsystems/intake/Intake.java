@@ -1,7 +1,6 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.math.filter.LinearFilter;
@@ -10,7 +9,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -40,19 +38,19 @@ public class Intake extends SubsystemBase {
     filteredStatorCurrent = currentFilter.calculate(inputs.rollersCurrentAmps);
 
     // Logs
-    measuredVisualizer.update(inputs.pivotCurrentPosition);
-    setpointVisualizer.update(positionSetpoint);
-    Logger.recordOutput("Intake/positionSetpointRadians", positionSetpoint.in(Radians));
+    measuredVisualizer.update(Degrees.of(inputs.pivotCurrentPositionDeg));
+    setpointVisualizer.update(Degrees.of(positionSetpoint));
+    Logger.recordOutput("Intake/positionSetpointRadians", Units.degreesToRadians(positionSetpoint));
     Util.logSubsystem(this, "Intake");
   }
 
   private void lower() {
-    positionSetpoint = Degrees.of(loweredAngle.get());
+    positionSetpoint = loweredAngle.get();
     io.setPivotPosition(positionSetpoint);
   }
 
   private void raise() {
-    positionSetpoint = Degrees.of(raisedAngle.get());
+    positionSetpoint = raisedAngle.get();
     io.setPivotPosition(positionSetpoint);
   }
 
