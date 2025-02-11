@@ -51,11 +51,11 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersIn() {
-    io.runRollers(rollersSpeed.get());
+    io.runRollers(rollersSpeedIn.get());
   }
 
   private void rollersOut() {
-    io.runRollers(-rollersSpeed.get());
+    io.runRollers(-rollersSpeedOut.get());
   }
 
   private void rollersStopOrHold() {
