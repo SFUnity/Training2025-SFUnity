@@ -10,12 +10,10 @@ public class IntakeConstants {
 
   public static final LoggedTunableNumber kP;
 
-  public static final boolean pivotInverted = false;
+  public static final boolean pivotInverted = true;
   public static final boolean rollersInverted = false;
-  public static final double pivotPositionFactor =
-      25 * 360; // 25 rotations of the motor is 360 degrees of the arm
-  public static final double rollersPositionFactor =
-      5; // 5 rotations of the motor is 1 rotation of the rollers
+  public static final double pivotPositionFactor = 2.9;
+  public static final double rollersPositionFactor = .2;
 
   public static final double minAngleRads = Units.degreesToRadians(18.39);
   public static final double maxAngleRads = Units.degreesToRadians(87.39);
