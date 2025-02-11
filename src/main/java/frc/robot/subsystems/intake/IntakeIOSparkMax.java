@@ -28,7 +28,6 @@ public class IntakeIOSparkMax implements IntakeIO {
     configureSpark(pivot, pivotConfig, true);
 
     var rollerConfig = sparkConfig(rollersInverted, rollersPositionFactor);
-    rollerConfig.encoder.velocityConversionFactor(1);
     configureSpark(rollers, rollerConfig, true);
   }
 
