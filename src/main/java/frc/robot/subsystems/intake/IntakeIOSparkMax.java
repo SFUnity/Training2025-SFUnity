@@ -17,6 +17,7 @@ import edu.wpi.first.units.measure.Angle;
 public class IntakeIOSparkMax implements IntakeIO {
   private final SparkMax pivot = new SparkMax(pivotID, MotorType.kBrushless);
   private final SparkMax rollers = new SparkMax(rollersID, MotorType.kBrushless);
+  private final RelativeEncoder rollerEncoder = rollers.getEncoder();
   private final RelativeEncoder encoder = pivot.getEncoder();
   private final SparkClosedLoopController pid = pivot.getClosedLoopController();
 
@@ -41,6 +42,7 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     inputs.rollersAppliedVolts = rollers.getAppliedOutput() * rollers.getBusVoltage();
     inputs.rollersCurrentAmps = rollers.getOutputCurrent();
+    inputs.rollerVelocityRPM = rollerEncoder.getVelocity();
   }
 
   @Override
