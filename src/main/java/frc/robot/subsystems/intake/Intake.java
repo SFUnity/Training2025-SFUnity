@@ -40,7 +40,7 @@ public class Intake extends SubsystemBase {
     // Logs
     measuredVisualizer.update(Degrees.of(inputs.pivotCurrentPositionDeg));
     setpointVisualizer.update(Degrees.of(positionSetpoint));
-    Logger.recordOutput("Intake/positionSetpointRadians", Units.degreesToRadians(positionSetpoint));
+    Logger.recordOutput("Intake/positionSetpoint", positionSetpoint);
     Util.logSubsystem(this, "Intake");
   }
 
