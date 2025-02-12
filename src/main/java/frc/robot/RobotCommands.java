@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 /** Put high level commands here */
 public final class RobotCommands {
   public static boolean allowAutoDrive = false;
-  public static ScoreState scoreState = Dealgify;
+  public static ScoreState scoreState = LeftBranch;
   public static boolean dealgifyAfterPlacing = false;
 
   public static Command scoreCoral(
