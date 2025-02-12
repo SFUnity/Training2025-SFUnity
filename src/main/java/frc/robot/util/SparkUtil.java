@@ -111,8 +111,8 @@ public class SparkUtil {
         .voltageCompensation(12.0);
     config
         .encoder
-        .positionConversionFactor(2 * Math.PI / encoderToMechanismRatio) // Rotations -> Radians
-        .velocityConversionFactor((2 * Math.PI) / 60.0 / encoderToMechanismRatio) // RPM -> Rad/Sec
+        .positionConversionFactor(encoderToMechanismRatio) 
+        .velocityConversionFactor(encoderToMechanismRatio)
         .uvwAverageDepth(2);
     config
         .signals

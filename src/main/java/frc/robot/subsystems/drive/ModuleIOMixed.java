@@ -184,7 +184,8 @@ public class ModuleIOMixed implements ModuleIO {
     tryUntilOk(5, () -> driveTalon.setPosition(0.0, 0.25));
 
     // Configure turn motor
-    turnConfig = sparkConfig(turnInverted, turnMotorReduction);
+    turnConfig = sparkConfig(turnInverted, (2 * Math.PI) / turnMotorReduction);
+    turnConfig.encoder.velocityConversionFactor((2 * Math.PI) / 60.0 / turnMotorReduction);
     turnConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
