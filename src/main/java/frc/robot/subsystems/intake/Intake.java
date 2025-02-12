@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,6 +16,11 @@ public class Intake extends SubsystemBase {
   private final IntakeVisualizer measuredVisualizer = new IntakeVisualizer("Measured", Color.kRed);
   private final IntakeVisualizer setpointVisualizer = new IntakeVisualizer("Setpoint", Color.kBlue);
   private double positionSetpoint = raisedAngle.get();
+
+  private final LinearFilter voltageFilter = LinearFilter.singlePoleIIR(.06, 0.02);
+  private final LinearFilter currentFilter = LinearFilter.singlePoleIIR(.06, 0.02);
+  private double filteredVoltage;
+  private double filteredCurrent;
 
   private boolean lowered = false;
   private boolean hasAlgae = false;
@@ -31,8 +37,11 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
 
-    if (inputs.pivotAppliedVolts <= algaeVoltageThreshold.get()
-        && inputs.rollersCurrentAmps >= algaeCurrentThreshold.get()) {
+    filteredVoltage = voltageFilter.calculate(inputs.pivotAppliedVolts);
+    filteredCurrent = currentFilter.calculate(inputs.rollersCurrentAmps);
+
+    if (filteredVoltage <= algaeVoltageThreshold.get()
+        && filteredCurrent >= algaeCurrentThreshold.get()) {
       if (lowered) {
         hasAlgae = true;
       } else {
