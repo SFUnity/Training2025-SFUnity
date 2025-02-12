@@ -11,8 +11,8 @@ public class ElevatorConstants {
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
   public static final double elevatorDistanceToleranceInches = 0.3;
-  public static final double maxElevatorSpeed = 78.74; // inches/sec
-  public static final double maxElevatorAcceleration = 394; // inches/sec^2
+  public static final double maxElevatorSpeed = 11; // inches/sec
+  public static final double maxElevatorAcceleration = 11; // inches/sec^2
   // FF values
   public static final LoggedTunableNumber kG;
   public static final LoggedTunableNumber kV;
