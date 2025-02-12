@@ -111,7 +111,7 @@ public class SparkUtil {
         .voltageCompensation(12.0);
     config
         .encoder
-        .positionConversionFactor(encoderToMechanismRatio) 
+        .positionConversionFactor(encoderToMechanismRatio)
         .velocityConversionFactor(encoderToMechanismRatio)
         .uvwAverageDepth(2);
     config
