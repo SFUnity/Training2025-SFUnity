@@ -46,10 +46,10 @@ public class DriveConstants {
       new SwerveDriveKinematics(moduleTranslations);
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(); // -2.186
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(); // -2.140
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(); // 1.993
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(); // -0.031
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d();
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d();
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d();
+  public static final Rotation2d backRightZeroRotation = new Rotation2d();
 
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = false;

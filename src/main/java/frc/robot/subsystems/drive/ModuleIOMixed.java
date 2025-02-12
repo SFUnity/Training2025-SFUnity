@@ -199,10 +199,10 @@ public class ModuleIOMixed implements ModuleIO {
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
     double cancoderOffsetRad =
         switch (module) {
-          case 0 -> 1.510;
-          case 1 -> 1.535;
-          case 2 -> 3.132;
-          case 3 -> 1.828;
+          case 0 -> 1.588;
+          case 1 -> 0.268;
+          case 2 -> 3.062;
+          case 3 -> 3.045;
           default -> 0;
         };
     cancoderConfig.MagnetSensor.MagnetOffset = Units.radiansToRotations(cancoderOffsetRad);
