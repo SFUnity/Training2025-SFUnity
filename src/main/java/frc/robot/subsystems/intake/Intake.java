@@ -3,8 +3,6 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,12 +14,11 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends SubsystemBase {
   private final IntakeVisualizer measuredVisualizer = new IntakeVisualizer("Measured", Color.kRed);
   private final IntakeVisualizer setpointVisualizer = new IntakeVisualizer("Setpoint", Color.kBlue);
-  private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
-  private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
-  private double filteredVelocity;
-  private double filteredStatorCurrent;
-  public static boolean simHasAlgae = false;
   private double positionSetpoint = raisedAngle.get();
+
+  private boolean lowered = false;
+  private boolean hasAlgae = false;
+  public static boolean simHasAlgae = false;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -34,8 +31,14 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
 
-    filteredVelocity = velocityFilter.calculate(Math.abs(inputs.rollerVelocityRPM));
-    filteredStatorCurrent = currentFilter.calculate(inputs.rollersCurrentAmps);
+    if (inputs.pivotAppliedVolts <= algaeVoltageThreshold.get()
+        && inputs.rollersCurrentAmps >= algaeCurrentThreshold.get()) {
+      if (lowered) {
+        hasAlgae = true;
+      } else {
+        hasAlgae = false;
+      }
+    }
 
     // Logs
     measuredVisualizer.update(Degrees.of(inputs.pivotCurrentPositionDeg));
@@ -47,11 +50,13 @@ public class Intake extends SubsystemBase {
   private void lower() {
     positionSetpoint = loweredAngle.get();
     io.setPivotPosition(positionSetpoint);
+    lowered = true;
   }
 
   private void raise() {
     positionSetpoint = raisedAngle.get();
     io.setPivotPosition(positionSetpoint);
+    lowered = false;
   }
 
   private void rollersIn() {
@@ -97,8 +102,6 @@ public class Intake extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasAlgae;
     }
-    return (filteredVelocity <= algaeVelocityThreshold.get()
-            && (filteredStatorCurrent >= algaeCurrentThreshold.get())
-        || filteredStatorCurrent <= -2);
+    return hasAlgae;
   }
 }
