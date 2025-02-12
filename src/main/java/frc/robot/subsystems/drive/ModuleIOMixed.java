@@ -235,6 +235,9 @@ public class ModuleIOMixed implements ModuleIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, driveVelocity, driveAppliedVolts, driveCurrent, turnAbsolutePosition);
     ParentDevice.optimizeBusUtilizationForAll(driveTalon, cancoder);
+
+    // Logging
+    // logSparkMax("Drive/Module" + Integer.toString(index) + "TurnConfig", turnSpark);
   }
 
   @Override
@@ -281,9 +284,6 @@ public class ModuleIOMixed implements ModuleIO {
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
-
-    // Logging
-    logSparkMax("Drive/Module" + Integer.toString(index) + "TurnConfig", turnSpark);
   }
 
   @Override
