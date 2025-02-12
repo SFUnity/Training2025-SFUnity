@@ -57,10 +57,10 @@ public class DriveConstants {
   public static final boolean backLeftDriveInverted = false;
   public static final boolean backRightDriveInverted = false;
 
-  public static final boolean frontLeftTurnInverted = false;
-  public static final boolean frontRightTurnInverted = false;
-  public static final boolean backLeftTurnInverted = false;
-  public static final boolean backRightTurnInverted = false;
+  public static final boolean frontLeftTurnInverted = true;
+  public static final boolean frontRightTurnInverted = true;
+  public static final boolean backLeftTurnInverted = true;
+  public static final boolean backRightTurnInverted = true;
 
   public static final boolean frontLeftTurnEncoderInverted = false;
   public static final boolean frontRightTurnEncoderInverted = false;
