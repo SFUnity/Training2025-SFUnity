@@ -21,10 +21,10 @@ public class IntakeConstants {
   public static final double intakePIDMinInput = 0;
   public static final double intakePIDMaxInput = 1 * 360;
 
-  public static final LoggedTunableNumber algaeVelocityThreshold =
-      new LoggedTunableNumber("Intake/algaeVelocityThreshold", 200);
+  public static final LoggedTunableNumber algaeVoltageThreshold =
+      new LoggedTunableNumber("Intake/algaeVoltageThreshold", .5);
   public static final LoggedTunableNumber algaeCurrentThreshold =
-      new LoggedTunableNumber("Intake/algaeCurrentThreshold", 40);
+      new LoggedTunableNumber("Intake/algaeCurrentThreshold", 20);
 
   // In rotations
   public static final LoggedTunableNumber loweredAngle =
