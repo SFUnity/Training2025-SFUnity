@@ -84,7 +84,7 @@ public class Intake extends SubsystemBase {
           lower();
           rollersIn();
         })
-        .until(this::algaeHeld)
+        // .until(this::algaeHeld)
         .withName("intake");
   }
 
@@ -93,7 +93,7 @@ public class Intake extends SubsystemBase {
           raise();
           rollersOut();
         })
-        .until(() -> !algaeHeld())
+        // .until(() -> !algaeHeld())
         .withName("poop");
   }
 
