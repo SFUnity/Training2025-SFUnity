@@ -2,11 +2,6 @@ package frc.robot.subsystems.apriltagvision;
 
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 
-import java.util.List;
-
-
-import java.util.LinkedList;
-import java.util.List;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -22,8 +17,9 @@ import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.GeomUtil;
 import frc.robot.util.PoseManager;
-import frc.robot.util.Util;
 import frc.robot.util.VirtualSubsystem;
+import java.util.LinkedList;
+import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends VirtualSubsystem {
@@ -31,18 +27,18 @@ public class AprilTagVision extends VirtualSubsystem {
   private final AprilTagVisionIOInputsAutoLogged inputs = new AprilTagVisionIOInputsAutoLogged();
   private final PoseManager poseManager;
 
-  public AprilTagVision( PoseManager poseManager, AprilTagVisionIO... io) {
+  public AprilTagVision(PoseManager poseManager, AprilTagVisionIO... io) {
     this.io = io;
     this.poseManager = poseManager;
     // TODO download the correct pipelines and add them to the code
     // pipelines are the setting configured in the limelight software
-    for(int i=0;i<this.io.length;i++) {
+    for (int i = 0; i < this.io.length; i++) {
       this.io[i].setPipeline(Pipelines.HUMAN_MADE);
     }
   }
 
   public void periodic() {
-    for(int i=0;i<this.io.length;i++) {
+    for (int i = 0; i < this.io.length; i++) {
       io[i].updateInputs(inputs, poseManager);
       Logger.processInputs("AprilTagVision", inputs);
 
@@ -56,30 +52,30 @@ public class AprilTagVision extends VirtualSubsystem {
       // Exit if there are no tags in sight or the pose is blank or the robot is spinning too fast
       // These are the basic checks LL recommends
       double allowableDistance = inputs.tagCount;
-      boolean isRejected = 
+      boolean isRejected =
           // true if
           // If no tags
           inputs.tagCount == 0
-          // if no pose, then ignored
-          || estimatedPose.equals(new Pose2d())
-          // if turning too fast
-          || Math.abs(poseManager.robotVelocity().dtheta) > 720
-          // if off the ground
-          || inputs.estimatedPose.getY() > 0.15
-          // if off field
-          || estimatedPose.getX() < -fieldBorderMargin
-          || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
-          || estimatedPose.getY() < -fieldBorderMargin
-          || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
-          // if too far away from current pose, depends on amount of apriltags
-          || poseManager.getDistanceTo(estimatedPose) > allowableDistance;
-      
-        if (isRejected) {
-          robotPosesRejected.add(inputs.estimatedPose);
-          
-        } else {
-          robotPosesAccepted.add(inputs.estimatedPose);
-        }
+              // if no pose, then ignored
+              || estimatedPose.equals(new Pose2d())
+              // if turning too fast
+              || Math.abs(poseManager.robotVelocity().dtheta) > 720
+              // if off the ground
+              || inputs.estimatedPose.getY() > 0.15
+              // if off field
+              || estimatedPose.getX() < -fieldBorderMargin
+              || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
+              || estimatedPose.getY() < -fieldBorderMargin
+              || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
+              // if too far away from current pose, depends on amount of apriltags
+              || poseManager.getDistanceTo(estimatedPose) > allowableDistance;
+
+      if (isRejected) {
+        robotPosesRejected.add(inputs.estimatedPose);
+
+      } else {
+        robotPosesAccepted.add(inputs.estimatedPose);
+      }
 
       // Smaller number = more trust
       double trust = .7;
@@ -114,14 +110,12 @@ public class AprilTagVision extends VirtualSubsystem {
       // Add result because all checks passed
       poseManager.addVisionMeasurement(estimatedPose, inputs.timestamp, stdDevs);
 
-      
-
       Logger.recordOutput(
-        "Vision/" + this.io[i].getName() + "/RobotPosesAccepted",
-        robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
+          "Vision/" + this.io[i].getName() + "/RobotPosesAccepted",
+          robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
       Logger.recordOutput(
-        "Vision/" + this.io[i].getName() + "/RobotPosesRejected",
-        robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+          "Vision/" + this.io[i].getName() + "/RobotPosesRejected",
+          robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
     }
   }
 }
