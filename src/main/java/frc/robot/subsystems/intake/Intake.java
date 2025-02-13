@@ -6,6 +6,7 @@ import static frc.robot.subsystems.intake.IntakeConstants.*;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.Util;
@@ -23,6 +24,9 @@ public class Intake extends SubsystemBase {
   private boolean lowered = false;
   private boolean hasAlgae = false;
   public static boolean simHasAlgae = false;
+
+  private final double intakeDelay = .25;
+  private final double outtakeDelay = .3;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -84,20 +88,26 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCmd() {
-    return run(() -> {
-          lower();
-          rollersIn();
-        })
-        .until(this::algaeHeld)
+    return Commands.waitUntil(this::algaeHeld)
+        .andThen(Commands.waitSeconds(intakeDelay))
+        .deadlineFor(
+            run(
+                () -> {
+                  lower();
+                  rollersIn();
+                }))
         .withName("intake");
   }
 
   public Command poopCmd() {
-    return run(() -> {
-          raise();
-          rollersOut();
-        })
-        .until(() -> !algaeHeld())
+    return Commands.waitUntil(() -> !algaeHeld())
+        .andThen(Commands.waitSeconds(outtakeDelay))
+        .deadlineFor(
+            run(
+                () -> {
+                  raise();
+                  rollersOut();
+                }))
         .withName("poop");
   }
 
