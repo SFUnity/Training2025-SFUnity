@@ -3,6 +3,7 @@
 package frc.robot.subsystems.leds;
 
 import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
@@ -66,7 +67,7 @@ public class Leds extends VirtualSubsystem {
   private static final boolean prideLeds = false;
   private static final int minLoopCycleCount = 10;
   private static final int length = 150;
-  private static final Distance ledSpacing = Meters.of(1.0 / 60); // TODO get from specs sheet
+  private static final Distance ledSpacing = Feet.of(8 / length);
   private static final Time breathDuration = Seconds.of(1);
   private static final LinearVelocity waveFastCycleLength = InchesPerSecond.of(25.0);
   private static final LinearVelocity waveAllianceCycleLength = InchesPerSecond.of(15.0);
