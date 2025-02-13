@@ -17,9 +17,7 @@ public class Intake extends SubsystemBase {
   private final IntakeVisualizer setpointVisualizer = new IntakeVisualizer("Setpoint", Color.kBlue);
   private double positionSetpoint = raisedAngle.get();
 
-  private final LinearFilter voltageFilter = LinearFilter.singlePoleIIR(.06, 0.02);
-  private final LinearFilter currentFilter = LinearFilter.singlePoleIIR(.06, 0.02);
-  private double filteredVoltage;
+  private final LinearFilter currentFilter = LinearFilter.movingAverage(4);
   private double filteredCurrent;
 
   private boolean lowered = false;
@@ -37,11 +35,10 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
 
-    filteredVoltage = voltageFilter.calculate(inputs.pivotAppliedVolts);
     filteredCurrent = currentFilter.calculate(inputs.rollersCurrentAmps);
+    lowered = inputs.pivotCurrentPositionDeg >= loweredAngle.get() / 2;
 
-    if (filteredVoltage <= algaeVoltageThreshold.get()
-        && filteredCurrent >= algaeCurrentThreshold.get()) {
+    if (inputs.pivotAppliedVolts <= 0.5 && filteredCurrent >= 10) {
       if (lowered) {
         hasAlgae = true;
       } else {
@@ -59,13 +56,11 @@ public class Intake extends SubsystemBase {
   private void lower() {
     positionSetpoint = loweredAngle.get();
     io.setPivotPosition(positionSetpoint);
-    lowered = true;
   }
 
   private void raise() {
     positionSetpoint = raisedAngle.get();
     io.setPivotPosition(positionSetpoint);
-    lowered = false;
   }
 
   private void rollersIn() {
