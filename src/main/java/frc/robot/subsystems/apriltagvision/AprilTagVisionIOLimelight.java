@@ -23,11 +23,11 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   public AprilTagVisionIOLimelight(String camName) {
     name = camName;
     switch (name) {
-      case reefName:
-        position = reefPosition;
+      case rightName:
+        position = rightPosition;
         break;
-      case sourceName:
-        position = sourcePosition;
+      case leftName:
+        position = leftPosition;
         break;
       default:
         position = new double[0];

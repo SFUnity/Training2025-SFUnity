@@ -17,8 +17,8 @@ import static frc.robot.RobotCommands.*;
 import static frc.robot.RobotCommands.IntakeState.*;
 import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.reefName;
-import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.sourceName;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.leftName;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.rightName;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
 
@@ -205,7 +205,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSparkMax());
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
-        vision = new AprilTagVision(poseManager, new AprilTagVisionIOLimelight(reefName), new AprilTagVisionIOLimelight(sourceName));
+        vision = new AprilTagVision(poseManager, new AprilTagVisionIOLimelight(leftName), new AprilTagVisionIOLimelight(rightName));
         break;
 
       case SIM:
