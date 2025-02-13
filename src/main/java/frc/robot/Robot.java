@@ -262,7 +262,8 @@ public class Robot extends LoggedRobot {
 
     // Set up port forwarding for limelights so we can connect to them through the RoboRIO USB port
     for (int port = 5800; port <= 5809; port++) {
-      PortForwarder.add(port, "limelight.local", port);
+      PortForwarder.add(port, leftName + ".local", port);
+      PortForwarder.add(port + 10, rightName + ".local", port);
     }
   }
 
