@@ -23,15 +23,15 @@ public class ElevatorConstants {
   public static final double minHeightInches = 0;
   public static final double maxHeightInches = 23.0;
   public static final double gearRatio = 9;
-  public static final double wheelRadius = 1;
+  public static final double wheelRadius = 0.44444;
 
   static {
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Elevator/kP", 0);
+        kP = new LoggedTunableNumber("Elevator/kP", 0.7);
         kD = new LoggedTunableNumber("Elevator/kD", 0);
-        kG = new LoggedTunableNumber("Elevator/kG", 0);
-        kV = new LoggedTunableNumber("Elevator/kV", 0);
+        kG = new LoggedTunableNumber("Elevator/kG", 0.25);
+        kV = new LoggedTunableNumber("Elevator/kV", 0.285);
         break;
       case SIM:
         kP = new LoggedTunableNumber("Elevator/kP", 0.15);
