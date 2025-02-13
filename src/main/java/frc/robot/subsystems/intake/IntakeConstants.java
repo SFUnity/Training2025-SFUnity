@@ -5,21 +5,42 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 
 public class IntakeConstants {
+  public static final int rollersID = 18;
+  public static final int pivotID = 15;
+
   public static final LoggedTunableNumber kP;
-  public static final double pivotPositionFactor = 0;
+
+  public static final boolean pivotInverted = true;
+  public static final boolean rollersInverted = false;
+  public static final double pivotPositionFactor = 2.9;
+  public static final double rollersPositionFactor = .2;
+
   public static final double minAngleRads = Units.degreesToRadians(18.39);
   public static final double maxAngleRads = Units.degreesToRadians(87.39);
   public static final double armLengthMeters = Units.inchesToMeters(15);
+  public static final double intakePIDMinInput = 0;
+  public static final double intakePIDMaxInput = 1 * 360;
 
-  public static final LoggedTunableNumber algaeVelocityThreshold;
-  public static final LoggedTunableNumber algaeCurrentThreshold;
+  public static final LoggedTunableNumber algaeVoltageThreshold =
+      new LoggedTunableNumber("Intake/algaeVoltageThreshold", .5);
+  public static final LoggedTunableNumber algaeCurrentThreshold =
+      new LoggedTunableNumber("Intake/algaeCurrentThreshold", 20);
+
+  // In rotations
+  public static final LoggedTunableNumber loweredAngle =
+      new LoggedTunableNumber("Intake/loweredAngle", 55);
+  public static final LoggedTunableNumber raisedAngle =
+      new LoggedTunableNumber("Intake/raisedAngle", 0);
+  // In volts
+  public static final LoggedTunableNumber rollersSpeedIn =
+      new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
+  public static final LoggedTunableNumber rollersSpeedOut =
+      new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
 
   static {
-    algaeVelocityThreshold = new LoggedTunableNumber("Intake/algaeVelocityThreshold");
-    algaeCurrentThreshold = new LoggedTunableNumber("Intake/algaeCurrentThreshold");
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Intake/kP", 2.0);
+        kP = new LoggedTunableNumber("Intake/kP", 0.028);
         break;
       case SIM:
         kP = new LoggedTunableNumber("Intake/simkP", 4.82);
