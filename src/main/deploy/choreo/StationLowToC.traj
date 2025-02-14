@@ -1,5 +1,5 @@
 {
- "name":"StationLowToCDL2",
+ "name":"StationLowToC",
  "version":1,
  "snapshot":{
   "waypoints":[
@@ -14,7 +14,7 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"1.5084547996520996 m", "val":1.5084547996520996}, "y":{"exp":"0.6671732068061829 m", "val":0.6671732068061829}, "heading":{"exp":"0.9339797878062142 rad", "val":0.9339797878062142}, "intervals":26, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"3.8469362258911133 m", "val":3.8469362258911137}, "y":{"exp":"2.8404414653778076 m", "val":2.8404414653778076}, "heading":{"exp":"1.0650048009991315 rad", "val":1.0650048009991315}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"C.x", "val":3.7046921253204346}, "y":{"exp":"C.y", "val":2.9956493377685547}, "heading":{"exp":"C.heading", "val":1.0537644925946867}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
