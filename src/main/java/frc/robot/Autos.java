@@ -182,12 +182,17 @@ public class Autos {
     StationHighToK.active()
         .and(carriage::coralHeld)
         .onTrue(
-            scoreCoral(
-                elevator,
-                carriage,
-                poseManager,
-                () -> StationHighToK.getFinalPose().get(),
-                StationHighToK.done()));
+            either(
+                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
+                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
+                    () -> coralOnL3 >= 2)
+                .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> StationHighToK.getFinalPose().get(),
+                        StationHighToK.done())));
 
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
@@ -195,12 +200,17 @@ public class Autos {
     StationHighToL.active()
         .and(carriage::coralHeld)
         .onTrue(
-            scoreCoral(
-                elevator,
-                carriage,
-                poseManager,
-                () -> StationHighToL.getFinalPose().get(),
-                StationHighToL.done()));
+            either(
+                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
+                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
+                    () -> coralOnL3 >= 2)
+                .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> StationHighToL.getFinalPose().get(),
+                        StationHighToL.done())));
 
     StationHighToL.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
