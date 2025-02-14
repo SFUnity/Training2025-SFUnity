@@ -6,7 +6,6 @@ import static frc.robot.subsystems.intake.IntakeConstants.*;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.Util;
@@ -23,10 +22,12 @@ public class Intake extends SubsystemBase {
 
   private boolean lowered = false;
   private boolean hasAlgae = false;
+  private boolean startedIntaking = false;
+  private boolean middleOfIntaking = false;
   public static boolean simHasAlgae = false;
 
-  private final double intakeDelay = .25;
-  private final double outtakeDelay = .3;
+  // private final double intakeDelay = .25;
+  // private final double outtakeDelay = .3;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -40,14 +41,35 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
 
     filteredCurrent = currentFilter.calculate(inputs.rollersCurrentAmps);
+    Logger.recordOutput("Intake/filteredCurrent", filteredCurrent);
+    Logger.recordOutput("Intake/startedIntaking", startedIntaking);
     lowered = inputs.pivotCurrentPositionDeg >= loweredAngle.get() / 2;
 
-    if (inputs.pivotAppliedVolts <= 0.5 && filteredCurrent >= 10) {
-      if (lowered) {
-        hasAlgae = true;
-      } else {
-        hasAlgae = false;
+    // * There's a specific pattern in the current draw of the rollers that we're checking for here
+    // Check that the pivot is lowered and not rising
+    if (inputs.pivotAppliedVolts <= 0.5 && lowered) {
+      // Check if the current is high enough to be intaking
+      if (filteredCurrent >= 8) {
+        // check for start of intaking
+        if (!startedIntaking && !hasAlgae) {
+          startedIntaking = true;
+        }
+        // check for end of intaking
+        if (middleOfIntaking && !hasAlgae) {
+          hasAlgae = true;
+          startedIntaking = false;
+          middleOfIntaking = false;
+        }
       }
+      // check for dip in current
+      if (filteredCurrent <= 5 && startedIntaking) {
+        middleOfIntaking = true;
+      }
+    }
+
+    // Check if the pivot is raised high current
+    if (!lowered && filteredCurrent > 20) {
+      hasAlgae = false;
     }
 
     // Logs
@@ -88,26 +110,28 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCmd() {
-    return Commands.waitUntil(this::algaeHeld)
-        .andThen(Commands.waitSeconds(intakeDelay))
-        .deadlineFor(
-            run(
-                () -> {
-                  lower();
-                  rollersIn();
-                }))
+    /*
+     Commands.waitUntil(this::algaeHeld)
+       .andThen(Commands.waitSeconds(intakeDelay))
+       .deadlineFor(
+    */
+    return run(() -> {
+          lower();
+          rollersIn();
+        })
         .withName("intake");
   }
 
   public Command poopCmd() {
-    return Commands.waitUntil(() -> !algaeHeld())
-        .andThen(Commands.waitSeconds(outtakeDelay))
-        .deadlineFor(
-            run(
-                () -> {
-                  raise();
-                  rollersOut();
-                }))
+    /*
+    Commands.waitUntil(() -> !algaeHeld())
+       .andThen(Commands.waitSeconds(outtakeDelay))
+       .deadlineFor(
+    */
+    return run(() -> {
+          raise();
+          rollersOut();
+        })
         .withName("poop");
   }
 
