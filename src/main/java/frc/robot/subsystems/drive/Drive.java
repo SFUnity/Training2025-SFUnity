@@ -69,7 +69,7 @@ public class Drive extends SubsystemBase {
 
   private final PoseManager poseManager;
   private final DriveCommandsConfig config;
-  private static final double DEADBAND = 0.05;
+  private static final double DEADBAND = 0.1;
 
   private static final LoggedTunableNumber linearkP =
       new LoggedTunableNumber("Drive/Commands/Linear/kP", 3.5);
@@ -96,8 +96,14 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber(
           "Drive/Commands/Theta - maxAcceleration", maxAngularAccelerationRadiansPerSec * 0.8);
 
+  private static final LoggedTunableNumber ffMinRadius =
+      new LoggedTunableNumber("AutoAlign/ffMinRadius", 0.2);
+  private static final LoggedTunableNumber ffMaxRadius =
+      new LoggedTunableNumber("AutoAlign/ffMaxRadius", 0.8);
+
   private final ProfiledPIDController thetaController;
   private final ProfiledPIDController linearController;
+  private Translation2d lastSetpointTranslation;
 
   // Autos
   private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 15);
@@ -437,24 +443,43 @@ public class Drive extends SubsystemBase {
           updateTunables();
           updateConstraints();
 
-          // Calculate linear speed
           Pose2d targetPose = goalPose.get();
 
-          double currentDistance = poseManager.getDistanceTo(targetPose);
+          // Reset the linear controller
+          linearController.reset(
+              lastSetpointTranslation.getDistance(targetPose.getTranslation()),
+              linearController.getSetpoint().velocity);
 
-          double driveVelocityScalar = linearController.calculate(currentDistance, 0.0);
+          // Calculate linear speed
+          double currentDistance = poseManager.getDistanceTo(targetPose);
+          double ffScaler =
+              MathUtil.clamp(
+                  (currentDistance - ffMinRadius.get()) / (ffMaxRadius.get() - ffMinRadius.get()),
+                  0.0,
+                  1.0);
+          double driveVelocityScalar =
+              linearController.getSetpoint().velocity * ffScaler
+                  + linearController.calculate(currentDistance, 0.0);
 
           if (linearAtGoal()) driveVelocityScalar = 0.0;
 
-          // Calculate angle to target then transform by velocity scalar
-          Rotation2d angleToTarget =
-              poseManager.getHorizontalAngleTo(targetPose).rotateBy(Rotation2d.kPi);
+          lastSetpointTranslation =
+              new Pose2d(targetPose.getTranslation(), poseManager.getHorizontalAngleTo(targetPose))
+                  .transformBy(GeomUtil.toTransform2d(linearController.getSetpoint().position, 0.0))
+                  .getTranslation();
 
-          Translation2d driveVelocity = new Translation2d(driveVelocityScalar, angleToTarget);
+          // Calculate angle to target then transform by velocity scalar
+          Translation2d driveVelocity =
+              new Pose2d(
+                      new Translation2d(),
+                      poseManager.getTranslation().minus(targetPose.getTranslation()).getAngle())
+                  .transformBy(GeomUtil.toTransform2d(driveVelocityScalar, 0.0))
+                  .getTranslation();
 
           // Calculate theta speed
           double thetaVelocity =
-              getAngularVelocityFromProfiledPID(targetPose.getRotation().getRadians());
+              thetaController.getSetpoint().velocity * ffScaler
+                  + getAngularVelocityFromProfiledPID(targetPose.getRotation().getRadians());
           if (thetaController.atGoal()) thetaVelocity = 0.0;
 
           // Send command
@@ -565,11 +590,13 @@ public class Drive extends SubsystemBase {
     double linearVelocity =
         Math.min(
             0.0,
-            new Translation2d(fieldVelocity.dx, fieldVelocity.dy)
-                .rotateBy(poseManager.getHorizontalAngleTo(goalPose).rotateBy(Rotation2d.kPi))
+            -new Translation2d(fieldVelocity.dx, fieldVelocity.dy)
+                .rotateBy(poseManager.getHorizontalAngleTo(goalPose).unaryMinus())
                 .getX());
     linearController.reset(poseManager.getDistanceTo(goalPose), linearVelocity);
     resetThetaController();
+    Logger.recordOutput("resetControllers/linearVelocity", linearVelocity);
+    lastSetpointTranslation = poseManager.getTranslation();
   }
 
   private void resetThetaController() {
@@ -650,8 +677,7 @@ public class Drive extends SubsystemBase {
                         .schedule(
                             startRun(
                                     () -> {
-                                      for (var module : modules)
-                                        module.setTurnPIDF(turnKp.get(), turnKd.get());
+                                      for (var module : modules) module.setTurnPIDF(turnKp.get());
                                     },
                                     () ->
                                         setAllModuleSetpointsToSame(
@@ -660,7 +686,6 @@ public class Drive extends SubsystemBase {
                                 .finallyDo(this::stop));
                   },
                   turnKp,
-                  turnKd,
                   tuningTurnDelta);
             })
         .withName("tuneModuleTurn");

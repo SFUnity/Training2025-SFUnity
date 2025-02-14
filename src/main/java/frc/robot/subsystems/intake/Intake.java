@@ -1,15 +1,12 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -17,69 +14,67 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends SubsystemBase {
   private final IntakeVisualizer measuredVisualizer = new IntakeVisualizer("Measured", Color.kRed);
   private final IntakeVisualizer setpointVisualizer = new IntakeVisualizer("Setpoint", Color.kBlue);
-  private double filteredVelocity;
-  private double filteredStatorCurrent;
-  public static boolean simHasAlgae = false;
-  // In rotations
-  private static final LoggedTunableNumber loweredAngle =
-      new LoggedTunableNumber("Intake/loweredAngle", 19);
-  private static final LoggedTunableNumber raisedAngle =
-      new LoggedTunableNumber("Intake/raisedAngle", 86);
-  // In percent output
-  private static final LoggedTunableNumber rollersSpeed =
-      new LoggedTunableNumber("Intake/rollerSpeed", 1);
+  private double positionSetpoint = raisedAngle.get();
 
-  private Angle positionSetpoint = Degrees.zero();
+  private boolean lowered = false;
+  private boolean hasAlgae = false;
+  public static boolean simHasAlgae = false;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   public Intake(IntakeIO io) {
     this.io = io;
-
-    io.setPID(kP.get());
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
 
-    // Update controllers
-    LoggedTunableNumber.ifChanged(hashCode(), () -> io.setPID(kP.get()), kP);
+    if (inputs.pivotAppliedVolts <= algaeVoltageThreshold.get()
+        && inputs.rollersCurrentAmps >= algaeCurrentThreshold.get()) {
+      if (lowered) {
+        hasAlgae = true;
+      } else {
+        hasAlgae = false;
+      }
+    }
 
     // Logs
-    measuredVisualizer.update(inputs.pivotCurrentPosition);
-    setpointVisualizer.update(positionSetpoint);
-    Logger.recordOutput("Intake/positionSetpointRadians", positionSetpoint.in(Radians));
+    measuredVisualizer.update(Degrees.of(inputs.pivotCurrentPositionDeg));
+    setpointVisualizer.update(Degrees.of(positionSetpoint));
+    Logger.recordOutput("Intake/positionSetpoint", positionSetpoint);
     Util.logSubsystem(this, "Intake");
   }
 
   private void lower() {
-    positionSetpoint = Degrees.of(loweredAngle.get());
+    positionSetpoint = loweredAngle.get();
     io.setPivotPosition(positionSetpoint);
+    lowered = true;
   }
 
   private void raise() {
-    positionSetpoint = Degrees.of(raisedAngle.get());
+    positionSetpoint = raisedAngle.get();
     io.setPivotPosition(positionSetpoint);
+    lowered = false;
   }
 
   private void rollersIn() {
-    io.runRollers(rollersSpeed.get());
+    io.runRollers(rollersSpeedIn.get());
   }
 
   private void rollersOut() {
-    io.runRollers(-rollersSpeed.get());
+    io.runRollers(-rollersSpeedOut.get());
   }
 
-  private void rollersStop() {
+  private void rollersStopOrHold() {
     io.runRollers(0);
   }
 
-  public Command raiseAndStopCmd() {
+  public Command raiseAndStopOrHoldCmd() {
     return run(() -> {
           raise();
-          rollersStop();
+          rollersStopOrHold();
         })
         .withName("raise and stop");
   }
@@ -107,8 +102,6 @@ public class Intake extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasAlgae;
     }
-    return (filteredVelocity <= algaeVelocityThreshold.get()
-            && (filteredStatorCurrent >= algaeCurrentThreshold.get())
-        || filteredStatorCurrent <= -2);
+    return hasAlgae;
   }
 }

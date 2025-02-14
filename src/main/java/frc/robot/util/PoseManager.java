@@ -1,18 +1,22 @@
 package frc.robot.util;
 
+import static frc.robot.RobotCommands.ScoreState.Dealgify;
+import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.util.AllianceFlipUtil.apply;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import frc.robot.constantsGlobal.FieldConstants.Face;
+import edu.wpi.first.math.util.Units;
+import frc.robot.RobotCommands.ScoreState;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -119,16 +123,105 @@ public class PoseManager {
     return robotVelocity;
   }
 
-  public Face closestFace() {
-    Face closestFace = Face.One;
-    double distanceToClosestFace = Double.MAX_VALUE;
+  public boolean lockClosest = false;
+  private Face lockedFace = Face.One;
+
+  private Face closestFace(ScoreState scoreState) {
+    if (lockClosest) {
+      return lockedFace;
+    }
+    Face closest = Face.One;
+    Face secondClosest = Face.Two;
+    double distanceToClosest = Double.MAX_VALUE;
+    double distanceTo2ndClosest = Double.MAX_VALUE;
     for (Face face : Face.values()) {
-      double distance = getDistanceTo(apply(face.pose));
-      if (distance < distanceToClosestFace) {
-        distanceToClosestFace = distance;
-        closestFace = face;
+      double distance =
+          getDistanceTo(
+              apply(
+                  switch (scoreState) {
+                    case LeftBranch -> face.leftBranch.getPose();
+                    case RightBranch -> face.rightBranch.getPose();
+                    default -> face.getPose();
+                  }));
+      if (distance < distanceToClosest) {
+        secondClosest = closest;
+        distanceTo2ndClosest = distanceToClosest;
+        distanceToClosest = distance;
+        closest = face;
+      } else if (distance < distanceTo2ndClosest) {
+        distanceTo2ndClosest = distance;
+        secondClosest = face;
       }
     }
-    return closestFace;
+
+    // Get angles
+    double fieldVelocityAngle =
+        Units.radiansToDegrees(Math.atan2(fieldVelocity().dy, fieldVelocity().dx));
+    double angleToClosest = getHorizontalAngleTo(apply(closest.getPose())).getDegrees();
+    double angleTo2ndClosest = getHorizontalAngleTo(apply(secondClosest.getPose())).getDegrees();
+
+    // Change angles from -180, 180 to 0, 360
+    if (fieldVelocityAngle < 0) fieldVelocityAngle += 360;
+    if (angleToClosest < 0) angleToClosest += 360;
+    if (angleTo2ndClosest < 0) angleTo2ndClosest += 360;
+
+    // Logger.recordOutput("FieldVelocityAngle", fieldVelocityAngle);
+    // Logger.recordOutput("AngleToClosest", angleToClosest);
+    // Logger.recordOutput("AngleTo2ndClosest", angleTo2ndClosest);
+
+    // Find angle differences
+    double toClosestAngleDiff = Math.abs(fieldVelocityAngle - angleToClosest);
+    double to2ndClosestAngleDiff = Math.abs(fieldVelocityAngle - angleTo2ndClosest);
+
+    if (toClosestAngleDiff > 180) toClosestAngleDiff = 360 - toClosestAngleDiff;
+    if (to2ndClosestAngleDiff > 180) to2ndClosestAngleDiff = 360 - to2ndClosestAngleDiff;
+
+    // Logger.recordOutput("ToClosestAngleDiff", toClosestAngleDiff);
+    // Logger.recordOutput("To2ndClosestAngleDiff", to2ndClosestAngleDiff);
+
+    // Find closest angle
+    if (toClosestAngleDiff > to2ndClosestAngleDiff
+        && (fieldVelocity().dx > 0.1 || fieldVelocity().dy > 0.1)) {
+      lockedFace = secondClosest;
+      return secondClosest;
+    } else {
+      lockedFace = closest;
+      return closest;
+    }
+  }
+
+  public Pose2d closest(ScoreState scoreState) {
+    Face closest = closestFace(scoreState);
+    return switch (scoreState) {
+      case LeftBranch -> closest.leftBranch.getPose();
+      case RightBranch -> closest.rightBranch.getPose();
+      default -> closest.getPose();
+    };
+  }
+
+  public boolean closestFaceHighAlgae() {
+    return closestFace(Dealgify).highAlgae;
+  }
+
+  public Pose2d closestStation() {
+    final Pose2d leftFaceFlipped = apply(CoralStation.leftCenterFace);
+    final Pose2d rightFaceFlipped = apply(CoralStation.rightCenterFace);
+
+    if (getDistanceTo(leftFaceFlipped) < getDistanceTo(rightFaceFlipped)) {
+      return leftFaceFlipped;
+    } else {
+      return rightFaceFlipped;
+    }
+  }
+
+  public double distanceToStationFace() {
+    Pose2d station =
+        closestStation()
+            .transformBy(new Transform2d(intakeDistanceMeters.get(), 0, Rotation2d.kZero));
+    Rotation2d angleToStation = getHorizontalAngleTo(station);
+    Rotation2d stationAngle = station.getRotation();
+    double hypotenuse = getDistanceTo(station);
+    double angleDiff = angleToStation.minus(stationAngle).getRadians();
+    return -Math.cos(angleDiff) * hypotenuse;
   }
 }

@@ -23,7 +23,7 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
-  private static LoggedTunableNumber highDealgifyTime =
+  private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
 
   public Carriage(CarriageIO io) {
@@ -59,8 +59,8 @@ public class Carriage extends SubsystemBase {
         || filteredStatorCurrent <= -2);
   }
 
-  public Command stop() {
-    return run(() -> io.runVolts(0)).withName("stop");
+  public Command stopOrHold() {
+    return run(() -> io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0)).withName("stop");
   }
 
   public Command placeCoral() {

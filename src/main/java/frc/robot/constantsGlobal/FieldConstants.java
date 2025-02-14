@@ -9,6 +9,9 @@ package frc.robot.constantsGlobal;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import frc.robot.util.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 /**
  * Contains various field dimensions and useful reference points. All units are in meters and poses
@@ -59,103 +62,164 @@ public final class FieldConstants {
         new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
   }
 
+  private static final LoggedTunableNumber extraXOffset =
+      new LoggedTunableNumber("Distances/extraX", .75 / 2 + .2);
+  public static final LoggedTunableNumber extraYOffset =
+      new LoggedTunableNumber("Distances/extraY", 0);
+  public static final LoggedTunableNumber elevatorSafeExtensionDistanceMeters =
+      new LoggedTunableNumber("Distances/elevatorExtension", 1);
+  public static final LoggedTunableNumber intakeDistanceMeters =
+      new LoggedTunableNumber("Distances/intake", .5);
+
   public static final Translation2d reefCenter =
       new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
-  private static final double xOffset = Units.inchesToMeters(30.738) + .75 / 2 + .2;
-  private static final double yOffset = Units.inchesToMeters(6.469);
+  private static final DoubleSupplier xOffset =
+      () -> Units.inchesToMeters(30.738) + extraXOffset.get();
+  private static final DoubleSupplier yOffset =
+      () -> Units.inchesToMeters(6.469) + extraYOffset.get();
 
   public static enum Branch {
     A(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 0)))
-            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 0)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), -yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     B(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 0)))
-            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 0)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     C(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 1)))
-            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 1)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), -yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     D(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 1)))
-            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 1)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     E(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 2)))
-            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 2)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), -yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     F(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 2)))
-            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 2)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     G(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 3)))
-            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 3)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), -yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     H(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 3)))
-            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 3)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     I(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 4)))
-            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 4)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), -yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     J(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 4)))
-            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 4)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     K(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 5)))
-            .transformBy(new Transform2d(xOffset, -yOffset, new Rotation2d(Math.PI)))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 5)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), -yOffset.getAsDouble(), new Rotation2d(Math.PI)))),
     L(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 5)))
-            .transformBy(new Transform2d(xOffset, yOffset, new Rotation2d(Math.PI))));
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 5)))
+                .transformBy(
+                    new Transform2d(
+                        xOffset.getAsDouble(), yOffset.getAsDouble(), new Rotation2d(Math.PI))));
 
-    Branch(Pose2d pose) {
+    Branch(Supplier<Pose2d> pose) {
       this.pose = pose;
     }
 
-    public final Pose2d pose;
+    public Pose2d getPose() {
+      return pose.get();
+    }
+
+    public final Supplier<Pose2d> pose;
   }
 
   public static enum Face {
     One(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180))
+                .transformBy(new Transform2d(xOffset.getAsDouble(), 0, new Rotation2d(Math.PI))),
         Branch.A,
         Branch.B,
         true),
     Two(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 1)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 1)))
+                .transformBy(new Transform2d(xOffset.getAsDouble(), 0, new Rotation2d(Math.PI))),
         Branch.C,
         Branch.D,
         false),
     Three(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 2)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 2)))
+                .transformBy(new Transform2d(xOffset.getAsDouble(), 0, new Rotation2d(Math.PI))),
         Branch.E,
         Branch.F,
         true),
     Four(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 3)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 3)))
+                .transformBy(new Transform2d(xOffset.getAsDouble(), 0, new Rotation2d(Math.PI))),
         Branch.G,
         Branch.H,
         false),
     Five(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 4)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 4)))
+                .transformBy(new Transform2d(xOffset.getAsDouble(), 0, new Rotation2d(Math.PI))),
         Branch.I,
         Branch.J,
         true),
     Six(
-        new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 5)))
-            .transformBy(new Transform2d(xOffset, 0, new Rotation2d(Math.PI))),
+        () ->
+            new Pose2d(reefCenter, Rotation2d.fromDegrees(180 + (60 * 5)))
+                .transformBy(new Transform2d(xOffset.getAsDouble(), 0, new Rotation2d(Math.PI))),
         Branch.K,
         Branch.L,
         false),
     ;
 
-    Face(Pose2d pose, Branch lefBranch, Branch rightBranch, boolean highAlgae) {
+    Face(Supplier<Pose2d> pose, Branch lefBranch, Branch rightBranch, boolean highAlgae) {
       this.pose = pose;
       this.leftBranch = lefBranch;
       this.rightBranch = rightBranch;
       this.highAlgae = highAlgae;
     }
 
-    public final Pose2d pose;
+    public Pose2d getPose() {
+      return pose.get();
+    }
+
+    public final Supplier<Pose2d> pose;
     public final Branch leftBranch;
     public final Branch rightBranch;
     public final boolean highAlgae;

@@ -24,7 +24,8 @@ import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = Units.feetToMeters(17.1);
+  public static final double maxSpeedMetersPerSec =
+      Constants.onCarpet ? Units.feetToMeters(17.1) : Units.feetToMeters(17.1);
   public static final double maxAccelerationMetersPerSec =
       Units.feetToMeters(75.0); // This is what 6328
   public static final double odometryFrequency = 100.0; // Hz
@@ -45,21 +46,21 @@ public class DriveConstants {
       new SwerveDriveKinematics(moduleTranslations);
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(-2.186);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(-2.140);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(1.993);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(-0.031);
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(); // -2.186
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(); // -2.140
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(); // 1.993
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(); // -0.031
 
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = false;
-  public static final boolean frontRightDriveInverted = true;
+  public static final boolean frontRightDriveInverted = false;
   public static final boolean backLeftDriveInverted = false;
-  public static final boolean backRightDriveInverted = true;
+  public static final boolean backRightDriveInverted = false;
 
-  public static final boolean frontLeftTurnInverted = true;
-  public static final boolean frontRightTurnInverted = true;
-  public static final boolean backLeftTurnInverted = true;
-  public static final boolean backRightTurnInverted = true;
+  public static final boolean frontLeftTurnInverted = false;
+  public static final boolean frontRightTurnInverted = false;
+  public static final boolean backLeftTurnInverted = false;
+  public static final boolean backRightTurnInverted = false;
 
   public static final boolean frontLeftTurnEncoderInverted = false;
   public static final boolean frontRightTurnEncoderInverted = false;
@@ -69,27 +70,28 @@ public class DriveConstants {
   // Device CAN IDs. Based off power port on PDH
   public static final int pigeonCanId = 20;
 
-  public static final int frontLeftDriveCanId = 15;
-  public static final int backLeftDriveCanId = 0;
-  public static final int frontRightDriveCanId = 10;
-  public static final int backRightDriveCanId = 9;
+  public static final int frontLeftDriveCanId = 3;
+  public static final int backLeftDriveCanId = 19;
+  public static final int frontRightDriveCanId = 4;
+  public static final int backRightDriveCanId = 13;
 
-  public static final int frontLeftTurnCanId = 19;
-  public static final int backLeftTurnCanId = 2;
-  public static final int frontRightTurnCanId = 11;
-  public static final int backRightTurnCanId = 1;
+  public static final int frontLeftTurnCanId = 8;
+  public static final int backLeftTurnCanId = 13;
+  public static final int frontRightTurnCanId = 6;
+  public static final int backRightTurnCanId = 17;
 
-  public static final int frontLeftTurnEncoderCanId = 18;
-  public static final int backLeftTurnEncoderCanId = 4;
-  public static final int frontRightTurnEncoderCanId = 19; // on same power as 18
-  public static final int backRightTurnEncoderCanId = 5; // on same power as 4
+  public static final int frontLeftTurnEncoderCanId = 19;
+  public static final int backLeftTurnEncoderCanId = 18;
+  public static final int frontRightTurnEncoderCanId = 4;
+  public static final int backRightTurnEncoderCanId = 5;
 
   public static final String CANBusName = "rio";
 
   // Drive motor configuration
   public static final int driveMotorSupplyCurrentLimit = 50;
   public static final int driveMotorStatorCurrentLimit = 80;
-  public static final double wheelRadiusMeters = Units.inchesToMeters(2);
+  public static final double wheelRadiusMeters =
+      Constants.onCarpet ? Units.inchesToMeters(2) : Units.inchesToMeters(2);
   public static final double driveMotorReduction = 6.12;
   public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
 
@@ -102,10 +104,12 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.0);
-        driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = 0.0;
-        driveKv = 0.0;
+        driveKp =
+            new LoggedTunableNumber("Drive/ModuleTunables/driveKp", Constants.onCarpet ? 0.0 : 0.0);
+        driveKd =
+            new LoggedTunableNumber("Drive/ModuleTunables/driveKd", Constants.onCarpet ? 0.0 : 0.0);
+        driveKs = Constants.onCarpet ? 0.0 : 0.0;
+        driveKv = Constants.onCarpet ? 0.0 : 0.0;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
@@ -121,27 +125,20 @@ public class DriveConstants {
   public static final double turnMotorReduction = 150 / 7;
   public static final DCMotor turnGearbox = DCMotor.getNEO(1);
 
-  // Turn encoder configuration
-  public static final double turnEncoderPositionFactor =
-      2 * Math.PI / turnMotorReduction; // Rotations -> Radians
-  public static final double turnEncoderVelocityFactor =
-      (2 * Math.PI) / 60.0 / turnMotorReduction; // RPM -> Rad/Sec
-
   // Turn PID configuration
   public static final LoggedTunableNumber turnKp;
-  public static final LoggedTunableNumber turnKd;
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   static {
     switch (Constants.currentMode) {
       default:
-        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", 0.32);
-        turnKd = new LoggedTunableNumber("Drive/ModuleTunables/turnKd", 0.0);
+        turnKp =
+            new LoggedTunableNumber(
+                "Drive/ModuleTunables/turnKp", Constants.onCarpet ? 0.32 : 0.32);
         break;
       case SIM:
         turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 14.0);
-        turnKd = new LoggedTunableNumber("Drive/SimModuleTunables/turnKd", 0.0);
         break;
     }
   }
@@ -169,11 +166,11 @@ public class DriveConstants {
     private static final boolean simMode = Constants.currentMode == Constants.Mode.SIM;
 
     public double getXInput() {
-      return simMode ? -controller.getLeftX() : controller.getLeftY();
+      return simMode ? -controller.getLeftX() : -controller.getLeftY();
     }
 
     public double getYInput() {
-      return simMode ? controller.getLeftY() : controller.getLeftX();
+      return simMode ? controller.getLeftY() : -controller.getLeftX();
     }
 
     public double getOmegaInput() {

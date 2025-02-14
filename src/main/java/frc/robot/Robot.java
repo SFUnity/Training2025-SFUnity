@@ -59,6 +59,7 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -244,7 +245,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    autos = new Autos(drive, poseManager, elevator, carriage);
+    autos = new Autos(drive, carriage, elevator, intake, poseManager);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -313,7 +314,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Controls/intakeState", intakeState.toString());
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
     Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
-    Logger.recordOutput("Controls/allowAutoRotation", allowAutoRotation);
+    Logger.recordOutput("Controls/allowAutoRotation", allowAutoDrive);
     Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
@@ -323,20 +324,22 @@ public class Robot extends LoggedRobot {
             controller.getHID().getPort()); // Should be an XBox controller
   }
 
-  private boolean allowAutoRotation = true;
-
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     // Setup rumble
     new Trigger(() -> intake.algaeHeld())
-        .onTrue(Commands.run(() -> driver.setRumble(RumbleType.kBothRumble, 0.5)).withTimeout(.5));
+        .onTrue(
+            Commands.runEnd(
+                    () -> driver.setRumble(RumbleType.kBothRumble, 0.5),
+                    () -> driver.setRumble(RumbleType.kBothRumble, 0.0))
+                .withTimeout(.5));
 
     // Default cmds
     drive.setDefaultCommand(drive.joystickDrive());
     elevator.setDefaultCommand(elevator.disableElevator());
-    carriage.setDefaultCommand(carriage.stop());
-    intake.setDefaultCommand(intake.raiseAndStopCmd());
+    carriage.setDefaultCommand(carriage.stopOrHold());
+    intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
     driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -363,19 +366,52 @@ public class Robot extends LoggedRobot {
                 .ignoringDisable(true));
     driver
         .back()
-        .onTrue(
-            Commands.runOnce(() -> allowAutoRotation = !allowAutoRotation).ignoringDisable(true));
+        .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
-    driver.leftBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
     driver
         .rightBumper()
+        .whileTrue(fullIntake(drive, carriage, intake, poseManager, () -> allowAutoDrive));
+    driver
+        .leftBumper()
         .whileTrue(
-            fullScore(drive, elevator, carriage, intake, poseManager, driver.rightBumper())
+            Commands.select(
+                    Map.of(
+                        LeftBranch,
+                        scoreCoral(elevator, carriage, poseManager, atGoal(drive)),
+                        Dealgify,
+                        dealgify(elevator, carriage, poseManager),
+                        ProcessorFront,
+                        scoreProcessor(carriage, intake, poseManager, true, atGoal(drive)),
+                        ProcessorBack,
+                        scoreProcessor(carriage, intake, poseManager, false, atGoal(drive))),
+                    () -> scoreState == RightBranch ? LeftBranch : scoreState)
+                .deadlineFor(
+                    Commands.either(
+                        drive.fullAutoDrive(goalPose(poseManager)),
+                        Commands.none(),
+                        () -> allowAutoDrive))
                 .beforeStarting(
                     () -> {
+                      poseManager.lockClosest = true;
                       if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
-                    }));
+                    })
+                .andThen(
+                    Commands.either(
+                        dealgify(elevator, carriage, poseManager)
+                            .deadlineFor(
+                                Commands.either(
+                                    drive.fullAutoDrive(goalPose(poseManager)),
+                                    Commands.none(),
+                                    () -> allowAutoDrive))
+                            .beforeStarting(
+                                () -> {
+                                  scoreState = Dealgify;
+                                  dealgifyAfterPlacing = false;
+                                }),
+                        Commands.none(),
+                        () -> dealgifyAfterPlacing))
+                .finallyDo(() -> poseManager.lockClosest = false));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -402,12 +438,27 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
+    operator.back().onTrue(elevator.runCurrentZeroing());
+
     // State-Based Triggers
+    // Teleop Only
     new Trigger(carriage::coralHeld)
-        .and(() -> allowAutoRotation)
+        .and(() -> allowAutoDrive)
+        // Maybe should remove so that even if most of poseEstimation isn't working, this still will
+        .and(() -> DriverStation.isTeleop())
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
-    new Trigger(carriage::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
-    new Trigger(intake::algaeHeld).onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+    new Trigger(carriage::algaeHeld)
+        .and(() -> DriverStation.isTeleop())
+        .onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+    new Trigger(intake::algaeHeld)
+        .and(() -> DriverStation.isTeleop())
+        .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+
+    // All the time
+    new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
+        .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .and(() -> allowAutoDrive)
+        .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces
     SmartDashboard.putData(
@@ -418,6 +469,8 @@ public class Robot extends LoggedRobot {
         Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
     SmartDashboard.putData(
         "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
+
+    SmartDashboard.putData("Run Elevator Sysid", elevator.runSysidCmd());
   }
 
   /** This function is called once when the robot is disabled. */
