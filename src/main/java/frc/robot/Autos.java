@@ -82,6 +82,7 @@ public class Autos {
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
+    chooser.addRoutine("CenterCDProcessorAlgaeL2L3", this::CenterCDProcessorAlgaeL2L3);
     chooser.addRoutine("WallCDAlgaeProcessorScoreL2L3", this::WallCDAlgaeProcessorScoreL2L3);
     chooser.addRoutine("L1HGAlgae", this::L1HGAlgae);
     chooser.addRoutine("FL2HGAlgae", this::FL2HGAlgae);
@@ -217,15 +218,15 @@ public class Autos {
 
     return routine;
   }
-  
-  public AutoRoutine ProcessorCDAlgaeL2L3() {
-    AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
-    AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToLKAlgae");
+
+  public AutoRoutine CenterCDProcessorAlgaeL2L3() {
+    AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
+    AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("KLAlgaeToStationHigh");
-    AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
-    AutoTrajectory KToStationHigh = routine.trajectory("KToStationHigh");
-    AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
-    AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
+    AutoTrajectory StationHighToK = routine.trajectory("StationLowToC");
+    AutoTrajectory KToStationHigh = routine.trajectory("CToStationLow");
+    AutoTrajectory StationHighToL = routine.trajectory("StationLowToD");
+    AutoTrajectory LToStationHigh = routine.trajectory("DToStationLow");
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
@@ -316,10 +317,8 @@ public class Autos {
 
     return routine;
   }
-  
 
   public AutoRoutine WallCDAlgaeProcessorScoreL2L3() {
-
 
     AutoRoutine routine = factory.newRoutine("WallCDAlgaeProcessorScoreL2L3");
 
@@ -361,7 +360,6 @@ public class Autos {
 
     return routine;
   }
-  
 
   public AutoRoutine L1HGAlgae() {
 
@@ -429,7 +427,6 @@ public class Autos {
   }
 
   public AutoRoutine IL2HGAlgae() {
-
 
     AutoRoutine routine = factory.newRoutine("IL2HGAlgae");
 
