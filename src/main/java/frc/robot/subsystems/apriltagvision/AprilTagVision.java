@@ -2,20 +2,13 @@ package frc.robot.subsystems.apriltagvision;
 
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import frc.robot.constantsGlobal.FieldConstants;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
-import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.util.GeomUtil;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
 import java.util.LinkedList;
@@ -59,15 +52,16 @@ public class AprilTagVision extends VirtualSubsystem {
               || estimatedPose.equals(new Pose2d())
               // if turning too fast
               || Math.abs(poseManager.robotVelocity().dtheta) > 720
-              // if off the ground
-              || inputs.estimatedPose.getY() > 0.15
-              // if off field
-              || estimatedPose.getX() < -fieldBorderMargin
-              || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
-              || estimatedPose.getY() < -fieldBorderMargin
-              || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
-              // if too far away from current pose, depends on amount of apriltags
-              || poseManager.getDistanceTo(estimatedPose) > allowableDistance;
+          // if off the ground
+          // || inputs.estimatedPose.getY() > 0.15
+          // if off field
+          // || estimatedPose.getX() < -fieldBorderMargin
+          // || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
+          // || estimatedPose.getY() < -fieldBorderMargin
+          // || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
+          // if too far away from current pose, depends on amount of apriltags
+          // || poseManager.getDistanceTo(estimatedPose) > allowableDistance
+          ;
 
       if (isRejected) {
         robotPosesRejected.add(inputs.estimatedPose);
@@ -80,28 +74,28 @@ public class AprilTagVision extends VirtualSubsystem {
       double trust = .7;
 
       // Scale trust based on number of tags
-      if (inputs.tagCount < 2) {
-        trust *= 2;
-      }
+      // if (inputs.tagCount < 2) {
+      //   trust *= 2;
+      // }
 
       // Scale trust based on max velocity
-      ChassisSpeeds velo = GeomUtil.toChassisSpeeds(poseManager.robotVelocity());
-      if (new Translation2d(velo.vxMetersPerSecond, velo.vyMetersPerSecond).getNorm()
-          > DriveConstants.maxSpeedMetersPerSec / 2.0) {
-        trust *= 2.0;
-      }
-      if (velo.omegaRadiansPerSecond > DriveConstants.maxAngularSpeedRadiansPerSec / 3.0) {
-        trust *= 2.0;
-      }
+      // ChassisSpeeds velo = GeomUtil.toChassisSpeeds(poseManager.robotVelocity());
+      // if (new Translation2d(velo.vxMetersPerSecond, velo.vyMetersPerSecond).getNorm()
+      //     > DriveConstants.maxSpeedMetersPerSec / 2.0) {
+      //   trust *= 2.0;
+      // }
+      // if (velo.omegaRadiansPerSecond > DriveConstants.maxAngularSpeedRadiansPerSec / 3.0) {
+      //   trust *= 2.0;
+      // }
 
       // Scale trust based on estimated rotations difference from gyro measure
-      Rotation2d rotation = poseManager.getRotation();
-      if (Math.abs(
-              MathUtil.angleModulus(rotation.getRadians())
-                  - MathUtil.angleModulus(estimatedPose.getRotation().getRadians()))
-          > Math.toRadians(30.0)) {
-        trust *= 2.0;
-      }
+      // Rotation2d rotation = poseManager.getRotation();
+      // if (Math.abs(
+      //         MathUtil.angleModulus(rotation.getRadians())
+      //             - MathUtil.angleModulus(estimatedPose.getRotation().getRadians()))
+      //     > Math.toRadians(30.0)) {
+      //   trust *= 2.0;
+      // }
 
       // Create stdDevs
       Matrix<N3, N1> stdDevs = VecBuilder.fill(trust, trust, 99999);
