@@ -26,6 +26,7 @@ public class Carriage extends SubsystemBase {
   private boolean coralPassed = false;
 
   public boolean realCoralHeld = false;
+  private boolean doCoralHeld = false;
 
   private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
@@ -52,7 +53,7 @@ public class Carriage extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       realCoralHeld = simHasCoral;
     }
-    if (Constants.tuningMode) {
+    if (!doCoralHeld) {
       realCoralHeld = true;
     } else {
       if (!inputs.beamBreak && !coralPassed) {
