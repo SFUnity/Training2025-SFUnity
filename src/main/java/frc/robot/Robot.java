@@ -40,18 +40,14 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarriageIOSim;
-import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
@@ -59,7 +55,6 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
-import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -190,15 +185,15 @@ public class Robot extends LoggedRobot {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOMixed(0),
-                new ModuleIOMixed(1),
-                new ModuleIOMixed(2),
-                new ModuleIOMixed(3),
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSparkMax());
-        carriage = new Carriage(new CarriageIOSparkMax());
+        elevator = new Elevator(new ElevatorIO() {});
+        carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIOSparkMax());
         break;
 
@@ -357,50 +352,8 @@ public class Robot extends LoggedRobot {
         .back()
         .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
-    driver
-        .rightBumper()
-        .whileTrue(fullIntake(drive, carriage, intake, poseManager, () -> allowAutoDrive));
-    driver
-        .leftBumper()
-        .whileTrue(
-            Commands.select(
-                    Map.of(
-                        LeftBranch,
-                        scoreCoral(elevator, carriage, poseManager, atGoal(drive)),
-                        Dealgify,
-                        dealgify(elevator, carriage, poseManager),
-                        ProcessorFront,
-                        scoreProcessor(carriage, intake, poseManager, true, atGoal(drive)),
-                        ProcessorBack,
-                        scoreProcessor(carriage, intake, poseManager, false, atGoal(drive))),
-                    () -> scoreState == RightBranch ? LeftBranch : scoreState)
-                .deadlineFor(
-                    Commands.either(
-                        drive.fullAutoDrive(goalPose(poseManager)),
-                        Commands.none(),
-                        () -> allowAutoDrive))
-                .beforeStarting(
-                    () -> {
-                      poseManager.lockClosest = true;
-                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
-                        scoreState = Dealgify;
-                    })
-                .andThen(
-                    Commands.either(
-                        dealgify(elevator, carriage, poseManager)
-                            .deadlineFor(
-                                Commands.either(
-                                    drive.fullAutoDrive(goalPose(poseManager)),
-                                    Commands.none(),
-                                    () -> allowAutoDrive))
-                            .beforeStarting(
-                                () -> {
-                                  scoreState = Dealgify;
-                                  dealgifyAfterPlacing = false;
-                                }),
-                        Commands.none(),
-                        () -> dealgifyAfterPlacing))
-                .finallyDo(() -> poseManager.lockClosest = false));
+    driver.rightBumper().whileTrue(intake.intakeCmd());
+    driver.leftBumper().whileTrue(intake.poopCmd());
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -416,6 +369,7 @@ public class Robot extends LoggedRobot {
                   } else if (carriage.algaeHeld()) {
                     scoreState = ProcessorFront;
                   }
+                  scoreState = ProcessorBack;
                 }));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
