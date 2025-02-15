@@ -122,6 +122,12 @@ public class Intake extends SubsystemBase {
         .withName("intake");
   }
 
+  public Command runCurrentZeroing() {
+    return this.run(() -> io.runRollers(-1.0))
+        .until(() -> inputs.pivotCurrentAmps > 40.0)
+        .finallyDo(() -> io.resetEncoder(0.0));
+  }
+
   public Command poopCmd() {
     /*
     Commands.waitUntil(() -> !algaeHeld())
