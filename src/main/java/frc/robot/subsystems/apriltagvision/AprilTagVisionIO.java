@@ -9,6 +9,7 @@ public interface AprilTagVisionIO {
   @AutoLog
   public static class AprilTagVisionIOInputs {
     public PoseEstimate observation;
+    public int[] tagIds = new int[0];
     public Pose3d estimatedPose = new Pose3d();
     public double timestamp = 0.0;
     public int tagCount = 0;

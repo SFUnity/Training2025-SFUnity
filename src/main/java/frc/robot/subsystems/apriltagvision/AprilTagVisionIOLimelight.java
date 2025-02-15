@@ -3,10 +3,15 @@ package frc.robot.subsystems.apriltagvision;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 import static frc.robot.util.LimelightHelpers.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
+import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.PoseManager;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
@@ -61,8 +66,19 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         0,
         0);
     PoseEstimate observation = getBotPoseEstimate_wpiBlue_MegaTag2(name);
-
     inputs.observation = observation;
+
+    // Get tag IDs
+    Set<Integer> tagIds = new HashSet<>();
+    for (var tag : observation.rawFiducials) {
+      tagIds.add(tag.id);
+    }
+    // Save tag IDs to inputs objects
+    inputs.tagIds = new int[tagIds.size()];
+    int i = 0;
+    for (int id : tagIds) {
+      inputs.tagIds[i++] = id;
+    }
 
     inputs.estimatedPose = observation.pose;
     inputs.timestamp = observation.timestampSeconds;
