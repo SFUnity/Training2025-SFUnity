@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
-
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -27,9 +25,7 @@ public class Carriage extends SubsystemBase {
 
   private boolean coralPassed = false;
 
-  
   public boolean realCoralHeld = false;
-
 
   private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
@@ -41,6 +37,7 @@ public class Carriage extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    coralHeld();
     Logger.processInputs("Carriage", inputs);
 
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
@@ -51,27 +48,25 @@ public class Carriage extends SubsystemBase {
     Logger.recordOutput("Carriage/coralHeld", realCoralHeld);
   }
 
-  @AutoLogOutput
   public void coralHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
-      realCoralHeld =  simHasCoral;
+      realCoralHeld = simHasCoral;
     }
-    
-    if(!inputs.beamBreak && !coralPassed){
-      realCoralHeld = false;
-      
-    }
-    else if(inputs.beamBreak && !coralPassed && !realCoralHeld){
-      coralPassed = true;
-    }
-    else if(!inputs.beamBreak && coralPassed){
+    if (Constants.tuningMode) {
       realCoralHeld = true;
-    }
-    else if(inputs.beamBreak && coralPassed){
-      realCoralHeld = true;
-      coralPassed = false;
-    }
+    } else {
+      if (!inputs.beamBreak && !coralPassed) {
+        realCoralHeld = false;
 
+      } else if (inputs.beamBreak && !coralPassed && !realCoralHeld) {
+        coralPassed = true;
+      } else if (!inputs.beamBreak && coralPassed) {
+        realCoralHeld = true;
+      } else if (inputs.beamBreak && coralPassed) {
+        realCoralHeld = true;
+        coralPassed = false;
+      }
+    }
   }
 
   @AutoLogOutput
@@ -110,7 +105,7 @@ public class Carriage extends SubsystemBase {
     return run(() -> io.runVolts(intakingSpeedVolts.get()))
         .until(() -> realCoralHeld)
         .andThen(() -> io.runVolts(intakingSpeedVolts.get() * -1))
-        .until (() -> inputs.beamBreak)
+        .until(() -> inputs.beamBreak)
         .withName("intake coral");
   }
 
