@@ -3,16 +3,14 @@ package frc.robot.subsystems.apriltagvision;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 import static frc.robot.util.LimelightHelpers.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.PoseManager;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private String name;
@@ -31,7 +29,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
     resetCropping();
     setLEDMode_PipelineControl(name);
-    
+
     double[] position;
     switch (name) {
       case rightName:
@@ -42,7 +40,8 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         break;
       default:
         position = new double[6];
-    };
+    }
+    ;
     setCameraPose_RobotSpace(
         name,
         position[0], // Forward offset (meters)
@@ -56,14 +55,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   @Override
   public void updateInputs(AprilTagVisionIOInputs inputs, PoseManager poseManager) {
-    SetRobotOrientation(
-        name,
-        poseManager.getRotation().getDegrees(),
-        0,
-        0,
-        0,
-        0,
-        0);
+    SetRobotOrientation(name, poseManager.getRotation().getDegrees(), 0, 0, 0, 0, 0);
     PoseEstimate observation = getBotPoseEstimate_wpiBlue_MegaTag2(name);
     inputs.observation = observation;
 
