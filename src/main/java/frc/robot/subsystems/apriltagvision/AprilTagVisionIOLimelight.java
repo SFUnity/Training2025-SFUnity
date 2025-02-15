@@ -16,7 +16,6 @@ import frc.robot.util.PoseManager;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private String name;
-  private double[] position;
 
   private static final double disconnectedTimeout = 0.5;
   private final Alert disconnectedAlert;
@@ -27,6 +26,13 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   public AprilTagVisionIOLimelight(String camName) {
     name = camName;
+
+    disconnectedAlert = new Alert("No data from: " + name, AlertType.kError);
+
+    resetCropping();
+    setLEDMode_PipelineControl(name);
+    
+    double[] position;
     switch (name) {
       case rightName:
         position = rightPosition;
@@ -35,15 +41,8 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         position = leftPosition;
         break;
       default:
-        position = new double[0];
-    }
-    ;
-
-    setLEDMode_PipelineControl(name);
-
-    disconnectedAlert = new Alert("No data from: " + name, AlertType.kError);
-
-    resetCropping();
+        position = new double[6];
+    };
     setCameraPose_RobotSpace(
         name,
         position[0], // Forward offset (meters)
