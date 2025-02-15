@@ -6,6 +6,7 @@ import static frc.robot.subsystems.intake.IntakeConstants.*;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.Util;
@@ -130,16 +131,14 @@ public class Intake extends SubsystemBase {
   }
 
   public Command poopCmd() {
-    /*
-    Commands.waitUntil(() -> !algaeHeld())
-       .andThen(Commands.waitSeconds(outtakeDelay))
-       .deadlineFor(
-    */
-    return run(() -> {
-          raise();
-          rollersOut();
-        })
-        .until(() -> !algaeHeld())
+    return Commands.waitUntil(() -> !algaeHeld())
+        .andThen(Commands.waitSeconds(.1))
+        .deadlineFor(
+            run(
+                () -> {
+                  raise();
+                  rollersOut();
+                }))
         .withName("poop");
   }
 
