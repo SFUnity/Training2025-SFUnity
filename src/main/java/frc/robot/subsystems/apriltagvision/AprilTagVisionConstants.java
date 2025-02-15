@@ -3,8 +3,6 @@ package frc.robot.subsystems.apriltagvision;
 import edu.wpi.first.math.util.Units;
 
 public class AprilTagVisionConstants {
-  public static final double fieldBorderMargin = 0.5;
-
   // TODO this all needs testing to see if it's correct
   public static final String leftName = "limelight-left";
   // Change the camera pose relative to robot center (x forward, y left, z up, degrees)
