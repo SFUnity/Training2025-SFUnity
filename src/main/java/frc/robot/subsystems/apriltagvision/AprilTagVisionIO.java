@@ -1,12 +1,14 @@
 package frc.robot.subsystems.apriltagvision;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface AprilTagVisionIO {
   @AutoLog
   public static class AprilTagVisionIOInputs {
+    public PoseEstimate observation;
     public Pose3d estimatedPose = new Pose3d();
     public double timestamp = 0.0;
     public int tagCount = 0;

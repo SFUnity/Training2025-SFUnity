@@ -62,6 +62,8 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         0);
     PoseEstimate observation = getBotPoseEstimate_wpiBlue_MegaTag2(name);
 
+    inputs.observation = observation;
+
     inputs.estimatedPose = observation.pose;
     inputs.timestamp = observation.timestampSeconds;
     inputs.tagCount = observation.tagCount;
