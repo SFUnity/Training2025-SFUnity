@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
+
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -22,6 +24,12 @@ public class Carriage extends SubsystemBase {
 
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
+
+  private boolean coralPassed = false;
+
+  
+  public boolean realCoralHeld = false;
+
 
   private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
@@ -39,14 +47,31 @@ public class Carriage extends SubsystemBase {
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
     Util.logSubsystem(this, "Carriage");
+
+    Logger.recordOutput("Carriage/coralHeld", realCoralHeld);
   }
 
   @AutoLogOutput
-  public boolean coralHeld() {
+  public void coralHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
-      return simHasCoral;
+      realCoralHeld =  simHasCoral;
     }
-    return inputs.coralHeld;
+    
+    if(!inputs.beamBreak && !coralPassed){
+      realCoralHeld = false;
+      
+    }
+    else if(inputs.beamBreak && !coralPassed && !realCoralHeld){
+      coralPassed = true;
+    }
+    else if(!inputs.beamBreak && coralPassed){
+      realCoralHeld = true;
+    }
+    else if(inputs.beamBreak && coralPassed){
+      realCoralHeld = true;
+      coralPassed = false;
+    }
+
   }
 
   @AutoLogOutput
@@ -65,7 +90,7 @@ public class Carriage extends SubsystemBase {
 
   public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeedVolts.get()))
-        .until(() -> !coralHeld())
+        .until(() -> !realCoralHeld)
         .withName("placeCoral");
   }
 
@@ -83,8 +108,10 @@ public class Carriage extends SubsystemBase {
 
   public Command intakeCoral() {
     return run(() -> io.runVolts(intakingSpeedVolts.get()))
-        .until(() -> coralHeld())
-        .withName("intakeCoral");
+        .until(() -> realCoralHeld)
+        .andThen(() -> io.runVolts(intakingSpeedVolts.get() * -1))
+        .until (() -> inputs.beamBreak)
+        .withName("intake coral");
   }
 
   public Command scoreProcessor() {

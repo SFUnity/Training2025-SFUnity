@@ -118,7 +118,7 @@ public final class RobotCommands {
                         () -> {
                           return poseManager.closestStation().getRotation();
                         })
-                    .until(carriage::coralHeld)
+                    .until(() -> carriage.realCoralHeld)
                     .asProxy(),
                 carriage.intakeCoral().asProxy(),
                 allowAutoDrive),

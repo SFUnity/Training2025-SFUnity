@@ -379,7 +379,7 @@ public class Robot extends LoggedRobot {
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
-                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
+                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.realCoralHeld)
                         scoreState = Dealgify;
                     })
                 .andThen(
@@ -428,7 +428,7 @@ public class Robot extends LoggedRobot {
 
     // State-Based Triggers
     // Teleop Only
-    new Trigger(carriage::coralHeld)
+    new Trigger(() -> carriage.realCoralHeld)
         .and(() -> allowAutoDrive)
         // Maybe should remove so that even if most of poseEstimation isn't working, this still will
         .and(() -> DriverStation.isTeleop())
@@ -442,7 +442,7 @@ public class Robot extends LoggedRobot {
 
     // All the time
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
-        .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .and(() -> !carriage.realCoralHeld && !carriage.algaeHeld())
         .and(() -> allowAutoDrive)
         .whileTrue(carriage.intakeCoral());
 
