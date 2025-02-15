@@ -59,7 +59,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     SetRobotOrientation(
         name,
         poseManager.getRotation().getDegrees(),
-        Units.degreesToRadians(poseManager.robotVelocity().dtheta),
+        0,
         0,
         0,
         0,
