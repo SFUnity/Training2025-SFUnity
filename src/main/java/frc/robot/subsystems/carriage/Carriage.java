@@ -23,8 +23,7 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
-  private boolean coralPassed = false;
-
+  public boolean coralPassed = false;
   public boolean realCoralHeld = false;
 
   private static final LoggedTunableNumber highDealgifyTime =
@@ -60,10 +59,9 @@ public class Carriage extends SubsystemBase {
         coralPassed = true;
       } else if (!inputs.beamBreak && coralPassed) {
         realCoralHeld = true;
-      } else if (realCoralHeld && !inputs.beamBreak && coralPassed) {
-        realCoralHeld = false;
+      } else if (realCoralHeld && inputs.beamBreak && coralPassed) {
         coralPassed = false;
-      }
+      } 
     }
   }
 
@@ -102,7 +100,7 @@ public class Carriage extends SubsystemBase {
   public Command intakeCoral() {
     return run(() -> io.runVolts(intakingSpeedVolts.get()))
         .until(() -> realCoralHeld)
-        .andThen(() -> io.runVolts(intakingSpeedVolts.get() * -1))
+        .andThen(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
         .until(() -> inputs.beamBreak)
         .withName("intake coral");
   }
