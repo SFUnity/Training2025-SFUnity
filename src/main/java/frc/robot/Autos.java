@@ -5,12 +5,10 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import static frc.robot.RobotCommands.ScoreState.Dealgify;
 import static frc.robot.RobotCommands.dealgify;
-import static frc.robot.RobotCommands.dealgifyAfterPlacing;
 import static frc.robot.RobotCommands.goalPose;
 import static frc.robot.RobotCommands.scoreCoral;
 import static frc.robot.RobotCommands.scoreProcessor;
 import static frc.robot.RobotCommands.scoreState;
-import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.AlgaeLow;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L1;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L2;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
@@ -363,34 +361,39 @@ public class Autos {
 
     AutoRoutine routine = factory.newRoutine("FL2HGAlgae");
 
-    AutoTrajectory centerWallToEFAlgae = routine.trajectory("CenterWallToEFAlgae");
-    AutoTrajectory eFToGHAlgae = routine.trajectory("EFToGHAlgae");
-    AutoTrajectory hGToProcessorScore = routine.trajectory("HGToProcessorScore");
+    AutoTrajectory CenterWallToI = routine.trajectory("CenterProcessorToF");
+    AutoTrajectory IToGHAlgae = routine.trajectory("FToGHAlgae");
+    AutoTrajectory hGToProcessorScore = routine.trajectory("GHToProcessorScore");
 
-    routine.active().onTrue(centerWallToEFAlgae.resetOdometry().andThen(centerWallToEFAlgae.cmd()));
-    centerWallToEFAlgae
-        .done()
+    routine.active().onTrue(CenterWallToI.resetOdometry().andThen(CenterWallToI.cmd()));
+    CenterWallToI.done()
         .onTrue(
+            // Score coral on L1
             elevator
                 .request(L2)
-                .andThen(scoreCoral(elevator, carriage, poseManager, null))
-                .andThen(eFToGHAlgae.cmd()));
-
-    eFToGHAlgae
-        .done()
-        .onTrue(
-            elevator
-                .request(AlgaeLow)
                 .andThen(
-                    runOnce(
-                        () -> {
-                          scoreState = Dealgify;
-                        }))
-                .andThen(dealgify(elevator, carriage, poseManager)));
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWallToI.getFinalPose().get(),
+                        CenterWallToI.done()))
+                .withName("ScoreCoralOnL2"));
+
+    CenterWallToI.done().onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(IToGHAlgae.cmd()));
+
+    IToGHAlgae.done()
+        .onTrue(
+            runOnce(() -> scoreState = Dealgify)
+                .andThen(
+                    dealgify(elevator, carriage, poseManager)
+                        .asProxy()
+                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    hGToProcessorScore.cmd()));
 
     hGToProcessorScore
         .done()
-        .onTrue(scoreProcessor(carriage, intake, poseManager, dealgifyAfterPlacing, null));
+        .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.done()));
 
     return routine;
   }
@@ -436,6 +439,7 @@ public class Autos {
     return routine;
   }
 
+  // Do not mess with this :
   public AutoRoutine chaos() {
     AutoRoutine routine = factory.newRoutine("chaos");
 
