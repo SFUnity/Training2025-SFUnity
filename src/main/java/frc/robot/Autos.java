@@ -22,11 +22,13 @@ import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -47,6 +49,8 @@ public class Autos {
 
   private int coralOnL3 = 0;
   private int coralOnL2 = 0;
+  private final LoggedTunableNumber delayAfterAlgaeIntake =
+      new LoggedTunableNumber("delayAfterAlgaeIntake", 1);
 
   public Autos(
       Drive drive, Carriage carriage, Elevator elevator, Intake intake, PoseManager poseManager) {
@@ -347,6 +351,7 @@ public class Autos {
                     dealgify(elevator, carriage, poseManager)
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    Commands.waitSeconds(delayAfterAlgaeIntake.get()),
                     // Start next path once algae is held
                     hGToProcessorScore.cmd())
                 .withName("DealgifyandScore"));
@@ -389,6 +394,7 @@ public class Autos {
                     dealgify(elevator, carriage, poseManager)
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    Commands.waitSeconds(delayAfterAlgaeIntake.get()),
                     hGToProcessorScore.cmd()));
 
     hGToProcessorScore
@@ -430,6 +436,7 @@ public class Autos {
                     dealgify(elevator, carriage, poseManager)
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    Commands.waitSeconds(delayAfterAlgaeIntake.get()),
                     hGToProcessorScore.cmd()));
 
     hGToProcessorScore
