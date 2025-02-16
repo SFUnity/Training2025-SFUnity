@@ -36,7 +36,7 @@ public class Carriage extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    coralHeld();
+    updateCoralStatus();
     Logger.processInputs("Carriage", inputs);
 
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
@@ -48,7 +48,7 @@ public class Carriage extends SubsystemBase {
     Logger.recordOutput("Carriage/coralHeld", realCoralHeld);
   }
 
-  public void coralHeld() {
+  public void updateCoralStatus() {
     if (Constants.currentMode == Constants.Mode.SIM) {
       realCoralHeld = simHasCoral;
     } else {
