@@ -6,7 +6,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import static frc.robot.RobotCommands.ScoreState.Dealgify;
 import static frc.robot.RobotCommands.dealgify;
 import static frc.robot.RobotCommands.dealgifyAfterPlacing;
-import static frc.robot.RobotCommands.fullIntake;
 import static frc.robot.RobotCommands.goalPose;
 import static frc.robot.RobotCommands.scoreCoral;
 import static frc.robot.RobotCommands.scoreProcessor;
@@ -83,7 +82,6 @@ public class Autos {
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
     chooser.addRoutine("CenterCDProcessorAlgaeL2L3", this::CenterCDProcessorAlgaeL2L3);
-    chooser.addRoutine("WallCDAlgaeProcessorScoreL2L3", this::WallCDAlgaeProcessorScoreL2L3);
     chooser.addRoutine("L1HGAlgae", this::L1HGAlgae);
     chooser.addRoutine("FL2HGAlgae", this::FL2HGAlgae);
     chooser.addRoutine("IL2HGAlgae", this::IL2HGAlgae);
@@ -222,7 +220,7 @@ public class Autos {
   public AutoRoutine CenterCDProcessorAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
-    AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("KLAlgaeToStationHigh");
+    AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
     AutoTrajectory StationHighToK = routine.trajectory("StationLowToC");
     AutoTrajectory KToStationHigh = routine.trajectory("CToStationLow");
     AutoTrajectory StationHighToL = routine.trajectory("StationLowToD");
@@ -314,49 +312,6 @@ public class Autos {
 
     StationHighToL.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
-
-    return routine;
-  }
-
-  public AutoRoutine WallCDAlgaeProcessorScoreL2L3() {
-
-    AutoRoutine routine = factory.newRoutine("WallCDAlgaeProcessorScoreL2L3");
-
-    AutoTrajectory centerWallToCD = routine.trajectory("CenterWallToCD");
-    AutoTrajectory cDToProcessorScore = routine.trajectory("CDToProcessorScore");
-    AutoTrajectory processorScoreToCD = routine.trajectory("ProcessorScoreToCD");
-    AutoTrajectory cDToStationLow = routine.trajectory("CDToStationLow");
-    AutoTrajectory stationLowToCD = routine.trajectory("StationLowToCD");
-
-    routine
-        .active()
-        .onTrue(
-            centerWallToCD
-                .resetOdometry()
-                .andThen(elevator.request(L2), scoreCoral(elevator, carriage, poseManager, null))
-                .andThen(cDToProcessorScore.cmd()));
-    cDToProcessorScore
-        .active()
-        .onTrue(
-            elevator
-                .request(AlgaeLow)
-                .andThen(
-                    runOnce(() -> scoreState = Dealgify),
-                    dealgify(elevator, carriage, poseManager),
-                    processorScoreToCD.cmd()));
-    processorScoreToCD
-        .active()
-        .onTrue(
-            scoreProcessor(carriage, intake, poseManager, dealgifyAfterPlacing, null)
-                .andThen(cDToStationLow.cmd()));
-
-    cDToStationLow
-        .active()
-        .onTrue(fullIntake(drive, carriage, intake, poseManager).andThen(stationLowToCD.cmd()));
-
-    stationLowToCD
-        .active()
-        .onTrue(elevator.request(L3).andThen(scoreCoral(elevator, carriage, poseManager, null)));
 
     return routine;
   }
