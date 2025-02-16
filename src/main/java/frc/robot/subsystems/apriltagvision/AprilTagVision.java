@@ -58,7 +58,7 @@ public class AprilTagVision extends VirtualSubsystem {
 
       // Exit if there are no tags in sight or the pose is blank or the robot is spinning too fast
       // These are the basic checks LL recommends
-      double allowableDistance = inputs[i].tagCount;
+      // double allowableDistance = inputs[i].tagCount;
       boolean isRejected =
           // true if
           // If no tags
