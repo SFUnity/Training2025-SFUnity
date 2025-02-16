@@ -195,7 +195,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSparkMax() );
+        elevator = new Elevator(new ElevatorIOSparkMax());
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIO() {});
         break;
