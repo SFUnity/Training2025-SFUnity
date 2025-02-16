@@ -85,6 +85,7 @@ public class Autos {
     chooser.addRoutine("GHAlgaeToProcessorL1", this::GHAlgaeToProcessorL1);
     chooser.addRoutine("FL2HGAlgae", this::FL2HGAlgae);
     chooser.addRoutine("IL2HGAlgae", this::IL2HGAlgae);
+    chooser.addRoutine("chaos", this::chaos);
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
@@ -398,42 +399,48 @@ public class Autos {
 
     AutoRoutine routine = factory.newRoutine("IL2HGAlgae");
 
-  
-    AutoTrajectory centerWallToHG = routine.trajectory("CenterToHGAlgae");
+    AutoTrajectory CenterWallToI = routine.trajectory("CenterWallToI");
+    AutoTrajectory IToGHAlgae = routine.trajectory("IToGHAlgae");
     AutoTrajectory hGToProcessorScore = routine.trajectory("GHToProcessorScore");
 
-    routine.active().onTrue(centerWallToHG.resetOdometry().andThen(centerWallToHG.cmd()));
-    centerWallToHG
-        .done()
+    routine.active().onTrue(CenterWallToI.resetOdometry().andThen(CenterWallToI.cmd()));
+    CenterWallToI.done()
         .onTrue(
             // Score coral on L1
             elevator
-                .request(L1)
+                .request(L2)
                 .andThen(
                     scoreCoral(
                         elevator,
                         carriage,
                         poseManager,
-                        () -> centerWallToHG.getFinalPose().get(),
-                        centerWallToHG.done()))
-                .withName("ScoreCoralOnL1"));
-    centerWallToHG
-        .done()
+                        () -> CenterWallToI.getFinalPose().get(),
+                        CenterWallToI.done()))
+                .withName("ScoreCoralOnL2"));
+
+    CenterWallToI.done().onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(IToGHAlgae.cmd()));
+
+    IToGHAlgae.done()
         .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
+            runOnce(() -> scoreState = Dealgify)
                 .andThen(
-                    // Dealgify
-                    runOnce(() -> scoreState = Dealgify),
                     dealgify(elevator, carriage, poseManager)
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
-                    // Start next path once algae is held
-                    hGToProcessorScore.cmd())
-                .withName("DealgifyandScore"));
+                    hGToProcessorScore.cmd()));
+
     hGToProcessorScore
         .done()
         .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.done()));
 
+    return routine;
+  }
+
+  public AutoRoutine chaos() {
+    AutoRoutine routine = factory.newRoutine("chaos");
+
+    AutoTrajectory chaos = routine.trajectory("chaos");
+    routine.active().onTrue(chaos.resetOdometry().andThen(chaos.cmd()));
     return routine;
   }
 }
