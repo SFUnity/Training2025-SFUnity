@@ -96,9 +96,8 @@ public class Elevator extends SubsystemBase {
 
   @AutoLogOutput
   public boolean atGoalHeight() {
-    // return Util.equalsWithTolerance(
-    //    goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
-    return true;
+    return Util.equalsWithTolerance(
+       goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
   }
 
   public Command enableElevator() {
