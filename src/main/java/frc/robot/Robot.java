@@ -40,6 +40,7 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarriageIOSim;
+import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
@@ -49,7 +50,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
@@ -194,8 +194,8 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSparkMax());
-        carriage = new Carriage(new CarriageIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
+        carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIO() {});
         break;
 
