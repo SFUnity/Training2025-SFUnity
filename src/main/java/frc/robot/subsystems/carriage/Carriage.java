@@ -1,5 +1,6 @@
 package frc.robot.subsystems.carriage;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.subsystems.carriage.CarriageConstants.*;
 
 import edu.wpi.first.math.filter.LinearFilter;
@@ -26,6 +27,8 @@ public class Carriage extends SubsystemBase {
   public boolean coralPassed = false;
   public boolean realCoralHeld = false;
 
+  public boolean realAlgaeHeld = false;
+
   private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
 
@@ -42,10 +45,17 @@ public class Carriage extends SubsystemBase {
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
+    if (filteredVelocity <= algaeVelocityThreshold.get()
+            && (filteredStatorCurrent >= algaeCurrentThreshold.get())
+        || filteredStatorCurrent <= -2) {
+      realAlgaeHeld = true;
+    }
+
     Util.logSubsystem(this, "Carriage");
 
     Logger.recordOutput("Carriage/coralPassed", coralPassed);
     Logger.recordOutput("Carriage/coralHeld", realCoralHeld);
+    Logger.recordOutput("Carriage/algaeHeld", realAlgaeHeld);
   }
 
   public void updateCoralStatus() {
@@ -61,7 +71,7 @@ public class Carriage extends SubsystemBase {
         realCoralHeld = true;
       } else if (realCoralHeld && inputs.beamBreak && coralPassed) {
         coralPassed = false;
-      } 
+      }
     }
   }
 
@@ -70,9 +80,7 @@ public class Carriage extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasAlgae;
     }
-    return (filteredVelocity <= algaeVelocityThreshold.get()
-            && (filteredStatorCurrent >= algaeCurrentThreshold.get())
-        || filteredStatorCurrent <= -2);
+    return realAlgaeHeld;
   }
 
   public Command stopOrHold() {
@@ -100,14 +108,15 @@ public class Carriage extends SubsystemBase {
   public Command intakeCoral() {
     return run(() -> io.runVolts(intakingSpeedVolts.get()))
         .until(() -> realCoralHeld)
-        .andThen(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
-        .until(() -> inputs.beamBreak)
+        .andThen(
+            run(() -> io.runVolts(backwardsIntakeSpeedVolts.get())).until(() -> inputs.beamBreak))
         .withName("intake coral");
   }
 
   public Command scoreProcessor() {
-    return run(() -> io.runVolts(intakingSpeedVolts.get()))
-        .until(() -> !algaeHeld())
+    return run(() -> io.runVolts(processorSpeedVolts.get()))
+        .withTimeout(Seconds.of(.25))
+        .andThen(() -> realAlgaeHeld = false)
         .withName("scoreProcessor");
   }
 }
