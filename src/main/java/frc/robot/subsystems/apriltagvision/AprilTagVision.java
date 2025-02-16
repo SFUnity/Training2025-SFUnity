@@ -54,6 +54,14 @@ public class AprilTagVision extends VirtualSubsystem {
       List<Pose3d> robotPosesAccepted = new LinkedList<>();
       List<Pose3d> robotPosesRejected = new LinkedList<>();
 
+      // Add tag poses
+      for (int tagId : inputs[i].tagIds) {
+        var tagPose = aprilTagLayout.getTagPose(tagId);
+        if (tagPose.isPresent()) {
+          tagPoses.add(tagPose.get());
+        }
+      }
+
       Pose2d estimatedPose = inputs[i].estimatedPose.toPose2d();
 
       // Exit if there are no tags in sight or the pose is blank or the robot is spinning too fast

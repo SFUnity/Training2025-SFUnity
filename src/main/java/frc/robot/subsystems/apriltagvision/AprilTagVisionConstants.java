@@ -1,8 +1,14 @@
 package frc.robot.subsystems.apriltagvision;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.util.Units;
 
 public class AprilTagVisionConstants {
+  // AprilTag layout
+  public static AprilTagFieldLayout aprilTagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
   // TODO this all needs testing to see if it's correct
   public static final String leftName = "limelight-left";
   // Change the camera pose relative to robot center (x forward, y left, z up, degrees)
