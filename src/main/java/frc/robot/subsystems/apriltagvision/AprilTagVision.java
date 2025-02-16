@@ -46,7 +46,7 @@ public class AprilTagVision extends VirtualSubsystem {
     // Loop over cameras
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i], poseManager);
-      Logger.processInputs("AprilTagVision/Camera" + Integer.toString(i), inputs[i]);
+      Logger.processInputs("Vision/" + this.io[i].getName(), inputs[i]);
 
       // Initialize logging values
       List<Pose3d> tagPoses = new LinkedList<>();
@@ -85,6 +85,11 @@ public class AprilTagVision extends VirtualSubsystem {
         robotPosesAccepted.add(inputs[i].estimatedPose);
       }
 
+      // Skip if rejected
+      if (isRejected) {
+        continue;
+      }
+
       // Smaller number = more trust
       double trust = .7;
 
@@ -118,12 +123,35 @@ public class AprilTagVision extends VirtualSubsystem {
       // Add result because all checks passed
       poseManager.addVisionMeasurement(estimatedPose, inputs[i].timestamp, stdDevs);
 
+      // Log camera datadata
+      Logger.recordOutput(
+          "Vision/" + this.io[i].getName() + "/TagPoses",
+          tagPoses.toArray(new Pose3d[tagPoses.size()]));
+      Logger.recordOutput(
+          "Vision/" + this.io[i].getName() + "/RobotPoses",
+          robotPoses.toArray(new Pose3d[robotPoses.size()]));
       Logger.recordOutput(
           "Vision/" + this.io[i].getName() + "/RobotPosesAccepted",
           robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
       Logger.recordOutput(
           "Vision/" + this.io[i].getName() + "/RobotPosesRejected",
           robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+      allTagPoses.addAll(tagPoses);
+      allRobotPoses.addAll(robotPoses);
+      allRobotPosesAccepted.addAll(robotPosesAccepted);
+      allRobotPosesRejected.addAll(robotPosesRejected);
     }
+
+    // Log summary data
+    Logger.recordOutput(
+        "Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[allTagPoses.size()]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[allRobotPoses.size()]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesAccepted",
+        allRobotPosesAccepted.toArray(new Pose3d[allRobotPosesAccepted.size()]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesRejected",
+        allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
   }
 }
