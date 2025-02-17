@@ -336,13 +336,13 @@ public class Robot extends LoggedRobot {
         .y()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
     driver
-        .b()
+        .x()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
     driver
         .a()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
     driver
-        .x()
+        .b()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
     driver
         .start()
