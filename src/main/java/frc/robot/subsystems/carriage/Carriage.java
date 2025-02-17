@@ -56,7 +56,7 @@ public class Carriage extends SubsystemBase {
 
     Util.logSubsystem(this, "Carriage");
 
-    Logger.recordOutput("Carriage/corelInDanger", coralInDanger);
+    Logger.recordOutput("Carriage/coralInDanger", coralInDanger);
   }
 
   public void updateCoralStatus() {
