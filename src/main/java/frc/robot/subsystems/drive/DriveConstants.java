@@ -92,7 +92,7 @@ public class DriveConstants {
   public static final int driveMotorStatorCurrentLimit = 80;
   public static final double wheelRadiusMeters =
       Constants.onCarpet ? Units.inchesToMeters(2) : Units.inchesToMeters(2);
-  public static final double driveMotorReduction = 6.12;
+  public static final double driveMotorReduction = 5.36;
   public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
 
   // Drive PID configuration
