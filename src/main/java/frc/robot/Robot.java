@@ -20,6 +20,8 @@ import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
 
+import java.util.Map;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
@@ -44,7 +46,6 @@ import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.elevator.Elevator;
@@ -54,10 +55,10 @@ import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
-import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -188,7 +189,7 @@ public class Robot extends LoggedRobot {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
-                new GyroIOPigeon2(),
+                new GyroIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
@@ -197,7 +198,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
         carriage = new Carriage(new CarriageIOSparkMax());
-        intake = new Intake(new IntakeIO() {});
+        intake = new Intake(new IntakeIOSparkMax());
         break;
 
       case SIM:
@@ -414,6 +415,7 @@ public class Robot extends LoggedRobot {
                   } else if (carriage.algaeHeld()) {
                     scoreState = ProcessorFront;
                   }
+                  scoreState = ProcessorBack;
                 }));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
