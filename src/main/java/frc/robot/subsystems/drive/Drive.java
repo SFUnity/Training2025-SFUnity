@@ -667,22 +667,32 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber("Drive/ModuleTunables/tuningDriveSpeed", 3);
 
   public Command tuneModuleTurn() {
-    return startRun(
-            () -> {
-              for (var module : modules) module.setTurnPIDF(turnKp.get());
-            },
-            () -> setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
+    return run(() -> {
+          setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get()));
+          LoggedTunableNumber.ifChanged(
+              hashCode(),
+              () -> {
+                for (var module : modules) module.setTurnPIDF(turnKp.get());
+              },
+              turnKp,
+              tuningTurnDelta);
+        })
         .withTimeout(2.0)
         .finallyDo(this::stop)
         .withName("tuneModuleTurn");
   }
 
   public Command tuneModuleDrive() {
-    return startRun(
-            () -> {
-              for (var module : modules) module.setDrivePIDF(driveKp.get(), driveKd.get());
-            },
-            () -> setAllModuleSetpointsToSame(tuningDriveSpeed.get(), new Rotation2d()))
+    return run(() -> {
+          setAllModuleSetpointsToSame(tuningDriveSpeed.get(), new Rotation2d());
+          LoggedTunableNumber.ifChanged(
+              hashCode(),
+              () -> {
+                for (var module : modules) module.setDrivePIDF(driveKp.get(), driveKd.get());
+              },
+              turnKp,
+              tuningTurnDelta);
+        })
         .withTimeout(2.0)
         .finallyDo(this::stop)
         .withName("tuneModuleDrive");
