@@ -66,7 +66,6 @@ public class Elevator extends SubsystemBase {
 
     if (setHeight) {
       pid.setGoal(goalHeightInches);
-
     } else {
       pid.setGoal(0);
     }
