@@ -34,4 +34,9 @@ public class CarriageIOSparkMax implements CarriageIO {
   public void runVolts(double volts) {
     rollerMotor.setVoltage(volts);
   }
+
+  @Override
+  public void resetEncoder() {
+    encoder.setPosition(0);
+  }
 }

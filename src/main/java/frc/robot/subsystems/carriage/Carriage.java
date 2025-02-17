@@ -31,6 +31,8 @@ public class Carriage extends SubsystemBase {
 
   private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
+  private static final LoggedTunableNumber backupForL3Rots =
+      new LoggedTunableNumber("Carriage/Backup for L3 Rots", 0.5);
 
   public Carriage(CarriageIO io) {
     this.io = io;
@@ -85,6 +87,13 @@ public class Carriage extends SubsystemBase {
 
   public Command stopOrHold() {
     return run(() -> io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0)).withName("stop");
+  }
+
+  public Command backUpForL3() {
+    return run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
+        .beforeStarting(() -> io.resetEncoder())
+        .until(() -> inputs.positionRots >= backupForL3Rots.get())
+        .withName("backUpForL3");
   }
 
   public Command placeCoral() {

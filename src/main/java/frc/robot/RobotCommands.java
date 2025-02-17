@@ -44,9 +44,14 @@ public final class RobotCommands {
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
-            elevator.enableElevator(),
-            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
-            carriage.placeCoral());
+            elevator
+                .enableElevator()
+                .alongWith(
+                    waitUntil(elevator::pastL3Height)
+                        .andThen(
+                            carriage.backUpForL3(),
+                            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
+                            carriage.placeCoral())));
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {

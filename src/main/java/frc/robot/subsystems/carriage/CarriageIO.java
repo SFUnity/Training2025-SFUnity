@@ -15,4 +15,6 @@ public interface CarriageIO {
   public default void updateInputs(CarrageIOInputs inputs) {}
 
   public default void runVolts(double volts) {}
+
+  public default void resetEncoder() {}
 }
