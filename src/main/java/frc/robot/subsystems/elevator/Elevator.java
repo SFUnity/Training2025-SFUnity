@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -67,12 +68,16 @@ public class Elevator extends SubsystemBase {
 
     if (setHeight) {
       if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
-        pid.setGoal(inputs.position);
+        pid.setGoal(L3.get());
       } else {
         pid.setGoal(goalHeightInches);
       }
     } else {
-      pid.setGoal(0);
+      if (Carriage.coralInDanger) {
+        pid.setGoal(L3.get());
+      } else {
+        pid.setGoal(0);
+      }
     }
 
     io.runVolts(
