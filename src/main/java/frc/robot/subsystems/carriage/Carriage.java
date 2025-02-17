@@ -111,13 +111,13 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command highDealgify() {
-    return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
+    return run(() -> io.runVolts(highDealgifyingSpeedVolts.get()))
         .withTimeout(highDealgifyTime.get())
         .withName("highDealgify");
   }
 
   public Command lowDealgify() {
-    return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
+    return run(() -> io.runVolts(lowDealgifyingSpeedVolts.get()))
         .until(() -> algaeHeld())
         .withName("lowDealgify");
   }
