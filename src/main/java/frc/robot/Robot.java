@@ -388,13 +388,15 @@ public class Robot extends LoggedRobot {
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoDrive)
         // Maybe should remove so that even if most of poseEstimation isn't working, this still will
-        .and(() -> DriverStation.isTeleop())
+        .and(DriverStation::isTeleop)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+
     new Trigger(carriage::algaeHeld)
-        .and(() -> DriverStation.isTeleop())
+        .and(DriverStation::isTeleop)
         .onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+
     new Trigger(intake::algaeHeld)
-        .and(() -> DriverStation.isTeleop())
+        .and(DriverStation::isTeleop)
         .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
     // All the time
