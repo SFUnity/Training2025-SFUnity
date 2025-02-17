@@ -10,7 +10,7 @@ public class ElevatorConstants {
   // Profiled PID values
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
-  public static final double elevatorDistanceToleranceInches = 0.3;
+  public static final double elevatorDistanceToleranceInches = 0.2;
   public static final double maxElevatorSpeed = 41; // inches/sec
   public static final double maxElevatorAcceleration = 682.5; // inches/sec^2
   // FF values

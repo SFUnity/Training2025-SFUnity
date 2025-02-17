@@ -43,7 +43,10 @@ public final class RobotCommands {
                 !allowAutoDrive
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
-        .andThen(elevator.enableElevator(), waitUntil(atPose), carriage.placeCoral());
+        .andThen(
+            elevator.enableElevator(),
+            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
+            carriage.placeCoral());
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
