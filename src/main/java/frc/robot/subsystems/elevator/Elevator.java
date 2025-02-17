@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
@@ -65,7 +66,11 @@ public class Elevator extends SubsystemBase {
     updateTunables();
 
     if (setHeight) {
-      pid.setGoal(goalHeightInches);
+      if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
+        pid.setGoal(inputs.position);
+      } else {
+        pid.setGoal(goalHeightInches);
+      }
     } else {
       pid.setGoal(0);
     }

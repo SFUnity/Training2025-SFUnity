@@ -5,6 +5,7 @@ import static frc.robot.subsystems.carriage.CarriageConstants.*;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
@@ -120,10 +121,14 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command intakeCoral() {
-    return run(() -> io.runVolts(intakingSpeedVolts.get()))
-        .until(() -> realCoralHeld)
-        .andThen(
-            run(() -> io.runVolts(backwardsIntakeSpeedVolts.get())).until(() -> inputs.beamBreak))
+    return Commands.either(
+            run(() -> io.runVolts(intakingSpeedVolts.get()))
+                .until(() -> realCoralHeld)
+                .andThen(
+                    run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
+                        .until(() -> inputs.beamBreak)),
+            run(() -> io.runVolts(backwardsIntakeSpeedVolts.get())),
+            () -> !coralInDanger)
         .withName("intake coral");
   }
 
