@@ -10,7 +10,7 @@ public class ElevatorConstants {
   // Profiled PID values
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
-  public static final double elevatorDistanceToleranceInches = 0.2;
+  public static final double elevatorDistanceToleranceInches = 0.1;
   public static final double maxElevatorSpeed = 41; // inches/sec
   public static final double maxElevatorAcceleration = 682.5; // inches/sec^2
   // FF values
@@ -21,7 +21,7 @@ public class ElevatorConstants {
   public static final double carrageMassKg = Units.lbsToKilograms(15);
   public static final double drumRadiusMeters = Units.inchesToMeters(1.4);
   public static final double minHeightInches = 0;
-  public static final double maxHeightInches = 23.5;
+  public static final double maxHeightInches = 23.1;
   public static final double gearRatio = 9;
   public static final double wheelRadius = 0.44444;
 
