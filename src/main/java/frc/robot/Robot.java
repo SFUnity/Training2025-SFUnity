@@ -43,9 +43,7 @@ import frc.robot.subsystems.carriage.CarriageIOSim;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
@@ -187,11 +185,11 @@ public class Robot extends LoggedRobot {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOMixed(0),
-                new ModuleIOMixed(1),
-                new ModuleIOMixed(2),
-                new ModuleIOMixed(3),
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {});
@@ -296,6 +294,9 @@ public class Robot extends LoggedRobot {
       lowBatteryAlert.set(true);
     }
 
+    // Check for coralInDanger
+    Carriage.coralInDanger = elevator.pastL3Height() && carriage.coralHeld();
+
     // Logs
     Logger.recordOutput("Controls/intakeState", intakeState.toString());
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
@@ -363,7 +364,7 @@ public class Robot extends LoggedRobot {
             Commands.select(
                     Map.of(
                         LeftBranch,
-                        scoreCoral(elevator, carriage, poseManager, atGoal(drive)),
+                        scoreCoral(elevator, carriage, poseManager, driver.rightTrigger()),
                         Dealgify,
                         dealgify(elevator, carriage, poseManager),
                         ProcessorFront,
@@ -397,7 +398,8 @@ public class Robot extends LoggedRobot {
                                 }),
                         Commands.none(),
                         () -> dealgifyAfterPlacing))
-                .finallyDo(() -> poseManager.lockClosest = false));
+                .finallyDo(() -> poseManager.lockClosest = false)
+                .withName("fullScore"));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -413,6 +415,7 @@ public class Robot extends LoggedRobot {
                   } else if (carriage.algaeHeld()) {
                     scoreState = ProcessorFront;
                   }
+                  scoreState = ProcessorBack;
                 }));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
@@ -427,17 +430,20 @@ public class Robot extends LoggedRobot {
     operator.back().onTrue(elevator.runCurrentZeroing());
 
     // State-Based Triggers
+
     // Teleop Only
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoDrive)
         // Maybe should remove so that even if most of poseEstimation isn't working, this still will
-        .and(() -> DriverStation.isTeleop())
+        .and(DriverStation::isTeleop)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+
     new Trigger(carriage::algaeHeld)
-        .and(() -> DriverStation.isTeleop())
+        .and(DriverStation::isTeleop)
         .onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+
     new Trigger(intake::algaeHeld)
-        .and(() -> DriverStation.isTeleop())
+        .and(DriverStation::isTeleop)
         .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
     // All the time
