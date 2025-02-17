@@ -8,7 +8,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
-import org.littletonrobotics.junction.Logger;
 
 public class CarriageIOSparkMax implements CarriageIO {
   private final SparkMax rollerMotor = new SparkMax(rollerMotorID, MotorType.kBrushless);
@@ -27,7 +26,6 @@ public class CarriageIOSparkMax implements CarriageIO {
     inputs.appliedVolts = rollerMotor.getAppliedOutput() * rollerMotor.getBusVoltage();
     inputs.currentAmps = rollerMotor.getOutputCurrent();
     inputs.beamBreak = !beamBreak.get();
-    Logger.recordOutput("Carriage/beambreak ID", beamBreak.getChannel());
   }
 
   @Override
