@@ -707,7 +707,7 @@ public class Drive extends SubsystemBase {
                                     () ->
                                         setAllModuleSetpointsToSame(
                                             tuningDriveSpeed.get(), new Rotation2d()))
-                                .withTimeout(1.0)
+                                .withTimeout(2.0)
                                 .finallyDo(this::stop));
                   },
                   driveKp,
