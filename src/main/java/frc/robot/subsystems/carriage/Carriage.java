@@ -1,6 +1,5 @@
 package frc.robot.subsystems.carriage;
 
-import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.subsystems.carriage.CarriageConstants.*;
 
 import edu.wpi.first.math.filter.LinearFilter;
@@ -142,7 +141,7 @@ public class Carriage extends SubsystemBase {
 
   public Command scoreProcessor() {
     return run(() -> io.runVolts(processorSpeedVolts.get()))
-        .withTimeout(Seconds.of(.25))
+        .withTimeout(.25)
         .andThen(() -> realAlgaeHeld = false)
         .withName("scoreProcessor");
   }
