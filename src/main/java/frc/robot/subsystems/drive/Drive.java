@@ -668,17 +668,10 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber("Drive/ModuleTunables/tuningDriveSpeed", 3);
 
   public Command tuneModuleTurn() {
-    return Commands.run(
+    return startRun(
             () -> {
-              LoggedTunableNumber.ifChanged(
-                  hashCode(),
-                  () -> {
-                    CommandScheduler.getInstance()
-                        .schedule(
-                            startRun(
-                                    () -> {
-                                      for (var module : modules) module.setTurnPIDF(turnKp.get());
-                                    },
+              for (var module : modules) module.setTurnPIDF(turnKp.get());
+            },
                                     () ->
                                         setAllModuleSetpointsToSame(
                                             0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
