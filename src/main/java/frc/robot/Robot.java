@@ -275,8 +275,8 @@ public class Robot extends LoggedRobot {
     }
 
     // Check controllers
-    driverDisconnected.set(isControllerConnected(driver));
-    operatorDisconnected.set(isControllerConnected(operator));
+    driverDisconnected.set(!isControllerConnected(driver));
+    operatorDisconnected.set(!isControllerConnected(operator));
 
     // Check CAN status
     var canStatus = RobotController.getCANStatus();
