@@ -25,8 +25,8 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
 
-  public boolean coralPassed = false;
-  public boolean realCoralHeld = false;
+  private boolean coralPassed = false;
+  private boolean realCoralHeld = false;
 
   public boolean realAlgaeHeld = false;
 
@@ -75,6 +75,14 @@ public class Carriage extends SubsystemBase {
         coralPassed = false;
       }
     }
+  }
+
+  @AutoLogOutput
+  public boolean coralHeld() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      return simHasCoral;
+    }
+    return realCoralHeld;
   }
 
   @AutoLogOutput

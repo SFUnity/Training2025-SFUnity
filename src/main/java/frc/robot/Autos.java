@@ -198,7 +198,7 @@ public class Autos {
             // .andThen(score(elevator, carriage))
             ); // Run score command
     StationHighToK.done()
-        .onTrue(Commands.waitUntil(() -> !carriage.realCoralHeld).andThen(KToStationHigh.cmd()));
+        .onTrue(Commands.waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
     StationHighToL.done().onTrue(getAutonomousCommand());
 
     return routine;
