@@ -34,6 +34,8 @@ public class Carriage extends SubsystemBase {
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 4);
 
+  public static boolean coralInDanger = false;
+
   public Carriage(CarriageIO io) {
     this.io = io;
   }
@@ -55,9 +57,7 @@ public class Carriage extends SubsystemBase {
 
     Util.logSubsystem(this, "Carriage");
 
-    Logger.recordOutput("Carriage/coralPassed", coralPassed);
-    Logger.recordOutput("Carriage/coralHeld", realCoralHeld);
-    Logger.recordOutput("Carriage/algaeHeld", realAlgaeHeld);
+    Logger.recordOutput("Carriage/corelInDanger", coralInDanger);
   }
 
   public void updateCoralStatus() {
@@ -92,13 +92,16 @@ public class Carriage extends SubsystemBase {
   public Command backUpForL3() {
     return run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
         .finallyDo(() -> io.runVolts(0))
-        .beforeStarting(() -> io.resetEncoder())
+        .beforeStarting(() -> {io.resetEncoder();
+          coralInDanger = true;
+        })
         .until(() -> inputs.positionRots >= backupForL3Rots.get())
         .withName("backUpForL3");
   }
 
   public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeedVolts.get()))
+        .finallyDo(() -> coralInDanger = false)
         .until(() -> !realCoralHeld)
         .withName("placeCoral");
   }
