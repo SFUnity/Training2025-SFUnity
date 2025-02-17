@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
@@ -672,41 +671,20 @@ public class Drive extends SubsystemBase {
             () -> {
               for (var module : modules) module.setTurnPIDF(turnKp.get());
             },
-                                    () ->
-                                        setAllModuleSetpointsToSame(
-                                            0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
-                                .withTimeout(2.0)
-                                .finallyDo(this::stop));
-                  },
-                  turnKp,
-                  tuningTurnDelta);
-            })
+            () -> setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
+        .withTimeout(2.0)
+        .finallyDo(this::stop)
         .withName("tuneModuleTurn");
   }
 
   public Command tuneModuleDrive() {
-    return Commands.run(
+    return startRun(
             () -> {
-              LoggedTunableNumber.ifChanged(
-                  hashCode(),
-                  () -> {
-                    CommandScheduler.getInstance()
-                        .schedule(
-                            startRun(
-                                    () -> {
-                                      for (var module : modules)
-                                        module.setDrivePIDF(driveKp.get(), driveKd.get());
-                                    },
-                                    () ->
-                                        setAllModuleSetpointsToSame(
-                                            tuningDriveSpeed.get(), new Rotation2d()))
-                                .withTimeout(2.0)
-                                .finallyDo(this::stop));
-                  },
-                  driveKp,
-                  driveKd,
-                  tuningDriveSpeed);
-            })
+              for (var module : modules) module.setDrivePIDF(driveKp.get(), driveKd.get());
+            },
+            () -> setAllModuleSetpointsToSame(tuningDriveSpeed.get(), new Rotation2d()))
+        .withTimeout(2.0)
+        .finallyDo(this::stop)
         .withName("tuneModuleDrive");
   }
 
