@@ -682,7 +682,7 @@ public class Drive extends SubsystemBase {
                                     () ->
                                         setAllModuleSetpointsToSame(
                                             0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
-                                .withTimeout(1.0)
+                                .withTimeout(2.0)
                                 .finallyDo(this::stop));
                   },
                   turnKp,
