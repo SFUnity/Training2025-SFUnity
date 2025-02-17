@@ -117,24 +117,26 @@ public final class RobotCommands {
       PoseManager poseManager,
       BooleanSupplier allowAutoDrive) {
     return select(
-        Map.of(
-            Source,
-            // Maybe should change so that even if most of poseEstimation isn't working, this does
-            either(
-                drive
-                    .headingDrive(
-                        () -> {
-                          return poseManager.closestStation().getRotation();
-                        })
-                    .until(carriage::coralHeld)
-                    .asProxy(),
-                carriage.intakeCoral().asProxy(),
-                allowAutoDrive),
-            Ground,
-            intake.intakeCmd().asProxy(),
-            Ice_Cream,
-            carriage.lowDealgify().asProxy()),
-        () -> intakeState);
+            Map.of(
+                Source,
+                // Maybe should change so that even if most of poseEstimation isn't working, this
+                // does
+                either(
+                    drive
+                        .headingDrive(
+                            () -> {
+                              return poseManager.closestStation().getRotation();
+                            })
+                        .until(carriage::coralHeld)
+                        .asProxy(),
+                    carriage.intakeCoral().asProxy(),
+                    allowAutoDrive),
+                Ground,
+                intake.intakeCmd().asProxy(),
+                Ice_Cream,
+                carriage.lowDealgify().asProxy()),
+            () -> intakeState)
+        .withName("fullIntake");
   }
 
   public static enum IntakeState {

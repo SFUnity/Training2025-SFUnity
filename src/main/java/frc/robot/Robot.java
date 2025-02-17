@@ -401,7 +401,8 @@ public class Robot extends LoggedRobot {
                                 }),
                         Commands.none(),
                         () -> dealgifyAfterPlacing))
-                .finallyDo(() -> poseManager.lockClosest = false));
+                .finallyDo(() -> poseManager.lockClosest = false)
+                .withName("fullScore"));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
