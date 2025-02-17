@@ -50,8 +50,7 @@ public class Carriage extends SubsystemBase {
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
     if (filteredVelocity <= algaeVelocityThreshold.get()
-            && (filteredStatorCurrent >= algaeCurrentThreshold.get())
-        || filteredStatorCurrent <= -2) {
+        && filteredStatorCurrent >= algaeCurrentThreshold.get()) {
       realAlgaeHeld = true;
     }
 
@@ -92,9 +91,11 @@ public class Carriage extends SubsystemBase {
   public Command backUpForL3() {
     return run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
         .finallyDo(() -> io.runVolts(0))
-        .beforeStarting(() -> {io.resetEncoder();
-          coralInDanger = true;
-        })
+        .beforeStarting(
+            () -> {
+              io.resetEncoder();
+              coralInDanger = true;
+            })
         .until(() -> inputs.positionRots >= backupForL3Rots.get())
         .withName("backUpForL3");
   }
