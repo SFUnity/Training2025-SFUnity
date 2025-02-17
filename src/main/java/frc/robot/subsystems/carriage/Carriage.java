@@ -32,7 +32,7 @@ public class Carriage extends SubsystemBase {
   private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
   private static final LoggedTunableNumber backupForL3Rots =
-      new LoggedTunableNumber("Carriage/Backup for L3 Rots", 0.5);
+      new LoggedTunableNumber("Carriage/Backup for L3 Rots", 4);
 
   public Carriage(CarriageIO io) {
     this.io = io;
