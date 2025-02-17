@@ -429,7 +429,7 @@ public class Robot extends LoggedRobot {
     operator.back().onTrue(elevator.runCurrentZeroing());
 
     // State-Based Triggers
-    
+
     // Teleop Only
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoDrive)
