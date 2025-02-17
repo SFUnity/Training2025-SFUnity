@@ -99,18 +99,13 @@ public class Carriage extends SubsystemBase {
   public Command backUpForL3() {
     return run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
         .finallyDo(() -> io.runVolts(0))
-        .beforeStarting(
-            () -> {
-              io.resetEncoder();
-              coralInDanger = true;
-            })
+        .beforeStarting(() -> io.resetEncoder())
         .until(() -> inputs.positionRots >= backupForL3Rots.get())
         .withName("backUpForL3");
   }
 
   public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeedVolts.get()))
-        .finallyDo(() -> coralInDanger = false)
         .until(() -> !realCoralHeld)
         .withName("placeCoral");
   }
@@ -134,7 +129,7 @@ public class Carriage extends SubsystemBase {
                 .andThen(
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
                         .until(() -> inputs.beamBreak)),
-            run(() -> io.runVolts(backwardsIntakeSpeedVolts.get())),
+            run(() -> io.runVolts(placeSpeedVolts.get())),
             () -> !coralInDanger)
         .withName("intake coral");
   }

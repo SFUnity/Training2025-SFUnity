@@ -297,6 +297,9 @@ public class Robot extends LoggedRobot {
       lowBatteryAlert.set(true);
     }
 
+    // Check for coralInDanger
+    Carriage.coralInDanger = elevator.pastL3Height() && carriage.coralHeld();
+
     // Logs
     Logger.recordOutput("Controls/intakeState", intakeState.toString());
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
