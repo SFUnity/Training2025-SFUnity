@@ -39,9 +39,6 @@ public class Elevator extends SubsystemBase {
   public boolean setHeight = false;
   public double goalHeightInches = 0;
 
-  private final LoggedTunableNumber pastL3Height =
-      new LoggedTunableNumber("Elevator/Past L3 Height", 20);
-
   public Elevator(ElevatorIO io) {
     this.io = io;
 
