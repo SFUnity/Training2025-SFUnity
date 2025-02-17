@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
@@ -65,8 +66,11 @@ public class Elevator extends SubsystemBase {
     updateTunables();
 
     if (setHeight) {
-      pid.setGoal(goalHeightInches);
-
+      if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
+        pid.setGoal(inputs.position);
+      } else {
+        pid.setGoal(goalHeightInches);
+      }
     } else {
       pid.setGoal(0);
     }
@@ -100,16 +104,21 @@ public class Elevator extends SubsystemBase {
         goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
   }
 
+  @AutoLogOutput
+  public boolean pastL3Height() {
+    return Util.equalsWithTolerance(pastL3Height.get(), inputs.position, 0.3);
+  }
+
   public Command enableElevator() {
     return run(() -> setHeight = true).until(this::atGoalHeight).withName("enableElevator");
   }
 
   public Command disableElevator() {
-
     return runOnce(() -> setHeight = false).withName("disableElevator");
   }
 
   public Command request(ElevatorHeight height) {
+    Logger.recordOutput("Elevator/RequestedHeight", height.toString());
     return runOnce(() -> goalHeightInches = height.get()).withName("request" + height.toString());
   }
 
