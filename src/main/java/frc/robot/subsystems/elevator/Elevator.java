@@ -106,7 +106,7 @@ public class Elevator extends SubsystemBase {
   @AutoLogOutput
   public boolean pastL3Height() {
     return Util.equalsWithTolerance(
-        pastL3Height.get(), inputs.position, elevatorDistanceToleranceInches);
+        pastL3Height.get(), inputs.position, 0.3);
   }
 
   public Command enableElevator() {
