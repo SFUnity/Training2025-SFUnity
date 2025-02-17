@@ -60,7 +60,7 @@ import java.util.function.DoubleSupplier;
  */
 public class ModuleIOMixed implements ModuleIO {
   // Module specific constants
-  private final Rotation2d zeroRotation;
+  private final Rotation2d zeroRotation = new Rotation2d();
   private final boolean driveInverted;
   private final boolean turnInverted;
   private final boolean turnEncoderInverted;
@@ -97,14 +97,6 @@ public class ModuleIOMixed implements ModuleIO {
   private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
   public ModuleIOMixed(int module) {
-    zeroRotation =
-        switch (module) {
-          case 0 -> frontLeftZeroRotation;
-          case 1 -> frontRightZeroRotation;
-          case 2 -> backLeftZeroRotation;
-          case 3 -> backRightZeroRotation;
-          default -> new Rotation2d();
-        };
     driveInverted =
         switch (module) {
           case 0 -> frontLeftDriveInverted;
@@ -195,15 +187,14 @@ public class ModuleIOMixed implements ModuleIO {
 
     // Configure CANCoder
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
-    double cancoderOffsetRad =
+    cancoderConfig.MagnetSensor.MagnetOffset =
         switch (module) {
-          case 0 -> 1.588;
-          case 1 -> 0.268;
-          case 2 -> 3.062;
-          case 3 -> 3.045;
+          case 0 -> frontLeftZeroRotation;
+          case 1 -> frontRightZeroRotation;
+          case 2 -> backLeftZeroRotation;
+          case 3 -> backRightZeroRotation;
           default -> 0;
         };
-    cancoderConfig.MagnetSensor.MagnetOffset = Units.radiansToRotations(cancoderOffsetRad);
     cancoderConfig.MagnetSensor.SensorDirection =
         turnEncoderInverted
             ? SensorDirectionValue.Clockwise_Positive

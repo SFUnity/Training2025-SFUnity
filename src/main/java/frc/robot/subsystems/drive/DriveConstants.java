@@ -13,7 +13,6 @@
 
 package frc.robot.subsystems.drive;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -46,10 +45,10 @@ public class DriveConstants {
       new SwerveDriveKinematics(moduleTranslations);
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d();
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d();
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d();
-  public static final Rotation2d backRightZeroRotation = new Rotation2d();
+  public static final double frontLeftZeroRotation = -0.241943;
+  public static final double frontRightZeroRotation = 0.042969;
+  public static final double backLeftZeroRotation = -0.014404;
+  public static final double backRightZeroRotation = 0.484375;
 
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = false;
