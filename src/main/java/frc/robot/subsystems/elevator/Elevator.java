@@ -119,6 +119,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command request(ElevatorHeight height) {
+    Logger.recordOutput("Elevator/RequestedHeight", height.toString());
     return runOnce(() -> goalHeightInches = height.get()).withName("request" + height.toString());
   }
 
