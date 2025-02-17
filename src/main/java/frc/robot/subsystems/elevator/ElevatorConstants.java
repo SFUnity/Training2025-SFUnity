@@ -46,11 +46,11 @@ public class ElevatorConstants {
 
   /** In inches */
   public static enum ElevatorHeight {
-    L3(new LoggedTunableNumber("Elevator/L3", maxHeightInches + .2)),
+    L3(new LoggedTunableNumber("Elevator/L3", maxHeightInches + .3)),
     L2(new LoggedTunableNumber("Elevator/L2", 10)),
     L1(new LoggedTunableNumber("Elevator/L1", 0)),
-    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 27)),
-    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", 23));
+    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 18)),
+    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", L3.get()));
 
     ElevatorHeight(LoggedTunableNumber height) {
       this.height = height;
