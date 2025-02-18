@@ -228,7 +228,7 @@ public class ModuleIOMixed implements ModuleIO {
         50.0, driveVelocity, driveAppliedVolts, driveCurrent, turnAbsolutePosition);
     ParentDevice.optimizeBusUtilizationForAll(driveTalon, cancoder);
 
-    logSparkMax("Drive/Module" + Integer.toString(module) + "TurnConfig", turnSpark);
+    // logSparkMax("Drive/Module" + Integer.toString(module) + "TurnConfig", turnSpark);
   }
 
   @Override
