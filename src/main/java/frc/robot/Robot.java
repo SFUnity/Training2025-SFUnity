@@ -44,7 +44,9 @@ import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
@@ -188,11 +190,11 @@ public class Robot extends LoggedRobot {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
+                new GyroIOPigeon2(),
+                new ModuleIOMixed(0),
+                new ModuleIOMixed(1),
+                new ModuleIOMixed(2),
+                new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax());
@@ -276,8 +278,8 @@ public class Robot extends LoggedRobot {
     }
 
     // Check controllers
-    driverDisconnected.set(isControllerConnected(driver));
-    operatorDisconnected.set(isControllerConnected(operator));
+    driverDisconnected.set(!isControllerConnected(driver));
+    operatorDisconnected.set(!isControllerConnected(operator));
 
     // Check CAN status
     var canStatus = RobotController.getCANStatus();
@@ -337,13 +339,13 @@ public class Robot extends LoggedRobot {
         .y()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
     driver
-        .b()
+        .x()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
     driver
         .a()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
     driver
-        .x()
+        .b()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
     driver
         .start()
