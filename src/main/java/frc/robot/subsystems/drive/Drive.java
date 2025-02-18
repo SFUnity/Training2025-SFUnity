@@ -543,7 +543,7 @@ public class Drive extends SubsystemBase {
 
   private double getAngularVelocityFromProfiledPID(double goalHeadingRads) {
     double output =
-        -thetaController.calculate(
+        thetaController.calculate(
             poseManager.getPose().getRotation().getRadians(), goalHeadingRads);
 
     Logger.recordOutput("Drive/Commands/HeadingError", thetaController.getPositionError());
