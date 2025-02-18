@@ -96,6 +96,9 @@ public class ModuleIOMixed implements ModuleIO {
   private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
   private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
+  // Motor Configurators
+  private final TalonFXConfiguration driveConfig;
+
   public ModuleIOMixed(int module) {
     driveInverted =
         switch (module) {
@@ -155,7 +158,7 @@ public class ModuleIOMixed implements ModuleIO {
     turnController = turnSpark.getClosedLoopController();
 
     // Configure drive motor
-    TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+    driveConfig = new TalonFXConfiguration();
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Slot0 =
         new Slot0Configs()
