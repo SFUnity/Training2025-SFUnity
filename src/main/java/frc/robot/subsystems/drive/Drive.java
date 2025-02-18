@@ -406,6 +406,7 @@ public class Drive extends SubsystemBase {
    */
   public Command headingDrive(Supplier<Rotation2d> goalHeading) {
     return run(() -> {
+          Logger.recordOutput("Drive/Commands/goalHeading", goalHeading.get());
           updateThetaTunables();
           updateThetaConstraints();
 
@@ -542,7 +543,7 @@ public class Drive extends SubsystemBase {
 
   private double getAngularVelocityFromProfiledPID(double goalHeadingRads) {
     double output =
-        thetaController.calculate(
+        -thetaController.calculate(
             poseManager.getPose().getRotation().getRadians(), goalHeadingRads);
 
     Logger.recordOutput("Drive/Commands/HeadingError", thetaController.getPositionError());
