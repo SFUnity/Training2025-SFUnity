@@ -303,7 +303,6 @@ public class ModuleIOMixed implements ModuleIO {
 
   @Override
   public void setDrivePIDF(double drivekP, double drivekD) {
-    var driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0.kP = drivekP;
     driveConfig.Slot0.kD = drivekD;
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
