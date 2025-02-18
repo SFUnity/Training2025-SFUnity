@@ -52,9 +52,9 @@ public class DriveConstants {
 
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = false;
-  public static final boolean frontRightDriveInverted = false;
+  public static final boolean frontRightDriveInverted = true;
   public static final boolean backLeftDriveInverted = false;
-  public static final boolean backRightDriveInverted = false;
+  public static final boolean backRightDriveInverted = true;
 
   public static final boolean frontLeftTurnInverted = true;
   public static final boolean frontRightTurnInverted = true;
@@ -134,7 +134,7 @@ public class DriveConstants {
     switch (Constants.currentMode) {
       default:
         turnKp =
-            new LoggedTunableNumber("Drive/ModuleTunables/turnKp", Constants.onCarpet ? 7 : 0.65);
+            new LoggedTunableNumber("Drive/ModuleTunables/turnKp", Constants.onCarpet ? 2 : 0.65);
         break;
       case SIM:
         turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 14.0);
