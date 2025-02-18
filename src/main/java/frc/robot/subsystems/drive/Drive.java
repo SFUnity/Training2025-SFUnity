@@ -679,7 +679,6 @@ public class Drive extends SubsystemBase {
               tuningTurnDelta);
         })
         .withTimeout(2.0)
-        .finallyDo(this::stop)
         .withName("tuneModuleTurn");
   }
 
@@ -692,7 +691,6 @@ public class Drive extends SubsystemBase {
               setAllModuleSetpointsToSame(tuningDriveSpeed.get(), new Rotation2d());
             })
         .withTimeout(2.0)
-        .finallyDo(this::stop)
         .withName("tuneModuleDrive");
   }
 
