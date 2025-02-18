@@ -173,7 +173,7 @@ public class DriveConstants {
     }
 
     public double getOmegaInput() {
-      return -controller.getRightX();
+      return controller.getRightX();
     }
 
     public boolean povUpPressed() {
