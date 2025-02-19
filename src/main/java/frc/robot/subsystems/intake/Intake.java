@@ -140,7 +140,7 @@ public class Intake extends SubsystemBase {
             Commands.waitUntil(() -> filteredCurrent > 10)
                 .andThen(
                     Commands.waitUntil(() -> filteredCurrent < 10),
-                    Commands.print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
+                    Commands.print("XXXX\nXXXXXXXX\nXXXXXXXXX\nXXXXXXXXX\nXXXXXXXXXX\nxxxxxxxx"))
                 .deadlineFor(
                     run(
                         () -> {
