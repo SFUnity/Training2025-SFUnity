@@ -448,7 +448,7 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
-    operator.back().onTrue(elevator.runCurrentZeroing());
+    operator.back().onTrue(elevator.runCurrentZeroing().alongWith(intake.runCurrentZeroing()));
 
     // State-Based Triggers
 

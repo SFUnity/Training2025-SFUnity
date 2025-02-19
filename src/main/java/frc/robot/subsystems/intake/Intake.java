@@ -125,7 +125,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Command runCurrentZeroing() {
-    return this.run(() -> io.runRollers(-1.0))
+    return this.run(() -> io.runPivot(-1.0))
         .until(() -> inputs.pivotCurrentAmps > 40.0)
         .finallyDo(() -> io.resetEncoder(0.0));
   }
