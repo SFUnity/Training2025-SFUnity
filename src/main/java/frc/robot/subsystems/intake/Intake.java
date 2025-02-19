@@ -66,6 +66,10 @@ public class Intake extends SubsystemBase {
       if (filteredCurrent <= 9 && startedIntaking) {
         middleOfIntaking = true;
       }
+      // check for massive current spike
+      if (filteredCurrent >= 40) {
+        hasAlgae = true;
+      }
     }
 
     // Check if the pivot is raised high current
@@ -132,13 +136,17 @@ public class Intake extends SubsystemBase {
 
   public Command poopCmd() {
     return Commands.waitUntil(() -> !algaeHeld())
-        .andThen(Commands.waitSeconds(.1))
-        .deadlineFor(
-            run(
-                () -> {
-                  raise();
-                  rollersOut();
-                }))
+        .andThen(
+            Commands.waitUntil(() -> filteredCurrent > 10)
+                .andThen(
+                    Commands.waitUntil(() -> filteredCurrent < 10),
+                    Commands.print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
+                .deadlineFor(
+                    run(
+                        () -> {
+                          raise();
+                          rollersOut();
+                        })))
         .withName("poop");
   }
 
