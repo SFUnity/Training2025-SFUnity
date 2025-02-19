@@ -115,11 +115,6 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCmd() {
-    /*
-     Commands.waitUntil(this::algaeHeld)
-       .andThen(Commands.waitSeconds(intakeDelay))
-       .deadlineFor(
-    */
     return run(() -> {
           lower();
           rollersIn();
