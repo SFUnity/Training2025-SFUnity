@@ -23,8 +23,6 @@ public class IntakeConstants {
 
   public static final LoggedTunableNumber algaeVoltageThreshold =
       new LoggedTunableNumber("Intake/algaeVoltageThreshold", .5);
-  public static final LoggedTunableNumber algaeCurrentThreshold =
-      new LoggedTunableNumber("Intake/algaeCurrentThreshold", 20);
 
   // In rotations
   public static final LoggedTunableNumber loweredAngle =

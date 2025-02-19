@@ -7,12 +7,14 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorConstants {
   public static final int elevatorMotorID = 16;
+  public static final LoggedTunableNumber pastL3Height =
+      new LoggedTunableNumber("Elevator/Past L3 Height", 10);
   // Profiled PID values
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
-  public static final double elevatorDistanceToleranceInches = 0.3;
-  public static final double maxElevatorSpeed = 78.74; // inches/sec
-  public static final double maxElevatorAcceleration = 394; // inches/sec^2
+  public static final double elevatorDistanceToleranceInches = 0.22;
+  public static final double maxElevatorSpeed = 41; // inches/sec
+  public static final double maxElevatorAcceleration = 682.5; // inches/sec^2
   // FF values
   public static final LoggedTunableNumber kG;
   public static final LoggedTunableNumber kV;
@@ -21,17 +23,17 @@ public class ElevatorConstants {
   public static final double carrageMassKg = Units.lbsToKilograms(15);
   public static final double drumRadiusMeters = Units.inchesToMeters(1.4);
   public static final double minHeightInches = 0;
-  public static final double maxHeightInches = 23.0;
+  public static final double maxHeightInches = 23;
   public static final double gearRatio = 9;
-  public static final double wheelRadius = 1;
+  public static final double wheelRadius = 0.44444;
 
   static {
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Elevator/kP", 0);
+        kP = new LoggedTunableNumber("Elevator/kP", 1.3);
         kD = new LoggedTunableNumber("Elevator/kD", 0);
-        kG = new LoggedTunableNumber("Elevator/kG", 0);
-        kV = new LoggedTunableNumber("Elevator/kV", 0);
+        kG = new LoggedTunableNumber("Elevator/kG", 0.34);
+        kV = new LoggedTunableNumber("Elevator/kV", 0.2);
         break;
       case SIM:
         kP = new LoggedTunableNumber("Elevator/kP", 0.15);
@@ -47,9 +49,8 @@ public class ElevatorConstants {
     L3(new LoggedTunableNumber("Elevator/L3", maxHeightInches)),
     L2(new LoggedTunableNumber("Elevator/L2", 10)),
     L1(new LoggedTunableNumber("Elevator/L1", 0)),
-    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 27)),
-    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", 23)),
-    Stow(new LoggedTunableNumber("Elevator/Stow", minHeightInches));
+    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 18)),
+    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", L3.get()));
 
     ElevatorHeight(LoggedTunableNumber height) {
       this.height = height;
