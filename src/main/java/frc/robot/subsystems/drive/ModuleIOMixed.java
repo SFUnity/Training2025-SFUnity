@@ -60,11 +60,11 @@ import java.util.function.DoubleSupplier;
  */
 public class ModuleIOMixed implements ModuleIO {
   // Module specific constants
-  private final Rotation2d zeroRotation;
+  private final Rotation2d zeroRotation = new Rotation2d();
   private final boolean driveInverted;
   private final boolean turnInverted;
   private final boolean turnEncoderInverted;
-  private final int index;
+  private final SparkMaxConfig turnConfig;
 
   // Hardware objects
   private final TalonFX driveTalon;
@@ -96,16 +96,10 @@ public class ModuleIOMixed implements ModuleIO {
   private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
   private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
+  // Motor Configurators
+  private final TalonFXConfiguration driveConfig;
+
   public ModuleIOMixed(int module) {
-    this.index = module;
-    zeroRotation =
-        switch (module) {
-          case 0 -> frontLeftZeroRotation;
-          case 1 -> frontRightZeroRotation;
-          case 2 -> backLeftZeroRotation;
-          case 3 -> backRightZeroRotation;
-          default -> new Rotation2d();
-        };
     driveInverted =
         switch (module) {
           case 0 -> frontLeftDriveInverted;
@@ -164,7 +158,7 @@ public class ModuleIOMixed implements ModuleIO {
     turnController = turnSpark.getClosedLoopController();
 
     // Configure drive motor
-    TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+    driveConfig = new TalonFXConfiguration();
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Slot0 =
         new Slot0Configs()
@@ -183,45 +177,27 @@ public class ModuleIOMixed implements ModuleIO {
     tryUntilOk(5, () -> driveTalon.setPosition(0.0, 0.25));
 
     // Configure turn motor
-    var turnConfig = new SparkMaxConfig();
-    turnConfig
-        .inverted(turnInverted)
-        .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(turnMotorCurrentLimit)
-        .voltageCompensation(12.0);
-    turnConfig
-        .encoder
-        .positionConversionFactor(turnEncoderPositionFactor)
-        .velocityConversionFactor(turnEncoderVelocityFactor)
-        .uvwAverageDepth(2);
+    turnConfig = sparkConfig(turnInverted, (2 * Math.PI) / turnMotorReduction);
+    turnConfig.encoder.velocityConversionFactor((2 * Math.PI) / 60.0 / turnMotorReduction);
     turnConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
-        .pidf(turnKp.get(), 0.0, turnKd.get(), 0.0);
-    turnConfig
-        .signals
-        .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency))
-        .primaryEncoderVelocityAlwaysOn(true)
-        .primaryEncoderVelocityPeriodMs(20)
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+        .pidf(turnKp.get(), 0.0, 0, 0.0);
+    turnConfig.signals.primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency));
     configureSpark(turnSpark, turnConfig, true);
 
     // Configure CANCoder
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
-    double cancoderOffsetRad =
+    cancoderConfig.MagnetSensor.MagnetOffset =
         switch (module) {
-          case 0 -> 1.510;
-          case 1 -> 1.535;
-          case 2 -> 3.132;
-          case 3 -> 1.828;
+          case 0 -> frontLeftZeroRotation;
+          case 1 -> frontRightZeroRotation;
+          case 2 -> backLeftZeroRotation;
+          case 3 -> backRightZeroRotation;
           default -> 0;
         };
-    cancoderConfig.MagnetSensor.MagnetOffset = Units.radiansToRotations(cancoderOffsetRad);
     cancoderConfig.MagnetSensor.SensorDirection =
         turnEncoderInverted
             ? SensorDirectionValue.Clockwise_Positive
@@ -251,6 +227,8 @@ public class ModuleIOMixed implements ModuleIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, driveVelocity, driveAppliedVolts, driveCurrent, turnAbsolutePosition);
     ParentDevice.optimizeBusUtilizationForAll(driveTalon, cancoder);
+
+    // logSparkMax("Drive/Module" + Integer.toString(module) + "TurnConfig", turnSpark);
   }
 
   @Override
@@ -297,9 +275,6 @@ public class ModuleIOMixed implements ModuleIO {
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
-
-    // Logging
-    logSparkMax("Drive/Module" + Integer.toString(index) + "TurnConfig", turnSpark);
   }
 
   @Override
@@ -328,16 +303,15 @@ public class ModuleIOMixed implements ModuleIO {
 
   @Override
   public void setDrivePIDF(double drivekP, double drivekD) {
-    var driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0.kP = drivekP;
     driveConfig.Slot0.kD = drivekD;
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
   }
 
   @Override
-  public void setTurnPIDF(double turnkP, double turnkD) {
+  public void setTurnPIDF(double turnkP) {
     SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pidf(turnkP, 0, turnkD, 0);
+    config.closedLoop.pidf(turnkP, 0, 0, 0);
     configureSpark(turnSpark, config, false);
   }
 
@@ -348,8 +322,7 @@ public class ModuleIOMixed implements ModuleIO {
 
   @Override
   public void setTurnBrakeMode(boolean brake) {
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.idleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
-    configureSpark(turnSpark, config, false);
+    turnConfig.idleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
+    configureSpark(turnSpark, turnConfig, false);
   }
 }

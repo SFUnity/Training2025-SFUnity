@@ -33,7 +33,7 @@ public class ModuleIOSim implements ModuleIO {
   private boolean driveClosedLoop = false;
   private boolean turnClosedLoop = false;
   private PIDController driveController = new PIDController(driveKp.get(), 0, driveKd.get());
-  private PIDController turnController = new PIDController(turnKp.get(), 0, turnKd.get());
+  private PIDController turnController = new PIDController(turnKp.get(), 0, 0);
   private double driveFFVolts = 0.0;
   private double driveAppliedVolts = 0.0;
   private double turnAppliedVolts = 0.0;
@@ -128,8 +128,7 @@ public class ModuleIOSim implements ModuleIO {
   }
 
   @Override
-  public void setTurnPIDF(double turnkP, double turnkD) {
+  public void setTurnPIDF(double turnkP) {
     turnController.setP(turnkP);
-    turnController.setD(turnkD);
   }
 }

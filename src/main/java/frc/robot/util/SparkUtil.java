@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -99,5 +100,28 @@ public class SparkUtil {
     Logger.recordOutput(key + "/inverted", sparkMax.configAccessor.getInverted());
     Logger.recordOutput(key + "/currentLimit", sparkMax.configAccessor.getSmartCurrentLimit());
     Logger.recordOutput(key + "/idleMode", sparkMax.configAccessor.getIdleMode());
+  }
+
+  public static SparkMaxConfig sparkConfig(boolean inverted, double encoderToMechanismRatio) {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config
+        .inverted(inverted)
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(60)
+        .voltageCompensation(12.0);
+    config
+        .encoder
+        .positionConversionFactor(encoderToMechanismRatio)
+        .velocityConversionFactor(encoderToMechanismRatio)
+        .uvwAverageDepth(2);
+    config
+        .signals
+        .primaryEncoderPositionAlwaysOn(true)
+        .primaryEncoderVelocityAlwaysOn(true)
+        .primaryEncoderVelocityPeriodMs(20)
+        .appliedOutputPeriodMs(20)
+        .busVoltagePeriodMs(20)
+        .outputCurrentPeriodMs(20);
+    return config;
   }
 }

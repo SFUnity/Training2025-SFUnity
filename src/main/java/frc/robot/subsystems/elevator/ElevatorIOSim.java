@@ -13,7 +13,7 @@ public class ElevatorIOSim implements ElevatorIO {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(1),
-          9,
+          gearRatio,
           carrageMassKg,
           drumRadiusMeters,
           Units.inchesToMeters(minHeightInches),
@@ -38,5 +38,10 @@ public class ElevatorIOSim implements ElevatorIO {
   public void runVolts(double volts) {
     appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
     sim.setInputVoltage(appliedVolts);
+  }
+
+  @Override
+  public void resetEncoder(final double position) {
+    sim.setState(position, 0.0);
   }
 }

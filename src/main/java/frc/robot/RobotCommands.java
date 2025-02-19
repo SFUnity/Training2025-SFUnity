@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
+  public static boolean allowAutoDrive = false;
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
@@ -39,9 +41,20 @@ public final class RobotCommands {
       BooleanSupplier atPose) {
     return waitUntil(
             () ->
-                poseManager.getDistanceTo(goalPose.get())
-                    < elevatorSafeExtensionDistanceMeters.get())
-        .andThen(elevator.enableElevator(), waitUntil(atPose), carriage.placeCoral());
+                !allowAutoDrive
+                    || poseManager.getDistanceTo(goalPose.get())
+                        < elevatorSafeExtensionDistanceMeters.get())
+        .andThen(
+            elevator
+                .enableElevator()
+                .alongWith(
+                    either(
+                            waitUntil(elevator::pastL3Height).andThen(carriage.backUpForL3()),
+                            none(),
+                            () -> elevator.goalHeightInches > ElevatorConstants.pastL3Height.get())
+                        .andThen(
+                            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
+                            carriage.placeCoral())));
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
@@ -50,11 +63,12 @@ public final class RobotCommands {
 
   public static Command dealgify(
       Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
-    BooleanSupplier highAlgae = () -> poseManager.closestFace().highAlgae;
+    BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
     return waitUntil(
             () ->
-                poseManager.getDistanceTo(goalPose.get())
-                    < elevatorSafeExtensionDistanceMeters.get())
+                !allowAutoDrive
+                    || poseManager.getDistanceTo(goalPose.get())
+                        < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
             either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
                 .andThen(elevator.enableElevator())
@@ -73,27 +87,18 @@ public final class RobotCommands {
   }
 
   public static BooleanSupplier atGoal(Drive drive) {
-    return () -> drive.linearAtGoal() && drive.thetaAtGoal();
+    return () -> !allowAutoDrive || (drive.linearAtGoal() && drive.thetaAtGoal());
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
     return () -> {
       switch (scoreState) {
-        case LeftBranch:
-          return apply(poseManager.closestLeftBranch().getPose());
-        case RightBranch:
-          return apply(poseManager.closestRightBranch().getPose());
-        case Dealgify:
-          return apply(poseManager.closestFace().getPose());
+        default:
+          return apply(poseManager.closest(scoreState));
         case ProcessorFront:
           return apply(processorScore);
         case ProcessorBack:
           return apply(processorScore).transformBy(new Transform2d(0, 0, new Rotation2d(Math.PI)));
-        default:
-          {
-            System.out.println("Invalid score state");
-            return poseManager.getPose();
-          }
       }
     };
   }
@@ -109,20 +114,32 @@ public final class RobotCommands {
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive, Carriage carriage, Intake intake, PoseManager poseManager) {
+      Drive drive,
+      Carriage carriage,
+      Intake intake,
+      PoseManager poseManager,
+      BooleanSupplier allowAutoDrive) {
     return select(
-        Map.of(
-            Source,
-                drive
-                    .headingDrive(
-                        () -> {
-                          return poseManager.closestStation().getRotation();
-                        })
-                    .until(carriage::coralHeld)
-                    .asProxy(),
-            Ground, intake.intakeCmd().asProxy(),
-            Ice_Cream, carriage.lowDealgify().asProxy()),
-        () -> intakeState);
+            Map.of(
+                Source,
+                // Maybe should change so that even if most of poseEstimation isn't working, this
+                // does
+                either(
+                    drive
+                        .headingDrive(
+                            () -> {
+                              return poseManager.closestStation().getRotation();
+                            })
+                        .until(carriage::coralHeld)
+                        .asProxy(),
+                    carriage.intakeCoral().asProxy(),
+                    allowAutoDrive),
+                Ground,
+                intake.intakeCmd().asProxy(),
+                Ice_Cream,
+                carriage.lowDealgify().asProxy()),
+            () -> intakeState)
+        .withName("fullIntake");
   }
 
   public static enum IntakeState {

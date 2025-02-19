@@ -1,6 +1,8 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -8,7 +10,11 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
@@ -30,6 +36,7 @@ public class Elevator extends SubsystemBase {
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+  private final SysIdRoutine elevatorRoutine;
 
   public boolean setHeight = false;
   public double goalHeightInches = 0;
@@ -38,6 +45,18 @@ public class Elevator extends SubsystemBase {
     this.io = io;
 
     pid.setTolerance(elevatorDistanceToleranceInches);
+    // Create the SysId routine
+    elevatorRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null,
+                null,
+                null, // Use default config
+                (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> io.runVolts(voltage.in(Volts)),
+                null, // No log consumer, since data is recorded by AdvantageKit
+                this));
   }
 
   @Override
@@ -48,10 +67,17 @@ public class Elevator extends SubsystemBase {
     updateTunables();
 
     if (setHeight) {
-      pid.setGoal(goalHeightInches);
-
+      if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
+        pid.setGoal(L3.get());
+      } else {
+        pid.setGoal(goalHeightInches);
+      }
     } else {
-      pid.setGoal(0);
+      if (Carriage.coralInDanger) {
+        pid.setGoal(L3.get());
+      } else {
+        pid.setGoal(0);
+      }
     }
 
     io.runVolts(
@@ -83,6 +109,11 @@ public class Elevator extends SubsystemBase {
         goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
   }
 
+  @AutoLogOutput
+  public boolean pastL3Height() {
+    return pastL3Height.get() <= inputs.position;
+  }
+
   public Command enableElevator() {
     return run(() -> setHeight = true).until(this::atGoalHeight).withName("enableElevator");
   }
@@ -92,6 +123,40 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command request(ElevatorHeight height) {
-    return runOnce(() -> goalHeightInches = height.get()).withName("request" + height.toString());
+    return runOnce(
+            () -> {
+              goalHeightInches = height.get();
+              Logger.recordOutput("Elevator/RequestedHeight", height.toString());
+            })
+        .withName("request" + height.toString());
+  }
+
+  public Command runCurrentZeroing() {
+    return this.run(() -> io.runVolts(-1.0))
+        .until(() -> inputs.currentAmps > 40.0)
+        .finallyDo(() -> io.resetEncoder(0.0));
+  }
+
+  public Command runSysidCmd() {
+    return Commands.sequence(
+        runCurrentZeroing(),
+        // Stop when we get close to max to avoid hitting hard stop
+        elevatorRoutine
+            .quasistatic(Direction.kForward)
+            .until(() -> inputs.position > maxHeightInches - 5),
+        this.runOnce(() -> io.runVolts(0.0)),
+        Commands.waitSeconds(1.0),
+        // Stop when we get close to max to avoid hitting hard stop
+        elevatorRoutine.quasistatic(Direction.kReverse).until(() -> inputs.position < 5),
+        this.runOnce(() -> io.runVolts(0.0)),
+        Commands.waitSeconds(1.0),
+        // Stop when we get close to max to avoid hitting hard stop
+        elevatorRoutine
+            .dynamic(Direction.kForward)
+            .until(() -> inputs.position > maxHeightInches - 5),
+        this.runOnce(() -> io.runVolts(0.0)),
+        Commands.waitSeconds(1.0),
+        // Stop when we get close to max to avoid hitting hard stop
+        elevatorRoutine.dynamic(Direction.kReverse).until(() -> inputs.position < 5));
   }
 }

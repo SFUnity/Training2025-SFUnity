@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
@@ -69,7 +68,7 @@ public class Drive extends SubsystemBase {
 
   private final PoseManager poseManager;
   private final DriveCommandsConfig config;
-  private static final double DEADBAND = 0.05;
+  private static final double DEADBAND = 0.1;
 
   private static final LoggedTunableNumber linearkP =
       new LoggedTunableNumber("Drive/Commands/Linear/kP", 3.5);
@@ -407,6 +406,7 @@ public class Drive extends SubsystemBase {
    */
   public Command headingDrive(Supplier<Rotation2d> goalHeading) {
     return run(() -> {
+          Logger.recordOutput("Drive/Commands/goalHeading", goalHeading.get());
           updateThetaTunables();
           updateThetaConstraints();
 
@@ -668,54 +668,29 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber("Drive/ModuleTunables/tuningDriveSpeed", 3);
 
   public Command tuneModuleTurn() {
-    return Commands.run(
-            () -> {
-              LoggedTunableNumber.ifChanged(
-                  hashCode(),
-                  () -> {
-                    CommandScheduler.getInstance()
-                        .schedule(
-                            startRun(
-                                    () -> {
-                                      for (var module : modules)
-                                        module.setTurnPIDF(turnKp.get(), turnKd.get());
-                                    },
-                                    () ->
-                                        setAllModuleSetpointsToSame(
-                                            0, Rotation2d.fromDegrees(tuningTurnDelta.get())))
-                                .withTimeout(1.0)
-                                .finallyDo(this::stop));
-                  },
-                  turnKp,
-                  turnKd,
-                  tuningTurnDelta);
-            })
+    return run(() -> {
+          setAllModuleSetpointsToSame(0, Rotation2d.fromDegrees(tuningTurnDelta.get()));
+          LoggedTunableNumber.ifChanged(
+              hashCode(),
+              () -> {
+                for (var module : modules) module.setTurnPIDF(turnKp.get());
+              },
+              turnKp,
+              tuningTurnDelta);
+        })
+        .withTimeout(2.0)
         .withName("tuneModuleTurn");
   }
 
   public Command tuneModuleDrive() {
-    return Commands.run(
+    return startRun(
             () -> {
-              LoggedTunableNumber.ifChanged(
-                  hashCode(),
-                  () -> {
-                    CommandScheduler.getInstance()
-                        .schedule(
-                            startRun(
-                                    () -> {
-                                      for (var module : modules)
-                                        module.setDrivePIDF(driveKp.get(), driveKd.get());
-                                    },
-                                    () ->
-                                        setAllModuleSetpointsToSame(
-                                            tuningDriveSpeed.get(), new Rotation2d()))
-                                .withTimeout(1.0)
-                                .finallyDo(this::stop));
-                  },
-                  driveKp,
-                  driveKd,
-                  tuningDriveSpeed);
+              for (var module : modules) module.setDrivePIDF(driveKp.get(), driveKd.get());
+            },
+            () -> {
+              setAllModuleSetpointsToSame(tuningDriveSpeed.get(), new Rotation2d());
             })
+        .withTimeout(2.0)
         .withName("tuneModuleDrive");
   }
 
