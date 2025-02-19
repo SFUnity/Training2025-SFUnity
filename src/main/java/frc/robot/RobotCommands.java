@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
@@ -23,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
-  public static boolean allowAutoDrive = true;
+  public static boolean allowAutoDrive = false;
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
@@ -43,7 +44,17 @@ public final class RobotCommands {
                 !allowAutoDrive
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
-        .andThen(elevator.enableElevator(), waitUntil(atPose), carriage.placeCoral());
+        .andThen(
+            elevator
+                .enableElevator()
+                .alongWith(
+                    either(
+                            waitUntil(elevator::pastL3Height).andThen(carriage.backUpForL3()),
+                            none(),
+                            () -> elevator.goalHeightInches > ElevatorConstants.pastL3Height.get())
+                        .andThen(
+                            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
+                            carriage.placeCoral())));
   }
 
   public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
@@ -109,24 +120,26 @@ public final class RobotCommands {
       PoseManager poseManager,
       BooleanSupplier allowAutoDrive) {
     return select(
-        Map.of(
-            Source,
-            // Maybe should change so that even if most of poseEstimation isn't working, this does
-            either(
-                drive
-                    .headingDrive(
-                        () -> {
-                          return poseManager.closestStation().getRotation();
-                        })
-                    .until(carriage::coralHeld)
-                    .asProxy(),
-                carriage.intakeCoral().asProxy(),
-                allowAutoDrive),
-            Ground,
-            intake.intakeCmd().asProxy(),
-            Ice_Cream,
-            carriage.lowDealgify().asProxy()),
-        () -> intakeState);
+            Map.of(
+                Source,
+                // Maybe should change so that even if most of poseEstimation isn't working, this
+                // does
+                either(
+                    drive
+                        .headingDrive(
+                            () -> {
+                              return poseManager.closestStation().getRotation();
+                            })
+                        .until(carriage::coralHeld)
+                        .asProxy(),
+                    carriage.intakeCoral().asProxy(),
+                    allowAutoDrive),
+                Ground,
+                intake.intakeCmd().asProxy(),
+                Ice_Cream,
+                carriage.lowDealgify().asProxy()),
+            () -> intakeState)
+        .withName("fullIntake");
   }
 
   public static enum IntakeState {

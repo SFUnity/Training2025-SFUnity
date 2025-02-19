@@ -19,7 +19,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private double deltaTime = 0;
 
   public ElevatorIOSparkMax() {
-    var motorConfig = sparkConfig(false, gearRatio);
+    var motorConfig = sparkConfig(false, 1);
+    motorConfig.encoder.positionConversionFactor(1).velocityConversionFactor(1);
     configureSpark(elevatorMotor, motorConfig, true);
   }
 
@@ -29,8 +30,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     currentTime = System.nanoTime();
 
     prevoiusPosition = inputs.position;
-    inputs.position =
-        encoder.getPosition() * .8; // how much the elevator moves per rotation (from otis)
+    // how much the elevator moves per rotation (from otis)
+    inputs.position = encoder.getPosition() * (wheelRadius);
     deltaPosition = inputs.position - prevoiusPosition;
     deltaTime = (currentTime - prevoiusTime) / 1e9;
     inputs.velocityInchesPerSec = deltaPosition / deltaTime;

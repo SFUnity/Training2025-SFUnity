@@ -17,6 +17,8 @@ import static frc.robot.RobotCommands.*;
 import static frc.robot.RobotCommands.IntakeState.*;
 import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.leftName;
+import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.rightName;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
 
@@ -37,6 +39,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.apriltagvision.AprilTagVision;
+import frc.robot.subsystems.apriltagvision.AprilTagVisionIO;
+import frc.robot.subsystems.apriltagvision.AprilTagVisionIOLimelight;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.carriage.CarriageIO;
 import frc.robot.subsystems.carriage.CarriageIOSim;
@@ -101,6 +106,7 @@ public class Robot extends LoggedRobot {
   private final Elevator elevator;
   private final Carriage carriage;
   private final Intake intake;
+  private final AprilTagVision vision;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -200,6 +206,11 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSparkMax());
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
+        vision =
+            new AprilTagVision(
+                poseManager,
+                new AprilTagVisionIOLimelight(leftName),
+                new AprilTagVisionIOLimelight(rightName));
         break;
 
       case SIM:
@@ -216,6 +227,8 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSim());
         carriage = new Carriage(new CarriageIOSim());
         intake = new Intake(new IntakeIOSim());
+        vision =
+            new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
 
       default:
@@ -232,6 +245,8 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIO() {});
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
+        vision =
+            new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
     }
 
@@ -253,7 +268,8 @@ public class Robot extends LoggedRobot {
 
     // Set up port forwarding for limelights so we can connect to them through the RoboRIO USB port
     for (int port = 5800; port <= 5809; port++) {
-      PortForwarder.add(port, "limelight.local", port);
+      PortForwarder.add(port, leftName + ".local", port);
+      PortForwarder.add(port + 10, rightName + ".local", port);
     }
   }
 
@@ -278,8 +294,8 @@ public class Robot extends LoggedRobot {
     }
 
     // Check controllers
-    driverDisconnected.set(isControllerConnected(driver));
-    operatorDisconnected.set(isControllerConnected(operator));
+    driverDisconnected.set(!isControllerConnected(driver));
+    operatorDisconnected.set(!isControllerConnected(operator));
 
     // Check CAN status
     var canStatus = RobotController.getCANStatus();
@@ -298,6 +314,9 @@ public class Robot extends LoggedRobot {
         && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
       lowBatteryAlert.set(true);
     }
+
+    // Check for coralInDanger
+    Carriage.coralInDanger = elevator.pastL3Height() && carriage.coralHeld();
 
     // Logs
     Logger.recordOutput("Controls/intakeState", intakeState.toString());
@@ -336,13 +355,13 @@ public class Robot extends LoggedRobot {
         .y()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
     driver
-        .b()
+        .x()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
     driver
         .a()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
     driver
-        .x()
+        .b()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
     driver
         .start()
@@ -366,7 +385,7 @@ public class Robot extends LoggedRobot {
             Commands.select(
                     Map.of(
                         LeftBranch,
-                        scoreCoral(elevator, carriage, poseManager, atGoal(drive)),
+                        scoreCoral(elevator, carriage, poseManager, driver.rightTrigger()),
                         Dealgify,
                         dealgify(elevator, carriage, poseManager),
                         ProcessorFront,
@@ -376,7 +395,7 @@ public class Robot extends LoggedRobot {
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
                     Commands.either(
-                        drive.fullAutoDrive(goalPose(poseManager)),
+                        drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
                         Commands.none(),
                         () -> allowAutoDrive))
                 .beforeStarting(
@@ -390,7 +409,7 @@ public class Robot extends LoggedRobot {
                         dealgify(elevator, carriage, poseManager)
                             .deadlineFor(
                                 Commands.either(
-                                    drive.fullAutoDrive(goalPose(poseManager)),
+                                    drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
                                     Commands.none(),
                                     () -> allowAutoDrive))
                             .beforeStarting(
@@ -400,7 +419,8 @@ public class Robot extends LoggedRobot {
                                 }),
                         Commands.none(),
                         () -> dealgifyAfterPlacing))
-                .finallyDo(() -> poseManager.lockClosest = false));
+                .finallyDo(() -> poseManager.lockClosest = false)
+                .withName("fullScore"));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
@@ -411,6 +431,7 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(
                 () -> {
+                  scoreState = ProcessorBack;
                   if (intake.algaeHeld()) {
                     scoreState = ProcessorBack;
                   } else if (carriage.algaeHeld()) {
@@ -427,9 +448,10 @@ public class Robot extends LoggedRobot {
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
 
-    operator.back().onTrue(elevator.runCurrentZeroing());
+    operator.back().onTrue(elevator.runCurrentZeroing().alongWith(intake.runCurrentZeroing()));
 
     // State-Based Triggers
+
     // Teleop Only
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoDrive)
