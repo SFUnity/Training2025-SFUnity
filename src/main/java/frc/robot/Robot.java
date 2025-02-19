@@ -395,7 +395,7 @@ public class Robot extends LoggedRobot {
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
                     Commands.either(
-                        drive.fullAutoDrive(goalPose(poseManager)),
+                        drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
                         Commands.none(),
                         () -> allowAutoDrive))
                 .beforeStarting(
@@ -409,7 +409,7 @@ public class Robot extends LoggedRobot {
                         dealgify(elevator, carriage, poseManager)
                             .deadlineFor(
                                 Commands.either(
-                                    drive.fullAutoDrive(goalPose(poseManager)),
+                                    drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
                                     Commands.none(),
                                     () -> allowAutoDrive))
                             .beforeStarting(
@@ -431,12 +431,12 @@ public class Robot extends LoggedRobot {
         .onTrue(
             Commands.runOnce(
                 () -> {
+                  scoreState = ProcessorBack;
                   if (intake.algaeHeld()) {
                     scoreState = ProcessorBack;
                   } else if (carriage.algaeHeld()) {
                     scoreState = ProcessorFront;
                   }
-                  scoreState = ProcessorBack;
                 }));
     operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
