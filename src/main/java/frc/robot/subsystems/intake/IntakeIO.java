@@ -18,6 +18,8 @@ public interface IntakeIO {
 
   default void runRollers(double volts) {}
 
+  default void runPivot(double volts) {}
+
   default void setPivotPosition(double setpointDeg) {}
 
   default void resetEncoder(double position) {}
