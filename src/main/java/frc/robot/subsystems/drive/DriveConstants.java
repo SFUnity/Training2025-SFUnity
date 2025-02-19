@@ -109,7 +109,7 @@ public class DriveConstants {
         driveKd =
             new LoggedTunableNumber("Drive/ModuleTunables/driveKd", Constants.onCarpet ? 0.0 : 0.0);
         driveKs = Constants.onCarpet ? 0.129 : 0.129;
-        driveKv = Constants.onCarpet ? 0.657 : 0.113;
+        driveKv = Constants.onCarpet ? 0.657 : 0.657;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
@@ -134,7 +134,7 @@ public class DriveConstants {
     switch (Constants.currentMode) {
       default:
         turnKp =
-            new LoggedTunableNumber("Drive/ModuleTunables/turnKp", Constants.onCarpet ? 2 : 0.65);
+            new LoggedTunableNumber("Drive/ModuleTunables/turnKp", Constants.onCarpet ? 2 : 2);
         break;
       case SIM:
         turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 14.0);
