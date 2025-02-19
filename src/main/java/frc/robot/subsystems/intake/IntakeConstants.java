@@ -26,7 +26,7 @@ public class IntakeConstants {
 
   // In rotations
   public static final LoggedTunableNumber loweredAngle =
-      new LoggedTunableNumber("Intake/loweredAngle", 55);
+      new LoggedTunableNumber("Intake/loweredAngle", 64);
   public static final LoggedTunableNumber raisedAngle =
       new LoggedTunableNumber("Intake/raisedAngle", 0);
   // In volts

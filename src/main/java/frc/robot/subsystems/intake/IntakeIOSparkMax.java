@@ -48,6 +48,11 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
+  public void runPivot(double volts) {
+    pivot.setVoltage(volts);
+  }
+
+  @Override
   public void setPivotPosition(double setpointDeg) {
     pid.setReference(setpointDeg, ControlType.kPosition);
   }

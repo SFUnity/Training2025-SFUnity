@@ -50,7 +50,7 @@ public class Intake extends SubsystemBase {
     // Check that the pivot is lowered and not rising
     if (inputs.pivotAppliedVolts <= 0.5 && lowered) {
       // Check if the current is high enough to be intaking
-      if (filteredCurrent >= 8) {
+      if (filteredCurrent >= 10) {
         // check for start of intaking
         if (!startedIntaking && !hasAlgae) {
           startedIntaking = true;
@@ -63,13 +63,17 @@ public class Intake extends SubsystemBase {
         }
       }
       // check for dip in current
-      if (filteredCurrent <= 5 && startedIntaking) {
+      if (filteredCurrent <= 9 && startedIntaking) {
         middleOfIntaking = true;
+      }
+      // check for massive current spike
+      if (filteredCurrent >= 40) {
+        hasAlgae = true;
       }
     }
 
     // Check if the pivot is raised high current
-    if (!lowered && filteredCurrent > 20) {
+    if (!lowered && filteredCurrent > 10) {
       hasAlgae = false;
     }
 
@@ -125,20 +129,24 @@ public class Intake extends SubsystemBase {
   }
 
   public Command runCurrentZeroing() {
-    return this.run(() -> io.runRollers(-1.0))
+    return this.run(() -> io.runPivot(-1.0))
         .until(() -> inputs.pivotCurrentAmps > 40.0)
         .finallyDo(() -> io.resetEncoder(0.0));
   }
 
   public Command poopCmd() {
     return Commands.waitUntil(() -> !algaeHeld())
-        .andThen(Commands.waitSeconds(.1))
-        .deadlineFor(
-            run(
-                () -> {
-                  raise();
-                  rollersOut();
-                }))
+        .andThen(
+            Commands.waitUntil(() -> filteredCurrent > 10)
+                .andThen(
+                    Commands.waitUntil(() -> filteredCurrent < 10),
+                    Commands.print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
+                .deadlineFor(
+                    run(
+                        () -> {
+                          raise();
+                          rollersOut();
+                        })))
         .withName("poop");
   }
 
