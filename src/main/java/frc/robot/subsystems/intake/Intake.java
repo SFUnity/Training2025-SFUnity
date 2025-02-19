@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -27,8 +28,7 @@ public class Intake extends SubsystemBase {
   private boolean middleOfIntaking = false;
   public static boolean simHasAlgae = false;
 
-  // private final double intakeDelay = .25;
-  // private final double outtakeDelay = .3;
+  private final LoggedTunableNumber spikeCurrent = new LoggedTunableNumber("Intake/spikeCurrent", 10);
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -50,7 +50,7 @@ public class Intake extends SubsystemBase {
     // Check that the pivot is lowered and not rising
     if (inputs.pivotAppliedVolts <= 0.5 && lowered) {
       // Check if the current is high enough to be intaking
-      if (filteredCurrent >= 10) {
+      if (filteredCurrent >= spikeCurrent.get()) {
         // check for start of intaking
         if (!startedIntaking && !hasAlgae) {
           startedIntaking = true;
@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase {
         }
       }
       // check for dip in current
-      if (filteredCurrent <= 9 && startedIntaking) {
+      if (filteredCurrent < spikeCurrent.get() && startedIntaking) {
         middleOfIntaking = true;
       }
       // check for massive current spike
