@@ -469,9 +469,9 @@ public class Robot extends LoggedRobot {
 
     // All the time
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
-        .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .and(() -> !carriage.algaeHeld())
         .and(() -> allowAutoDrive)
-        .whileTrue(carriage.intakeCoral());
+        .whileTrue(carriage.intakeCoral().onlyIf(() -> !carriage.coralHeld()));
 
     // Sim fake gamepieces
     SmartDashboard.putData(
