@@ -385,7 +385,11 @@ public class Robot extends LoggedRobot {
             Commands.select(
                     Map.of(
                         LeftBranch,
-                        scoreCoral(elevator, carriage, poseManager, atGoal(drive)), // driver.rightTrigger()
+                        scoreCoral(
+                            elevator,
+                            carriage,
+                            poseManager,
+                            atGoal(drive)), // driver.rightTrigger()
                         Dealgify,
                         dealgify(elevator, carriage, poseManager),
                         ProcessorFront,
