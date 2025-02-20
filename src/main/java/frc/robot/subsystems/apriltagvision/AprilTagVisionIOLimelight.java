@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.PoseManager;
 import java.util.HashSet;
@@ -51,6 +52,9 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         position[4], // Pitch (degrees)
         position[5] // Yaw (degrees)
         );
+
+    int[] goodIDs = {12, 16};
+    LimelightHelpers.SetFiducialIDFiltersOverride(name,  goodIDs);
   }
 
   @Override
