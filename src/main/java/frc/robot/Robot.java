@@ -389,7 +389,7 @@ public class Robot extends LoggedRobot {
                             elevator,
                             carriage,
                             poseManager,
-                            atGoal(drive)), // driver.rightTrigger()
+                            driver.rightTrigger()), // driver.rightTrigger() atGoal(drive)
                         Dealgify,
                         dealgify(elevator, carriage, poseManager),
                         ProcessorFront,
