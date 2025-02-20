@@ -425,7 +425,10 @@ public class Robot extends LoggedRobot {
                         () -> dealgifyAfterPlacing))
                 .finallyDo(() -> poseManager.lockClosest = false)
                 .withName("fullScore"));
-                driver.rightTrigger().onTrue(Commands.runOnce(() -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d()))));
+    driver
+        .rightTrigger()
+        .onTrue(
+            Commands.runOnce(() -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d()))));
 
     // Operator controls
     operator.y().onTrue(elevator.request(L3));

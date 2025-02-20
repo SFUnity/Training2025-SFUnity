@@ -54,7 +54,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         );
 
     int[] goodIDs = {12, 16};
-    LimelightHelpers.SetFiducialIDFiltersOverride(name,  goodIDs);
+    LimelightHelpers.SetFiducialIDFiltersOverride(name, goodIDs);
   }
 
   @Override
