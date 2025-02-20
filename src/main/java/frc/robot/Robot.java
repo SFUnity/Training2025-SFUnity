@@ -322,7 +322,8 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Controls/intakeState", intakeState.toString());
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
     Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
-    Logger.recordOutput("Controls/allowAutoRotation", allowAutoDrive);
+    Logger.recordOutput("Controls/allowAutoDrive", allowAutoDrive);
+    Logger.recordOutput("Controls/allowHeadingAlign", allowHeadingAlign);
     Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
@@ -367,18 +368,13 @@ public class Robot extends LoggedRobot {
         .start()
         .onTrue(
             Commands.runOnce(
-                    () ->
-                        poseManager.setPose(
-                          new Pose2d(3.23, 4.203, new Rotation2d())),
-                    drive)
+                    () -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d())), drive)
                 .ignoringDisable(true));
     driver
         .back()
         .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
-    driver
-        .rightBumper()
-        .whileTrue(fullIntake(drive, carriage, intake, poseManager, () -> allowAutoDrive));
+    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
     driver
         .leftBumper()
         .whileTrue(
@@ -389,7 +385,10 @@ public class Robot extends LoggedRobot {
                             elevator,
                             carriage,
                             poseManager,
-                            driver.rightTrigger()), // driver.rightTrigger() atGoal(drive)
+                            () ->
+                                allowAutoDrive
+                                    ? atGoal(drive).getAsBoolean()
+                                    : driver.rightTrigger().getAsBoolean()),
                         Dealgify,
                         dealgify(elevator, carriage, poseManager),
                         ProcessorFront,
@@ -458,8 +457,7 @@ public class Robot extends LoggedRobot {
 
     // Teleop Only
     new Trigger(carriage::coralHeld)
-        .and(() -> allowAutoDrive)
-        // Maybe should remove so that even if most of poseEstimation isn't working, this still will
+        .and(() -> allowHeadingAlign)
         .and(DriverStation::isTeleop)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
 
@@ -474,7 +472,7 @@ public class Robot extends LoggedRobot {
     // All the time
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
         .and(() -> !carriage.algaeHeld())
-        .and(() -> allowAutoDrive)
+        .and(() -> allowHeadingAlign)
         .whileTrue(carriage.intakeCoral().onlyIf(() -> !carriage.coralHeld()));
 
     // Sim fake gamepieces
