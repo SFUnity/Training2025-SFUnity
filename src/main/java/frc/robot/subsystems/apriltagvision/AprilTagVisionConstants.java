@@ -5,6 +5,8 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.util.Units;
 
 public class AprilTagVisionConstants {
+  public static final double fieldBorderMargin = 0.2; // meters
+
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
