@@ -351,7 +351,7 @@ public class Robot extends LoggedRobot {
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
-    driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver.rightTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
     driver
         .y()
         .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
@@ -388,7 +388,7 @@ public class Robot extends LoggedRobot {
                             () ->
                                 allowAutoDrive
                                     ? atGoal(drive).getAsBoolean()
-                                    : driver.rightTrigger().getAsBoolean()),
+                                    : driver.leftTrigger().getAsBoolean()),
                         Dealgify,
                         dealgify(elevator, carriage, poseManager),
                         ProcessorFront,
