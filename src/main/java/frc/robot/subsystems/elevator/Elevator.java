@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.RobotCommands;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -37,12 +39,16 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
   private final SysIdRoutine elevatorRoutine;
+  private final PoseManager poseManager;
+
+  private final LoggedTunableNumber safeDropDist = new LoggedTunableNumber("Elevator/SafeDropDist", 0.3);
 
   public boolean setHeight = false;
   public double goalHeightInches = 0;
 
-  public Elevator(ElevatorIO io) {
+  public Elevator(ElevatorIO io, PoseManager poseManager) {
     this.io = io;
+    this.poseManager = poseManager;
 
     pid.setTolerance(elevatorDistanceToleranceInches);
     // Create the SysId routine
@@ -66,7 +72,8 @@ public class Elevator extends SubsystemBase {
 
     updateTunables();
 
-    if (setHeight) {
+    if (setHeight
+        || poseManager.getDistanceTo(poseManager.closest(RobotCommands.scoreState)) < safeDropDist.get()) {
       if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
         pid.setGoal(L3.get());
       } else {

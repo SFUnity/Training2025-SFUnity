@@ -203,7 +203,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSparkMax());
+        elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
         vision =
@@ -224,7 +224,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSim());
+        elevator = new Elevator(new ElevatorIOSim(), poseManager);
         carriage = new Carriage(new CarriageIOSim());
         intake = new Intake(new IntakeIOSim());
         vision =
@@ -242,7 +242,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIO() {}, poseManager);
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
         vision =
