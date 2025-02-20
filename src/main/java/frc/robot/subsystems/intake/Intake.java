@@ -28,7 +28,8 @@ public class Intake extends SubsystemBase {
   private boolean middleOfIntaking = false;
   public static boolean simHasAlgae = false;
 
-  private final LoggedTunableNumber spikeCurrent = new LoggedTunableNumber("Intake/spikeCurrent", 10);
+  private final LoggedTunableNumber spikeCurrent =
+      new LoggedTunableNumber("Intake/spikeCurrent", 10);
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -130,18 +131,14 @@ public class Intake extends SubsystemBase {
   }
 
   public Command poopCmd() {
-    return Commands.waitUntil(() -> !algaeHeld())
-        .andThen(
-            Commands.waitUntil(() -> filteredCurrent > 10)
-                .andThen(
-                    Commands.waitUntil(() -> filteredCurrent < 10),
-                    Commands.print("XXXX\nXXXXXXXX\nXXXXXXXXX\nXXXXXXXXX\nXXXXXXXXXX\nxxxxxxxx"))
-                .deadlineFor(
-                    run(
-                        () -> {
-                          raise();
-                          rollersOut();
-                        })))
+    return Commands.waitUntil(() -> filteredCurrent > 10)
+        .andThen(Commands.waitUntil(() -> filteredCurrent < 5))
+        .deadlineFor(
+            run(
+                () -> {
+                  raise();
+                  rollersOut();
+                }))
         .withName("poop");
   }
 
