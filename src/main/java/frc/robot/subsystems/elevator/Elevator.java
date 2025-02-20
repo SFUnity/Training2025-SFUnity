@@ -74,8 +74,9 @@ public class Elevator extends SubsystemBase {
     updateTunables();
 
     if (setHeight
-        || poseManager.getDistanceTo(poseManager.closest(RobotCommands.scoreState))
-            < safeDropDist.get()) {
+        || (poseManager.getDistanceTo(poseManager.closest(RobotCommands.scoreState))
+                < safeDropDist.get()
+            && inputs.position > 1)) {
       if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
         pid.setGoal(L3.get());
       } else {
