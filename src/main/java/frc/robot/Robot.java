@@ -426,7 +426,7 @@ public class Robot extends LoggedRobot {
                 .finallyDo(() -> poseManager.lockClosest = false)
                 .withName("fullScore"));
     driver
-        .rightTrigger()
+        .leftTrigger()
         .onTrue(
             Commands.runOnce(() -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d()))));
 
