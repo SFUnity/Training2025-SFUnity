@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.RobotCommands.allowAutoDrive;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
@@ -76,7 +77,8 @@ public class Elevator extends SubsystemBase {
     if (setHeight
         || (poseManager.getDistanceTo(poseManager.closest(RobotCommands.scoreState))
                 < safeDropDist.get()
-            && inputs.position > 1)) {
+            && inputs.position > 1
+            && allowAutoDrive)) {
       if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
         pid.setGoal(L3.get());
       } else {
