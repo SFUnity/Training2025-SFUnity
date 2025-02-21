@@ -851,12 +851,19 @@ public class Drive extends SubsystemBase {
 
   // Module Testing
   private int moduleToTest = 0;
+  public boolean allModules = false;
 
   public Command moduleTestingCommand() {
     return run(() -> {
           double driveInput = config.getYInput();
           double turnInput = config.getOmegaInput();
-          modules[moduleToTest].test(driveInput * 12, turnInput * 12);
+          if (allModules) {
+            for (int i = 0; i < 4; i++) {
+              modules[i].test(driveInput * 12, turnInput * 12);
+            }
+          } else {
+            modules[moduleToTest].test(driveInput * 12, turnInput * 12);
+          }
         })
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         .withName("Module Testing Command");

@@ -364,16 +364,17 @@ public class Robot extends LoggedRobot {
     // driver
     //     .b()
     //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
+    // driver
+    //     .start()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d())), drive)
+    //             .ignoringDisable(true));
     driver.y().onTrue(drive.setModuleToTest(0));
     driver.x().onTrue(drive.setModuleToTest(1));
     driver.a().onTrue(drive.setModuleToTest(2));
     driver.b().onTrue(drive.setModuleToTest(3));
-    driver
-        .start()
-        .onTrue(
-            Commands.runOnce(
-                    () -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d())), drive)
-                .ignoringDisable(true));
+    driver.start().onTrue(Commands.runOnce(() -> drive.allModules = !drive.allModules));
     driver
         .back()
         .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
