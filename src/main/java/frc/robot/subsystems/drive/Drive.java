@@ -863,6 +863,6 @@ public class Drive extends SubsystemBase {
   }
 
   public Command setModuleToTest(int moduleIndex) {
-    return runOnce(() -> moduleToTest = moduleIndex).withName("Set Module To Test");
+    return Commands.runOnce(() -> moduleToTest = moduleIndex).withName("Set Module To Test");
   }
 }
