@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
@@ -846,5 +847,22 @@ public class Drive extends SubsystemBase {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
+  }
+
+  // Module Testing
+  private int moduleToTest = 0;
+
+  public Command moduleTestingCommand() {
+    return run(() -> {
+          double driveInput = config.getYInput();
+          double turnInput = config.getOmegaInput();
+          modules[moduleToTest].test(driveInput * 12, turnInput * 12);
+        })
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        .withName("Module Testing Command");
+  }
+
+  public Command setModuleToTest(int moduleIndex) {
+    return runOnce(() -> moduleToTest = moduleIndex).withName("Set Module To Test");
   }
 }
