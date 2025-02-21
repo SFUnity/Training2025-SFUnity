@@ -238,6 +238,14 @@ public class Drive extends SubsystemBase {
         },
         turnKp);
 
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          for (var module : modules) module.setDrivePIDF(driveKp.get(), driveKd.get());
+        },
+        driveKp,
+        driveKd);
+
     Util.logSubsystem(this, "Drive");
   }
 
