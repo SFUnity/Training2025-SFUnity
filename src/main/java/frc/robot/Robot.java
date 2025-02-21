@@ -345,25 +345,29 @@ public class Robot extends LoggedRobot {
                 .withTimeout(.5));
 
     // Default cmds
-    drive.setDefaultCommand(drive.joystickDrive());
+    drive.setDefaultCommand(drive.moduleTestingCommand()); // drive.joystickDrive()
     elevator.setDefaultCommand(elevator.disableElevator());
     carriage.setDefaultCommand(carriage.stopOrHold());
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
     driver.rightTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    driver
-        .y()
-        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
-    driver
-        .x()
-        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
-    driver
-        .a()
-        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
-    driver
-        .b()
-        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
+    // driver
+    //     .y()
+    //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
+    // driver
+    //     .x()
+    //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
+    // driver
+    //     .a()
+    //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
+    // driver
+    //     .b()
+    //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
+    driver.y().onTrue(drive.setModuleToTest(0));
+    driver.x().onTrue(drive.setModuleToTest(1));
+    driver.a().onTrue(drive.setModuleToTest(2));
+    driver.b().onTrue(drive.setModuleToTest(3));
     driver
         .start()
         .onTrue(
