@@ -78,8 +78,8 @@ public class Module {
     state.cosineScale(getAngle());
 
     // Apply setpoints
-    // io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
-    io.setDriveOpenLoop(0.0);
+    io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
+    // io.setDriveOpenLoop(0.0);
     io.setTurnPosition(state.angle);
   }
 
