@@ -231,6 +231,13 @@ public class Drive extends SubsystemBase {
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
 
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          for (var module : modules) module.setTurnPIDF(turnKp.get());
+        },
+        turnKp);
+
     Util.logSubsystem(this, "Drive");
   }
 

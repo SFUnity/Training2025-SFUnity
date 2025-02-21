@@ -78,7 +78,8 @@ public class Module {
     state.cosineScale(inputs.turnPosition);
 
     // Apply setpoints
-    io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
+    // io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
+    io.setDriveOpenLoop(0.0);
     io.setTurnPosition(state.angle);
   }
 
@@ -96,7 +97,7 @@ public class Module {
 
   /** Returns the current turn angle of the module. */
   public Rotation2d getAngle() {
-    return inputs.turnPosition;
+    return inputs.turnAbsolutePosition;
   }
 
   /** Returns the current drive position of the module in meters. */

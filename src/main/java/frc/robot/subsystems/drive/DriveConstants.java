@@ -133,7 +133,8 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", Constants.onCarpet ? 2 : 2);
+        turnKp =
+            new LoggedTunableNumber("Drive/ModuleTunables/turnKp", Constants.onCarpet ? 0.5 : 2);
         break;
       case SIM:
         turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 14.0);
@@ -164,11 +165,11 @@ public class DriveConstants {
     private static final boolean simMode = Constants.currentMode == Constants.Mode.SIM;
 
     public double getXInput() {
-      return simMode ? -controller.getLeftX() : -controller.getLeftY();
+      return 0.8 * (simMode ? -controller.getLeftX() : -controller.getLeftY());
     }
 
     public double getYInput() {
-      return simMode ? controller.getLeftY() : -controller.getLeftX();
+      return 0.8 * (simMode ? controller.getLeftY() : -controller.getLeftX());
     }
 
     public double getOmegaInput() {

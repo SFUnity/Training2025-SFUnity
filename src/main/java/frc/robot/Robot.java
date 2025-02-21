@@ -404,8 +404,8 @@ public class Robot extends LoggedRobot {
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
-                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
-                        scoreState = Dealgify;
+                      // if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
+                      //   scoreState = Dealgify;
                     })
                 .andThen(
                     Commands.either(
