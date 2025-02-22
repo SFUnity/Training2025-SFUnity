@@ -109,7 +109,8 @@ public final class RobotCommands {
     RightBranch,
     Dealgify,
     ProcessorFront,
-    ProcessorBack
+    ProcessorBack,
+    ScoreL1
   }
 
   public static IntakeState intakeState = Source;
