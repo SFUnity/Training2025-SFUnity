@@ -402,7 +402,9 @@ public class Robot extends LoggedRobot {
                             elevator,
                             carriage,
                             poseManager,
-                            () -> atGoal(drive).getAsBoolean() || driver.leftTrigger().getAsBoolean()),
+                            () ->
+                                atGoal(drive).getAsBoolean()
+                                    || driver.leftTrigger().getAsBoolean()),
                         ScoreL1,
                         scoreCoral(
                             elevator,
