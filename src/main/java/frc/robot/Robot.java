@@ -22,6 +22,8 @@ import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.rightN
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 import static frc.robot.util.AllianceFlipUtil.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -331,6 +333,8 @@ public class Robot extends LoggedRobot {
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
+    boolean testDrive = false;
+
     // Setup rumble
     new Trigger(() -> intake.algaeHeld())
         .onTrue(
@@ -340,36 +344,43 @@ public class Robot extends LoggedRobot {
                 .withTimeout(.5));
 
     // Default cmds
-    drive.setDefaultCommand(drive.moduleTestingCommand()); // drive.joystickDrive()
+    if (testDrive) {
+      drive.setDefaultCommand(drive.moduleTestingCommand());
+    } else {
+      drive.setDefaultCommand(drive.joystickDrive());
+    }
     elevator.setDefaultCommand(elevator.disableElevator());
     carriage.setDefaultCommand(carriage.stopOrHold());
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
     driver.rightTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    // driver
-    //     .y()
-    //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
-    // driver
-    //     .x()
-    //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
-    // driver
-    //     .a()
-    //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
-    // driver
-    //     .b()
-    //     .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
-    // driver
-    //     .start()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d())), drive)
-    //             .ignoringDisable(true));
-    driver.y().onTrue(drive.setModuleToTest(0));
-    driver.x().onTrue(drive.setModuleToTest(1));
-    driver.a().onTrue(drive.setModuleToTest(2));
-    driver.b().onTrue(drive.setModuleToTest(3));
-    driver.start().onTrue(Commands.runOnce(() -> drive.allModules = !drive.allModules));
+    if (testDrive) {
+      driver.y().onTrue(drive.setModuleToTest(0));
+      driver.x().onTrue(drive.setModuleToTest(1));
+      driver.a().onTrue(drive.setModuleToTest(2));
+      driver.b().onTrue(drive.setModuleToTest(3));
+      driver.start().onTrue(Commands.runOnce(() -> drive.allModules = !drive.allModules));
+    } else {
+      driver
+          .y()
+          .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
+      driver
+          .x()
+          .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
+      driver
+          .a()
+          .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
+      driver
+          .b()
+          .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
+      driver
+          .start()
+          .onTrue(
+              Commands.runOnce(
+                      () -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d())), drive)
+                  .ignoringDisable(true));
+    }
     driver
         .back()
         .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
