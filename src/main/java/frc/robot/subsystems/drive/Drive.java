@@ -424,13 +424,13 @@ public class Drive extends SubsystemBase {
             runVelocity(ChassisSpeeds.fromRobotRelativeSpeeds(x, y, omega, gyroInputs.yawPosition));
           } else {
             runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX(),
-                  linearVelocity.getY(),
-                  omega,
-                  AllianceFlipUtil.shouldFlip()
-                      ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
-                      : poseManager.getRotation()));
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                    linearVelocity.getX(),
+                    linearVelocity.getY(),
+                    omega,
+                    AllianceFlipUtil.shouldFlip()
+                        ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
+                        : poseManager.getRotation()));
           }
         })
         .withName("Joystick Drive");
