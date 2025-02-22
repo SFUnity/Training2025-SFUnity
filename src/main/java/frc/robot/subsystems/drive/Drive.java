@@ -388,13 +388,13 @@ public class Drive extends SubsystemBase {
           // Convert to doubles
           double o = config.getOmegaInput();
 
-          // Check for slow mode
-          if (config.slowMode().getAsBoolean()) {
-            o *= config.slowTurnMultiplier().get();
-          }
-
           // Apply deadband
           double omega = MathUtil.applyDeadband(o, DEADBAND);
+
+          // Check for slow mode
+          if (config.slowMode().getAsBoolean()) {
+            omega *= config.slowTurnMultiplier().get();
+          }
 
           // Square values and scale to max velocity
           omega = Math.copySign(omega * omega, omega);
