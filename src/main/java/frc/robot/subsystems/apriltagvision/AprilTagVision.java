@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import frc.robot.constantsGlobal.FieldConstants;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -76,13 +75,13 @@ public class AprilTagVision extends VirtualSubsystem {
               || estimatedPose.equals(new Pose2d())
               // if turning too fast
               || Math.abs(poseManager.robotVelocity().dtheta) > 720
-              // if off the ground
-              || inputs[i].estimatedPose.getY() > 0.15
-              // if off field
-              || estimatedPose.getX() < -fieldBorderMargin
-              || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
-              || estimatedPose.getY() < -fieldBorderMargin
-              || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
+          // if off the ground
+          // || inputs[i].estimatedPose.getY() > 0.15
+          // if off field
+          // || estimatedPose.getX() < -fieldBorderMargin
+          // || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
+          // || estimatedPose.getY() < -fieldBorderMargin
+          // || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
           // if too far away from current pose, depends on amount of apriltags
           // || poseManager.getDistanceTo(estimatedPose) > allowableDistance
           ;
@@ -92,11 +91,6 @@ public class AprilTagVision extends VirtualSubsystem {
         robotPosesRejected.add(inputs[i].estimatedPose);
       } else {
         robotPosesAccepted.add(inputs[i].estimatedPose);
-      }
-
-      // Skip if rejected
-      if (isRejected) {
-        continue;
       }
 
       // Smaller number = more trust
@@ -130,7 +124,9 @@ public class AprilTagVision extends VirtualSubsystem {
       Matrix<N3, N1> stdDevs = VecBuilder.fill(trust, trust, 99999);
 
       // Add result because all checks passed
-      poseManager.addVisionMeasurement(estimatedPose, inputs[i].timestamp, stdDevs);
+      if (!isRejected) {
+        poseManager.addVisionMeasurement(estimatedPose, inputs[i].timestamp, stdDevs);
+      }
 
       // Log camera datadata
       Logger.recordOutput(
