@@ -17,7 +17,7 @@ public class AprilTagVisionConstants {
   public static final double leftForwardOffset = Units.inchesToMeters(11.285); // meters
   public static final double leftSideOffset = Units.inchesToMeters(7.683); // meters
   public static final double leftHeightOffset = Units.inchesToMeters(8.252); // meters
-  public static final double leftRoll = 0; // degrees
+  public static final double leftRoll = 180; // degrees
   public static final double leftPitch = -20; // degrees
   public static final double leftYaw = 25; // degrees
   public static final double[] leftPosition = {
@@ -28,7 +28,7 @@ public class AprilTagVisionConstants {
   public static final double rightForwardOffset = Units.inchesToMeters(11.285); // meters
   public static final double rightSideOffset = Units.inchesToMeters(-7.683); // meters
   public static final double rightHeightOffset = Units.inchesToMeters(8.252); // meters
-  public static final double rightRoll = 0; // degrees
+  public static final double rightRoll = 180; // degrees
   public static final double rightPitch = -20; // degrees
   public static final double rightYaw = -25; // degrees
   public static final double[] rightPosition = {
