@@ -855,7 +855,7 @@ public class Drive extends SubsystemBase {
 
   public Command moduleTestingCommand() {
     return run(() -> {
-          double driveInput = MathUtil.applyDeadband(config.getYInput(), DEADBAND);
+          double driveInput = MathUtil.applyDeadband(config.getXInput(), DEADBAND);
           double turnInput = MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND);
           if (allModules) {
             for (int i = 0; i < 4; i++) {
