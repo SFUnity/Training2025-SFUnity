@@ -54,7 +54,7 @@ public class Carriage extends SubsystemBase {
       realAlgaeHeld = true;
     }
 
-    Logger.recordOutput("Coral/coralPassed", coralPassed);
+    Logger.recordOutput("Carriage/coralPassed", coralPassed);
 
     Util.logSubsystem(this, "Carriage");
 
