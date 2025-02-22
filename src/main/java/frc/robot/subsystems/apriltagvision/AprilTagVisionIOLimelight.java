@@ -87,7 +87,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     if (observation.timestampSeconds != 0) {
       lastTimestamp = observation.timestampSeconds;
     }
-    disconnectedAlert.set(Timer.getFPGATimestamp() - lastTimestamp < disconnectedTimeout);
+    // disconnectedAlert.set(Timer.getFPGATimestamp() - lastTimestamp < disconnectedTimeout);
 
     // dynamicCropping();
   }
