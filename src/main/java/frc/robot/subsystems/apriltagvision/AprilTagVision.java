@@ -88,8 +88,7 @@ public class AprilTagVision extends VirtualSubsystem {
               || estimatedPose.getY() < -fieldBorderMargin
               || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
               // if too far away from current pose, depends on amount of apriltags
-              || (poseManager.getDistanceTo(estimatedPose) > allowableDistance
-                  && poseManager.getDistanceTo(new Pose2d()) > 0.75);
+              || poseManager.getDistanceTo(estimatedPose) > allowableDistance;
 
       Logger.recordOutput("distanceToBlankPose", poseManager.getDistanceTo(new Pose2d()));
 
