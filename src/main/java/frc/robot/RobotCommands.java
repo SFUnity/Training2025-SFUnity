@@ -129,7 +129,7 @@ public final class RobotCommands {
                                 })
                             .until(carriage::coralHeld)
                             .asProxy(),
-                        carriage.intakeCoral(),
+                        carriage.intakeCoral().asProxy(),
                         () -> poseManager.distanceToStationFace() < 0.5),
                     carriage.intakeCoral().asProxy(),
                     () -> allowHeadingAlign),
