@@ -2,7 +2,6 @@ package frc.robot.subsystems.apriltagvision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.util.Units;
 
 public class AprilTagVisionConstants {
   public static final double fieldBorderMargin = 0.2; // meters
