@@ -406,14 +406,8 @@ public class Robot extends LoggedRobot {
                                 allowAutoDrive
                                     ? atGoal(drive).getAsBoolean()
                                     : driver.leftTrigger().getAsBoolean()),
-                        ScoreL1,
-                        scoreCoral(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () ->
-                                poseManager.getDistanceTo(poseManager.closest(scoreState))
-                                    < elevatorSafeExtensionDistanceMeters.get()),
+                                    ScoreL1,
+                                    scoreCoral(elevator, carriage, poseManager, () -> poseManager.getDistanceTo(poseManager.closest(scoreState)) < elevatorSafeExtensionDistanceMeters.get()),
                         Dealgify,
                         dealgify(elevator, carriage, poseManager),
                         ProcessorFront,
@@ -453,9 +447,7 @@ public class Robot extends LoggedRobot {
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     operator.x().onTrue(elevator.request(L2));
-    operator
-        .a()
-        .onTrue(elevator.request(L1).alongWith(Commands.runOnce(() -> scoreState = ScoreL1)));
+    operator.a().onTrue(elevator.request(L1).alongWith(Commands.runOnce(() -> scoreState = ScoreL1)));
     operator
         .b()
         .onTrue(
@@ -489,7 +481,8 @@ public class Robot extends LoggedRobot {
     new Trigger(carriage::coralHeld)
         .and(() -> allowHeadingAlign)
         .and(DriverStation::isTeleop)
-        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+        .whileTrue(drive.headingDrive(() ->
+    poseManager.getHorizontalAngleTo(apply(reefCenter))));
 
     new Trigger(carriage::algaeHeld)
         .and(DriverStation::isTeleop)
