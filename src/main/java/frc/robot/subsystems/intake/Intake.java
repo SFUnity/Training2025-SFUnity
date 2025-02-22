@@ -75,7 +75,7 @@ public class Intake extends SubsystemBase {
     }
 
     // Check if the pivot is raised high current
-    if (!lowered && filteredCurrent > 10 && !runningIceCream) {
+    if (!lowered && filteredCurrent > 20 && !runningIceCream) {
       hasAlgae = false;
     }
 
