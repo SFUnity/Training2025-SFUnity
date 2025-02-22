@@ -479,7 +479,8 @@ public class Robot extends LoggedRobot {
     // new Trigger(carriage::coralHeld)
     //     .and(() -> allowHeadingAlign)
     //     .and(DriverStation::isTeleop)
-    //     .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+    //     .whileTrue(drive.headingDrive(() ->
+    // poseManager.getHorizontalAngleTo(apply(reefCenter))));
 
     new Trigger(carriage::algaeHeld)
         .and(DriverStation::isTeleop)
