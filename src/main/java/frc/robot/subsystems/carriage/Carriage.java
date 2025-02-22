@@ -69,8 +69,6 @@ public class Carriage extends SubsystemBase {
         coralPassed = true;
       } else if (!inputs.beamBreak && coralPassed) {
         realCoralHeld = true;
-      } else if (realCoralHeld && inputs.beamBreak && coralPassed) {
-        coralPassed = false;
       }
     }
   }
@@ -92,7 +90,14 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command stopOrHold() {
-    return run(() -> io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0)).withName("stop");
+    return run(() -> {
+          if (!inputs.beamBreak && realCoralHeld) {
+            io.runVolts(-holdSpeedVolts.get());
+          } else {
+            io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
+          }
+        })
+        .withName("stop");
   }
 
   public Command backUpForL3() {
@@ -105,7 +110,9 @@ public class Carriage extends SubsystemBase {
 
   public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeedVolts.get()))
-        .until(() -> !realCoralHeld)
+        .until(() -> !inputs.beamBreak)
+        .andThen(() -> realCoralHeld = false)
+        .andThen(() -> coralPassed = false)
         .withName("placeCoral");
   }
 
