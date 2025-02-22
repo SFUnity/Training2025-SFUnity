@@ -142,6 +142,15 @@ public class Intake extends SubsystemBase {
         .withName("poop");
   }
 
+  public Command iceCreamCmd() {
+    return run(() -> {
+          raise();
+          rollersIn();
+        })
+        .until(this::algaeHeld)
+        .withName("iceCream");
+  }
+
   @AutoLogOutput
   public boolean algaeHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {

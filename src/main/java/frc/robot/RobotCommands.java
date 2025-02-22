@@ -134,8 +134,9 @@ public final class RobotCommands {
                 Ice_Cream,
                 elevator
                     .request(IceCream)
-                    .andThen(
-                        elevator.enableElevator().alongWith(carriage.lowDealgify().asProxy()))),
+                    .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
+                    .raceWith(intake.iceCreamCmd())
+                    .asProxy()),
             () -> intakeState)
         .withName("fullIntake");
   }
