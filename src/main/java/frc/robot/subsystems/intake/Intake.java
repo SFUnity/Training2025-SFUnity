@@ -50,7 +50,7 @@ public class Intake extends SubsystemBase {
 
     // * There's a specific pattern in the current draw of the rollers that we're checking for here
     // Check that the pivot is lowered and not rising
-    if (inputs.pivotAppliedVolts <= 0.5 && lowered || runningIceCream) {
+    if ((inputs.pivotAppliedVolts <= 0.5 && lowered) || runningIceCream) {
       // Check if the current is high enough to be intaking
       if (filteredCurrent >= spikeCurrent.get()) {
         // check for start of intaking
@@ -78,6 +78,8 @@ public class Intake extends SubsystemBase {
     if (!lowered && filteredCurrent > 10) {
       hasAlgae = false;
     }
+
+    Logger.recordOutput("Intake/runningIceCream", runningIceCream);
 
     // Logs
     measuredVisualizer.update(Degrees.of(inputs.pivotCurrentPositionDeg));
