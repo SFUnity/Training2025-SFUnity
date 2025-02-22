@@ -388,7 +388,7 @@ public class Robot extends LoggedRobot {
         .back()
         .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
-    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, poseManager));
+    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, elevator, poseManager));
     driver
         .leftBumper()
         .whileTrue(

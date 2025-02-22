@@ -115,7 +115,7 @@ public final class RobotCommands {
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive, Carriage carriage, Intake intake, PoseManager poseManager) {
+      Drive drive, Carriage carriage, Intake intake, Elevator elevator, PoseManager poseManager) {
     return select(
             Map.of(
                 Source,
@@ -132,7 +132,7 @@ public final class RobotCommands {
                 Ground,
                 intake.intakeCmd().asProxy(),
                 Ice_Cream,
-                carriage.lowDealgify().asProxy()),
+                elevator.request(IceCream).andThen(elevator.enableElevator().alongWith(carriage.lowDealgify().asProxy()))),
             () -> intakeState)
         .withName("fullIntake");
   }
