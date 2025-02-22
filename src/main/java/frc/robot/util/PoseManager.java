@@ -39,7 +39,7 @@ public class PoseManager {
           DriveConstants.kinematics,
           rawGyroRotation,
           lastModulePositions,
-          new Pose2d(2.8, 3.8, new Rotation2d()));
+          new Pose2d());
 
   public PoseManager() {}
 

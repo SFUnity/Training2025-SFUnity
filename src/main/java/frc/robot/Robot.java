@@ -381,7 +381,7 @@ public class Robot extends LoggedRobot {
           .start()
           .onTrue(
               Commands.runOnce(
-                      () -> poseManager.setPose(new Pose2d(3.23, 4.203, new Rotation2d())), drive)
+                      () -> poseManager.setPose(new Pose2d(poseManager.getTranslation(), new Rotation2d())), drive)
                   .ignoringDisable(true));
     }
     driver
