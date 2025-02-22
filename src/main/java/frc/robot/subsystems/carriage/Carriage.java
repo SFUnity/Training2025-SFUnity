@@ -81,6 +81,14 @@ public class Carriage extends SubsystemBase {
     return realCoralHeld;
   }
 
+  public Command resetCoralHeld() {
+    return Commands.runOnce(
+        () -> {
+          realCoralHeld = false;
+          coralPassed = false;
+        });
+  }
+
   @AutoLogOutput
   public boolean algaeHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
