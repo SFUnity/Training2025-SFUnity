@@ -488,15 +488,15 @@ public class Robot extends LoggedRobot {
         .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
     // All the time
-    new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
-        .and(() -> !carriage.algaeHeld())
-        .and(() -> allowHeadingAlign)
-        .and(
-            () -> {
-              if (DriverStation.isTeleop()) return intakeState == Source;
-              return true;
-            })
-        .whileTrue(carriage.intakeCoral().onlyIf(() -> !carriage.coralHeld()));
+    // new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
+    //     .and(() -> !carriage.algaeHeld())
+    //     .and(() -> allowHeadingAlign)
+    //     .and(
+    //         () -> {
+    //           if (DriverStation.isTeleop()) return intakeState == Source;
+    //           return true;
+    //         })
+    //     .whileTrue(carriage.intakeCoral().onlyIf(() -> !carriage.coralHeld()));
 
     // Sim fake gamepieces
     SmartDashboard.putData(
