@@ -23,7 +23,7 @@ public class ElevatorConstants {
   public static final double carrageMassKg = Units.lbsToKilograms(15);
   public static final double drumRadiusMeters = Units.inchesToMeters(1.4);
   public static final double minHeightInches = 0;
-  public static final double maxHeightInches = 22.7;
+  public static final double maxHeightInches = 22.3;
   public static final double gearRatio = 9;
   public static final double wheelRadius = 0.44444;
 
