@@ -120,7 +120,7 @@ public final class RobotCommands {
     return select(
             Map.of(
                 Source,
-                parallel(
+                either(
                     drive
                         .headingDrive(
                             () -> {
@@ -128,7 +128,8 @@ public final class RobotCommands {
                             })
                         .until(carriage::coralHeld)
                         .asProxy(),
-                    carriage.intakeCoral().asProxy()),
+                    carriage.intakeCoral().asProxy(),
+                    () -> allowHeadingAlign),
                 Ground,
                 intake.intakeCmd().asProxy(),
                 Ice_Cream,
