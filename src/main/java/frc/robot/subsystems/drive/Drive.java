@@ -71,6 +71,9 @@ public class Drive extends SubsystemBase {
   private final DriveCommandsConfig config;
   private static final double DEADBAND = 0.1;
 
+  private static final LoggedTunableNumber povMovementSpeed =
+      new LoggedTunableNumber("Drive/POV Movement Speed", 0.5);
+
   private static final LoggedTunableNumber linearkP =
       new LoggedTunableNumber("Drive/Commands/Linear/kP", 3.5);
   private static final LoggedTunableNumber linearkD =
@@ -403,8 +406,24 @@ public class Drive extends SubsystemBase {
           // Get linear velocity
           Translation2d linearVelocity = getLinearVelocityFromJoysticks();
 
+          // Get pov movement
+          double x = 0;
+          double y = 0;
+          if (config.povDownPressed()) {
+            x = -povMovementSpeed.get();
+          } else if (config.povUpPressed()) {
+            x = povMovementSpeed.get();
+          } else if (config.povLeftPressed()) {
+            y = povMovementSpeed.get();
+          } else if (config.povRightPressed()) {
+            y = -povMovementSpeed.get();
+          }
+
           // Convert to field relative speeds & send command
-          runVelocity(
+          if (x > 0 || y > 0) {
+            runVelocity(ChassisSpeeds.fromRobotRelativeSpeeds(x, y, omega, gyroInputs.yawPosition));
+          } else {
+            runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   linearVelocity.getX(),
                   linearVelocity.getY(),
@@ -412,6 +431,7 @@ public class Drive extends SubsystemBase {
                   AllianceFlipUtil.shouldFlip()
                       ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
                       : poseManager.getRotation()));
+          }
         })
         .withName("Joystick Drive");
   }
@@ -523,18 +543,6 @@ public class Drive extends SubsystemBase {
     // Convert to doubles
     double x = config.getXInput();
     double y = config.getYInput();
-
-    // The speed value here might need to change
-    double povMovementSpeed = 0.5;
-    if (config.povDownPressed()) {
-      x = -povMovementSpeed;
-    } else if (config.povUpPressed()) {
-      x = povMovementSpeed;
-    } else if (config.povLeftPressed()) {
-      y = povMovementSpeed;
-    } else if (config.povRightPressed()) {
-      y = -povMovementSpeed;
-    }
 
     // Check for slow mode
     if (config.slowMode().getAsBoolean()) {
