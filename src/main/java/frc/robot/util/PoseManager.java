@@ -36,10 +36,7 @@ public class PoseManager {
 
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(
-          DriveConstants.kinematics,
-          rawGyroRotation,
-          lastModulePositions,
-          new Pose2d());
+          DriveConstants.kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   public PoseManager() {}
 
