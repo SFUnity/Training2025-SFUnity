@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.robot.constantsGlobal.FieldConstants;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -76,12 +77,12 @@ public class AprilTagVision extends VirtualSubsystem {
               // if turning too fast
               || Math.abs(poseManager.robotVelocity().dtheta) > 720
           // if off the ground
-          // || inputs[i].estimatedPose.getY() > 0.15
+          || inputs[i].estimatedPose.getY() > 0.15
           // if off field
-          // || estimatedPose.getX() < -fieldBorderMargin
-          // || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
-          // || estimatedPose.getY() < -fieldBorderMargin
-          // || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
+          || estimatedPose.getX() < -fieldBorderMargin
+          || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
+          || estimatedPose.getY() < -fieldBorderMargin
+          || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
           // if too far away from current pose, depends on amount of apriltags
           // || poseManager.getDistanceTo(estimatedPose) > allowableDistance
           ;
