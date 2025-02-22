@@ -122,9 +122,9 @@ public class Robot extends LoggedRobot {
 
   public boolean slowMode = true;
   private final LoggedTunableNumber slowDriveMultiplier =
-      new LoggedTunableNumber("Slow Drive Multiplier", 0.9);
+      new LoggedTunableNumber("Slow Drive Multiplier", 1);
   private final LoggedTunableNumber slowTurnMultiplier =
-      new LoggedTunableNumber("Slow Turn Multiplier", 0.4);
+      new LoggedTunableNumber("Slow Turn Multiplier", 0.7);
 
   private final DriveCommandsConfig driveCommandsConfig =
       new DriveCommandsConfig(driver, () -> slowMode, slowDriveMultiplier, slowTurnMultiplier);
