@@ -67,7 +67,7 @@ public class AprilTagVision extends VirtualSubsystem {
 
       // Exit if there are no tags in sight or the pose is blank or the robot is spinning too fast
       // These are the basic checks LL recommends
-      // double allowableDistance = inputs[i].tagCount;
+      double allowableDistance = inputs[i].tagCount;
       boolean isRejected =
           // true if
           // If no tags
@@ -83,9 +83,8 @@ public class AprilTagVision extends VirtualSubsystem {
               || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
               || estimatedPose.getY() < -fieldBorderMargin
               || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
-          // if too far away from current pose, depends on amount of apriltags
-          // || poseManager.getDistanceTo(estimatedPose) > allowableDistance
-          ;
+              // if too far away from current pose, depends on amount of apriltags
+              || (poseManager.getDistanceTo(estimatedPose) > allowableDistance && poseManager.getDistanceTo(new Pose2d()) > 0.2);
 
       robotPoses.add(inputs[i].estimatedPose);
       if (isRejected) {
