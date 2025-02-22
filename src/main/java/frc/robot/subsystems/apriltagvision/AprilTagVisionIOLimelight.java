@@ -19,8 +19,8 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private final Alert disconnectedAlert;
   private double lastTimestamp = 0;
 
-  private final double DEFAUlT_CROP = 0.9;
-  private final double CROP_BUFFER = 0.1;
+  private final double DEFAUlT_CROP = 1;
+  // private final double CROP_BUFFER = 0.1;
 
   public AprilTagVisionIOLimelight(String camName) {
     name = camName;
@@ -51,6 +51,9 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         position[4], // Pitch (degrees)
         position[5] // Yaw (degrees)
         );
+
+    // int[] goodIDs = {12, 16};
+    // SetFiducialIDFiltersOverride(name, goodIDs);
   }
 
   @Override

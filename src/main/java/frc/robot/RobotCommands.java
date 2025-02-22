@@ -25,6 +25,7 @@ import org.littletonrobotics.junction.Logger;
 /** Put high level commands here */
 public final class RobotCommands {
   public static boolean allowAutoDrive = false;
+  public static boolean allowHeadingAlign = false;
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
@@ -114,16 +115,10 @@ public final class RobotCommands {
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive,
-      Carriage carriage,
-      Intake intake,
-      PoseManager poseManager,
-      BooleanSupplier allowAutoDrive) {
+      Drive drive, Carriage carriage, Intake intake, Elevator elevator, PoseManager poseManager) {
     return select(
             Map.of(
                 Source,
-                // Maybe should change so that even if most of poseEstimation isn't working, this
-                // does
                 either(
                     drive
                         .headingDrive(
@@ -133,11 +128,15 @@ public final class RobotCommands {
                         .until(carriage::coralHeld)
                         .asProxy(),
                     carriage.intakeCoral().asProxy(),
-                    allowAutoDrive),
+                    () -> allowHeadingAlign),
                 Ground,
                 intake.intakeCmd().asProxy(),
                 Ice_Cream,
-                carriage.lowDealgify().asProxy()),
+                elevator
+                    .request(IceCream)
+                    .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
+                    .raceWith(intake.iceCreamCmd())
+                    .asProxy()),
             () -> intakeState)
         .withName("fullIntake");
   }
