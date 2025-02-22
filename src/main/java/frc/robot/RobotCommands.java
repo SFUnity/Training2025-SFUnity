@@ -121,13 +121,15 @@ public final class RobotCommands {
             Map.of(
                 Source,
                 either(
-                    drive
+                    either(drive
                         .headingDrive(
                             () -> {
                               return poseManager.closestStation().getRotation();
                             })
                         .until(carriage::coralHeld)
                         .asProxy(),
+                        carriage.intakeCoral(),
+                        () -> poseManager.distanceToStationFace() < 0.5),
                     carriage.intakeCoral().asProxy(),
                     () -> allowHeadingAlign),
                 Ground,
