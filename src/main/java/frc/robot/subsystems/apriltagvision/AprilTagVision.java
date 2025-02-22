@@ -76,13 +76,13 @@ public class AprilTagVision extends VirtualSubsystem {
               || estimatedPose.equals(new Pose2d())
               // if turning too fast
               || Math.abs(poseManager.robotVelocity().dtheta) > 720
-          // if off the ground
-          || inputs[i].estimatedPose.getY() > 0.15
-          // if off field
-          || estimatedPose.getX() < -fieldBorderMargin
-          || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
-          || estimatedPose.getY() < -fieldBorderMargin
-          || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
+              // if off the ground
+              || inputs[i].estimatedPose.getZ() > 0.15
+              // if off field
+              || estimatedPose.getX() < -fieldBorderMargin
+              || estimatedPose.getX() > FieldConstants.fieldLength + fieldBorderMargin
+              || estimatedPose.getY() < -fieldBorderMargin
+              || estimatedPose.getY() > FieldConstants.fieldWidth + fieldBorderMargin
           // if too far away from current pose, depends on amount of apriltags
           // || poseManager.getDistanceTo(estimatedPose) > allowableDistance
           ;
