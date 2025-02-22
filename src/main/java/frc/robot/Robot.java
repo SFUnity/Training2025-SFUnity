@@ -120,11 +120,11 @@ public class Robot extends LoggedRobot {
   private final Alert operatorDisconnected =
       new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
 
-  public boolean slowMode = false;
+  public boolean slowMode = true;
   private final LoggedTunableNumber slowDriveMultiplier =
-      new LoggedTunableNumber("Slow Drive Multiplier", 0.6);
+      new LoggedTunableNumber("Slow Drive Multiplier", 0.9);
   private final LoggedTunableNumber slowTurnMultiplier =
-      new LoggedTunableNumber("Slow Turn Multiplier", 0.5);
+      new LoggedTunableNumber("Slow Turn Multiplier", 0.4);
 
   private final DriveCommandsConfig driveCommandsConfig =
       new DriveCommandsConfig(driver, () -> slowMode, slowDriveMultiplier, slowTurnMultiplier);
