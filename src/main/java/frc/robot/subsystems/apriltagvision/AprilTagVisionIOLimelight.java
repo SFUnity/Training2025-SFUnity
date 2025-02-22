@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
-import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.PoseManager;
 import java.util.HashSet;
@@ -21,7 +20,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private double lastTimestamp = 0;
 
   private final double DEFAUlT_CROP = 1;
-  private final double CROP_BUFFER = 0.1;
+  // private final double CROP_BUFFER = 0.1;
 
   public AprilTagVisionIOLimelight(String camName) {
     name = camName;
@@ -53,8 +52,8 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
         position[5] // Yaw (degrees)
         );
 
-    int[] goodIDs = {12, 16};
-    LimelightHelpers.SetFiducialIDFiltersOverride(name, goodIDs);
+    // int[] goodIDs = {12, 16};
+    // SetFiducialIDFiltersOverride(name, goodIDs);
   }
 
   @Override
