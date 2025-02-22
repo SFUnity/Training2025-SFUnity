@@ -132,7 +132,10 @@ public final class RobotCommands {
                 Ground,
                 intake.intakeCmd().asProxy(),
                 Ice_Cream,
-                elevator.request(IceCream).andThen(elevator.enableElevator().alongWith(carriage.lowDealgify().asProxy()))),
+                elevator
+                    .request(IceCream)
+                    .andThen(
+                        elevator.enableElevator().alongWith(carriage.lowDealgify().asProxy()))),
             () -> intakeState)
         .withName("fullIntake");
   }
