@@ -5,6 +5,8 @@ import static frc.robot.RobotCommands.allowAutoDrive;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -41,6 +43,8 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
   private final SysIdRoutine elevatorRoutine;
   private final PoseManager poseManager;
+
+  private BooleanSupplier algaeInCarriage;
 
   private final LoggedTunableNumber safeDropDist =
       new LoggedTunableNumber("Elevator/SafeDropDist", 0.3);
@@ -88,7 +92,11 @@ public class Elevator extends SubsystemBase {
       if (Carriage.coralInDanger) {
         pid.setGoal(L3.get());
       } else {
-        pid.setGoal(0);
+        if (algaeInCarriage.getAsBoolean()) {
+          pid.setGoal(5);
+        } else {
+          pid.setGoal(0);
+        }
       }
     }
 
@@ -130,7 +138,8 @@ public class Elevator extends SubsystemBase {
     return run(() -> setHeight = true).until(this::atGoalHeight).withName("enableElevator");
   }
 
-  public Command disableElevator() {
+  public Command disableElevator(BooleanSupplier algaeInCarriage) {
+    this.algaeInCarriage = algaeInCarriage;
     return runOnce(() -> setHeight = false).withName("disableElevator");
   }
 
