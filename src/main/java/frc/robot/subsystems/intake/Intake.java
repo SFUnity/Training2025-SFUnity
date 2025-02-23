@@ -88,6 +88,10 @@ public class Intake extends SubsystemBase {
     Util.logSubsystem(this, "Intake");
   }
 
+  public Command resetAlgaeHeld() {
+    return Commands.runOnce(() -> hasAlgae = false);
+  }
+
   private void lower() {
     positionSetpoint = loweredAngle.get();
     io.setPivotPosition(positionSetpoint);
