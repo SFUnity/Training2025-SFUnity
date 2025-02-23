@@ -426,7 +426,7 @@ public class Robot extends LoggedRobot {
                     Commands.either(
                         drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
                         Commands.none(),
-                        () -> allowAutoDrive && scoreState != ScoreL1))
+                        () -> allowAutoDrive && scoreState != ScoreL1 && scoreState != Dealgify))
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
