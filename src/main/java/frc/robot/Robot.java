@@ -299,8 +299,6 @@ public class Robot extends LoggedRobot {
 
     // Check CAN status
     var canStatus = RobotController.getCANStatus();
-    Logger.recordOutput("SystemStats/transmitErrorCount", canStatus.transmitErrorCount);
-    Logger.recordOutput("SystemStats/receiveErrorCount", canStatus.receiveErrorCount);
     if (canStatus.transmitErrorCount > 0 || canStatus.receiveErrorCount > 0) {
       canErrorTimer.restart();
     }
