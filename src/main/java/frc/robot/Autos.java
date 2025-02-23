@@ -45,7 +45,7 @@ public class Autos {
 
   private final LoggedDashboardChooser<Command> nonChoreoChooser =
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
-  private static final boolean isChoreoAuto = false;
+  private static final boolean isChoreoAuto = true;
 
   private int coralOnL3 = 0;
   private int coralOnL2 = 0;
@@ -156,7 +156,12 @@ public class Autos {
                 .andThen(
                     // Dealgify
                     runOnce(() -> scoreState = Dealgify),
-                    dealgify(elevator, carriage, poseManager)
+                    dealgify(
+                            elevator,
+                            carriage,
+                            poseManager,
+                            () -> CenterWallToLKAlgae.getFinalPose().get(),
+                            () -> !CenterWallToLKAlgae.active().getAsBoolean())
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     // Start next path once algae is held
@@ -255,9 +260,9 @@ public class Autos {
                 .andThen(
                     // Dealgify
                     runOnce(() -> scoreState = Dealgify),
-                    dealgify(elevator, carriage, poseManager)
-                        .asProxy()
-                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    // dealgify(elevator, carriage, poseManager)
+                    //     .asProxy()
+                    //     .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     // Start next path once algae is held
                     KLAlgaeToStationHigh.cmd())
                 .withName("DealgifyThenGoToStationHigh"));
@@ -348,9 +353,9 @@ public class Autos {
                 .andThen(
                     // Dealgify
                     runOnce(() -> scoreState = Dealgify),
-                    dealgify(elevator, carriage, poseManager)
-                        .asProxy()
-                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    // dealgify(elevator, carriage, poseManager)
+                    //     .asProxy()
+                    //     .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     Commands.waitSeconds(delayAfterAlgaeIntake.get()),
                     // Start next path once algae is held
                     hGToProcessorScore.cmd())
@@ -391,9 +396,9 @@ public class Autos {
         .onTrue(
             runOnce(() -> scoreState = Dealgify)
                 .andThen(
-                    dealgify(elevator, carriage, poseManager)
-                        .asProxy()
-                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    // dealgify(elevator, carriage, poseManager)
+                    //     .asProxy()
+                    //     .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     Commands.waitSeconds(delayAfterAlgaeIntake.get()),
                     hGToProcessorScore.cmd()));
 
@@ -433,9 +438,9 @@ public class Autos {
         .onTrue(
             runOnce(() -> scoreState = Dealgify)
                 .andThen(
-                    dealgify(elevator, carriage, poseManager)
-                        .asProxy()
-                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                    // dealgify(elevator, carriage, poseManager)
+                    //     .asProxy()
+                    //     .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     Commands.waitSeconds(delayAfterAlgaeIntake.get()),
                     hGToProcessorScore.cmd()));
 
