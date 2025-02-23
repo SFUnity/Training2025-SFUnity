@@ -63,27 +63,20 @@ public class Carriage extends SubsystemBase {
   }
 
   public void updateCoralStatus() {
-    if (Constants.currentMode == Constants.Mode.SIM) {
-      realCoralHeld = simHasCoral;
-    } else {
-      if (!beamBreak() && !coralPassed) {
-        realCoralHeld = false;
-      } else if (!beamBreak() && coralPassed) {
-        realCoralHeld = true;
-      } else if (beamBreak() && !coralPassed && !realCoralHeld) {
-        coralPassed = true;
-      }
-      // } else if (beamBreak() && coralPassed && realCoralHeld){
-      //   coralPassed = false;
-      // }
+
+    if (!beamBreak() && !coralPassed) {
+      realCoralHeld = false;
+    } else if (!beamBreak() && coralPassed) {
+      realCoralHeld = true;
+    } else if (beamBreak() && !coralPassed && !realCoralHeld) {
+      coralPassed = true;
+    } else if (beamBreak() && coralPassed && realCoralHeld) {
+      coralPassed = false;
     }
   }
 
   @AutoLogOutput
   public boolean coralHeld() {
-    if (Constants.currentMode == Constants.Mode.SIM) {
-      return simHasCoral;
-    }
     return realCoralHeld;
   }
 
