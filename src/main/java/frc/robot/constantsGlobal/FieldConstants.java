@@ -224,19 +224,4 @@ public final class FieldConstants {
     public final Branch rightBranch;
     public final boolean highAlgae;
   }
-
-  // TODO replace with robot heights instead
-  public static enum ReefHeight {
-    L3(Units.inchesToMeters(47.625)),
-    L2(Units.inchesToMeters(31.875)),
-    L1(Units.inchesToMeters(18)),
-    AlgaeHigh(Units.inchesToMeters(55)),
-    AlgaeLow(Units.inchesToMeters(40));
-
-    ReefHeight(double height) {
-      this.height = height;
-    }
-
-    public final double height;
-  }
 }

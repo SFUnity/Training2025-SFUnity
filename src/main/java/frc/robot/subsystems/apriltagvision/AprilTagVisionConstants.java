@@ -10,7 +10,6 @@ public class AprilTagVisionConstants {
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-  // TODO this all needs testing to see if it's correct
   public static final String leftName = "limelight-left";
   // Change the camera pose relative to robot center (x forward, y left, z up, degrees)
   public static final double leftForwardOffset = 0.29; // meters
