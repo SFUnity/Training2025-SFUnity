@@ -1,7 +1,9 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.RobotCommands.allowAutoDrive;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -13,9 +15,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.RobotCommands;
+import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -35,12 +41,20 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
   private final SysIdRoutine elevatorRoutine;
+  private final PoseManager poseManager;
+
+  private BooleanSupplier algaeInCarriage;
+  private final LoggedTunableNumber algeInCarriageHeight =
+      new LoggedTunableNumber("Elevator/algeInCarriageHeight", 5);
+  private final LoggedTunableNumber safeDropDist =
+      new LoggedTunableNumber("Elevator/SafeDropDist", 0.3);
 
   public boolean setHeight = false;
   public double goalHeightInches = 0;
 
-  public Elevator(ElevatorIO io) {
+  public Elevator(ElevatorIO io, PoseManager poseManager) {
     this.io = io;
+    this.poseManager = poseManager;
 
     pid.setTolerance(elevatorDistanceToleranceInches);
     // Create the SysId routine
@@ -64,11 +78,26 @@ public class Elevator extends SubsystemBase {
 
     updateTunables();
 
-    if (setHeight) {
-      pid.setGoal(goalHeightInches);
-
+    if (setHeight
+        || (poseManager.getDistanceTo(poseManager.closest(RobotCommands.scoreState))
+                < safeDropDist.get()
+            && inputs.position > 1
+            && allowAutoDrive)) {
+      if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
+        pid.setGoal(L3.get());
+      } else {
+        pid.setGoal(goalHeightInches);
+      }
     } else {
-      pid.setGoal(0);
+      if (Carriage.coralInDanger) {
+        pid.setGoal(L3.get());
+      } else {
+        if (algaeInCarriage.getAsBoolean()) {
+          pid.setGoal(algeInCarriageHeight.get());
+        } else {
+          pid.setGoal(0);
+        }
+      }
     }
 
     io.runVolts(
@@ -100,17 +129,27 @@ public class Elevator extends SubsystemBase {
         goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
   }
 
+  @AutoLogOutput
+  public boolean pastL3Height() {
+    return pastL3Height.get() <= inputs.position;
+  }
+
   public Command enableElevator() {
     return run(() -> setHeight = true).until(this::atGoalHeight).withName("enableElevator");
   }
 
-  public Command disableElevator() {
-
+  public Command disableElevator(BooleanSupplier algaeInCarriage) {
+    this.algaeInCarriage = algaeInCarriage;
     return runOnce(() -> setHeight = false).withName("disableElevator");
   }
 
   public Command request(ElevatorHeight height) {
-    return runOnce(() -> goalHeightInches = height.get()).withName("request" + height.toString());
+    return runOnce(
+            () -> {
+              goalHeightInches = height.get();
+              Logger.recordOutput("Elevator/RequestedHeight", height.toString());
+            })
+        .withName("request" + height.toString());
   }
 
   public Command runCurrentZeroing() {

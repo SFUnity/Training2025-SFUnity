@@ -75,11 +75,17 @@ public class Module {
   public void runSetpoint(SwerveModuleState state) {
     // Optimize velocity setpoint
     state.optimize(getAngle());
-    state.cosineScale(inputs.turnPosition);
+    state.cosineScale(getAngle());
 
     // Apply setpoints
     io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
+    // io.setDriveOpenLoop(0.0);
     io.setTurnPosition(state.angle);
+  }
+
+  public void test(double driveVoltage, double turnVoltage) {
+    io.setDriveOpenLoop(driveVoltage);
+    io.setTurnOpenLoop(turnVoltage);
   }
 
   /** Runs the module with the specified output while controlling to zero degrees. */
@@ -96,7 +102,7 @@ public class Module {
 
   /** Returns the current turn angle of the module. */
   public Rotation2d getAngle() {
-    return inputs.turnPosition;
+    return inputs.turnAbsolutePosition;
   }
 
   /** Returns the current drive position of the module in meters. */

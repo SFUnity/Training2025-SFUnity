@@ -4,6 +4,7 @@ import static frc.robot.subsystems.carriage.CarriageConstants.*;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.leds.Leds;
@@ -23,9 +24,19 @@ public class Carriage extends SubsystemBase {
 
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
+  public static boolean simBeamBreak = false;
+
+  private boolean coralPassed = false;
+  private boolean realCoralHeld = false;
+
+  public boolean realAlgaeHeld = false;
 
   private static final LoggedTunableNumber highDealgifyTime =
       new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
+  private static final LoggedTunableNumber backupForL3Rots =
+      new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
+
+  public static boolean coralInDanger = false;
 
   public Carriage(CarriageIO io) {
     this.io = io;
@@ -34,14 +45,42 @@ public class Carriage extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    updateCoralStatus();
     Logger.processInputs("Carriage", inputs);
 
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
-    Util.logSubsystem(this, "Carriage");
+    if (filteredVelocity <= algaeVelocityThreshold.get()
+        && filteredStatorCurrent >= algaeCurrentThreshold.get()) {
+      realAlgaeHeld = true;
+    }
+
     Leds.getInstance().coralHeld = coralHeld();
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
+
+    Logger.recordOutput("Carriage/coralPassed", coralPassed);
+
+    Util.logSubsystem(this, "Carriage");
+
+    Logger.recordOutput("Carriage/coralInDanger", coralInDanger);
+  }
+
+  public void updateCoralStatus() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      realCoralHeld = simHasCoral;
+    } else {
+      if (!beamBreak() && !coralPassed) {
+        realCoralHeld = false;
+      } else if (!beamBreak() && coralPassed) {
+        realCoralHeld = true;
+      } else if (beamBreak() && !coralPassed && !realCoralHeld) {
+        coralPassed = true;
+      }
+      // } else if (beamBreak() && coralPassed && realCoralHeld){
+      //   coralPassed = false;
+      // }
+    }
   }
 
   @AutoLogOutput
@@ -49,7 +88,16 @@ public class Carriage extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasCoral;
     }
-    return inputs.coralHeld;
+    return realCoralHeld;
+  }
+
+  public Command resetHeld() {
+    return Commands.runOnce(
+        () -> {
+          realCoralHeld = false;
+          coralPassed = false;
+          realAlgaeHeld = false;
+        });
   }
 
   @AutoLogOutput
@@ -57,42 +105,74 @@ public class Carriage extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simHasAlgae;
     }
-    return (filteredVelocity <= algaeVelocityThreshold.get()
-            && (filteredStatorCurrent >= algaeCurrentThreshold.get())
-        || filteredStatorCurrent <= -2);
+    return realAlgaeHeld;
+  }
+
+  @AutoLogOutput
+  private boolean beamBreak() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      return simBeamBreak;
+    }
+    return inputs.beamBreak;
   }
 
   public Command stopOrHold() {
-    return run(() -> io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0)).withName("stop");
+    return run(() -> {
+          if (!beamBreak() && realCoralHeld) {
+            io.runVolts(-holdSpeedVolts.get());
+          } else {
+            io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
+          }
+        })
+        .onlyWhile(() -> coralHeld() || algaeHeld())
+        .withName("stop");
+  }
+
+  public Command backUpForL3() {
+    return run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
+        .finallyDo(() -> io.runVolts(0))
+        .beforeStarting(() -> io.resetEncoder())
+        .until(() -> inputs.positionRots >= backupForL3Rots.get())
+        .withName("backUpForL3");
   }
 
   public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeedVolts.get()))
-        .until(() -> !coralHeld())
+        .until(() -> !beamBreak())
+        .andThen(() -> realCoralHeld = false)
+        .andThen(() -> coralPassed = false)
         .withName("placeCoral");
   }
 
   public Command highDealgify() {
-    return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
+    return run(() -> io.runVolts(highDealgifyingSpeedVolts.get()))
         .withTimeout(highDealgifyTime.get())
         .withName("highDealgify");
   }
 
   public Command lowDealgify() {
-    return run(() -> io.runVolts(dealgifyingSpeedVolts.get()))
+    return run(() -> io.runVolts(lowDealgifyingSpeedVolts.get()))
         .until(() -> algaeHeld())
         .withName("lowDealgify");
   }
 
   public Command intakeCoral() {
-    return run(() -> io.runVolts(intakingSpeedVolts.get()))
-        .until(() -> coralHeld())
-        .withName("intakeCoral");
+    return Commands.either(
+            run(() -> io.runVolts(placeSpeedVolts.get())),
+            run(() -> io.runVolts(intakingSpeedVolts.get()))
+                .until(() -> realCoralHeld)
+                .andThen(
+                    run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
+                        .until(() -> beamBreak())),
+            () -> coralInDanger)
+        .onlyIf(() -> !coralHeld())
+        .withName("intake coral");
   }
 
   public Command scoreProcessor() {
-    return run(() -> io.runVolts(intakingSpeedVolts.get()))
-        .until(() -> !algaeHeld())
+    return run(() -> io.runVolts(processorSpeedVolts.get()))
+        .withTimeout(.2)
+        .andThen(() -> realAlgaeHeld = false)
         .withName("scoreProcessor");
   }
 }

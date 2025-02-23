@@ -11,12 +11,15 @@ public interface IntakeIO {
 
     public double rollersAppliedVolts = 0.0;
     public double rollersCurrentAmps = 0.0;
-    public double rollerVelocityRPM = 0;
   }
 
   default void updateInputs(IntakeIOInputs inputs) {}
 
   default void runRollers(double volts) {}
 
+  default void runPivot(double volts) {}
+
   default void setPivotPosition(double setpointDeg) {}
+
+  default void resetEncoder(double position) {}
 }

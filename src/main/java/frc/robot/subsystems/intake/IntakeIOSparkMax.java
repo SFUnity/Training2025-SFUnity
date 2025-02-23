@@ -14,7 +14,6 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 public class IntakeIOSparkMax implements IntakeIO {
   private final SparkMax pivot = new SparkMax(pivotID, MotorType.kBrushless);
   private final SparkMax rollers = new SparkMax(rollersID, MotorType.kBrushless);
-  private final RelativeEncoder rollerEncoder = rollers.getEncoder();
   private final RelativeEncoder encoder = pivot.getEncoder();
   private final SparkClosedLoopController pid = pivot.getClosedLoopController();
 
@@ -39,7 +38,6 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     inputs.rollersAppliedVolts = rollers.getAppliedOutput() * rollers.getBusVoltage();
     inputs.rollersCurrentAmps = rollers.getOutputCurrent();
-    inputs.rollerVelocityRPM = rollerEncoder.getVelocity();
   }
 
   @Override
@@ -48,7 +46,17 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
+  public void runPivot(double volts) {
+    pivot.setVoltage(volts);
+  }
+
+  @Override
   public void setPivotPosition(double setpointDeg) {
     pid.setReference(setpointDeg, ControlType.kPosition);
+  }
+
+  @Override
+  public void resetEncoder(double position) {
+    encoder.setPosition(position);
   }
 }

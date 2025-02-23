@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PoseManager;
 import java.util.Map;
@@ -43,15 +44,30 @@ public final class RobotCommands {
                 !allowAutoDrive
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
-        .andThen(elevator.enableElevator(), waitUntil(atPose), carriage.placeCoral());
-  }
-
-  public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
-    return dealgify(elevator, carriage, poseManager, goalPose(poseManager));
+        .andThen(
+            elevator
+                .enableElevator()
+                .alongWith(
+                    either(
+                            waitUntil(elevator::pastL3Height).andThen(carriage.backUpForL3()),
+                            none(),
+                            () -> elevator.goalHeightInches > ElevatorConstants.pastL3Height.get())
+                        .andThen(
+                            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
+                            carriage.placeCoral())));
   }
 
   public static Command dealgify(
-      Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
+      Elevator elevator, Carriage carriage, PoseManager poseManager, BooleanSupplier atPose) {
+    return dealgify(elevator, carriage, poseManager, goalPose(poseManager), atPose);
+  }
+
+  public static Command dealgify(
+      Elevator elevator,
+      Carriage carriage,
+      PoseManager poseManager,
+      Supplier<Pose2d> goalPose,
+      BooleanSupplier atPose) {
     BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
     return waitUntil(
             () ->
@@ -59,9 +75,11 @@ public final class RobotCommands {
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
-            either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
-                .andThen(elevator.enableElevator())
-                .alongWith(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
+            parallel(
+                either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
+                    .andThen(elevator.enableElevator()),
+                waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight())
+                    .andThen(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae))))
         .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
   }
 
@@ -97,36 +115,38 @@ public final class RobotCommands {
     RightBranch,
     Dealgify,
     ProcessorFront,
-    ProcessorBack
+    ProcessorBack,
+    ScoreL1
   }
 
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive,
-      Carriage carriage,
-      Intake intake,
-      PoseManager poseManager,
-      BooleanSupplier allowAutoDrive) {
+      Drive drive, Carriage carriage, Intake intake, Elevator elevator, PoseManager poseManager) {
     return select(
-        Map.of(
-            Source,
-            // Maybe should change so that even if most of poseEstimation isn't working, this does
-            either(
-                drive
-                    .headingDrive(
-                        () -> {
-                          return poseManager.closestStation().getRotation();
-                        })
-                    .until(carriage::coralHeld)
-                    .asProxy(),
-                carriage.intakeCoral().asProxy(),
-                allowAutoDrive),
-            Ground,
-            intake.intakeCmd().asProxy(),
-            Ice_Cream,
-            carriage.lowDealgify().asProxy()),
-        () -> intakeState);
+            Map.of(
+                Source,
+                either(
+                    drive
+                        .headingDrive(
+                            () -> {
+                              return poseManager.closestStation().getRotation();
+                            })
+                        .until(carriage::coralHeld)
+                        .asProxy()
+                        .alongWith(carriage.intakeCoral().asProxy()),
+                    carriage.intakeCoral().asProxy(),
+                    () -> allowAutoDrive),
+                Ground,
+                intake.intakeCmd().asProxy(),
+                Ice_Cream,
+                elevator
+                    .request(IceCream)
+                    .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
+                    .raceWith(intake.iceCreamCmd())
+                    .asProxy()),
+            () -> intakeState)
+        .withName("fullIntake");
   }
 
   public static enum IntakeState {
