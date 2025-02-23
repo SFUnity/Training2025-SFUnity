@@ -217,6 +217,7 @@ public class Drive extends SubsystemBase {
         poseManager.rawGyroRotation =
             poseManager.rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
+      Logger.recordOutput("Drive/rawGyroRotation", poseManager.rawGyroRotation);
 
       // Apply update
       poseManager.addOdometryMeasurementWithTimestamps(sampleTimestamps[i], modulePositions);
@@ -415,14 +416,14 @@ public class Drive extends SubsystemBase {
           } else if (config.povUpPressed()) {
             x = povMovementSpeed.get();
           } else if (config.povLeftPressed()) {
-            y = povMovementSpeed.get();
-          } else if (config.povRightPressed()) {
             y = -povMovementSpeed.get();
+          } else if (config.povRightPressed()) {
+            y = povMovementSpeed.get();
           }
 
           // Convert to field relative speeds & send command
-          if (x > 0 || y > 0) {
-            runVelocity(ChassisSpeeds.fromRobotRelativeSpeeds(x, y, omega, gyroInputs.yawPosition));
+          if (Math.abs(x) > 0 || Math.abs(y) > 0) {
+            runVelocity(new ChassisSpeeds(x, y, omega));
           } else {
             runVelocity(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -447,8 +448,27 @@ public class Drive extends SubsystemBase {
           updateThetaTunables();
           updateThetaConstraints();
 
-          // Get linear velocity
-          Translation2d linearVelocity = getLinearVelocityFromJoysticks();
+          // Get pov movement
+          double x = 0;
+          double y = 0;
+          if (config.povDownPressed()) {
+            x = povMovementSpeed.get();
+          } else if (config.povUpPressed()) {
+            x = -povMovementSpeed.get();
+          } else if (config.povLeftPressed()) {
+            y = povMovementSpeed.get();
+          } else if (config.povRightPressed()) {
+            y = -povMovementSpeed.get();
+          }
+
+          Translation2d linearVelocity;
+          if (Math.abs(x) > 0 || Math.abs(y) > 0) {
+            ChassisSpeeds speeds =
+                ChassisSpeeds.fromRobotRelativeSpeeds(x, y, 0, poseManager.rawGyroRotation);
+            linearVelocity = new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+          } else {
+            linearVelocity = getLinearVelocityFromJoysticks();
+          }
 
           // Convert to field relative speeds & send command
           runVelocity(

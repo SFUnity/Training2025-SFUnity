@@ -454,9 +454,13 @@ public class Robot extends LoggedRobot {
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
                     Commands.either(
-                        drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
+                        Commands.either(
+                                drive.fullAutoDrive(goalPose(poseManager)),
+                                drive.headingDrive(() -> goalPose(poseManager).get().getRotation()),
+                                () -> scoreState != ScoreL1)
+                            .asProxy(),
                         Commands.none(),
-                        () -> allowAutoDrive && scoreState != ScoreL1))
+                        () -> allowAutoDrive))
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
@@ -514,12 +518,11 @@ public class Robot extends LoggedRobot {
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
-    operator.povLeft().onTrue(intake.resetAlgaeHeld());
 
     operator.back().onTrue(elevator.runCurrentZeroing());
     operator.back().onTrue(intake.runCurrentZeroing());
 
-    operator.start().onTrue(carriage.resetHeld());
+    operator.start().onTrue(carriage.resetHeld().alongWith(intake.resetAlgaeHeld()));
 
     // State-Based Triggers
 
