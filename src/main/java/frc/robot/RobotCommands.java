@@ -25,7 +25,6 @@ import org.littletonrobotics.junction.Logger;
 /** Put high level commands here */
 public final class RobotCommands {
   public static boolean allowAutoDrive = true;
-  public static boolean allowHeadingAlign = true;
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 

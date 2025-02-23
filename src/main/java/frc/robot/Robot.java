@@ -338,7 +338,6 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
     Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
     Logger.recordOutput("Controls/allowAutoDrive", allowAutoDrive);
-    Logger.recordOutput("Controls/allowHeadingAlign", allowHeadingAlign);
     Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
@@ -505,7 +504,7 @@ public class Robot extends LoggedRobot {
 
     // Teleop Only
     new Trigger(carriage::coralHeld)
-        .and(() -> allowHeadingAlign)
+        .and(() -> allowAutoDrive)
         .and(DriverStation::isTeleop)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
 
@@ -520,7 +519,7 @@ public class Robot extends LoggedRobot {
     // All the time
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
         .and(() -> !carriage.algaeHeld())
-        .and(() -> allowHeadingAlign)
+        .and(() -> allowAutoDrive)
         .and(
             () -> {
               if (DriverStation.isTeleop()) return intakeState == Source;
