@@ -25,6 +25,7 @@ import static frc.robot.util.AllianceFlipUtil.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.util.datalog.DataLogWriter;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -64,6 +65,7 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.io.IOException;
 import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -100,6 +102,8 @@ public class Robot extends LoggedRobot {
       new Alert(
           "Battery voltage is very low, consider turning off the robot or replacing the battery.",
           AlertType.kWarning);
+  private final Alert noLoggingAlert =
+      new Alert("[AdvantageKit] Failed to open output log file.", AlertType.kError);
 
   // Subsystems
   private final Drive drive;
@@ -120,11 +124,11 @@ public class Robot extends LoggedRobot {
   private final Alert operatorDisconnected =
       new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
 
-  public boolean slowMode = false;
+  public boolean slowMode = true;
   private final LoggedTunableNumber slowDriveMultiplier =
-      new LoggedTunableNumber("Slow Drive Multiplier", 0.6);
+      new LoggedTunableNumber("Slow Drive Multiplier", 1);
   private final LoggedTunableNumber slowTurnMultiplier =
-      new LoggedTunableNumber("Slow Turn Multiplier", 0.5);
+      new LoggedTunableNumber("Slow Turn Multiplier", 0.7);
 
   private final DriveCommandsConfig driveCommandsConfig =
       new DriveCommandsConfig(driver, () -> slowMode, slowDriveMultiplier, slowTurnMultiplier);
@@ -203,7 +207,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(3),
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSparkMax());
+        elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
         vision =
@@ -224,7 +228,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSim());
+        elevator = new Elevator(new ElevatorIOSim(), poseManager);
         carriage = new Carriage(new CarriageIOSim());
         intake = new Intake(new IntakeIOSim());
         vision =
@@ -242,7 +246,7 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIO() {}, poseManager);
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
         vision =
@@ -278,6 +282,17 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     VirtualSubsystem.periodicAll();
     CommandScheduler.getInstance().run();
+
+    // Check if logging source is available
+    try {
+      // These inputs are custom constants from the source of WPILOGWriter
+      DataLogWriter testDataLogWriter = new DataLogWriter("/U/logs", "AdvantageKit");
+      testDataLogWriter.close();
+      noLoggingAlert.set(false);
+    } catch (IOException e) {
+      noLoggingAlert.set(true);
+      DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
+    }
 
     // Print auto duration
     if (autoCommand != null) {
@@ -322,7 +337,7 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("Controls/intakeState", intakeState.toString());
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
     Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
-    Logger.recordOutput("Controls/allowAutoRotation", allowAutoDrive);
+    Logger.recordOutput("Controls/allowAutoDrive", allowAutoDrive);
     Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
@@ -335,6 +350,8 @@ public class Robot extends LoggedRobot {
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
+    boolean testDrive = false;
+
     // Setup rumble
     new Trigger(() -> intake.algaeHeld())
         .onTrue(
@@ -344,50 +361,83 @@ public class Robot extends LoggedRobot {
                 .withTimeout(.5));
 
     // Default cmds
-    drive.setDefaultCommand(drive.joystickDrive());
-    elevator.setDefaultCommand(elevator.disableElevator());
-    carriage.setDefaultCommand(carriage.stopOrHold());
+    if (testDrive) {
+      drive.setDefaultCommand(drive.moduleTestingCommand());
+    } else {
+      drive.setDefaultCommand(drive.joystickDrive());
+    }
+    elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
+    carriage.setDefaultCommand(
+        Commands.either(
+                carriage.intakeCoral().onlyWhile(() -> poseManager.distanceToStationFace() < 0.5),
+                carriage.stopOrHold(),
+                () -> poseManager.distanceToStationFace() < 0.5)
+            .withName("carriageDefault"));
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
-    driver.leftTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    driver
-        .y()
-        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
-    driver
-        .x()
-        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
-    driver
-        .a()
-        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
-    driver
-        .b()
-        .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
-    driver
-        .start()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        poseManager.setPose(
-                            new Pose2d(poseManager.getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+    driver.rightTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    if (testDrive) {
+      driver.y().onTrue(drive.setModuleToTest(0));
+      driver.x().onTrue(drive.setModuleToTest(1));
+      driver.a().onTrue(drive.setModuleToTest(2));
+      driver.b().onTrue(drive.setModuleToTest(3));
+      driver.start().onTrue(Commands.runOnce(() -> drive.allModules = !drive.allModules));
+    } else {
+      driver
+          .y()
+          .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(0)).until(drive::thetaAtGoal));
+      driver
+          .x()
+          .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(90)).until(drive::thetaAtGoal));
+      driver
+          .a()
+          .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(180)).until(drive::thetaAtGoal));
+      driver
+          .b()
+          .onTrue(drive.headingDrive(() -> Rotation2d.fromDegrees(270)).until(drive::thetaAtGoal));
+      driver
+          .start()
+          .onTrue(
+              Commands.runOnce(
+                      () ->
+                          poseManager.setPose(
+                              new Pose2d(poseManager.getTranslation(), new Rotation2d())),
+                      drive)
+                  .ignoringDisable(true));
+    }
     driver
         .back()
         .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
-    driver
-        .rightBumper()
-        .whileTrue(fullIntake(drive, carriage, intake, poseManager, () -> allowAutoDrive));
+    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, elevator, poseManager));
     driver
         .leftBumper()
         .whileTrue(
             Commands.select(
                     Map.of(
                         LeftBranch,
-                        scoreCoral(elevator, carriage, poseManager, driver.rightTrigger()),
+                        scoreCoral(
+                            elevator,
+                            carriage,
+                            poseManager,
+                            () ->
+                                atGoal(drive).getAsBoolean()
+                                    || driver.leftTrigger().getAsBoolean()),
+                        ScoreL1,
+                        elevator
+                            .enableElevator()
+                            .alongWith(
+                                Commands.waitUntil(driver.rightTrigger())
+                                    .andThen(carriage.placeCoral())),
                         Dealgify,
-                        dealgify(elevator, carriage, poseManager),
+                        dealgify(
+                            elevator,
+                            carriage,
+                            poseManager,
+                            () ->
+                                atGoal(drive).getAsBoolean()
+                                    || driver.leftTrigger().getAsBoolean()),
                         ProcessorFront,
                         scoreProcessor(carriage, intake, poseManager, true, atGoal(drive)),
                         ProcessorBack,
@@ -397,7 +447,7 @@ public class Robot extends LoggedRobot {
                     Commands.either(
                         drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
                         Commands.none(),
-                        () -> allowAutoDrive))
+                        () -> allowAutoDrive && scoreState != ScoreL1))
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
@@ -406,7 +456,13 @@ public class Robot extends LoggedRobot {
                     })
                 .andThen(
                     Commands.either(
-                        dealgify(elevator, carriage, poseManager)
+                        dealgify(
+                                elevator,
+                                carriage,
+                                poseManager,
+                                () ->
+                                    atGoal(drive).getAsBoolean()
+                                        || driver.leftTrigger().getAsBoolean())
                             .deadlineFor(
                                 Commands.either(
                                     drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
@@ -425,7 +481,9 @@ public class Robot extends LoggedRobot {
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     operator.x().onTrue(elevator.request(L2));
-    operator.a().onTrue(elevator.request(L1));
+    operator
+        .a()
+        .onTrue(elevator.request(L1).alongWith(Commands.runOnce(() -> scoreState = ScoreL1)));
     operator
         .b()
         .onTrue(
@@ -447,15 +505,18 @@ public class Robot extends LoggedRobot {
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
+    operator.povLeft().onTrue(intake.resetAlgaeHeld());
 
-    operator.back().onTrue(elevator.runCurrentZeroing().alongWith(intake.runCurrentZeroing()));
+    operator.back().onTrue(elevator.runCurrentZeroing());
+    operator.back().onTrue(intake.runCurrentZeroing());
+
+    operator.start().onTrue(carriage.resetHeld());
 
     // State-Based Triggers
 
     // Teleop Only
     new Trigger(carriage::coralHeld)
         .and(() -> allowAutoDrive)
-        // Maybe should remove so that even if most of poseEstimation isn't working, this still will
         .and(DriverStation::isTeleop)
         .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
 
@@ -470,8 +531,13 @@ public class Robot extends LoggedRobot {
     // All the time
     // TODO might need to be onTrue
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
-        .and(() -> !carriage.coralHeld() && !carriage.algaeHeld())
+        .and(() -> !carriage.algaeHeld())
         .and(() -> allowAutoDrive)
+        .and(
+            () -> {
+              if (DriverStation.isTeleop()) return intakeState == Source;
+              return true;
+            })
         .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces
@@ -481,6 +547,9 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putData(
         "Toggle Algae in Carriage",
         Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+    SmartDashboard.putData(
+        "Toggle Beam Break in Carriage",
+        Commands.runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
     SmartDashboard.putData(
         "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
 

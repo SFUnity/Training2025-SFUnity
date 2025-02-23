@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -26,9 +27,10 @@ public class Intake extends SubsystemBase {
   private boolean startedIntaking = false;
   private boolean middleOfIntaking = false;
   public static boolean simHasAlgae = false;
+  private boolean runningIceCream = false;
 
-  // private final double intakeDelay = .25;
-  // private final double outtakeDelay = .3;
+  private final LoggedTunableNumber spikeCurrent =
+      new LoggedTunableNumber("Intake/spikeCurrent", 10);
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -48,9 +50,9 @@ public class Intake extends SubsystemBase {
 
     // * There's a specific pattern in the current draw of the rollers that we're checking for here
     // Check that the pivot is lowered and not rising
-    if (inputs.pivotAppliedVolts <= 0.5 && lowered) {
+    if ((inputs.pivotAppliedVolts <= 0.5 && lowered) || runningIceCream) {
       // Check if the current is high enough to be intaking
-      if (filteredCurrent >= 10) {
+      if (filteredCurrent >= spikeCurrent.get()) {
         // check for start of intaking
         if (!startedIntaking && !hasAlgae) {
           startedIntaking = true;
@@ -63,7 +65,7 @@ public class Intake extends SubsystemBase {
         }
       }
       // check for dip in current
-      if (filteredCurrent <= 9 && startedIntaking) {
+      if (filteredCurrent < spikeCurrent.get() && startedIntaking) {
         middleOfIntaking = true;
       }
       // check for massive current spike
@@ -72,16 +74,17 @@ public class Intake extends SubsystemBase {
       }
     }
 
-    // Check if the pivot is raised high current
-    if (!lowered && filteredCurrent > 10) {
-      hasAlgae = false;
-    }
+    Logger.recordOutput("Intake/runningIceCream", runningIceCream);
 
     // Logs
     measuredVisualizer.update(Degrees.of(inputs.pivotCurrentPositionDeg));
     setpointVisualizer.update(Degrees.of(positionSetpoint));
     Logger.recordOutput("Intake/positionSetpoint", positionSetpoint);
     Util.logSubsystem(this, "Intake");
+  }
+
+  public Command resetAlgaeHeld() {
+    return Commands.runOnce(() -> hasAlgae = false);
   }
 
   private void lower() {
@@ -115,11 +118,6 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCmd() {
-    /*
-     Commands.waitUntil(this::algaeHeld)
-       .andThen(Commands.waitSeconds(intakeDelay))
-       .deadlineFor(
-    */
     return run(() -> {
           lower();
           rollersIn();
@@ -130,24 +128,32 @@ public class Intake extends SubsystemBase {
 
   public Command runCurrentZeroing() {
     return this.run(() -> io.runPivot(-1.0))
-        .until(() -> inputs.pivotCurrentAmps > 40.0)
+        .until(() -> inputs.pivotCurrentAmps > 30.0)
         .finallyDo(() -> io.resetEncoder(0.0));
   }
 
   public Command poopCmd() {
-    return Commands.waitUntil(() -> !algaeHeld())
+    return Commands.waitUntil(() -> filteredCurrent > 10)
         .andThen(
-            Commands.waitUntil(() -> filteredCurrent > 10)
-                .andThen(
-                    Commands.waitUntil(() -> filteredCurrent < 10),
-                    Commands.print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
-                .deadlineFor(
-                    run(
-                        () -> {
-                          raise();
-                          rollersOut();
-                        })))
+            Commands.waitUntil(() -> filteredCurrent < 5), Commands.runOnce(() -> hasAlgae = false))
+        .raceWith(
+            run(() -> {
+                  raise();
+                  rollersOut();
+                })
+                .until(() -> !algaeHeld()))
         .withName("poop");
+  }
+
+  public Command iceCreamCmd() {
+    return run(() -> {
+          raise();
+          rollersIn();
+        })
+        .beforeStarting(() -> runningIceCream = true)
+        .finallyDo(() -> runningIceCream = false)
+        .until(this::algaeHeld)
+        .withName("iceCream");
   }
 
   @AutoLogOutput

@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
@@ -70,6 +71,9 @@ public class Drive extends SubsystemBase {
   private final DriveCommandsConfig config;
   private static final double DEADBAND = 0.1;
 
+  private static final LoggedTunableNumber povMovementSpeed =
+      new LoggedTunableNumber("Drive/POV Movement Speed", 0.5);
+
   private static final LoggedTunableNumber linearkP =
       new LoggedTunableNumber("Drive/Commands/Linear/kP", 3.5);
   private static final LoggedTunableNumber linearkD =
@@ -81,7 +85,7 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber linearTolerance =
       new LoggedTunableNumber("Drive/Commands/Linear/tolerance", 0.05);
   private static final LoggedTunableNumber thetaToleranceDeg =
-      new LoggedTunableNumber("Drive/Commands/Theta/toleranceDeg", 1.0);
+      new LoggedTunableNumber("Drive/Commands/Theta/toleranceDeg", 2.0);
 
   private static final LoggedTunableNumber maxLinearVelocity =
       new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", maxSpeedMetersPerSec);
@@ -231,6 +235,21 @@ public class Drive extends SubsystemBase {
     // update the brake mode based on the robot's velocity and state (enabled/disabled)
     updateBrakeMode();
 
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          for (var module : modules) module.setTurnPIDF(turnKp.get());
+        },
+        turnKp);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          for (var module : modules) module.setDrivePIDF(driveKp.get(), driveKd.get());
+        },
+        driveKp,
+        driveKd);
+
     Util.logSubsystem(this, "Drive");
   }
 
@@ -372,13 +391,13 @@ public class Drive extends SubsystemBase {
           // Convert to doubles
           double o = config.getOmegaInput();
 
-          // Check for slow mode
-          if (config.slowMode().getAsBoolean()) {
-            o *= config.slowTurnMultiplier().get();
-          }
-
           // Apply deadband
           double omega = MathUtil.applyDeadband(o, DEADBAND);
+
+          // Check for slow mode
+          if (config.slowMode().getAsBoolean()) {
+            omega *= config.slowTurnMultiplier().get();
+          }
 
           // Square values and scale to max velocity
           omega = Math.copySign(omega * omega, omega);
@@ -387,15 +406,32 @@ public class Drive extends SubsystemBase {
           // Get linear velocity
           Translation2d linearVelocity = getLinearVelocityFromJoysticks();
 
+          // Get pov movement
+          double x = 0;
+          double y = 0;
+          if (config.povDownPressed()) {
+            x = -povMovementSpeed.get();
+          } else if (config.povUpPressed()) {
+            x = povMovementSpeed.get();
+          } else if (config.povLeftPressed()) {
+            y = povMovementSpeed.get();
+          } else if (config.povRightPressed()) {
+            y = -povMovementSpeed.get();
+          }
+
           // Convert to field relative speeds & send command
-          runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX(),
-                  linearVelocity.getY(),
-                  omega,
-                  AllianceFlipUtil.shouldFlip()
-                      ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
-                      : poseManager.getRotation()));
+          if (x > 0 || y > 0) {
+            runVelocity(ChassisSpeeds.fromRobotRelativeSpeeds(x, y, omega, gyroInputs.yawPosition));
+          } else {
+            runVelocity(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                    linearVelocity.getX(),
+                    linearVelocity.getY(),
+                    omega,
+                    AllianceFlipUtil.shouldFlip()
+                        ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
+                        : poseManager.getRotation()));
+          }
         })
         .withName("Joystick Drive");
   }
@@ -507,18 +543,6 @@ public class Drive extends SubsystemBase {
     // Convert to doubles
     double x = config.getXInput();
     double y = config.getYInput();
-
-    // The speed value here might need to change
-    double povMovementSpeed = 0.5;
-    if (config.povDownPressed()) {
-      x = povMovementSpeed;
-    } else if (config.povUpPressed()) {
-      x = -povMovementSpeed;
-    } else if (config.povLeftPressed()) {
-      y = -povMovementSpeed;
-    } else if (config.povRightPressed()) {
-      y = povMovementSpeed;
-    }
 
     // Check for slow mode
     if (config.slowMode().getAsBoolean()) {
@@ -831,5 +855,29 @@ public class Drive extends SubsystemBase {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
+  }
+
+  // Module Testing
+  private int moduleToTest = 0;
+  public boolean allModules = false;
+
+  public Command moduleTestingCommand() {
+    return run(() -> {
+          double driveInput = MathUtil.applyDeadband(config.getXInput(), DEADBAND);
+          double turnInput = MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND);
+          if (allModules) {
+            for (int i = 0; i < 4; i++) {
+              modules[i].test(driveInput * 12, turnInput * 12);
+            }
+          } else {
+            modules[moduleToTest].test(driveInput * 12, turnInput * 12);
+          }
+        })
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        .withName("Module Testing Command");
+  }
+
+  public Command setModuleToTest(int moduleIndex) {
+    return Commands.runOnce(() -> moduleToTest = moduleIndex).withName("Set Module To Test");
   }
 }

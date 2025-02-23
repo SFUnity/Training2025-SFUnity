@@ -23,8 +23,7 @@ import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec =
-      Constants.onCarpet ? Units.feetToMeters(17.1) : Units.feetToMeters(17.1);
+  public static final double maxSpeedMetersPerSec = Units.feetToMeters(15.1);
   public static final double maxAccelerationMetersPerSec =
       Units.feetToMeters(75.0); // This is what 6328
   public static final double odometryFrequency = 100.0; // Hz
@@ -89,8 +88,7 @@ public class DriveConstants {
   // Drive motor configuration
   public static final int driveMotorSupplyCurrentLimit = 50;
   public static final int driveMotorStatorCurrentLimit = 80;
-  public static final double wheelRadiusMeters =
-      Constants.onCarpet ? Units.inchesToMeters(2) : Units.inchesToMeters(2);
+  public static final double wheelRadiusMeters = Units.inchesToMeters(2);
   public static final double driveMotorReduction = 5.36;
   public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
 
@@ -103,13 +101,10 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        driveKp =
-            new LoggedTunableNumber(
-                "Drive/ModuleTunables/driveKp", Constants.onCarpet ? 0.35 : 0.35);
-        driveKd =
-            new LoggedTunableNumber("Drive/ModuleTunables/driveKd", Constants.onCarpet ? 0.0 : 0.0);
-        driveKs = Constants.onCarpet ? 0.129 : 0.129;
-        driveKv = Constants.onCarpet ? 0.657 : 0.113;
+        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.35);
+        driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
+        driveKs = 0.129;
+        driveKv = 0.657;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
@@ -122,7 +117,7 @@ public class DriveConstants {
 
   // Turn motor configuration
   public static final int turnMotorCurrentLimit = 60;
-  public static final double turnMotorReduction = 150 / 7;
+  public static final double turnMotorReduction = 150.0 / 7.0;
   public static final DCMotor turnGearbox = DCMotor.getNEO(1);
 
   // Turn PID configuration
@@ -133,8 +128,7 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        turnKp =
-            new LoggedTunableNumber("Drive/ModuleTunables/turnKp", Constants.onCarpet ? 2 : 0.65);
+        turnKp = new LoggedTunableNumber("Drive/ModuleTunables/turnKp", 0.5);
         break;
       case SIM:
         turnKp = new LoggedTunableNumber("Drive/SimModuleTunables/turnKp", 14.0);

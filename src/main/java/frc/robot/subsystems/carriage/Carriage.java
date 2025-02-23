@@ -23,6 +23,7 @@ public class Carriage extends SubsystemBase {
 
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
+  public static boolean simBeamBreak = false;
 
   private boolean coralPassed = false;
   private boolean realCoralHeld = false;
@@ -54,6 +55,8 @@ public class Carriage extends SubsystemBase {
       realAlgaeHeld = true;
     }
 
+    Logger.recordOutput("Carriage/coralPassed", coralPassed);
+
     Util.logSubsystem(this, "Carriage");
 
     Logger.recordOutput("Carriage/coralInDanger", coralInDanger);
@@ -63,16 +66,16 @@ public class Carriage extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       realCoralHeld = simHasCoral;
     } else {
-      if (!inputs.beamBreak && !coralPassed) {
+      if (!beamBreak() && !coralPassed) {
         realCoralHeld = false;
-
-      } else if (inputs.beamBreak && !coralPassed && !realCoralHeld) {
-        coralPassed = true;
-      } else if (!inputs.beamBreak && coralPassed) {
+      } else if (!beamBreak() && coralPassed) {
         realCoralHeld = true;
-      } else if (realCoralHeld && inputs.beamBreak && coralPassed) {
-        coralPassed = false;
+      } else if (beamBreak() && !coralPassed && !realCoralHeld) {
+        coralPassed = true;
       }
+      // } else if (beamBreak() && coralPassed && realCoralHeld){
+      //   coralPassed = false;
+      // }
     }
   }
 
@@ -84,6 +87,15 @@ public class Carriage extends SubsystemBase {
     return realCoralHeld;
   }
 
+  public Command resetHeld() {
+    return Commands.runOnce(
+        () -> {
+          realCoralHeld = false;
+          coralPassed = false;
+          realAlgaeHeld = false;
+        });
+  }
+
   @AutoLogOutput
   public boolean algaeHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
@@ -92,8 +104,24 @@ public class Carriage extends SubsystemBase {
     return realAlgaeHeld;
   }
 
+  @AutoLogOutput
+  private boolean beamBreak() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      return simBeamBreak;
+    }
+    return inputs.beamBreak;
+  }
+
   public Command stopOrHold() {
-    return run(() -> io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0)).withName("stop");
+    return run(() -> {
+          if (!beamBreak() && realCoralHeld) {
+            io.runVolts(-holdSpeedVolts.get());
+          } else {
+            io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
+          }
+        })
+        .onlyWhile(() -> coralHeld() || algaeHeld())
+        .withName("stop");
   }
 
   public Command backUpForL3() {
@@ -106,7 +134,9 @@ public class Carriage extends SubsystemBase {
 
   public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeedVolts.get()))
-        .until(() -> !realCoralHeld)
+        .until(() -> !beamBreak())
+        .andThen(() -> realCoralHeld = false)
+        .andThen(() -> coralPassed = false)
         .withName("placeCoral");
   }
 
@@ -124,13 +154,14 @@ public class Carriage extends SubsystemBase {
 
   public Command intakeCoral() {
     return Commands.either(
+            run(() -> io.runVolts(placeSpeedVolts.get())),
             run(() -> io.runVolts(intakingSpeedVolts.get()))
                 .until(() -> realCoralHeld)
                 .andThen(
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
-                        .until(() -> inputs.beamBreak)),
-            run(() -> io.runVolts(placeSpeedVolts.get())),
-            () -> !coralInDanger)
+                        .until(() -> beamBreak())),
+            () -> coralInDanger)
+        .onlyIf(() -> !coralHeld())
         .withName("intake coral");
   }
 

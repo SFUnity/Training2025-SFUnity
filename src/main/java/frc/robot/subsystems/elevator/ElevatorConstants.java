@@ -12,7 +12,7 @@ public class ElevatorConstants {
   // Profiled PID values
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
-  public static final double elevatorDistanceToleranceInches = 0.22;
+  public static final double elevatorDistanceToleranceInches = 0.3;
   public static final double maxElevatorSpeed = 41; // inches/sec
   public static final double maxElevatorAcceleration = 682.5; // inches/sec^2
   // FF values
@@ -30,9 +30,9 @@ public class ElevatorConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Elevator/kP", 1.3);
+        kP = new LoggedTunableNumber("Elevator/kP", 1.5);
         kD = new LoggedTunableNumber("Elevator/kD", 0);
-        kG = new LoggedTunableNumber("Elevator/kG", 0.34);
+        kG = new LoggedTunableNumber("Elevator/kG", 0.37);
         kV = new LoggedTunableNumber("Elevator/kV", 0.2);
         break;
       case SIM:
@@ -50,7 +50,8 @@ public class ElevatorConstants {
     L2(new LoggedTunableNumber("Elevator/L2", 10)),
     L1(new LoggedTunableNumber("Elevator/L1", 0)),
     AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 18)),
-    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", L3.get()));
+    AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", L3.get())),
+    IceCream(new LoggedTunableNumber("Elevator/IceCream", 5));
 
     ElevatorHeight(LoggedTunableNumber height) {
       this.height = height;

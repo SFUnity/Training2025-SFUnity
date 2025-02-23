@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
-  public static boolean allowAutoDrive = false;
+  public static boolean allowAutoDrive = true;
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
@@ -57,12 +57,17 @@ public final class RobotCommands {
                             carriage.placeCoral())));
   }
 
-  public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
-    return dealgify(elevator, carriage, poseManager, goalPose(poseManager));
+  public static Command dealgify(
+      Elevator elevator, Carriage carriage, PoseManager poseManager, BooleanSupplier atPose) {
+    return dealgify(elevator, carriage, poseManager, goalPose(poseManager), atPose);
   }
 
   public static Command dealgify(
-      Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
+      Elevator elevator,
+      Carriage carriage,
+      PoseManager poseManager,
+      Supplier<Pose2d> goalPose,
+      BooleanSupplier atPose) {
     BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
     return waitUntil(
             () ->
@@ -70,9 +75,11 @@ public final class RobotCommands {
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
-            either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
-                .andThen(elevator.enableElevator())
-                .alongWith(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
+            parallel(
+                either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
+                    .andThen(elevator.enableElevator()),
+                waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight())
+                    .andThen(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae))))
         .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
   }
 
@@ -108,22 +115,17 @@ public final class RobotCommands {
     RightBranch,
     Dealgify,
     ProcessorFront,
-    ProcessorBack
+    ProcessorBack,
+    ScoreL1
   }
 
   public static IntakeState intakeState = Source;
 
   public static Command fullIntake(
-      Drive drive,
-      Carriage carriage,
-      Intake intake,
-      PoseManager poseManager,
-      BooleanSupplier allowAutoDrive) {
+      Drive drive, Carriage carriage, Intake intake, Elevator elevator, PoseManager poseManager) {
     return select(
             Map.of(
                 Source,
-                // Maybe should change so that even if most of poseEstimation isn't working, this
-                // does
                 either(
                     drive
                         .headingDrive(
@@ -131,13 +133,18 @@ public final class RobotCommands {
                               return poseManager.closestStation().getRotation();
                             })
                         .until(carriage::coralHeld)
-                        .asProxy(),
+                        .asProxy()
+                        .alongWith(carriage.intakeCoral().asProxy()),
                     carriage.intakeCoral().asProxy(),
-                    allowAutoDrive),
+                    () -> allowAutoDrive),
                 Ground,
                 intake.intakeCmd().asProxy(),
                 Ice_Cream,
-                carriage.lowDealgify().asProxy()),
+                elevator
+                    .request(IceCream)
+                    .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
+                    .raceWith(intake.iceCreamCmd())
+                    .asProxy()),
             () -> intakeState)
         .withName("fullIntake");
   }
