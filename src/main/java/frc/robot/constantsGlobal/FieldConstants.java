@@ -24,7 +24,7 @@ public final class FieldConstants {
       Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
   public static final Pose2d processorScore =
-      new Pose2d(Units.inchesToMeters(235.726), .8 / 2, Rotation2d.fromDegrees(-90));
+      new Pose2d(Units.inchesToMeters(235.726), .84 / 2, Rotation2d.fromDegrees(-90));
 
   public static class Barge {
     public static final Translation2d farCage =
