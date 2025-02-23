@@ -525,7 +525,7 @@ public class Robot extends LoggedRobot {
               if (DriverStation.isTeleop()) return intakeState == Source;
               return true;
             })
-        .whileTrue(carriage.intakeCoral().onlyIf(() -> !carriage.coralHeld()));
+        .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces
     SmartDashboard.putData(

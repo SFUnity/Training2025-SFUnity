@@ -142,13 +142,14 @@ public class Carriage extends SubsystemBase {
 
   public Command intakeCoral() {
     return Commands.either(
+            run(() -> io.runVolts(placeSpeedVolts.get())),
             run(() -> io.runVolts(intakingSpeedVolts.get()))
                 .until(() -> realCoralHeld)
                 .andThen(
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
                         .until(() -> inputs.beamBreak)),
-            run(() -> io.runVolts(placeSpeedVolts.get())),
-            () -> !coralInDanger)
+            () -> coralInDanger)
+        .onlyIf(() -> !coralHeld())
         .withName("intake coral");
   }
 
