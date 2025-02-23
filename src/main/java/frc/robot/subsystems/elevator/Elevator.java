@@ -44,7 +44,8 @@ public class Elevator extends SubsystemBase {
   private final PoseManager poseManager;
 
   private BooleanSupplier algaeInCarriage;
-  private final LoggedTunableNumber algeInCarriageHeight = new LoggedTunableNumber("Elevator/algeInCarriageHeight", 5);
+  private final LoggedTunableNumber algeInCarriageHeight =
+      new LoggedTunableNumber("Elevator/algeInCarriageHeight", 5);
   private final LoggedTunableNumber safeDropDist =
       new LoggedTunableNumber("Elevator/SafeDropDist", 0.3);
 
