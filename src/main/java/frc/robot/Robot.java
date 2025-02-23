@@ -512,12 +512,11 @@ public class Robot extends LoggedRobot {
     operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
-    operator.povLeft().onTrue(intake.resetAlgaeHeld());
 
     operator.back().onTrue(elevator.runCurrentZeroing());
     operator.back().onTrue(intake.runCurrentZeroing());
 
-    operator.start().onTrue(carriage.resetHeld());
+    operator.start().onTrue(carriage.resetHeld().alongWith(intake.resetAlgaeHeld()));
 
     // State-Based Triggers
 
