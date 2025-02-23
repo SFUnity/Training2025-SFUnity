@@ -546,9 +546,9 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putData(
         "Toggle Algae in Carriage",
         Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
-        SmartDashboard.putData(
-          "Toggle Beam Break in Carriage",
-          Commands.runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
+    SmartDashboard.putData(
+        "Toggle Beam Break in Carriage",
+        Commands.runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
     SmartDashboard.putData(
         "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
 
