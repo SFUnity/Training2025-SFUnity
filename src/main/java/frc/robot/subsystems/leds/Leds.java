@@ -2,10 +2,8 @@
 
 package frc.robot.subsystems.leds;
 
-import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.InchesPerSecond;
-import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj.LEDPattern.*;
 
@@ -145,17 +143,15 @@ public class Leds extends VirtualSubsystem {
         pattern = solid(Color.kOrangeRed);
       } else if (prideLeds) {
         // Pride stripes
-        rainbow(255, 128).scrollAtAbsoluteSpeed(InchesPerSecond.of(1), ledSpacing);
+        pattern = rainbow(255, 128); // .scrollAtAbsoluteSpeed(InchesPerSecond.of(1), ledSpacing);
       } else {
         // Default pattern
-        pattern =
-            gradient(GradientType.kContinuous, allianceColor, secondaryDisabledColor)
-                .scrollAtAbsoluteSpeed(waveAllianceCycleLength, ledSpacing);
+        pattern = gradient(GradientType.kContinuous, allianceColor, secondaryDisabledColor);
+        // .scrollAtAbsoluteSpeed(waveAllianceCycleLength, ledSpacing);
       }
     } else if (DriverStation.isAutonomous()) {
-      pattern =
-          gradient(GradientType.kContinuous, Color.kOrangeRed, Color.kDarkBlue)
-              .scrollAtAbsoluteSpeed(waveFastCycleLength, ledSpacing);
+      pattern = gradient(GradientType.kContinuous, Color.kOrangeRed, Color.kDarkBlue);
+      // .scrollAtAbsoluteSpeed(waveFastCycleLength, ledSpacing);
       if (autoFinished) {
         pattern =
             solid(Color.kGreen)
@@ -204,6 +200,6 @@ public class Leds extends VirtualSubsystem {
 
   private void teamColors() {
     LEDPattern base = LEDPattern.steps(Map.of(0, Color.kOrange, 0.5, Color.kBlue));
-    pattern = base.scrollAtAbsoluteSpeed(Centimeters.per(Second).of(12.5), ledSpacing);
+    pattern = base; // .scrollAtAbsoluteSpeed(Centimeters.per(Second).of(12.5), ledSpacing);
   }
 }
