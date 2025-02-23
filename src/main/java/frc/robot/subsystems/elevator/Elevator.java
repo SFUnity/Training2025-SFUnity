@@ -44,7 +44,7 @@ public class Elevator extends SubsystemBase {
   private final PoseManager poseManager;
 
   private BooleanSupplier algaeInCarriage;
-
+  private final LoggedTunableNumber algeInCarriageHeight = new LoggedTunableNumber("Elevator/algeInCarriageHeight", 5);
   private final LoggedTunableNumber safeDropDist =
       new LoggedTunableNumber("Elevator/SafeDropDist", 0.3);
 
@@ -92,7 +92,7 @@ public class Elevator extends SubsystemBase {
         pid.setGoal(L3.get());
       } else {
         if (algaeInCarriage.getAsBoolean()) {
-          pid.setGoal(5);
+          pid.setGoal(algeInCarriageHeight.get());
         } else {
           pid.setGoal(0);
         }
