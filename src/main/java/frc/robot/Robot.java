@@ -529,6 +529,7 @@ public class Robot extends LoggedRobot {
         .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
     // All the time
+    // TODO might need to be onTrue
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
         .and(() -> !carriage.algaeHeld())
         .and(() -> allowAutoDrive)
