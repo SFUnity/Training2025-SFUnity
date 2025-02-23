@@ -399,8 +399,7 @@ public class Autos {
                     // dealgify(elevator, carriage, poseManager)
                     //     .asProxy()
                     //     .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
-                    Commands.waitSeconds(delayAfterAlgaeIntake.get()),
-                    hGToProcessorScore.cmd()));
+                    Commands.waitSeconds(delayAfterAlgaeIntake.get()), hGToProcessorScore.cmd()));
 
     hGToProcessorScore
         .done()
@@ -441,8 +440,7 @@ public class Autos {
                     // dealgify(elevator, carriage, poseManager)
                     //     .asProxy()
                     //     .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
-                    Commands.waitSeconds(delayAfterAlgaeIntake.get()),
-                    hGToProcessorScore.cmd()));
+                    Commands.waitSeconds(delayAfterAlgaeIntake.get()), hGToProcessorScore.cmd()));
 
     hGToProcessorScore
         .done()
