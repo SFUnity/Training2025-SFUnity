@@ -485,7 +485,7 @@ public class Robot extends LoggedRobot {
     operator.back().onTrue(elevator.runCurrentZeroing());
     operator.back().onTrue(intake.runCurrentZeroing());
 
-    operator.start().onTrue(carriage.resetCoralHeld());
+    operator.start().onTrue(carriage.resetHeld());
 
     // State-Based Triggers
 

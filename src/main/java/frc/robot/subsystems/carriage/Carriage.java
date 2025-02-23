@@ -86,11 +86,12 @@ public class Carriage extends SubsystemBase {
     return realCoralHeld;
   }
 
-  public Command resetCoralHeld() {
+  public Command resetHeld() {
     return Commands.runOnce(
         () -> {
           realCoralHeld = false;
           coralPassed = false;
+          realAlgaeHeld = false;
         });
   }
 
