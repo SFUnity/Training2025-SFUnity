@@ -448,9 +448,13 @@ public class Robot extends LoggedRobot {
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
                     Commands.either(
-                        drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
+                        Commands.either(
+                                drive.fullAutoDrive(goalPose(poseManager)),
+                                drive.headingDrive(() -> goalPose(poseManager).get().getRotation()),
+                                () -> scoreState != ScoreL1)
+                            .asProxy(),
                         Commands.none(),
-                        () -> allowAutoDrive && scoreState != ScoreL1))
+                        () -> allowAutoDrive))
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
