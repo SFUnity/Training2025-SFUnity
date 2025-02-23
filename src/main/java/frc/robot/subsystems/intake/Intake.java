@@ -74,11 +74,6 @@ public class Intake extends SubsystemBase {
       }
     }
 
-    // Check if the pivot is raised high current
-    if (!lowered && filteredCurrent > 20 && !runningIceCream) {
-      hasAlgae = false;
-    }
-
     Logger.recordOutput("Intake/runningIceCream", runningIceCream);
 
     // Logs
@@ -139,13 +134,14 @@ public class Intake extends SubsystemBase {
 
   public Command poopCmd() {
     return Commands.waitUntil(() -> filteredCurrent > 10)
-        .andThen(Commands.waitUntil(() -> filteredCurrent < 5))
-        .deadlineFor(
-            run(
-                () -> {
+        .andThen(
+            Commands.waitUntil(() -> filteredCurrent < 5), Commands.runOnce(() -> hasAlgae = false))
+        .raceWith(
+            run(() -> {
                   raise();
                   rollersOut();
-                }))
+                })
+                .until(() -> !algaeHeld()))
         .withName("poop");
   }
 
