@@ -102,7 +102,7 @@ public class Robot extends LoggedRobot {
       new Alert(
           "Battery voltage is very low, consider turning off the robot or replacing the battery.",
           AlertType.kWarning);
-          private final Alert noLoggingAlert =
+  private final Alert noLoggingAlert =
       new Alert("[AdvantageKit] Failed to open output log file.", AlertType.kError);
 
   // Subsystems
