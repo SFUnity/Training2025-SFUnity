@@ -111,6 +111,7 @@ public class Carriage extends SubsystemBase {
             io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
           }
         })
+        .onlyWhile(() -> coralHeld() || algaeHeld())
         .withName("stop");
   }
 

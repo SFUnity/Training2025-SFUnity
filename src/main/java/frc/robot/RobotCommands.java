@@ -127,13 +127,9 @@ public final class RobotCommands {
                             })
                         .until(carriage::coralHeld)
                         .asProxy()
-                        .alongWith(
-                            either(
-                                none(),
-                                carriage.intakeCoral().asProxy(),
-                                () -> poseManager.distanceToStationFace() < 0.5)),
+                        .alongWith(carriage.intakeCoral().asProxy()),
                     carriage.intakeCoral().asProxy(),
-                    () -> allowHeadingAlign),
+                    () -> allowAutoDrive),
                 Ground,
                 intake.intakeCmd().asProxy(),
                 Ice_Cream,

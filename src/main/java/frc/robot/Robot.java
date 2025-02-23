@@ -367,7 +367,12 @@ public class Robot extends LoggedRobot {
       drive.setDefaultCommand(drive.joystickDrive());
     }
     elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
-    carriage.setDefaultCommand(carriage.stopOrHold());
+    carriage.setDefaultCommand(
+        Commands.either(
+                carriage.intakeCoral().onlyWhile(() -> poseManager.distanceToStationFace() < 0.5),
+                carriage.stopOrHold(),
+                () -> poseManager.distanceToStationFace() < 0.5)
+            .withName("carriageDefault"));
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
