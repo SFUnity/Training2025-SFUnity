@@ -424,7 +424,10 @@ public class Robot extends LoggedRobot {
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
                     Commands.either(
-                        drive.fullAutoDrive(goalPose(poseManager)).onlyIf(() -> scoreState != Dealgify).asProxy(),
+                        drive
+                            .fullAutoDrive(goalPose(poseManager))
+                            .onlyIf(() -> scoreState != Dealgify)
+                            .asProxy(),
                         Commands.none(),
                         () -> allowAutoDrive && scoreState != ScoreL1))
                 .beforeStarting(
