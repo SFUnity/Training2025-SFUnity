@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -284,15 +285,18 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Check if logging source is available
-    try {
-      // These inputs are custom constants from the source of WPILOGWriter
-      DataLogWriter testDataLogWriter = new DataLogWriter("/U/logs", "AdvantageKit");
-      testDataLogWriter.close();
-      noLoggingAlert.set(false);
-    } catch (IOException e) {
-      noLoggingAlert.set(true);
-      DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
+    if (RobotBase.isReal()) {
+      try {
+        // These inputs are custom constants from the source of WPILOGWriter
+        DataLogWriter testDataLogWriter = new DataLogWriter("/U/logs", "AdvantageKit");
+        testDataLogWriter.close();
+        noLoggingAlert.set(false);
+      } catch (IOException e) {
+        noLoggingAlert.set(true);
+        DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
+      }
     }
+    ;
 
     // Print auto duration
     if (autoCommand != null) {
