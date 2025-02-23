@@ -91,8 +91,6 @@ public class AprilTagVision extends VirtualSubsystem {
           // || poseManager.getDistanceTo(estimatedPose) > allowableDistance
           ;
 
-      Logger.recordOutput("distanceToBlankPose", poseManager.getDistanceTo(new Pose2d()));
-
       robotPoses.add(inputs[i].estimatedPose);
       if (isRejected) {
         robotPosesRejected.add(inputs[i].estimatedPose);
