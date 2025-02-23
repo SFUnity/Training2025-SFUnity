@@ -447,10 +447,7 @@ public class Robot extends LoggedRobot {
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
                     Commands.either(
-                        drive
-                            .fullAutoDrive(goalPose(poseManager))
-                            .onlyWhile(() -> scoreState != Dealgify)
-                            .asProxy(),
+                        drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
                         Commands.none(),
                         () -> allowAutoDrive && scoreState != ScoreL1))
                 .beforeStarting(
@@ -468,11 +465,11 @@ public class Robot extends LoggedRobot {
                                 () ->
                                     atGoal(drive).getAsBoolean()
                                         || driver.leftTrigger().getAsBoolean())
-                            // .deadlineFor(
-                            //     Commands.either(
-                            //         drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
-                            //         Commands.none(),
-                            //         () -> allowAutoDrive))
+                            .deadlineFor(
+                                Commands.either(
+                                    drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
+                                    Commands.none(),
+                                    () -> allowAutoDrive))
                             .beforeStarting(
                                 () -> {
                                   scoreState = Dealgify;
