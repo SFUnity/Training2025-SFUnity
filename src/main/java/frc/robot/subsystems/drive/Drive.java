@@ -420,8 +420,9 @@ public class Drive extends SubsystemBase {
           }
 
           // Convert to field relative speeds & send command
-          if (x > 0 || y > 0) {
-            runVelocity(ChassisSpeeds.fromRobotRelativeSpeeds(x, y, omega, gyroInputs.yawPosition));
+          if (Math.abs(x) > 0 || Math.abs(y) > 0) {
+            runVelocity(
+                ChassisSpeeds.fromRobotRelativeSpeeds(x, y, omega, poseManager.rawGyroRotation));
           } else {
             runVelocity(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
