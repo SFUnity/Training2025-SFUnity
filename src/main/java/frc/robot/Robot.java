@@ -433,7 +433,13 @@ public class Robot extends LoggedRobot {
                                 poseManager.getDistanceTo(poseManager.closest(scoreState))
                                     < elevatorSafeExtensionDistanceMeters.get()),
                         Dealgify,
-                        dealgify(elevator, carriage, poseManager),
+                        dealgify(
+                            elevator,
+                            carriage,
+                            poseManager,
+                            () ->
+                                atGoal(drive).getAsBoolean()
+                                    || driver.leftTrigger().getAsBoolean()),
                         ProcessorFront,
                         scoreProcessor(carriage, intake, poseManager, true, atGoal(drive)),
                         ProcessorBack,
@@ -455,7 +461,13 @@ public class Robot extends LoggedRobot {
                     })
                 .andThen(
                     Commands.either(
-                        dealgify(elevator, carriage, poseManager)
+                        dealgify(
+                                elevator,
+                                carriage,
+                                poseManager,
+                                () ->
+                                    atGoal(drive).getAsBoolean()
+                                        || driver.leftTrigger().getAsBoolean())
                             // .deadlineFor(
                             //     Commands.either(
                             //         drive.fullAutoDrive(goalPose(poseManager)).asProxy(),

@@ -57,12 +57,17 @@ public final class RobotCommands {
                             carriage.placeCoral())));
   }
 
-  public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
-    return dealgify(elevator, carriage, poseManager, goalPose(poseManager));
+  public static Command dealgify(
+      Elevator elevator, Carriage carriage, PoseManager poseManager, BooleanSupplier atPose) {
+    return dealgify(elevator, carriage, poseManager, goalPose(poseManager), atPose);
   }
 
   public static Command dealgify(
-      Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
+      Elevator elevator,
+      Carriage carriage,
+      PoseManager poseManager,
+      Supplier<Pose2d> goalPose,
+      BooleanSupplier atPose) {
     BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
     return waitUntil(
             () ->
@@ -70,9 +75,11 @@ public final class RobotCommands {
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
-            either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
-                .andThen(elevator.enableElevator())
-                .alongWith(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
+            parallel(
+                either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
+                    .andThen(elevator.enableElevator()),
+                waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight())
+                    .andThen(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae))))
         .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
   }
 
