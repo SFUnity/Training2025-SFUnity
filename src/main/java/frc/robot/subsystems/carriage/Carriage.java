@@ -23,6 +23,7 @@ public class Carriage extends SubsystemBase {
 
   public static boolean simHasCoral = false;
   public static boolean simHasAlgae = false;
+  public static boolean simBeamBreak = false;
 
   private boolean coralPassed = false;
   private boolean realCoralHeld = false;
@@ -65,14 +66,14 @@ public class Carriage extends SubsystemBase {
     if (Constants.currentMode == Constants.Mode.SIM) {
       realCoralHeld = simHasCoral;
     } else {
-      if (!inputs.beamBreak && !coralPassed) {
+      if (!beamBreak() && !coralPassed) {
         realCoralHeld = false;
-      } else if (!inputs.beamBreak && coralPassed) {
+      } else if (!beamBreak() && coralPassed) {
         realCoralHeld = true;
-      } else if (inputs.beamBreak && !coralPassed && !realCoralHeld) {
+      } else if (beamBreak() && !coralPassed && !realCoralHeld) {
         coralPassed = true;
       }
-      // } else if (inputs.beamBreak && coralPassed && realCoralHeld){
+      // } else if (beamBreak() && coralPassed && realCoralHeld){
       //   coralPassed = false;
       // }
     }
@@ -103,9 +104,16 @@ public class Carriage extends SubsystemBase {
     return realAlgaeHeld;
   }
 
+  private boolean beamBreak() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      return simBeamBreak;
+    }
+    return inputs.beamBreak;
+  }
+
   public Command stopOrHold() {
     return run(() -> {
-          if (!inputs.beamBreak && realCoralHeld) {
+          if (!beamBreak() && realCoralHeld) {
             io.runVolts(-holdSpeedVolts.get());
           } else {
             io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
@@ -125,7 +133,7 @@ public class Carriage extends SubsystemBase {
 
   public Command placeCoral() {
     return run(() -> io.runVolts(placeSpeedVolts.get()))
-        .until(() -> !inputs.beamBreak)
+        .until(() -> !beamBreak())
         .andThen(() -> realCoralHeld = false)
         .andThen(() -> coralPassed = false)
         .withName("placeCoral");
@@ -150,7 +158,7 @@ public class Carriage extends SubsystemBase {
                 .until(() -> realCoralHeld)
                 .andThen(
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
-                        .until(() -> inputs.beamBreak)),
+                        .until(() -> beamBreak())),
             () -> coralInDanger)
         .onlyIf(() -> !coralHeld())
         .withName("intake coral");

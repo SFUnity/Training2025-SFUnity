@@ -425,13 +425,11 @@ public class Robot extends LoggedRobot {
                                 atGoal(drive).getAsBoolean()
                                     || driver.leftTrigger().getAsBoolean()),
                         ScoreL1,
-                        scoreCoral(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () ->
-                                poseManager.getDistanceTo(poseManager.closest(scoreState))
-                                    < elevatorSafeExtensionDistanceMeters.get()),
+                        elevator
+                            .enableElevator()
+                            .alongWith(
+                                Commands.waitUntil(driver.rightTrigger())
+                                    .andThen(carriage.placeCoral())),
                         Dealgify,
                         dealgify(
                             elevator,
@@ -548,6 +546,9 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putData(
         "Toggle Algae in Carriage",
         Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+        SmartDashboard.putData(
+          "Toggle Beam Break in Carriage",
+          Commands.runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
     SmartDashboard.putData(
         "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
 
