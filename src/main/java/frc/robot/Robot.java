@@ -25,6 +25,7 @@ import static frc.robot.util.AllianceFlipUtil.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.util.datalog.DataLogWriter;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -64,6 +65,7 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import java.io.IOException;
 import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -100,6 +102,8 @@ public class Robot extends LoggedRobot {
       new Alert(
           "Battery voltage is very low, consider turning off the robot or replacing the battery.",
           AlertType.kWarning);
+          private final Alert noLoggingAlert =
+      new Alert("[AdvantageKit] Failed to open output log file.", AlertType.kError);
 
   // Subsystems
   private final Drive drive;
@@ -278,6 +282,17 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     VirtualSubsystem.periodicAll();
     CommandScheduler.getInstance().run();
+
+    // Check if logging source is available
+    try {
+      // These inputs are custom constants from the source of WPILOGWriter
+      DataLogWriter testDataLogWriter = new DataLogWriter("/U/logs", "AdvantageKit");
+      testDataLogWriter.close();
+      noLoggingAlert.set(false);
+    } catch (IOException e) {
+      noLoggingAlert.set(true);
+      DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
+    }
 
     // Print auto duration
     if (autoCommand != null) {
