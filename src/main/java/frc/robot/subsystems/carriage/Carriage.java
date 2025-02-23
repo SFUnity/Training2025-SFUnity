@@ -104,6 +104,7 @@ public class Carriage extends SubsystemBase {
     return realAlgaeHeld;
   }
 
+  @AutoLogOutput
   private boolean beamBreak() {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simBeamBreak;
