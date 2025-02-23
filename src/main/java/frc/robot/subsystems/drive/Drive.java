@@ -451,13 +451,13 @@ public class Drive extends SubsystemBase {
           double x = 0;
           double y = 0;
           if (config.povDownPressed()) {
-            x = -povMovementSpeed.get();
-          } else if (config.povUpPressed()) {
             x = povMovementSpeed.get();
+          } else if (config.povUpPressed()) {
+            x = -povMovementSpeed.get();
           } else if (config.povLeftPressed()) {
-            y = povMovementSpeed.get();
-          } else if (config.povRightPressed()) {
             y = -povMovementSpeed.get();
+          } else if (config.povRightPressed()) {
+            y = povMovementSpeed.get();
           }
 
           Translation2d linearVelocity;
