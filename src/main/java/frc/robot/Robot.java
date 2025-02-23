@@ -426,7 +426,7 @@ public class Robot extends LoggedRobot {
                     Commands.either(
                         drive
                             .fullAutoDrive(goalPose(poseManager))
-                            .onlyIf(() -> scoreState != Dealgify)
+                            .onlyWhile(() -> scoreState != Dealgify)
                             .asProxy(),
                         Commands.none(),
                         () -> allowAutoDrive && scoreState != ScoreL1))
@@ -439,11 +439,11 @@ public class Robot extends LoggedRobot {
                 .andThen(
                     Commands.either(
                         dealgify(elevator, carriage, poseManager)
-                            .deadlineFor(
-                                Commands.either(
-                                    drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
-                                    Commands.none(),
-                                    () -> allowAutoDrive))
+                            // .deadlineFor(
+                            //     Commands.either(
+                            //         drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
+                            //         Commands.none(),
+                            //         () -> allowAutoDrive))
                             .beforeStarting(
                                 () -> {
                                   scoreState = Dealgify;
