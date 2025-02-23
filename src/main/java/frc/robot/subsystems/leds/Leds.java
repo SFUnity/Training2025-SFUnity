@@ -4,6 +4,8 @@ package frc.robot.subsystems.leds;
 
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj.LEDPattern.*;
 
@@ -199,7 +201,8 @@ public class Leds extends VirtualSubsystem {
   }
 
   private void teamColors() {
-    LEDPattern base = LEDPattern.steps(Map.of(0, Color.kOrange, 0.5, Color.kBlue));
-    pattern = base; // .scrollAtAbsoluteSpeed(Centimeters.per(Second).of(12.5), ledSpacing);
+    LEDPattern base = LEDPattern.steps(Map.of(0, Color.kDarkOrange, 0.5, Color.kBlue));
+    pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(25));
+    // (InchesPerSecond.of(2), ledSpacing);
   }
 }
