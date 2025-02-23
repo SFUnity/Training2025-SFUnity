@@ -354,7 +354,7 @@ public class Robot extends LoggedRobot {
     } else {
       drive.setDefaultCommand(drive.joystickDrive());
     }
-    elevator.setDefaultCommand(elevator.disableElevator());
+    elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
     carriage.setDefaultCommand(carriage.stopOrHold());
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
