@@ -293,7 +293,7 @@ public class Robot extends LoggedRobot {
         noLoggingAlert.set(false);
       } catch (IOException e) {
         noLoggingAlert.set(true);
-        DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
+        DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
       }
     }
     ;
