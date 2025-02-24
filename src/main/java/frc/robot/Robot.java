@@ -285,18 +285,18 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Check if logging source is available
-    if (RobotBase.isReal()) {
-      try {
-        // These inputs are custom constants from the source of WPILOGWriter
-        DataLogWriter testDataLogWriter = new DataLogWriter("/U/logs", "AdvantageKit");
-        testDataLogWriter.close();
-        noLoggingAlert.set(false);
-      } catch (IOException e) {
-        noLoggingAlert.set(true);
-        DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
-      }
-    }
-    ;
+    // if (RobotBase.isReal()) {
+    //   try {
+    //     // These inputs are custom constants from the source of WPILOGWriter
+    //     DataLogWriter testDataLogWriter = new DataLogWriter("/U/logs", "AdvantageKit");
+    //     testDataLogWriter.close();
+    //     noLoggingAlert.set(false);
+    //   } catch (IOException e) {
+    //     noLoggingAlert.set(true);
+    //     DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
+    //   }
+    // }
+    // ;
 
     // Print auto duration
     if (autoCommand != null) {
