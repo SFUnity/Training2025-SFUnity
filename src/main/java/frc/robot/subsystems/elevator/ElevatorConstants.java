@@ -30,9 +30,9 @@ public class ElevatorConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        kP = new LoggedTunableNumber("Elevator/kP", 1.5);
+        kP = new LoggedTunableNumber("Elevator/kP", 1.3);
         kD = new LoggedTunableNumber("Elevator/kD", 0);
-        kG = new LoggedTunableNumber("Elevator/kG", 0.37);
+        kG = new LoggedTunableNumber("Elevator/kG", 0.34);
         kV = new LoggedTunableNumber("Elevator/kV", 0.2);
         break;
       case SIM:
