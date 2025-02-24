@@ -52,7 +52,7 @@ public class Intake extends SubsystemBase {
     // Check that the pivot is lowered and not rising
     if ((inputs.pivotAppliedVolts <= 0.5 && lowered) || runningIceCream) {
       // Check if the current is high enough to be intaking
-      if (filteredCurrent >= spikeCurrent.get()) {
+      if (filteredCurrent >= spikeCurrent.get() && !runningIceCream) {
         // check for start of intaking
         if (!startedIntaking && !hasAlgae) {
           startedIntaking = true;
