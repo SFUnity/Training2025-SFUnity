@@ -369,9 +369,11 @@ public class Robot extends LoggedRobot {
     elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
     carriage.setDefaultCommand(
         Commands.either(
-                carriage.intakeCoral().onlyWhile(() -> poseManager.distanceToStationFace() < 0.5),
+                carriage
+                    .intakeCoral()
+                    .onlyWhile(() -> poseManager.distanceToStationFace() < 0.5 && allowAutoDrive),
                 carriage.stopOrHold(),
-                () -> poseManager.distanceToStationFace() < 0.5)
+                () -> poseManager.distanceToStationFace() < 0.5 && allowAutoDrive)
             .withName("carriageDefault"));
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
