@@ -135,7 +135,7 @@ public class Intake extends SubsystemBase {
   public Command poopCmd() {
     return Commands.waitUntil(() -> filteredCurrent > 10)
         .andThen(
-            Commands.waitUntil(() -> filteredCurrent < 5), Commands.runOnce(() -> hasAlgae = false))
+            Commands.waitUntil(() -> filteredCurrent < 1), Commands.runOnce(() -> hasAlgae = false))
         .raceWith(
             run(() -> {
                   raise();
