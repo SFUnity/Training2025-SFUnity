@@ -440,9 +440,11 @@ public class Robot extends LoggedRobot {
                             elevator,
                             carriage,
                             poseManager,
-                            () ->
-                                atGoal(drive).getAsBoolean()
-                                    || driver.leftTrigger().getAsBoolean()),
+                            () -> {if (allowAutoDrive) {
+                              return atGoal(drive).getAsBoolean() || driver.leftTrigger().getAsBoolean();
+                            } else {
+                              return driver.leftTrigger().getAsBoolean();
+                            }}),
                         ProcessorFront,
                         scoreProcessor(carriage, intake, poseManager, true, atGoal(drive)),
                         ProcessorBack,
