@@ -326,10 +326,9 @@ public class Robot extends LoggedRobot {
     if (DriverStation.isEnabled()) {
       disabledTimer.reset();
     }
-    if (RobotController.getBatteryVoltage() <= lowBatteryVoltage
-        && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
-      lowBatteryAlert.set(true);
-    }
+    lowBatteryAlert.set(
+        RobotController.getBatteryVoltage() <= lowBatteryVoltage
+            && disabledTimer.hasElapsed(lowBatteryDisabledTime));
 
     // Check for coralInDanger
     Carriage.coralInDanger = elevator.pastL3Height() && carriage.coralHeld();
