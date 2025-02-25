@@ -62,6 +62,8 @@ public class WPILOGWriter9038 implements LogDataReceiver {
   private Map<String, Integer> entryIDs;
   private Map<String, LoggableType> entryTypes;
 
+  private boolean hasLogOutput = true;
+
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
@@ -151,7 +153,9 @@ public class WPILOGWriter9038 implements LogDataReceiver {
     System.out.println("[AdvantageKit] Logging to \"" + logPath + "\"");
     try {
       log = new DataLogWriter(logPath, WPILOGConstants.extraHeader);
+      hasLogOutput = true;
     } catch (IOException e) {
+      hasLogOutput = false;
       DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
       return;
     }
@@ -363,6 +367,10 @@ public class WPILOGWriter9038 implements LogDataReceiver {
 
     /** Never open the log file in AdvantageScope */
     NEVER
+  }
+
+  public boolean hasLogOutput() {
+    return hasLogOutput;
   }
 }
 
