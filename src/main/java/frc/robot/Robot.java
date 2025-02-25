@@ -64,7 +64,11 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
+import frc.robot.util.WPILOGWriter9038;
+
 import java.util.Map;
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -131,6 +135,8 @@ public class Robot extends LoggedRobot {
   private final DriveCommandsConfig driveCommandsConfig =
       new DriveCommandsConfig(driver, () -> slowMode, slowDriveMultiplier, slowTurnMultiplier);
 
+  private BooleanSupplier loggingOutputAvailable = () -> true;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -162,7 +168,9 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
+        WPILOGWriter9038 logWriter = new WPILOGWriter9038();
+        loggingOutputAvailable = logWriter::hasLogOutput;
+        Logger.addDataReceiver(logWriter);
         Logger.addDataReceiver(new NT4Publisher());
         Logger.registerURCL(URCL.startExternal()); // Enables REV CAN logging !!! not replayable !!!
         break;
@@ -281,19 +289,11 @@ public class Robot extends LoggedRobot {
     VirtualSubsystem.periodicAll();
     CommandScheduler.getInstance().run();
 
-    // Check if logging source is available
-    // if (RobotBase.isReal()) {
-    //   try {
-    //     // These inputs are custom constants from the source of WPILOGWriter
-    //     DataLogWriter testDataLogWriter = new DataLogWriter("/U/logs", "AdvantageKit");
-    //     testDataLogWriter.close();
-    //     noLoggingAlert.set(false);
-    //   } catch (IOException e) {
-    //     noLoggingAlert.set(true);
-    //     DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
-    //   }
-    // }
-    // ;
+    // Check if logging output is available
+    noLoggingAlert.set(!loggingOutputAvailable.getAsBoolean());
+    if (!loggingOutputAvailable.getAsBoolean()) {
+      DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
+    }
 
     // Print auto duration
     if (autoCommand != null) {
