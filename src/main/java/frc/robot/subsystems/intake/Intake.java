@@ -71,6 +71,7 @@ public class Intake extends SubsystemBase {
       // check for massive current spike
       if (filteredCurrent >= 35) {
         hasAlgae = true;
+        startedIntaking = false;
       }
     }
 
