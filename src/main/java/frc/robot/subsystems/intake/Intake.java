@@ -30,7 +30,7 @@ public class Intake extends SubsystemBase {
   private boolean runningIceCream = false;
 
   private final LoggedTunableNumber spikeCurrent =
-      new LoggedTunableNumber("Intake/spikeCurrent", 10);
+      new LoggedTunableNumber("Intake/spikeCurrent", 17);
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
