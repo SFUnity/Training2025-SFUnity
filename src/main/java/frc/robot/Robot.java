@@ -65,10 +65,8 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
 import frc.robot.util.WPILOGWriter9038;
-
 import java.util.Map;
 import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
