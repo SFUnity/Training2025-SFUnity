@@ -423,14 +423,14 @@ public class Robot extends LoggedRobot {
                             poseManager,
                             () ->
                                 atGoal(drive).getAsBoolean()
-                                    || driver.leftTrigger().getAsBoolean()),
+                                    || driveCommandsConfig.finishScoring()),
                         ScoreL1,
                         elevator
                             .enableElevator()
                             .alongWith(
                                 Commands.waitUntil(
                                         () ->
-                                            driver.rightTrigger().getAsBoolean()
+                                            driveCommandsConfig.finishScoring()
                                                 && elevator.atGoalHeight())
                                     .andThen(carriage.placeCoral())),
                         Dealgify,
@@ -441,9 +441,9 @@ public class Robot extends LoggedRobot {
                             () -> {
                               if (allowAutoDrive) {
                                 return atGoal(drive).getAsBoolean()
-                                    || driver.leftTrigger().getAsBoolean();
+                                    || driveCommandsConfig.finishScoring();
                               } else {
-                                return driver.leftTrigger().getAsBoolean();
+                                return driveCommandsConfig.finishScoring();
                               }
                             }),
                         ProcessorFront,
@@ -474,7 +474,7 @@ public class Robot extends LoggedRobot {
                                 poseManager,
                                 () ->
                                     atGoal(drive).getAsBoolean()
-                                        || driver.leftTrigger().getAsBoolean())
+                                        || driveCommandsConfig.finishScoring())
                             .deadlineFor(
                                 Commands.either(
                                     drive.fullAutoDrive(goalPose(poseManager)).asProxy(),

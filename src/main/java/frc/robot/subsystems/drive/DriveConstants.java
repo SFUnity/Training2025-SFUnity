@@ -185,5 +185,9 @@ public class DriveConstants {
     public boolean povRightPressed() {
       return controller.povRight().getAsBoolean();
     }
+
+    public boolean finishScoring() {
+      return controller.leftTrigger().getAsBoolean();
+    }
   }
 }
