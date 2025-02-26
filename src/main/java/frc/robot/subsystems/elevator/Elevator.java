@@ -135,7 +135,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command enableElevator() {
-    return run(() -> setHeight = true).until(this::atGoalHeight).withName("enableElevator");
+    return run(() -> setHeight = true).until(this::atDesiredHeight).withName("enableElevator");
   }
 
   public Command disableElevator(BooleanSupplier algaeInCarriage) {

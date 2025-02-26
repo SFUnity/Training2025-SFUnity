@@ -431,7 +431,7 @@ public class Robot extends LoggedRobot {
                                 Commands.waitUntil(
                                         () ->
                                             driver.rightTrigger().getAsBoolean()
-                                                && elevator.atGoalHeight())
+                                                && elevator.atDesiredHeight())
                                     .andThen(carriage.placeCoral())),
                         Dealgify,
                         dealgify(

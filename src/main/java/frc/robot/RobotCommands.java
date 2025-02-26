@@ -53,7 +53,7 @@ public final class RobotCommands {
                             none(),
                             () -> elevator.goalHeightInches > ElevatorConstants.pastL3Height.get())
                         .andThen(
-                            waitUntil(() -> atPose.getAsBoolean() && elevator.atGoalHeight()),
+                            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
                             carriage.placeCoral())));
   }
 
@@ -81,7 +81,7 @@ public final class RobotCommands {
                 waitUntil(() -> atPose.getAsBoolean())
                     .andThen(
                         either(
-                            waitUntil(elevator::atGoalHeight).andThen(carriage.highDealgify()),
+                            waitUntil(elevator::atDesiredHeight).andThen(carriage.highDealgify()),
                             carriage.lowDealgify(),
                             highAlgae))))
         .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
