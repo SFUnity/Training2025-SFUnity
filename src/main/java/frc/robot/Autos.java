@@ -88,6 +88,8 @@ public class Autos {
     chooser.addRoutine("GHAlgaeToProcessorL1", this::GHAlgaeToProcessorL1);
     chooser.addRoutine("FL2HGAlgae", this::FL2HGAlgae);
     chooser.addRoutine("IL2HGAlgae", this::IL2HGAlgae);
+    chooser.addRoutine("StraightLine", this::StraightLine);
+    chooser.addRoutine("Spin", this::Spin);
     chooser.addRoutine("chaos", this::chaos);
 
     if (!DriverStation.isFMSAttached()) {
@@ -467,6 +469,28 @@ public class Autos {
     hGToProcessorScore
         .done()
         .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.done()));
+
+    return routine;
+  }
+
+  public AutoRoutine StraightLine() {
+
+    AutoRoutine routine = factory.newRoutine("StraightLine");
+
+    AutoTrajectory StraightLine = routine.trajectory("StraightLine");
+
+    routine.active().onTrue(StraightLine.resetOdometry().andThen(StraightLine.cmd()));
+
+    return routine;
+  }
+
+  public AutoRoutine Spin() {
+
+    AutoRoutine routine = factory.newRoutine("Spin");
+
+    AutoTrajectory Spin = routine.trajectory("Spin");
+
+    routine.active().onTrue(Spin.resetOdometry().andThen(Spin.cmd()));
 
     return routine;
   }
