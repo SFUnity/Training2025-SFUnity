@@ -68,7 +68,7 @@ public final class RobotCommands {
       PoseManager poseManager,
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
-    BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
+    BooleanSupplier highAlgae = () -> false; // poseManager.closestFaceHighAlgae()
     return waitUntil(
             () ->
                 !allowAutoDrive
