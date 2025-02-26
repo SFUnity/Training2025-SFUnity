@@ -98,8 +98,28 @@ public class Autos {
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
         nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
 
-        nonChoreoChooser.addOption("StraightLineChoreo", factory.trajectoryCmd("StraightLine").beforeStarting(() -> poseManager.setPose(Choreo.loadTrajectory("StraightLine").get().getInitialPose(AllianceFlipUtil.shouldFlip()).get())));
-        nonChoreoChooser.addOption("SpinInLineChoreo", factory.trajectoryCmd("Spin").beforeStarting(() -> poseManager.setPose(Choreo.loadTrajectory("Spin").get().getInitialPose(AllianceFlipUtil.shouldFlip()).get())));
+        nonChoreoChooser.addOption(
+            "StraightLineChoreo",
+            factory
+                .trajectoryCmd("StraightLine")
+                .beforeStarting(
+                    () ->
+                        poseManager.setPose(
+                            Choreo.loadTrajectory("StraightLine")
+                                .get()
+                                .getInitialPose(AllianceFlipUtil.shouldFlip())
+                                .get())));
+        nonChoreoChooser.addOption(
+            "SpinInLineChoreo",
+            factory
+                .trajectoryCmd("Spin")
+                .beforeStarting(
+                    () ->
+                        poseManager.setPose(
+                            Choreo.loadTrajectory("Spin")
+                                .get()
+                                .getInitialPose(AllianceFlipUtil.shouldFlip())
+                                .get())));
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
