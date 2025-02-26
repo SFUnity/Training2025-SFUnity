@@ -13,7 +13,6 @@ import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L1;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L2;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
-import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
@@ -46,7 +45,7 @@ public class Autos {
 
   private final LoggedDashboardChooser<Command> nonChoreoChooser =
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
-  private static final boolean isChoreoAuto = false;
+  private static final boolean isChoreoAuto = true;
 
   private int coralOnL3 = 0;
   private int coralOnL2 = 0;
@@ -99,27 +98,6 @@ public class Autos {
       if (!isChoreoAuto) {
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
         nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
-
-        nonChoreoChooser.addOption(
-            "StraightLineChoreo",
-            runOnce(
-                    () ->
-                        poseManager.setPose(
-                            Choreo.loadTrajectory("StraightLine")
-                                .get()
-                                .getInitialPose(AllianceFlipUtil.shouldFlip())
-                                .get()))
-                .andThen(factory.trajectoryCmd("StraightLine")));
-        nonChoreoChooser.addOption(
-            "SpinInLineChoreo",
-            runOnce(
-                    () ->
-                        poseManager.setPose(
-                            Choreo.loadTrajectory("Spin")
-                                .get()
-                                .getInitialPose(AllianceFlipUtil.shouldFlip())
-                                .get()))
-                .andThen(factory.trajectoryCmd("Spin")));
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
