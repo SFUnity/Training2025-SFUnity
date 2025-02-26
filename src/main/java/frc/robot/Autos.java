@@ -100,26 +100,24 @@ public class Autos {
 
         nonChoreoChooser.addOption(
             "StraightLineChoreo",
-            factory
-                .trajectoryCmd("StraightLine")
-                .beforeStarting(
+            runOnce(
                     () ->
                         poseManager.setPose(
                             Choreo.loadTrajectory("StraightLine")
                                 .get()
                                 .getInitialPose(AllianceFlipUtil.shouldFlip())
-                                .get())));
+                                .get()))
+                .andThen(factory.trajectoryCmd("StraightLine")));
         nonChoreoChooser.addOption(
             "SpinInLineChoreo",
-            factory
-                .trajectoryCmd("Spin")
-                .beforeStarting(
+            runOnce(
                     () ->
                         poseManager.setPose(
                             Choreo.loadTrajectory("Spin")
                                 .get()
                                 .getInitialPose(AllianceFlipUtil.shouldFlip())
-                                .get())));
+                                .get()))
+                .andThen(factory.trajectoryCmd("Spin")));
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
