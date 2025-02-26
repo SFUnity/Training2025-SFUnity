@@ -161,7 +161,7 @@ public class Carriage extends SubsystemBase {
   public Command scoreProcessor() {
     return run(() -> io.runVolts(processorSpeedVolts.get()))
         .withTimeout(.2)
-        .andThen(() -> realAlgaeHeld = false)
+        .finallyDo(() -> realAlgaeHeld = false)
         .withName("scoreProcessor");
   }
 }
