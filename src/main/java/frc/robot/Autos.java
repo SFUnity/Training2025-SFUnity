@@ -45,7 +45,7 @@ public class Autos {
 
   private final LoggedDashboardChooser<Command> nonChoreoChooser =
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
-  private static final boolean isChoreoAuto = true;
+  private static final boolean isChoreoAuto = false;
 
   private int coralOnL3 = 0;
   private int coralOnL2 = 0;
@@ -96,6 +96,9 @@ public class Autos {
       if (!isChoreoAuto) {
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
         nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
+
+        nonChoreoChooser.addOption("StraightLineChoreo", factory.trajectoryCmd("StraightLine"));
+        nonChoreoChooser.addOption("SpinInLineChoreo", factory.trajectoryCmd("Spin"));
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
