@@ -13,6 +13,7 @@ import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L1;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L2;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
+import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
@@ -97,8 +98,8 @@ public class Autos {
         nonChoreoChooser.addOption("Module Turn Tuning", drive.tuneModuleTurn());
         nonChoreoChooser.addOption("Module Drive Tuning", drive.tuneModuleDrive());
 
-        nonChoreoChooser.addOption("StraightLineChoreo", factory.trajectoryCmd("StraightLine"));
-        nonChoreoChooser.addOption("SpinInLineChoreo", factory.trajectoryCmd("Spin"));
+        nonChoreoChooser.addOption("StraightLineChoreo", factory.trajectoryCmd("StraightLine").beforeStarting(() -> poseManager.setPose(Choreo.loadTrajectory("StraightLine").get().getInitialPose(AllianceFlipUtil.shouldFlip()).get())));
+        nonChoreoChooser.addOption("SpinInLineChoreo", factory.trajectoryCmd("Spin").beforeStarting(() -> poseManager.setPose(Choreo.loadTrajectory("Spin").get().getInitialPose(AllianceFlipUtil.shouldFlip()).get())));
 
         // Set up SysId routines
         nonChoreoChooser.addOption(
