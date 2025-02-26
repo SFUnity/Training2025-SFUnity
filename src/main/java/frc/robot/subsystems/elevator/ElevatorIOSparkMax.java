@@ -6,10 +6,8 @@ import static frc.robot.util.SparkUtil.sparkConfig;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import frc.robot.util.LoggedTunableNumber;
-
 import com.revrobotics.spark.SparkMax;
+import frc.robot.util.LoggedTunableNumber;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
@@ -21,7 +19,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private double deltaPosition = 0;
   private double deltaTime = 0;
 
-  private final LoggedTunableNumber sillyHeightOffset = new LoggedTunableNumber("Elevator/sillyHeightOffset", 0.05);
+  private final LoggedTunableNumber sillyHeightOffset =
+      new LoggedTunableNumber("Elevator/sillyHeightOffset", 0.05);
 
   public ElevatorIOSparkMax() {
     var motorConfig = sparkConfig(false, 1);
