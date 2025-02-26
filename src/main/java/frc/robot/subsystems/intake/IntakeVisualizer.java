@@ -43,6 +43,8 @@ public class IntakeVisualizer {
 
   /** Update intake visualizer with current intake angle */
   public void update(Angle angle) {
+    angle = Degrees.of(-1.0758 * angle.in(Degrees) + 89);
+
     // Log Mechanism2d
     intake.setAngle(angle.in(Degrees));
     Logger.recordOutput("Intake/Mechanism2d/" + key, mechanism);
