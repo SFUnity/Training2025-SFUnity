@@ -45,7 +45,7 @@ public class Autos {
 
   private final LoggedDashboardChooser<Command> nonChoreoChooser =
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
-  private static final boolean isChoreoAuto = false;
+  private static final boolean isChoreoAuto = true;
 
   private int coralOnL3 = 0;
   private int coralOnL2 = 0;
