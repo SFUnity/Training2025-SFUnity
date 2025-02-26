@@ -79,7 +79,11 @@ public final class RobotCommands {
                 either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
                     .andThen(elevator.enableElevator()),
                 waitUntil(() -> atPose.getAsBoolean())
-                    .andThen(either(waitUntil(elevator::atDesiredHeight).andThen(carriage.highDealgify()), carriage.lowDealgify(), highAlgae))))
+                    .andThen(
+                        either(
+                            waitUntil(elevator::atDesiredHeight).andThen(carriage.highDealgify()),
+                            carriage.lowDealgify(),
+                            highAlgae))))
         .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
   }
 
