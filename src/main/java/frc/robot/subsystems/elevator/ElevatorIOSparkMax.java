@@ -35,7 +35,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
     prevoiusPosition = inputs.position;
     // how much the elevator moves per rotation (from otis)
-    inputs.position = encoder.getPosition() * (wheelRadius) + sillyHeightOffset.get();
+    inputs.position = encoder.getPosition() * (wheelRadius) - sillyHeightOffset.get();
     deltaPosition = inputs.position - prevoiusPosition;
     deltaTime = (currentTime - prevoiusTime) / 1e9;
     inputs.velocityInchesPerSec = deltaPosition / deltaTime;
