@@ -61,6 +61,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -142,6 +143,8 @@ public class Robot extends LoggedRobot {
   @SuppressWarnings("resource")
   public Robot() {
     super();
+
+    Leds.getInstance();
 
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -304,6 +307,8 @@ public class Robot extends LoggedRobot {
               "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
         }
         autoMessagePrinted = true;
+        Leds.getInstance().autoFinished = true;
+        Leds.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
       }
     }
 
@@ -324,9 +329,11 @@ public class Robot extends LoggedRobot {
     if (DriverStation.isEnabled()) {
       disabledTimer.reset();
     }
-    lowBatteryAlert.set(
-        RobotController.getBatteryVoltage() <= lowBatteryVoltage
-            && disabledTimer.hasElapsed(lowBatteryDisabledTime));
+    if (RobotController.getBatteryVoltage() <= lowBatteryVoltage
+        && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
+      lowBatteryAlert.set(true);
+      Leds.getInstance().lowBatteryAlert = true;
+    }
 
     // Check for coralInDanger
     Carriage.coralInDanger = elevator.pastL3Height() && carriage.coralHeld();

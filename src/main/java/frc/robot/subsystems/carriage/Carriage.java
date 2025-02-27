@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -54,6 +55,9 @@ public class Carriage extends SubsystemBase {
         && filteredStatorCurrent >= algaeCurrentThreshold.get()) {
       realAlgaeHeld = true;
     }
+
+    Leds.getInstance().coralHeld = coralHeld();
+    Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 
     Logger.recordOutput("Carriage/coralPassed", coralPassed);
 

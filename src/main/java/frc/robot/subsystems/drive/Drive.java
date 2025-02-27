@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
@@ -478,6 +479,8 @@ public class Drive extends SubsystemBase {
                   AllianceFlipUtil.shouldFlip()
                       ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
                       : poseManager.getRotation()));
+
+          Leds.getInstance().alignedWithTarget = thetaAtGoal();
         })
         .beforeStarting(
             () -> {
@@ -486,6 +489,7 @@ public class Drive extends SubsystemBase {
         .finallyDo(
             () -> {
               stop();
+              Leds.getInstance().alignedWithTarget = false;
             })
         .withName("Heading Drive");
   }
@@ -546,15 +550,20 @@ public class Drive extends SubsystemBase {
                   thetaVelocity,
                   poseManager.getRotation()));
 
-          Logger.recordOutput("Drive/Commands/CurrentDistance", currentDistance);
+          Leds.getInstance().alignedWithTarget = linearAtGoal() && thetaAtGoal();
+
+          Logger.recordOutput("Drive/Commands/Linear/currentDistance", currentDistance);
         })
         .beforeStarting(
             () -> {
               resetControllers(goalPose.get());
+              Leds.getInstance().autoAllignActivated = true;
             })
         .finallyDo(
             () -> {
               stop();
+              Leds.getInstance().alignedWithTarget = false;
+              Leds.getInstance().autoAllignActivated = false;
             })
         .withName("Full Auto Drive");
   }
