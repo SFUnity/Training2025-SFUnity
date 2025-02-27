@@ -197,7 +197,7 @@ public class Leds extends VirtualSubsystem {
   }
 
   private void teamColors() {
-    LEDPattern base = LEDPattern.steps(Map.of(0, new Color(255, 30, 0), 0.5, new Color(0, 0, 100)));
+    LEDPattern base = LEDPattern.steps(Map.of(0, new Color(255, 30, 0), 0.5, new Color(0, 0, 225)));
     pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(25));
     // (InchesPerSecond.of(2), ledSpacing);
   }
