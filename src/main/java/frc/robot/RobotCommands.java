@@ -53,7 +53,7 @@ public final class RobotCommands {
                             none(),
                             () -> elevator.goalHeightInches > ElevatorConstants.pastL3Height.get())
                         .andThen(
-                            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
+                            waitUntil(() -> atPose.getAsBoolean() && elevator.atGoalHeight()),
                             carriage.placeCoral())));
   }
 
@@ -68,7 +68,7 @@ public final class RobotCommands {
       PoseManager poseManager,
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
-    BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
+    BooleanSupplier highAlgae = () -> false; // poseManager.closestFaceHighAlgae()
     return waitUntil(
             () ->
                 !allowAutoDrive
@@ -78,8 +78,12 @@ public final class RobotCommands {
             parallel(
                 either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
                     .andThen(elevator.enableElevator()),
-                waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight())
-                    .andThen(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae))))
+                waitUntil(() -> atPose.getAsBoolean())
+                    .andThen(
+                        either(
+                            waitUntil(elevator::atGoalHeight).andThen(carriage.highDealgify()),
+                            carriage.lowDealgify(),
+                            highAlgae))))
         .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
   }
 
@@ -144,6 +148,7 @@ public final class RobotCommands {
                     .request(IceCream)
                     .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
                     .raceWith(intake.iceCreamCmd())
+                    .withName("iceCreamIntake")
                     .asProxy()),
             () -> intakeState)
         .withName("fullIntake");

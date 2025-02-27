@@ -56,7 +56,7 @@ public class Elevator extends SubsystemBase {
     this.io = io;
     this.poseManager = poseManager;
 
-    pid.setTolerance(elevatorDistanceToleranceInches);
+    pid.setTolerance(elevatorPIDToleranceInches);
     // Create the SysId routine
     elevatorRoutine =
         new SysIdRoutine(
@@ -119,11 +119,6 @@ public class Elevator extends SubsystemBase {
   }
 
   @AutoLogOutput
-  public boolean atDesiredHeight() {
-    return pid.atSetpoint();
-  }
-
-  @AutoLogOutput
   public boolean atGoalHeight() {
     return Util.equalsWithTolerance(
         goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
@@ -153,8 +148,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command runCurrentZeroing() {
-    return this.run(() -> io.runVolts(-1.0))
-        .until(() -> inputs.currentAmps > 40.0)
+    return run(() -> io.runVolts(-1.0))
+        .until(() -> inputs.currentAmps > 30.0)
+        .andThen(run(() -> io.runVolts(0)).withTimeout(0.5))
         .finallyDo(() -> io.resetEncoder(0.0));
   }
 

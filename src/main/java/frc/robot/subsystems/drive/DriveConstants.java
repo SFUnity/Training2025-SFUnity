@@ -103,8 +103,8 @@ public class DriveConstants {
       default:
         driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.35);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = 0.129;
-        driveKv = 0.657;
+        driveKs = 0.12926;
+        driveKv = 0.83967;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
@@ -184,6 +184,10 @@ public class DriveConstants {
 
     public boolean povRightPressed() {
       return controller.povRight().getAsBoolean();
+    }
+
+    public boolean finishScoring() {
+      return controller.leftTrigger().getAsBoolean();
     }
   }
 }

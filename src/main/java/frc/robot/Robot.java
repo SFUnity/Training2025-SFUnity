@@ -25,12 +25,10 @@ import static frc.robot.util.AllianceFlipUtil.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
-import edu.wpi.first.util.datalog.DataLogWriter;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,8 +65,9 @@ import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
-import java.io.IOException;
+import frc.robot.util.WPILOGWriter9038;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -105,7 +104,7 @@ public class Robot extends LoggedRobot {
           "Battery voltage is very low, consider turning off the robot or replacing the battery.",
           AlertType.kWarning);
   private final Alert noLoggingAlert =
-      new Alert("[AdvantageKit] Failed to open output log file.", AlertType.kError);
+      new Alert("AdvantageKit Failed to open output log file.", AlertType.kError);
 
   // Subsystems
   private final Drive drive;
@@ -134,6 +133,8 @@ public class Robot extends LoggedRobot {
 
   private final DriveCommandsConfig driveCommandsConfig =
       new DriveCommandsConfig(driver, () -> slowMode, slowDriveMultiplier, slowTurnMultiplier);
+
+  private BooleanSupplier loggingOutputAvailable = () -> true;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -168,7 +169,9 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
+        WPILOGWriter9038 logWriter = new WPILOGWriter9038();
+        loggingOutputAvailable = logWriter::hasLogOutput;
+        Logger.addDataReceiver(logWriter);
         Logger.addDataReceiver(new NT4Publisher());
         Logger.registerURCL(URCL.startExternal()); // Enables REV CAN logging !!! not replayable !!!
         break;
@@ -287,19 +290,11 @@ public class Robot extends LoggedRobot {
     VirtualSubsystem.periodicAll();
     CommandScheduler.getInstance().run();
 
-    // Check if logging source is available
-    if (RobotBase.isReal()) {
-      try {
-        // These inputs are custom constants from the source of WPILOGWriter
-        DataLogWriter testDataLogWriter = new DataLogWriter("/U/logs", "AdvantageKit");
-        testDataLogWriter.close();
-        noLoggingAlert.set(false);
-      } catch (IOException e) {
-        noLoggingAlert.set(true);
-        DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
-      }
+    // Check if logging output is available
+    noLoggingAlert.set(!loggingOutputAvailable.getAsBoolean());
+    if (!loggingOutputAvailable.getAsBoolean()) {
+      DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
     }
-    ;
 
     // Print auto duration
     if (autoCommand != null) {
@@ -379,9 +374,11 @@ public class Robot extends LoggedRobot {
     elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
     carriage.setDefaultCommand(
         Commands.either(
-                carriage.intakeCoral().onlyWhile(() -> poseManager.distanceToStationFace() < 0.5),
+                carriage
+                    .intakeCoral()
+                    .onlyWhile(() -> poseManager.distanceToStationFace() < 0.5 && allowAutoDrive),
                 carriage.stopOrHold(),
-                () -> poseManager.distanceToStationFace() < 0.5)
+                () -> poseManager.distanceToStationFace() < 0.5 && allowAutoDrive)
             .withName("carriageDefault"));
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
@@ -433,24 +430,29 @@ public class Robot extends LoggedRobot {
                             poseManager,
                             () ->
                                 atGoal(drive).getAsBoolean()
-                                    || driver.leftTrigger().getAsBoolean()),
+                                    || driveCommandsConfig.finishScoring()),
                         ScoreL1,
                         elevator
                             .enableElevator()
                             .alongWith(
                                 Commands.waitUntil(
                                         () ->
-                                            driver.rightTrigger().getAsBoolean()
-                                                && elevator.atDesiredHeight())
+                                            driveCommandsConfig.finishScoring()
+                                                && elevator.atGoalHeight())
                                     .andThen(carriage.placeCoral())),
                         Dealgify,
                         dealgify(
                             elevator,
                             carriage,
                             poseManager,
-                            () ->
-                                atGoal(drive).getAsBoolean()
-                                    || driver.leftTrigger().getAsBoolean()),
+                            () -> {
+                              if (allowAutoDrive) {
+                                return atGoal(drive).getAsBoolean()
+                                    || driveCommandsConfig.finishScoring();
+                              } else {
+                                return driveCommandsConfig.finishScoring();
+                              }
+                            }),
                         ProcessorFront,
                         scoreProcessor(carriage, intake, poseManager, true, atGoal(drive)),
                         ProcessorBack,
@@ -479,7 +481,7 @@ public class Robot extends LoggedRobot {
                                 poseManager,
                                 () ->
                                     atGoal(drive).getAsBoolean()
-                                        || driver.leftTrigger().getAsBoolean())
+                                        || driveCommandsConfig.finishScoring())
                             .deadlineFor(
                                 Commands.either(
                                     drive.fullAutoDrive(goalPose(poseManager)).asProxy(),

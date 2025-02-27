@@ -416,9 +416,9 @@ public class Drive extends SubsystemBase {
           } else if (config.povUpPressed()) {
             x = povMovementSpeed.get();
           } else if (config.povLeftPressed()) {
-            y = -povMovementSpeed.get();
-          } else if (config.povRightPressed()) {
             y = povMovementSpeed.get();
+          } else if (config.povRightPressed()) {
+            y = -povMovementSpeed.get();
           }
 
           // Convert to field relative speeds & send command

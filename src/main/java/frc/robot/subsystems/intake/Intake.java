@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
   private boolean runningIceCream = false;
 
   private final LoggedTunableNumber spikeCurrent =
-      new LoggedTunableNumber("Intake/spikeCurrent", 10);
+      new LoggedTunableNumber("Intake/spikeCurrent", 17);
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -53,7 +53,7 @@ public class Intake extends SubsystemBase {
     // Check that the pivot is lowered and not rising
     if ((inputs.pivotAppliedVolts <= 0.5 && lowered) || runningIceCream) {
       // Check if the current is high enough to be intaking
-      if (filteredCurrent >= spikeCurrent.get()) {
+      if (filteredCurrent >= spikeCurrent.get() && !runningIceCream) {
         // check for start of intaking
         if (!startedIntaking && !hasAlgae) {
           startedIntaking = true;
@@ -70,8 +70,9 @@ public class Intake extends SubsystemBase {
         middleOfIntaking = true;
       }
       // check for massive current spike
-      if (filteredCurrent >= 40) {
+      if (filteredCurrent >= 35) {
         hasAlgae = true;
+        startedIntaking = false;
       }
     }
 
@@ -109,7 +110,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersStopOrHold() {
-    io.runRollers(algaeHeld() ? 0.3 : 0);
+    io.runRollers(algaeHeld() ? 0.15 : 0);
   }
 
   public Command raiseAndStopOrHoldCmd() {
@@ -138,7 +139,7 @@ public class Intake extends SubsystemBase {
   public Command poopCmd() {
     return Commands.waitUntil(() -> filteredCurrent > 10)
         .andThen(
-            Commands.waitUntil(() -> filteredCurrent < 5), Commands.runOnce(() -> hasAlgae = false))
+            Commands.waitUntil(() -> filteredCurrent < 1), Commands.runOnce(() -> hasAlgae = false))
         .raceWith(
             run(() -> {
                   raise();
