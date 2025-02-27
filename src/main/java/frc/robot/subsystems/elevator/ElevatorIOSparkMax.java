@@ -20,7 +20,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private double deltaTime = 0;
 
   private final LoggedTunableNumber sillyHeightOffset =
-      new LoggedTunableNumber("Elevator/sillyHeightOffset", 0.05);
+      new LoggedTunableNumber("Elevator/sillyHeightOffset", 0.16);
 
   public ElevatorIOSparkMax() {
     var motorConfig = sparkConfig(false, 1);
