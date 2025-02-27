@@ -20,7 +20,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private double deltaTime = 0;
 
   private final LoggedTunableNumber sillyHeightOffset =
-      new LoggedTunableNumber("Elevator/sillyHeightOffset", 0.05);
+      new LoggedTunableNumber("Elevator/sillyHeightOffset", 0.16);
 
   public ElevatorIOSparkMax() {
     var motorConfig = sparkConfig(false, 1);
@@ -35,7 +35,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
     prevoiusPosition = inputs.position;
     // how much the elevator moves per rotation (from otis)
-    inputs.position = encoder.getPosition() * (wheelRadius) + sillyHeightOffset.get();
+    inputs.position = encoder.getPosition() * (wheelRadius) - sillyHeightOffset.get();
     deltaPosition = inputs.position - prevoiusPosition;
     deltaTime = (currentTime - prevoiusTime) / 1e9;
     inputs.velocityInchesPerSec = deltaPosition / deltaTime;
