@@ -84,7 +84,7 @@ public final class RobotCommands {
                             waitUntil(elevator::atGoalHeight).andThen(carriage.highDealgify()),
                             carriage.lowDealgify(),
                             highAlgae))))
-        .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
+        .alongWith(runOnce(() -> Logger.recordOutput("Controls/HighAlgae", highAlgae.getAsBoolean())));
   }
 
   public static Command scoreProcessor(

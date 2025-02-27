@@ -648,7 +648,6 @@ public class Drive extends SubsystemBase {
                 .getX());
     linearController.reset(poseManager.getDistanceTo(goalPose), linearVelocity);
     resetThetaController();
-    Logger.recordOutput("resetControllers/linearVelocity", linearVelocity);
     lastSetpointTranslation = poseManager.getTranslation();
   }
 
