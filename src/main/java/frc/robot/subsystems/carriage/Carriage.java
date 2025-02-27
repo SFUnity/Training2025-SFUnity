@@ -125,12 +125,20 @@ public class Carriage extends SubsystemBase {
         .withName("backUpForL3");
   }
 
-  public Command placeCoral() {
-    return run(() -> io.runVolts(placeSpeedVolts.get()))
+  private Command privatePlaceCoral(LoggedTunableNumber placeSpeed) {
+    return run(() -> io.runVolts(placeSpeed.get()))
         .until(() -> !beamBreak())
         .andThen(() -> realCoralHeld = false)
         .andThen(() -> coralPassed = false)
         .withName("placeCoral");
+  }
+
+  public Command placeCoral() {
+    return privatePlaceCoral(placeSpeedVolts);
+  }
+
+  public Command placeL1Coral() {
+    return privatePlaceCoral(placeL1SpeedVolts);
   }
 
   public Command highDealgify() {
