@@ -56,7 +56,7 @@ public class Elevator extends SubsystemBase {
     this.io = io;
     this.poseManager = poseManager;
 
-    pid.setTolerance(elevatorDistanceToleranceInches);
+    pid.setTolerance(elevatorPIDToleranceInches);
     // Create the SysId routine
     elevatorRoutine =
         new SysIdRoutine(
