@@ -76,7 +76,7 @@ public class Leds extends VirtualSubsystem {
   private LEDPattern pattern = solid(Color.kBlack); // Default to off
 
   private Leds() {
-    leds = new AddressableLED(9);
+    leds = new AddressableLED(7);
     buffer = new AddressableLEDBuffer(length);
     leds.setLength(length);
     leds.setData(buffer);
