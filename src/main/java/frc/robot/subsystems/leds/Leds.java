@@ -163,7 +163,7 @@ public class Leds extends VirtualSubsystem {
         blink(Color.kYellow, Seconds.of(0.75));
       }
       if (coralHeld) {
-        pattern = solid(Color.kWhite);
+        pattern = solid(Color.kBrown);
       } else if (intakeAlgaeHeld) {
         pattern = solid(Color.kSeaGreen);
       } else if (carriageAlgaeHeld) {
