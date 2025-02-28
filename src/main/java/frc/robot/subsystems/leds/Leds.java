@@ -144,7 +144,8 @@ public class Leds extends VirtualSubsystem {
         pattern = rainbow(255, 128); // .scrollAtAbsoluteSpeed(InchesPerSecond.of(1), ledSpacing);
       } else {
         // Default pattern
-        pattern = gradient(GradientType.kContinuous, allianceColor, secondaryDisabledColor);
+        // pattern = gradient(GradientType.kContinuous, allianceColor, secondaryDisabledColor);
+        teamColors();
         // .scrollAtAbsoluteSpeed(waveAllianceCycleLength, ledSpacing);
       }
     } else if (DriverStation.isAutonomous()) {
@@ -198,7 +199,7 @@ public class Leds extends VirtualSubsystem {
 
   private void teamColors() {
     LEDPattern base = LEDPattern.steps(Map.of(0, new Color(255, 30, 0), 0.5, new Color(0, 0, 225)));
-    pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(25));
+    pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(35));
     // (InchesPerSecond.of(2), ledSpacing);
   }
 }
