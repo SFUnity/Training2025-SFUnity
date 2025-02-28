@@ -193,14 +193,14 @@ public class Leds extends VirtualSubsystem {
 
     // Logs
     Logger.recordOutput("LEDs/coralHeld", coralHeld);
-Logger.recordOutput("LEDs/carriageAlgaeHeld", carriageAlgaeHeld);
-Logger.recordOutput("LEDs/intakeAlgaeHeld", intakeAlgaeHeld);
-Logger.recordOutput("LEDs/autoFinished", autoFinished);
-Logger.recordOutput("LEDs/lowBatteryAlert", lowBatteryAlert);
-Logger.recordOutput("LEDs/autoAllignActivated", autoAllignActivated);
-Logger.recordOutput("LEDs/alignedWithTarget", alignedWithTarget);
-Logger.recordOutput("LEDs/lastEnabledAuto", lastEnabledAuto);
-Logger.recordOutput("LEDs/estopped", estopped);
+    Logger.recordOutput("LEDs/carriageAlgaeHeld", carriageAlgaeHeld);
+    Logger.recordOutput("LEDs/intakeAlgaeHeld", intakeAlgaeHeld);
+    Logger.recordOutput("LEDs/autoFinished", autoFinished);
+    Logger.recordOutput("LEDs/lowBatteryAlert", lowBatteryAlert);
+    Logger.recordOutput("LEDs/autoAllignActivated", autoAllignActivated);
+    Logger.recordOutput("LEDs/alignedWithTarget", alignedWithTarget);
+    Logger.recordOutput("LEDs/lastEnabledAuto", lastEnabledAuto);
+    Logger.recordOutput("LEDs/estopped", estopped);
   }
 
   private void blink(Color color, Time blink) {
