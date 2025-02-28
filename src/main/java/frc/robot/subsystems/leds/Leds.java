@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.util.VirtualSubsystem;
 import java.util.Map;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 public class Leds extends VirtualSubsystem {
   private static Leds instance;
@@ -39,7 +40,6 @@ public class Leds extends VirtualSubsystem {
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
   public boolean intakeAlgaeHeld = false;
-  public boolean tagsDetected = false;
   public boolean autoFinished = false;
   public double autoFinishedTime = 0.0;
   public boolean lowBatteryAlert = false;
@@ -190,6 +190,17 @@ public class Leds extends VirtualSubsystem {
     // Update LEDs
     pattern.applyTo(buffer);
     leds.setData(buffer);
+
+    // Logs
+    Logger.recordOutput("LEDs/coralHeld", coralHeld);
+Logger.recordOutput("LEDs/carriageAlgaeHeld", carriageAlgaeHeld);
+Logger.recordOutput("LEDs/intakeAlgaeHeld", intakeAlgaeHeld);
+Logger.recordOutput("LEDs/autoFinished", autoFinished);
+Logger.recordOutput("LEDs/lowBatteryAlert", lowBatteryAlert);
+Logger.recordOutput("LEDs/autoAllignActivated", autoAllignActivated);
+Logger.recordOutput("LEDs/alignedWithTarget", alignedWithTarget);
+Logger.recordOutput("LEDs/lastEnabledAuto", lastEnabledAuto);
+Logger.recordOutput("LEDs/estopped", estopped);
   }
 
   private void blink(Color color, Time blink) {
