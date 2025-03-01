@@ -42,6 +42,7 @@ public class Leds extends VirtualSubsystem {
   public double autoFinishedTime = 0.0;
   public boolean lowBatteryAlert = false;
   public boolean autoAllignActivated = false;
+  public boolean intakingActivated = false;
 
   // Not in use
   public boolean alignedWithTarget = false;
