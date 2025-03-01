@@ -38,9 +38,6 @@ public class Leds extends VirtualSubsystem {
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
   public boolean intakeAlgaeHeld = false;
-  public boolean autoFinished = false;
-  public double autoFinishedTime = 0.0;
-  public boolean lowBatteryAlert = false;
   public boolean autoAllignActivated = false;
   public boolean intakingActivated = false;
 
@@ -51,8 +48,13 @@ public class Leds extends VirtualSubsystem {
   private Optional<Alliance> alliance = Optional.empty();
   private Color allianceColor = Color.kOrange;
   private Color secondaryDisabledColor = Color.kDarkBlue;
+
   private boolean lastEnabledAuto = false;
+  public boolean autoFinished = false;
+  public double autoFinishedTime = 0.0;
   private double lastEnabledTime = 0.0;
+
+  public boolean lowBatteryAlert = false;
   private boolean estopped = false;
 
   // LED IO
