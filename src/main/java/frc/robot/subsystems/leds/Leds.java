@@ -153,11 +153,6 @@ public class Leds extends VirtualSubsystem {
                 .mask(progressMaskLayer(() -> Timer.getFPGATimestamp() - autoFinishedTime));
       }
     } else { // Enabled
-      if (autoAlignActivated) {
-        blink(Color.kYellow, Seconds.of(0.75));
-      } else if (intakingActivated) {
-        blink(Color.kYellow, Seconds.of(0.75));
-      }
       if (coralHeld) {
         pattern = solid(Color.kBrown);
       } else if (intakeAlgaeHeld) {
@@ -167,6 +162,11 @@ public class Leds extends VirtualSubsystem {
       } else {
         // No game piece state
         pattern = teamColors().atBrightness(Percent.of(0.5));
+      }
+      if (autoAlignActivated) {
+        blink(Color.kLimeGreen, Seconds.of(0.75));
+      } else if (intakingActivated) {
+        blink(Color.kYellow, Seconds.of(0.75));
       }
     }
 
