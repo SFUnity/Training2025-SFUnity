@@ -63,7 +63,7 @@ public final class FieldConstants {
   }
 
   private static final LoggedTunableNumber extraXOffset =
-      new LoggedTunableNumber("Distances/extraX", Units.inchesToMeters(32/2));
+      new LoggedTunableNumber("Distances/extraX", Units.inchesToMeters(32 / 2));
   public static final LoggedTunableNumber extraYOffset =
       new LoggedTunableNumber("Distances/extraY", 0);
   public static final LoggedTunableNumber elevatorSafeExtensionDistanceMeters =
