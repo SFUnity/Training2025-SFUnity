@@ -66,10 +66,7 @@ public class Leds extends VirtualSubsystem {
   private static final boolean prideLeds = false;
   private static final int minLoopCycleCount = 10;
   private static final int length = 150;
-  // private static final Distance ledSpacing = Feet.of(8 / length);
   private static final Time breathDuration = Seconds.of(1);
-  // private static final LinearVelocity waveFastCycleLength = InchesPerSecond.of(25.0);
-  // private static final LinearVelocity waveAllianceCycleLength = InchesPerSecond.of(15.0);
   private static final double autoFadeTime = 2.5; // 3s nominal
   private static final double autoFadeMaxTime = 5.0; // Return to normal
 
@@ -88,7 +85,6 @@ public class Leds extends VirtualSubsystem {
                 gradient(GradientType.kDiscontinuous, Color.kWhite, Color.kBlack)
                     .breathe(breathDuration)
                     .applyTo(buffer);
-                ;
                 leds.setData(buffer);
               }
             });
