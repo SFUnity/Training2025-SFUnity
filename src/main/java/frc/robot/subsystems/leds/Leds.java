@@ -172,20 +172,6 @@ public class Leds extends VirtualSubsystem {
         // No game piece state
         teamColors();
       }
-
-      // if (!coralHeld) {
-      //   if (intakeWorking) {
-      //     pattern = solid(Color.kRed);
-      //   } else {
-      //     pattern = solid(Color.kYellow);
-      //   }
-      // } else if (!tagsDetected) {
-      //   pattern = solid(Color.kBlue);
-      // } else if (!alignedWithTarget) {
-      //   pattern = solid(Color.kPurple);
-      // } else if (alignedWithTarget) {
-      //   pattern = solid(Color.kGreen);
-      // }
     }
 
     // Update LEDs
