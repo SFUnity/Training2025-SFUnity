@@ -160,12 +160,12 @@ public class DriveConstants {
 
     public double getXInput() {
       // return simMode ? -controller.getLeftX() : -controller.getLeftY();
-      return controller.getLeftY();
+      return controller.getLeftX();
     }
 
     public double getYInput() {
       // return simMode ? controller.getLeftY() : -controller.getLeftX();
-      return controller.getLeftX();
+      return -controller.getLeftY();
     }
 
     public double getOmegaInput() {
