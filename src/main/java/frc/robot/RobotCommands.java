@@ -153,8 +153,8 @@ public final class RobotCommands {
                     .withName("iceCreamIntake")
                     .asProxy()),
             () -> intakeState)
-            .beforeStarting(() -> Leds.getInstance().intakingActivated = true)
-            .finallyDo(() -> Leds.getInstance().intakingActivated = false)
+        .beforeStarting(() -> Leds.getInstance().intakingActivated = true)
+        .finallyDo(() -> Leds.getInstance().intakingActivated = false)
         .withName("fullIntake");
   }
 
