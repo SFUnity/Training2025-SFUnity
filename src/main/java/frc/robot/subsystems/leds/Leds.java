@@ -143,7 +143,7 @@ public class Leds extends VirtualSubsystem {
         pattern = rainbow(255, 128);
       } else {
         // Default pattern
-        teamColors();
+        pattern = teamColors();
       }
     } else if (DriverStation.isAutonomous()) {
       pattern = gradient(GradientType.kContinuous, Color.kOrangeRed, Color.kDarkBlue);
@@ -166,7 +166,7 @@ public class Leds extends VirtualSubsystem {
         pattern = solid(Color.kPurple);
       } else {
         // No game piece state
-        teamColors();
+        pattern = teamColors();
       }
     }
 
@@ -191,8 +191,8 @@ public class Leds extends VirtualSubsystem {
     pattern = base.blink(blink);
   }
 
-  private void teamColors() {
-    LEDPattern base = LEDPattern.steps(Map.of(0, new Color(255, 30, 0), 0.5, new Color(0, 0, 225)));
-    pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(35));
+  private LEDPattern teamColors() {
+    return LEDPattern.steps(Map.of(0, new Color(255, 30, 0), 0.5, new Color(0, 0, 225)))
+        .scrollAtRelativeSpeed(Percent.per(Second).of(35));
   }
 }
