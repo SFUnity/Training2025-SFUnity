@@ -155,6 +155,8 @@ public class Leds extends VirtualSubsystem {
     } else { // Enabled
       if (autoAlignActivated) {
         blink(Color.kYellow, Seconds.of(0.75));
+      } else if (intakingActivated) {
+        blink(Color.kYellow, Seconds.of(0.75));
       }
       if (coralHeld) {
         pattern = solid(Color.kBrown);
