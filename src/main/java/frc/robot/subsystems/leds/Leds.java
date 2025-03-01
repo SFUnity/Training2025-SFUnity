@@ -169,6 +169,7 @@ public class Leds extends VirtualSubsystem {
       } else if (carriageAlgaeHeld) {
         pattern = solid(Color.kPurple);
       } else {
+        // No game piece state
         teamColors();
       }
 
