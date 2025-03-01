@@ -42,8 +42,11 @@ public class Leds extends VirtualSubsystem {
   public double autoFinishedTime = 0.0;
   public boolean lowBatteryAlert = false;
   public boolean autoAllignActivated = false;
+
+  // Not in use
   public boolean alignedWithTarget = false;
 
+  // Non-season Specific
   private Optional<Alliance> alliance = Optional.empty();
   private Color allianceColor = Color.kOrange;
   private Color secondaryDisabledColor = Color.kDarkBlue;
