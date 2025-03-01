@@ -166,7 +166,7 @@ public class Leds extends VirtualSubsystem {
         pattern = solid(Color.kPurple);
       } else {
         // No game piece state
-        pattern = teamColors();
+        pattern = teamColors().atBrightness(Percent.of(0.5));
       }
     }
 
