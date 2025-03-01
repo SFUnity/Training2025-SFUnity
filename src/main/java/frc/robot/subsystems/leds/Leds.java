@@ -33,9 +33,7 @@ public class Leds extends VirtualSubsystem {
   }
 
   // Robot state tracking
-  // TODO change these to be what you need for the season
   public int loopCycleCount = 0;
-  public boolean intakeWorking = true;
 
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
