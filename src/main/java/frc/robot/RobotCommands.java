@@ -139,7 +139,11 @@ public final class RobotCommands {
                             })
                         .until(carriage::coralHeld)
                         .asProxy()
-                        .alongWith(carriage.intakeCoral().onlyWhile(() -> poseManager.distanceToStationFace() > 0.5).asProxy()),
+                        .alongWith(
+                            carriage
+                                .intakeCoral()
+                                .onlyWhile(() -> poseManager.distanceToStationFace() > 0.5)
+                                .asProxy()),
                     carriage.intakeCoral().asProxy(),
                     () -> allowAutoDrive),
                 Ground,
