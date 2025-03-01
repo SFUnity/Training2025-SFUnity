@@ -164,9 +164,9 @@ public class Leds extends VirtualSubsystem {
         pattern = teamColors().atBrightness(Percent.of(0.5));
       }
       if (autoAlignActivated) {
-        blink(Color.kLimeGreen, Seconds.of(0.75));
+        blink(Color.kLimeGreen, Seconds.of(0.25));
       } else if (intakingActivated) {
-        blink(Color.kYellow, Seconds.of(0.75));
+        blink(Color.kYellow, Seconds.of(0.25));
       }
     }
 
