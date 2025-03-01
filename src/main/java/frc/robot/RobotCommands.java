@@ -17,6 +17,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.PoseManager;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -69,7 +70,7 @@ public final class RobotCommands {
       PoseManager poseManager,
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
-    BooleanSupplier highAlgae = () -> false; // poseManager.closestFaceHighAlgae()
+    BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
     return waitUntil(
             () ->
                 !allowAutoDrive
@@ -153,6 +154,8 @@ public final class RobotCommands {
                     .withName("iceCreamIntake")
                     .asProxy()),
             () -> intakeState)
+        .beforeStarting(() -> Leds.getInstance().intakingActivated = true)
+        .finallyDo(() -> Leds.getInstance().intakingActivated = false)
         .withName("fullIntake");
   }
 

@@ -33,24 +33,28 @@ public class Leds extends VirtualSubsystem {
   }
 
   // Robot state tracking
-  // TODO change these to be what you need for the season
   public int loopCycleCount = 0;
-  public boolean intakeWorking = true;
 
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
   public boolean intakeAlgaeHeld = false;
-  public boolean autoFinished = false;
-  public double autoFinishedTime = 0.0;
-  public boolean lowBatteryAlert = false;
-  public boolean autoAllignActivated = false;
+  public boolean autoAlignActivated = false;
+  public boolean intakingActivated = false;
+
+  // Not in use
   public boolean alignedWithTarget = false;
 
+  // Non-season Specific
   private Optional<Alliance> alliance = Optional.empty();
   private Color allianceColor = Color.kOrange;
   private Color secondaryDisabledColor = Color.kDarkBlue;
+
   private boolean lastEnabledAuto = false;
+  public boolean autoFinished = false;
+  public double autoFinishedTime = 0.0;
   private double lastEnabledTime = 0.0;
+
+  public boolean lowBatteryAlert = false;
   private boolean estopped = false;
 
   // LED IO
@@ -62,10 +66,7 @@ public class Leds extends VirtualSubsystem {
   private static final boolean prideLeds = false;
   private static final int minLoopCycleCount = 10;
   private static final int length = 150;
-  // private static final Distance ledSpacing = Feet.of(8 / length);
   private static final Time breathDuration = Seconds.of(1);
-  // private static final LinearVelocity waveFastCycleLength = InchesPerSecond.of(25.0);
-  // private static final LinearVelocity waveAllianceCycleLength = InchesPerSecond.of(15.0);
   private static final double autoFadeTime = 2.5; // 3s nominal
   private static final double autoFadeMaxTime = 5.0; // Return to normal
 
@@ -84,7 +85,6 @@ public class Leds extends VirtualSubsystem {
                 gradient(GradientType.kDiscontinuous, Color.kWhite, Color.kBlack)
                     .breathe(breathDuration)
                     .applyTo(buffer);
-                ;
                 leds.setData(buffer);
               }
             });
@@ -125,7 +125,6 @@ public class Leds extends VirtualSubsystem {
     loadingNotifier.stop();
 
     // Select LED mode
-
     if (estopped) {
       pattern = solid(Color.kDarkRed);
     } else if (DriverStation.isDisabled()) {
@@ -141,25 +140,22 @@ public class Leds extends VirtualSubsystem {
         pattern = solid(Color.kOrangeRed);
       } else if (prideLeds) {
         // Pride stripes
-        pattern = rainbow(255, 128); // .scrollAtAbsoluteSpeed(InchesPerSecond.of(1), ledSpacing);
+        pattern = rainbow(255, 128);
       } else {
         // Default pattern
-        // pattern = gradient(GradientType.kContinuous, allianceColor, secondaryDisabledColor);
-        teamColors();
-        // .scrollAtAbsoluteSpeed(waveAllianceCycleLength, ledSpacing);
+        pattern = teamColors();
       }
     } else if (DriverStation.isAutonomous()) {
       pattern = gradient(GradientType.kContinuous, Color.kOrangeRed, Color.kDarkBlue);
-      // .scrollAtAbsoluteSpeed(waveFastCycleLength, ledSpacing);
       if (autoFinished) {
         pattern =
             solid(Color.kGreen)
                 .mask(progressMaskLayer(() -> Timer.getFPGATimestamp() - autoFinishedTime));
       }
     } else { // Enabled
-      if (alignedWithTarget) {
-        blink(Color.kGreen, Seconds.of(0.25));
-      } else if (autoAllignActivated) {
+      if (autoAlignActivated) {
+        blink(Color.kYellow, Seconds.of(0.75));
+      } else if (intakingActivated) {
         blink(Color.kYellow, Seconds.of(0.75));
       }
       if (coralHeld) {
@@ -169,22 +165,9 @@ public class Leds extends VirtualSubsystem {
       } else if (carriageAlgaeHeld) {
         pattern = solid(Color.kPurple);
       } else {
-        teamColors();
+        // No game piece state
+        pattern = teamColors().atBrightness(Percent.of(0.5));
       }
-
-      // if (!coralHeld) {
-      //   if (intakeWorking) {
-      //     pattern = solid(Color.kRed);
-      //   } else {
-      //     pattern = solid(Color.kYellow);
-      //   }
-      // } else if (!tagsDetected) {
-      //   pattern = solid(Color.kBlue);
-      // } else if (!alignedWithTarget) {
-      //   pattern = solid(Color.kPurple);
-      // } else if (alignedWithTarget) {
-      //   pattern = solid(Color.kGreen);
-      // }
     }
 
     // Update LEDs
@@ -197,7 +180,7 @@ public class Leds extends VirtualSubsystem {
     Logger.recordOutput("LEDs/intakeAlgaeHeld", intakeAlgaeHeld);
     Logger.recordOutput("LEDs/autoFinished", autoFinished);
     Logger.recordOutput("LEDs/lowBatteryAlert", lowBatteryAlert);
-    Logger.recordOutput("LEDs/autoAllignActivated", autoAllignActivated);
+    Logger.recordOutput("LEDs/autoAlignActivated", autoAlignActivated);
     Logger.recordOutput("LEDs/alignedWithTarget", alignedWithTarget);
     Logger.recordOutput("LEDs/lastEnabledAuto", lastEnabledAuto);
     Logger.recordOutput("LEDs/estopped", estopped);
@@ -208,9 +191,8 @@ public class Leds extends VirtualSubsystem {
     pattern = base.blink(blink);
   }
 
-  private void teamColors() {
-    LEDPattern base = LEDPattern.steps(Map.of(0, new Color(255, 30, 0), 0.5, new Color(0, 0, 225)));
-    pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(35));
-    // (InchesPerSecond.of(2), ledSpacing);
+  private LEDPattern teamColors() {
+    return LEDPattern.steps(Map.of(0, new Color(255, 30, 0), 0.5, new Color(0, 0, 225)))
+        .scrollAtRelativeSpeed(Percent.per(Second).of(35));
   }
 }
