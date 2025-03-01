@@ -151,9 +151,7 @@ public class Leds extends VirtualSubsystem {
                 .mask(progressMaskLayer(() -> Timer.getFPGATimestamp() - autoFinishedTime));
       }
     } else { // Enabled
-      if (alignedWithTarget) {
-        blink(Color.kGreen, Seconds.of(0.25));
-      } else if (autoAllignActivated) {
+      if (autoAllignActivated) {
         blink(Color.kYellow, Seconds.of(0.75));
       }
       if (coralHeld) {
