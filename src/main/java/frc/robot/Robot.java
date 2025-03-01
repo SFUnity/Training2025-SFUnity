@@ -558,9 +558,7 @@ public class Robot extends LoggedRobot {
             })
         .whileTrue(
             carriage
-                .intakeCoral()
-                .beforeStarting(() -> Leds.getInstance().intakingActivated = true)
-                .finallyDo(() -> Leds.getInstance().intakingActivated = false));
+                .intakeCoral());
 
     // Sim fake gamepieces
     SmartDashboard.putData(
