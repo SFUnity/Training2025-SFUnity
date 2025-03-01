@@ -38,7 +38,7 @@ public class Leds extends VirtualSubsystem {
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
   public boolean intakeAlgaeHeld = false;
-  public boolean autoAllignActivated = false;
+  public boolean autoAlignActivated = false;
   public boolean intakingActivated = false;
 
   // Not in use
@@ -157,7 +157,7 @@ public class Leds extends VirtualSubsystem {
                 .mask(progressMaskLayer(() -> Timer.getFPGATimestamp() - autoFinishedTime));
       }
     } else { // Enabled
-      if (autoAllignActivated) {
+      if (autoAlignActivated) {
         blink(Color.kYellow, Seconds.of(0.75));
       }
       if (coralHeld) {
@@ -182,7 +182,7 @@ public class Leds extends VirtualSubsystem {
     Logger.recordOutput("LEDs/intakeAlgaeHeld", intakeAlgaeHeld);
     Logger.recordOutput("LEDs/autoFinished", autoFinished);
     Logger.recordOutput("LEDs/lowBatteryAlert", lowBatteryAlert);
-    Logger.recordOutput("LEDs/autoAllignActivated", autoAllignActivated);
+    Logger.recordOutput("LEDs/autoAlignActivated", autoAlignActivated);
     Logger.recordOutput("LEDs/alignedWithTarget", alignedWithTarget);
     Logger.recordOutput("LEDs/lastEnabledAuto", lastEnabledAuto);
     Logger.recordOutput("LEDs/estopped", estopped);
