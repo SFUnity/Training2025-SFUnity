@@ -137,7 +137,7 @@ public final class RobotCommands {
                     drive
                         .headingDrive(
                             () -> {
-                              return FieldConstants.CoralStation.leftCenterFace.getRotation();
+                              return poseManager.closestStation().getRotation();
                             })
                         .until(carriage::coralHeld)
                         .asProxy()
