@@ -150,7 +150,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.done()))
+                        CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL1"));
     CenterWallToLKAlgae.done()
         .onTrue(
@@ -201,7 +201,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.done())));
+                        StationHighToK.active().negate())));
 
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
@@ -219,7 +219,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.done())));
+                        StationHighToL.active().negate())));
 
     StationHighToL.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
@@ -254,7 +254,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.done()))
+                        CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL1"));
     CenterWallToLKAlgae.done()
         .onTrue(
@@ -300,7 +300,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.done())));
+                        StationHighToK.active().negate())));
 
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
@@ -318,7 +318,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.done())));
+                        StationHighToL.active().negate())));
 
     StationHighToL.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
@@ -346,7 +346,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> centerWallToHG.getFinalPose().get(),
-                        centerWallToHG.done()))
+                        centerWallToHG.active().negate()))
                 .withName("ScoreCoralOnL1"));
     centerWallToHG
         .done()
@@ -364,7 +364,7 @@ public class Autos {
                 .withName("DealgifyandScore"));
     hGToProcessorScore
         .done()
-        .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.done()));
+        .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.active().negate()));
 
     return routine;
   }
@@ -389,7 +389,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToI.getFinalPose().get(),
-                        CenterWallToI.done()))
+                        CenterWallToI.active().negate()))
                 .withName("ScoreCoralOnL2"));
 
     CenterWallToI.done().onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(IToGHAlgae.cmd()));
@@ -405,7 +405,7 @@ public class Autos {
 
     hGToProcessorScore
         .done()
-        .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.done()));
+        .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.active().negate()));
 
     return routine;
   }
@@ -430,7 +430,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToI.getFinalPose().get(),
-                        CenterWallToI.done()))
+                        CenterWallToI.active().negate()))
                 .withName("ScoreCoralOnL2"));
 
     CenterWallToI.done().onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(IToGHAlgae.cmd()));
@@ -446,7 +446,7 @@ public class Autos {
 
     hGToProcessorScore
         .done()
-        .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.done()));
+        .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.active().negate()));
 
     return routine;
   }
