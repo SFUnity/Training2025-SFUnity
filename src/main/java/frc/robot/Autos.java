@@ -126,6 +126,7 @@ public class Autos {
   public AutoRoutine WallLKAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToLKAlgae");
+    AutoTrajectory LToDealgify = routine.trajectory("LToDealgify");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("KLAlgaeToStationHigh");
     AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
     AutoTrajectory KToStationHigh = routine.trajectory("KToStationHigh");
@@ -155,12 +156,12 @@ public class Autos {
                         CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
     CenterWallToLKAlgae.done()
+        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToDealgify.cmd()));
+    LToDealgify.done()
         .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
+            // Dealgify
+            runOnce(() -> scoreState = Dealgify)
                 .andThen(
-                    // Dealgify
-                    runOnce(() -> scoreState = Dealgify),
-                    drive.fullAutoDrive(goalPose(poseManager)),
                     dealgify(
                             elevator,
                             carriage,
