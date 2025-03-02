@@ -190,7 +190,7 @@ public class Autos {
 
     StationHighToK.active()
         .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
+        .and(() -> poseManager.getDistanceTo(StationHighToK.getFinalPose().get()) < 1)
         .onTrue(
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
@@ -202,14 +202,14 @@ public class Autos {
                             carriage,
                             poseManager,
                             () -> StationHighToK.getFinalPose().get(),
-                            StationHighToK.done())
-                        .asProxy()));
+                            StationHighToK.done())));
 
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
 
     StationHighToL.active()
         .and(carriage::coralHeld)
+        .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
         .onTrue(
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
@@ -221,8 +221,7 @@ public class Autos {
                             carriage,
                             poseManager,
                             () -> StationHighToL.getFinalPose().get(),
-                            StationHighToL.done())
-                        .asProxy()));
+                            StationHighToL.done())));
 
     StationHighToL.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
