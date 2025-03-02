@@ -168,7 +168,7 @@ public final class RobotCommands {
     Ground
   }
 
-  public BooleanSupplier shouldCoralIntake(PoseManager poseManager, Carriage carriage) {
+  public static BooleanSupplier shouldCoralIntake(PoseManager poseManager, Carriage carriage) {
     return () -> poseManager.distanceToStationFace() < 0.5
         && allowAutoDrive
         && (!DriverStation.isTeleop() || intakeState == Source)
