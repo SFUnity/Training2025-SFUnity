@@ -178,9 +178,9 @@ public class Carriage extends SubsystemBase {
                 .until(() -> realCoralHeld)
                 .andThen(
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
-                        .until(() -> beamBreak())),
+                        .until(() -> beamBreak()))
+                .onlyIf(() -> !coralHeld()),
             () -> coralInDanger)
-        .onlyIf(() -> !coralHeld())
         .beforeStarting(() -> Leds.getInstance().intakingActivated = true)
         .finallyDo(() -> Leds.getInstance().intakingActivated = false)
         .withName("intake coral");
