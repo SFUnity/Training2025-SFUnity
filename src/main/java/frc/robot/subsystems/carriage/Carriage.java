@@ -50,7 +50,7 @@ public class Carriage extends SubsystemBase {
     Logger.processInputs("Carriage", inputs);
 
     // Check for brake mode
-    io.setBrakeMode(DriverStation.isDisabled() && !beamBreak());
+    io.setBrakeMode(!DriverStation.isDisabled() || beamBreak());
 
     // Check for algae held
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
