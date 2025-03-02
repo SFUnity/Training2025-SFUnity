@@ -339,7 +339,7 @@ public class Autos {
         .onTrue(
             // Score coral on L1
             elevator
-                .request(L1)
+                .request(L3)
                 .andThen(
                     scoreCoral(
                         elevator,
