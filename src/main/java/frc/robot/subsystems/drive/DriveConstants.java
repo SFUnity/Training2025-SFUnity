@@ -159,13 +159,13 @@ public class DriveConstants {
     private static final boolean simMode = Constants.currentMode == Constants.Mode.SIM;
 
     public double getXInput() {
-      // return simMode ? -controller.getLeftX() : -controller.getLeftY();
-      return controller.getLeftX();
+      return simMode ? -controller.getLeftX() : -controller.getLeftY();
+      // return controller.getLeftX();
     }
 
     public double getYInput() {
-      // return simMode ? controller.getLeftY() : -controller.getLeftX();
-      return -controller.getLeftY();
+      return simMode ? controller.getLeftY() : -controller.getLeftX();
+      // return -controller.getLeftY();
     }
 
     public double getOmegaInput() {
