@@ -168,8 +168,7 @@ public class Autos {
                             poseManager,
                             () -> CenterWallToLKAlgae.getFinalPose().get(),
                             CenterWallToLKAlgae.active().negate())
-                        .asProxy()
-                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                        .asProxy(),
                     // Start next path once algae is held
                     KLAlgaeToStationHigh.cmd())
                 .withName("DealgifyThenGoToStationHigh"));
