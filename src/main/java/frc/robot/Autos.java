@@ -150,7 +150,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.done()))
+                        CenterWallToLKAlgae.done().or(CenterWallToLKAlgae.active().negate())))
                 .withName("ScoreCoralOnL3"));
     CenterWallToLKAlgae.done()
         .onTrue(
