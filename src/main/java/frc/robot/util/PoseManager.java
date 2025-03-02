@@ -112,6 +112,11 @@ public class PoseManager {
     poseEstimator.resetPosition(rawGyroRotation, lastModulePositions, pose);
   }
 
+  public void setPoseForAuto(Pose2d pose) {
+    Pose2d actualPose = new Pose2d(pose.getTranslation(), getRotation());
+    poseEstimator.resetPosition(rawGyroRotation, lastModulePositions, actualPose);
+  }
+
   @AutoLogOutput(key = "Odometry/FieldVelocity")
   public Twist2d fieldVelocity() {
     Translation2d linearFieldVelocity =
