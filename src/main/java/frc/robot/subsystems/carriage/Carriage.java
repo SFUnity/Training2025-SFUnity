@@ -3,6 +3,7 @@ package frc.robot.subsystems.carriage;
 import static frc.robot.subsystems.carriage.CarriageConstants.*;
 
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,6 +48,9 @@ public class Carriage extends SubsystemBase {
     io.updateInputs(inputs);
     updateCoralStatus();
     Logger.processInputs("Carriage", inputs);
+
+    // Check for brake mode
+    io.setBrakeMode(DriverStation.isDisabled() && !beamBreak());
 
     // Check for algae held
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
