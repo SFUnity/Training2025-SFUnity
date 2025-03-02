@@ -42,8 +42,10 @@ public final class RobotCommands {
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
     return waitUntil(
-            () -> poseManager.getDistanceTo(goalPose.get())
-                        < elevatorSafeExtensionDistanceMeters.get() || (!allowAutoDrive && DriverStation.isTeleop()))
+            () ->
+                poseManager.getDistanceTo(goalPose.get())
+                        < elevatorSafeExtensionDistanceMeters.get()
+                    || (!allowAutoDrive && DriverStation.isTeleop()))
         .andThen(
             elevator
                 .enableElevator()
