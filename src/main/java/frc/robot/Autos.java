@@ -132,6 +132,8 @@ public class Autos {
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
+    coralOnL3 += 1;
+
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
@@ -150,7 +152,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.done()))
+                        CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
     CenterWallToLKAlgae.done()
         .onTrue(
@@ -180,17 +182,18 @@ public class Autos {
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
         .onTrue(
-            waitUntil(() -> carriage.coralHeld())
+            waitUntil(carriage::coralHeld)
                 .andThen(
                     either(
-                        StationHighToL.cmd(),
                         StationHighToK.cmd(),
+                        StationHighToL.cmd(),
                         () -> (coralOnL2 + coralOnL3) % 2 == 0) // Alternate K and L
                     )
                 .withName("0"));
 
     StationHighToK.active()
         .and(carriage::coralHeld)
+        .and(() -> poseManager.getDistanceTo(StationHighToK.getFinalPose().get()) < 1)
         .onTrue(
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
@@ -202,13 +205,14 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.done())));
+                        StationHighToK.active().negate())));
 
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
 
     StationHighToL.active()
         .and(carriage::coralHeld)
+        .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
         .onTrue(
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
@@ -220,7 +224,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.done())));
+                        StationHighToL.active().negate())));
 
     StationHighToL.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
