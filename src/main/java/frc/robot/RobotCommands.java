@@ -169,6 +169,9 @@ public final class RobotCommands {
   }
 
   public boolean shouldCoralIntake(PoseManager poseManager, Carriage carriage) {
-    return poseManager.distanceToStationFace() < 0.5 && allowAutoDrive && (!DriverStation.isTeleop() || intakeState == Source) && !carriage.algaeHeld();
+    return poseManager.distanceToStationFace() < 0.5
+        && allowAutoDrive
+        && (!DriverStation.isTeleop() || intakeState == Source)
+        && !carriage.algaeHeld();
   }
 }
