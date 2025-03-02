@@ -356,6 +356,7 @@ public class Robot extends LoggedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     boolean testDrive = false;
+    Trigger intakeTrigger = driver.rightBumper();
 
     // Setup rumble
     new Trigger(() -> intake.algaeHeld())
@@ -372,14 +373,7 @@ public class Robot extends LoggedRobot {
       drive.setDefaultCommand(drive.joystickDrive());
     }
     elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
-    carriage.setDefaultCommand(
-        Commands.either(
-                carriage
-                    .intakeCoral()
-                    .onlyWhile(() -> poseManager.distanceToStationFace() < 0.5 && allowAutoDrive),
-                carriage.stopOrHold(),
-                () -> poseManager.distanceToStationFace() < 0.5 && allowAutoDrive)
-            .withName("carriageDefault"));
+    carriage.setDefaultCommand(carriage.stopOrHold());
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
@@ -417,7 +411,7 @@ public class Robot extends LoggedRobot {
         .back()
         .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
-    driver.rightBumper().whileTrue(fullIntake(drive, carriage, intake, elevator, poseManager));
+    intakeTrigger.whileTrue(fullIntake(drive, carriage, intake, elevator, poseManager));
     driver
         .leftBumper()
         .whileTrue(
@@ -547,8 +541,13 @@ public class Robot extends LoggedRobot {
         .and(DriverStation::isTeleop)
         .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
+    intakeTrigger
+        .or(() -> poseManager.nearStation() && allowAutoDrive)
+        .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
+        .whileTrue(carriage.intakeCoral());
+
     // Auto only
-    new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
+    new Trigger(() -> poseManager.nearStation())
         .and(() -> !carriage.algaeHeld())
         .and(DriverStation::isAutonomous)
         .whileTrue(carriage.intakeCoral());

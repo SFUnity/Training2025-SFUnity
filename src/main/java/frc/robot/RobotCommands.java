@@ -10,7 +10,6 @@ import static frc.robot.util.AllianceFlipUtil.apply;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
@@ -139,13 +138,8 @@ public final class RobotCommands {
                               return poseManager.closestStation().getRotation();
                             })
                         .until(carriage::coralHeld)
-                        .asProxy()
-                        .alongWith(
-                            carriage
-                                .intakeCoral()
-                                .onlyWhile(() -> poseManager.distanceToStationFace() > 0.5)
-                                .asProxy()),
-                    carriage.intakeCoral().asProxy(),
+                        .asProxy(),
+                    none(),
                     () -> allowAutoDrive),
                 Ground,
                 intake.intakeCmd().asProxy(),
@@ -166,12 +160,5 @@ public final class RobotCommands {
     Source,
     Ice_Cream,
     Ground
-  }
-
-  public static BooleanSupplier shouldCoralIntake(PoseManager poseManager, Carriage carriage) {
-    return () -> poseManager.distanceToStationFace() < 0.5
-        && allowAutoDrive
-        && (!DriverStation.isTeleop() || intakeState == Source)
-        && !carriage.algaeHeld();
   }
 }
