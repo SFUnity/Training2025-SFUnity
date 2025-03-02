@@ -10,6 +10,7 @@ import static frc.robot.util.AllianceFlipUtil.apply;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
@@ -42,7 +43,7 @@ public final class RobotCommands {
       BooleanSupplier atPose) {
     return waitUntil(
             () ->
-                !allowAutoDrive
+                (!allowAutoDrive && DriverStation.isTeleop())
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
