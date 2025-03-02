@@ -113,7 +113,7 @@ public class Carriage extends SubsystemBase {
   }
 
   @AutoLogOutput
-  private boolean beamBreak() {
+  public boolean beamBreak() {
     if (Constants.currentMode == Constants.Mode.SIM) {
       return simBeamBreak;
     }
