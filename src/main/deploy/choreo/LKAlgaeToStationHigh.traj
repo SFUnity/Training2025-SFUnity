@@ -14,7 +14,7 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"KL_Algae.x", "val":3.827310800552368}, "y":{"exp":"KL_Algae.y", "val":5.152493476867676}, "heading":{"exp":"KL_Algae.heading", "val":-1.0708615629529097}, "intervals":43, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"1.6208292245864868 m", "val":1.6208292245864868}, "y":{"exp":"7.384266376495361 m", "val":7.384266376495361}, "heading":{"exp":"-0.9314100437290479 rad", "val":-0.931410043729048}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"1.5677469968795776 m", "val":1.5677469968795776}, "y":{"exp":"7.425266265869141 m", "val":7.425266265869141}, "heading":{"exp":"-0.9314100437290479 rad", "val":-0.931410043729048}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
