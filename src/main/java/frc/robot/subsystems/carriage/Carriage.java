@@ -48,6 +48,7 @@ public class Carriage extends SubsystemBase {
     updateCoralStatus();
     Logger.processInputs("Carriage", inputs);
 
+    // Check for algae held
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
@@ -56,14 +57,15 @@ public class Carriage extends SubsystemBase {
       realAlgaeHeld = true;
     }
 
+    // Leds
     Leds.getInstance().coralHeld = coralHeld();
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 
+    // Logging
     Logger.recordOutput("Carriage/coralPassed", coralPassed);
+    Logger.recordOutput("Carriage/coralInDanger", coralInDanger);
 
     Util.logSubsystem(this, "Carriage");
-
-    Logger.recordOutput("Carriage/coralInDanger", coralInDanger);
   }
 
   public void updateCoralStatus() {
