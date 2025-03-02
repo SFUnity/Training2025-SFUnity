@@ -158,12 +158,13 @@ public class Autos {
                 .andThen(
                     // Dealgify
                     runOnce(() -> scoreState = Dealgify),
+                    drive.fullAutoDrive(goalPose(poseManager)),
                     dealgify(
                             elevator,
                             carriage,
                             poseManager,
                             () -> CenterWallToLKAlgae.getFinalPose().get(),
-                            () -> !CenterWallToLKAlgae.active().getAsBoolean())
+                            CenterWallToLKAlgae.active().negate())
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     // Start next path once algae is held
