@@ -150,7 +150,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.done().or(CenterWallToLKAlgae.active().negate())))
+                        CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
     CenterWallToLKAlgae.done()
         .onTrue(
@@ -163,7 +163,7 @@ public class Autos {
                             carriage,
                             poseManager,
                             () -> CenterWallToLKAlgae.getFinalPose().get(),
-                            () -> !CenterWallToLKAlgae.active().getAsBoolean())
+                            CenterWallToLKAlgae.active().negate())
                         .asProxy()
                         .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     // Start next path once algae is held
@@ -202,7 +202,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.done())));
+                        StationHighToK.active().negate())));
 
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
@@ -221,7 +221,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.done())));
+                        StationHighToL.active().negate())));
 
     StationHighToL.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
