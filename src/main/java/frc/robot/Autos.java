@@ -132,6 +132,8 @@ public class Autos {
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
+    coralOnL3 += 1;
+
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
@@ -182,8 +184,8 @@ public class Autos {
             waitUntil(carriage::coralHeld)
                 .andThen(
                     either(
-                        StationHighToL.cmd(),
                         StationHighToK.cmd(),
+                        StationHighToL.cmd(),
                         () -> (coralOnL2 + coralOnL3) % 2 == 0) // Alternate K and L
                     )
                 .withName("0"));
