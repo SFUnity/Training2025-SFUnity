@@ -185,8 +185,8 @@ public class Autos {
                 .andThen(
                     waitUntil(carriage::beamBreak),
                     either(
-                        StationHighToK.cmd(),
                         StationHighToL.cmd(),
+                        StationHighToK.cmd(),
                         () -> (coralOnL2 + coralOnL3) % 2 == 0) // Alternate K and L
                     )
                 .withName("0"));
