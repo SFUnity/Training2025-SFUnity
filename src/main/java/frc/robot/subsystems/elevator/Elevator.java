@@ -149,8 +149,8 @@ public class Elevator extends SubsystemBase {
 
   public Command runCurrentZeroing() {
     return run(() -> io.runVolts(-1.0))
-        .until(() -> inputs.currentAmps > 30.0)
-        .andThen(run(() -> io.runVolts(0)).withTimeout(0.5))
+        .until(() -> inputs.currentAmps > 40.0)
+        .andThen(run(() -> io.runVolts(0)).withTimeout(0.2))
         .finallyDo(() -> io.resetEncoder(0.0));
   }
 
