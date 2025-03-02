@@ -179,7 +179,7 @@ public class Autos {
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
         .onTrue(
-            waitUntil(() -> carriage.coralHeld())
+            waitUntil(carriage::coralHeld)
                 .andThen(
                     either(
                         StationHighToL.cmd(),
@@ -190,6 +190,7 @@ public class Autos {
 
     StationHighToK.active()
         .and(carriage::coralHeld)
+        .and(carriage::beamBreak)
         .onTrue(
             either(
                     elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
