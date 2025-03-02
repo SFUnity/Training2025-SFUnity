@@ -202,7 +202,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.done())));
+                        StationHighToK.done()).asProxy()));
 
     StationHighToK.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
@@ -220,7 +220,7 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.done())));
+                        StationHighToL.done()).asProxy()));
 
     StationHighToL.done()
         .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
