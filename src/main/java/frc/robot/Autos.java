@@ -141,9 +141,9 @@ public class Autos {
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWallToLKAlgae.active()
         .onTrue(
-            // Score coral on L1
+            // Score coral on L3
             elevator
-                .request(L1)
+                .request(L3)
                 .andThen(
                     scoreCoral(
                         elevator,
@@ -151,7 +151,7 @@ public class Autos {
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
                         CenterWallToLKAlgae.done()))
-                .withName("ScoreCoralOnL1"));
+                .withName("ScoreCoralOnL3"));
     CenterWallToLKAlgae.done()
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
