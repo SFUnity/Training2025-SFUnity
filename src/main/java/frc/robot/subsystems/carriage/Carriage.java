@@ -29,7 +29,6 @@ public class Carriage extends SubsystemBase {
 
   private boolean coralPassed = false;
   private boolean realCoralHeld = false;
-
   public boolean realAlgaeHeld = false;
 
   private static final LoggedTunableNumber highDealgifyTime =
@@ -38,6 +37,7 @@ public class Carriage extends SubsystemBase {
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
 
   public static boolean coralInDanger = false;
+  private boolean lastShouldBrake = false;
 
   public Carriage(CarriageIO io) {
     this.io = io;
@@ -50,7 +50,11 @@ public class Carriage extends SubsystemBase {
     Logger.processInputs("Carriage", inputs);
 
     // Check for brake mode
-    io.setBrakeMode(!DriverStation.isDisabled() || beamBreak());
+    boolean shouldBrake = !DriverStation.isDisabled() || beamBreak();
+    if (shouldBrake != lastShouldBrake) {
+      io.setBrakeMode(shouldBrake);
+      lastShouldBrake = shouldBrake;
+    }
 
     // Check for algae held
     filteredVelocity = velocityFilter.calculate(Math.abs(inputs.velocityRotsPerSec));
