@@ -183,6 +183,7 @@ public class Autos {
         .onTrue(
             waitUntil(carriage::coralHeld)
                 .andThen(
+                    waitUntil(carriage::beamBreak),
                     either(
                         StationHighToK.cmd(),
                         StationHighToL.cmd(),
