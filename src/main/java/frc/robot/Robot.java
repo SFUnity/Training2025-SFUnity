@@ -547,15 +547,10 @@ public class Robot extends LoggedRobot {
         .and(DriverStation::isTeleop)
         .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
 
-    // All the time
+    // Auto only
     new Trigger(() -> poseManager.distanceToStationFace() < 0.5)
         .and(() -> !carriage.algaeHeld())
-        .and(() -> allowAutoDrive)
-        .and(
-            () -> {
-              if (DriverStation.isTeleop()) return intakeState == Source;
-              return true;
-            })
+        .and(DriverStation::isAutonomous)
         .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces
