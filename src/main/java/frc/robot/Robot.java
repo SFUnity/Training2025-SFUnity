@@ -455,7 +455,13 @@ public class Robot extends LoggedRobot {
                 .deadlineFor(
                     Commands.either(
                         Commands.either(
-                                drive.fullAutoDrive(goalPose(poseManager)),
+                                drive
+                                    .fullAutoDrive(goalPose(poseManager))
+                                    .andThen(
+                                        Commands.either(
+                                            drive.driveIntoWall(),
+                                            Commands.none(),
+                                            () -> scoreState == Dealgify)),
                                 drive.headingDrive(() -> goalPose(poseManager).get().getRotation()),
                                 () -> scoreState != ScoreL1)
                             .asProxy(),
@@ -478,7 +484,10 @@ public class Robot extends LoggedRobot {
                                         || driveCommandsConfig.finishScoring())
                             .deadlineFor(
                                 Commands.either(
-                                    drive.fullAutoDrive(goalPose(poseManager)).asProxy(),
+                                    drive
+                                        .fullAutoDrive(goalPose(poseManager))
+                                        .andThen(drive.driveIntoWall())
+                                        .asProxy(),
                                     Commands.none(),
                                     () -> allowAutoDrive))
                             .beforeStarting(

@@ -155,7 +155,9 @@ public class Autos {
                         CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
     CenterWallToLKAlgae.done()
-        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToDealgify.cmd().andThen(drive.driveIntoWall())));
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(LToDealgify.cmd().andThen(drive.driveIntoWall())));
     LToDealgify.done()
         .onTrue(
             // Dealgify
