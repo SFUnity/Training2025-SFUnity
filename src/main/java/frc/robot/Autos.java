@@ -62,7 +62,7 @@ public class Autos {
     factory =
         new AutoFactory(
             poseManager::getPose,
-            poseManager::setPoseForAuto,
+            poseManager::setPose,
             drive::followTrajectory,
             true,
             drive,
