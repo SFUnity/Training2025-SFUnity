@@ -181,8 +181,10 @@ public class Carriage extends SubsystemBase {
                         .until(() -> beamBreak()))
                 .onlyIf(() -> !coralHeld()),
             () -> coralInDanger)
-        .beforeStarting(() -> Leds.getInstance().intakingActivated = true)
-        .finallyDo(() -> Leds.getInstance().intakingActivated = false)
+        .deadlineFor(
+            runEnd(
+                () -> Leds.getInstance().intakingActivated = true,
+                () -> Leds.getInstance().intakingActivated = false))
         .withName("intake coral");
   }
 
