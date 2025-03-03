@@ -155,7 +155,7 @@ public class Autos {
                         CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
     CenterWallToLKAlgae.done()
-        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToDealgify.cmd()));
+        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToDealgify.cmd().andThen(drive.driveIntoWall())));
     LToDealgify.done()
         .onTrue(
             // Dealgify
@@ -169,7 +169,7 @@ public class Autos {
                             CenterWallToLKAlgae.active().negate())
                         .asProxy(),
                     // Start next path once algae is held
-                    KLAlgaeToStationHigh.cmd())
+                    KLAlgaeToStationHigh.cmd().asProxy())
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
