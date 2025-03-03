@@ -170,7 +170,7 @@ public class Robot extends LoggedRobot {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
         WPILOGWriter9038 logWriter = new WPILOGWriter9038();
-        loggingOutputAvailable = logWriter::hasLogOutput;
+        // loggingOutputAvailable = logWriter::hasLogOutput;
         Logger.addDataReceiver(logWriter);
         Logger.addDataReceiver(new NT4Publisher());
         Logger.registerURCL(URCL.startExternal()); // Enables REV CAN logging !!! not replayable !!!
