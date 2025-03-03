@@ -491,6 +491,7 @@ public class Drive extends SubsystemBase {
               stop();
               Leds.getInstance().alignedWithTarget = false;
             })
+        .onlyWhile(() -> MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND) == 0)
         .withName("Heading Drive");
   }
 
@@ -565,6 +566,12 @@ public class Drive extends SubsystemBase {
               Leds.getInstance().alignedWithTarget = false;
               Leds.getInstance().autoAlignActivated = false;
             })
+        .onlyWhile(
+            () ->
+                MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND) == 0
+                    && MathUtil.applyDeadband(
+                            Math.hypot(config.getXInput(), config.getYInput()), DEADBAND)
+                        == 0)
         .withName("Full Auto Drive");
   }
 
