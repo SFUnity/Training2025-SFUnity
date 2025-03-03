@@ -569,14 +569,16 @@ public class Drive extends SubsystemBase {
   }
 
   public Command driveIntoWall() {
-    return run(() -> setAllModuleSetpointsToSame(0.5, new Rotation2d())).until(() -> {
-      int count = 0;
-      for (Module module : modules) {
-        if (module.getDriveCurrent() > 30) count += 1;
-        if (count >= 2) return true;
-      }
-      return false;
-    });
+    return run(() -> setAllModuleSetpointsToSame(0.5, new Rotation2d()))
+        .until(
+            () -> {
+              int count = 0;
+              for (Module module : modules) {
+                if (module.getDriveCurrent() > 30) count += 1;
+                if (count >= 2) return true;
+              }
+              return false;
+            });
   }
 
   private Translation2d getLinearVelocityFromJoysticks() {
