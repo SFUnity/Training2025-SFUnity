@@ -100,6 +100,8 @@ public class Leds extends VirtualSubsystem {
               .map(alliance -> alliance == Alliance.Blue ? Color.kDarkBlue : Color.kOrangeRed)
               .orElse(Color.kRed);
       secondaryDisabledColor = alliance.isPresent() ? Color.kWhite : Color.kBlue;
+      Logger.recordOutput("LEDs/allianceColor", allianceColor.toString());
+      Logger.recordOutput("LEDs/secondaryDisabledColor", secondaryDisabledColor.toString());
     }
 
     // Update auto state
