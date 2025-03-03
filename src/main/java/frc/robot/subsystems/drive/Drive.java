@@ -568,6 +568,17 @@ public class Drive extends SubsystemBase {
         .withName("Full Auto Drive");
   }
 
+  public Command driveIntoWall() {
+    return run(() -> setAllModuleSetpointsToSame(0.5, new Rotation2d())).until(() -> {
+      int count = 0;
+      for (Module module : modules) {
+        if (module.getDriveCurrent() > 30) count += 1;
+        if (count >= 2) return true;
+      }
+      return false;
+    });
+  }
+
   private Translation2d getLinearVelocityFromJoysticks() {
     // Convert to doubles
     double x = config.getXInput();
