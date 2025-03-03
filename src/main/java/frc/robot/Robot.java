@@ -419,10 +419,7 @@ public class Robot extends LoggedRobot {
                     Map.of(
                         LeftBranch,
                         scoreCoral(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            atGoal(drive, driveCommandsConfig)),
+                            elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
                         ScoreL1,
                         elevator
                             .enableElevator()
@@ -434,14 +431,21 @@ public class Robot extends LoggedRobot {
                                     .andThen(carriage.placeCoral())),
                         Dealgify,
                         dealgify(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            atGoal(drive, driveCommandsConfig)),
+                            elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
                         ProcessorFront,
-                        scoreProcessor(carriage, intake, poseManager, true, atGoal(drive, driveCommandsConfig)),
+                        scoreProcessor(
+                            carriage,
+                            intake,
+                            poseManager,
+                            true,
+                            atGoal(drive, driveCommandsConfig)),
                         ProcessorBack,
-                        scoreProcessor(carriage, intake, poseManager, false, atGoal(drive, driveCommandsConfig))),
+                        scoreProcessor(
+                            carriage,
+                            intake,
+                            poseManager,
+                            false,
+                            atGoal(drive, driveCommandsConfig))),
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
                     Commands.either(
@@ -467,10 +471,7 @@ public class Robot extends LoggedRobot {
                 .andThen(
                     Commands.either(
                         dealgify(
-                                elevator,
-                                carriage,
-                                poseManager,
-                                atGoal(drive, driveCommandsConfig))
+                                elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig))
                             .deadlineFor(
                                 Commands.either(
                                     drive

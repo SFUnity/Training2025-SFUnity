@@ -107,7 +107,8 @@ public final class RobotCommands {
   }
 
   public static BooleanSupplier atGoal(Drive drive, DriveCommandsConfig driveCommandsConfig) {
-    return () -> driveCommandsConfig.finishScoring() || (drive.linearAtGoal() && drive.thetaAtGoal());
+    return () ->
+        driveCommandsConfig.finishScoring() || (drive.linearAtGoal() && drive.thetaAtGoal());
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
