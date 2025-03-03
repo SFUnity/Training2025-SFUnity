@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
@@ -105,8 +106,8 @@ public final class RobotCommands {
         .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 
-  public static BooleanSupplier atGoal(Drive drive) {
-    return () -> !allowAutoDrive || (drive.linearAtGoal() && drive.thetaAtGoal());
+  public static BooleanSupplier atGoal(Drive drive, DriveCommandsConfig driveCommandsConfig) {
+    return () -> driveCommandsConfig.finishScoring() || (drive.linearAtGoal() && drive.thetaAtGoal());
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {

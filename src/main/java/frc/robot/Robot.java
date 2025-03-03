@@ -422,9 +422,7 @@ public class Robot extends LoggedRobot {
                             elevator,
                             carriage,
                             poseManager,
-                            () ->
-                                atGoal(drive).getAsBoolean()
-                                    || driveCommandsConfig.finishScoring()),
+                            atGoal(drive, driveCommandsConfig)),
                         ScoreL1,
                         elevator
                             .enableElevator()
@@ -439,18 +437,11 @@ public class Robot extends LoggedRobot {
                             elevator,
                             carriage,
                             poseManager,
-                            () -> {
-                              if (allowAutoDrive) {
-                                return atGoal(drive).getAsBoolean()
-                                    || driveCommandsConfig.finishScoring();
-                              } else {
-                                return driveCommandsConfig.finishScoring();
-                              }
-                            }),
+                            atGoal(drive, driveCommandsConfig)),
                         ProcessorFront,
-                        scoreProcessor(carriage, intake, poseManager, true, atGoal(drive)),
+                        scoreProcessor(carriage, intake, poseManager, true, atGoal(drive, driveCommandsConfig)),
                         ProcessorBack,
-                        scoreProcessor(carriage, intake, poseManager, false, atGoal(drive))),
+                        scoreProcessor(carriage, intake, poseManager, false, atGoal(drive, driveCommandsConfig))),
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
                     Commands.either(
@@ -479,9 +470,7 @@ public class Robot extends LoggedRobot {
                                 elevator,
                                 carriage,
                                 poseManager,
-                                () ->
-                                    atGoal(drive).getAsBoolean()
-                                        || driveCommandsConfig.finishScoring())
+                                atGoal(drive, driveCommandsConfig))
                             .deadlineFor(
                                 Commands.either(
                                     drive
