@@ -92,6 +92,9 @@ public class Carriage extends SubsystemBase {
 
   @AutoLogOutput
   public boolean coralHeld() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      return simHasCoral;
+    }
     return realCoralHeld;
   }
 
