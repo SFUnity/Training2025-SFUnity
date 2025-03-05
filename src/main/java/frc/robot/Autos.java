@@ -121,7 +121,7 @@ public class Autos {
   // .active().whileTrue() =  Trigger while the trajectory is still running.
   // Routines
 
-  public AutoRoutine WallLKAlgaeL2L3() {
+  private AutoRoutine WallLKAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToL");
     AutoTrajectory LToDealgify = routine.trajectory("LToDealgify");
@@ -233,7 +233,7 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine CenterCDProcessorAlgaeL2L3() {
+  private AutoRoutine CenterCDProcessorAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
@@ -332,7 +332,7 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine GHAlgaeToProcessorL1() {
+  private AutoRoutine GHAlgaeToProcessorL1() {
 
     AutoRoutine routine = factory.newRoutine("L1HGalgae");
 
@@ -375,7 +375,7 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine FL2HGAlgae() {
+  private AutoRoutine FL2HGAlgae() {
 
     AutoRoutine routine = factory.newRoutine("FL2HGAlgae");
 
@@ -416,7 +416,7 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine IL2HGAlgae() {
+  private AutoRoutine IL2HGAlgae() {
 
     AutoRoutine routine = factory.newRoutine("IL2HGAlgae");
 
@@ -457,7 +457,7 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine StraightLine() {
+  private AutoRoutine StraightLine() {
 
     AutoRoutine routine = factory.newRoutine("StraightLine");
 
@@ -468,7 +468,7 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine Spin() {
+  private AutoRoutine Spin() {
 
     AutoRoutine routine = factory.newRoutine("Spin");
 
@@ -480,7 +480,7 @@ public class Autos {
   }
 
   // Do not mess with this :
-  public AutoRoutine chaos() {
+  private AutoRoutine chaos() {
     AutoRoutine routine = factory.newRoutine("chaos");
 
     AutoTrajectory chaos = routine.trajectory("chaos");
