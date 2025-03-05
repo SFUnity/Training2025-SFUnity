@@ -184,7 +184,6 @@ public class Autos {
         .onTrue(
             waitUntil(carriage::coralHeld)
                 .andThen(
-                    waitUntil(carriage::beamBreak),
                     either(
                         StationHighToL.cmd(),
                         StationHighToK.cmd(),
@@ -194,6 +193,7 @@ public class Autos {
 
     StationHighToK.active()
         .and(carriage::coralHeld)
+        .and(carriage::beamBreak)
         .and(() -> poseManager.getDistanceTo(StationHighToK.getFinalPose().get()) < 1)
         .onTrue(
             either(
@@ -217,6 +217,7 @@ public class Autos {
 
     StationHighToL.active()
         .and(carriage::coralHeld)
+        .and(carriage::beamBreak)
         .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
         .onTrue(
             either(
