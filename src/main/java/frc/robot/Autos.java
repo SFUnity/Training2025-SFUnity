@@ -206,10 +206,14 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.active().negate())).withName("ScoreOnK"));
+                        StationHighToK.active().negate()))
+                .withName("ScoreOnK"));
 
     StationHighToK.done()
-        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()).withName("KToStationHigh"));
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(KToStationHigh.cmd())
+                .withName("KToStationHigh"));
 
     StationHighToL.active()
         .and(carriage::coralHeld)
@@ -225,10 +229,14 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.active().negate())).withName("ScoreOnL"));
+                        StationHighToL.active().negate()))
+                .withName("ScoreOnL"));
 
     StationHighToL.done()
-        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()).withName("LToStationHigh"));
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(LToStationHigh.cmd())
+                .withName("LToStationHigh"));
 
     return routine;
   }
@@ -370,7 +378,9 @@ public class Autos {
                 .withName("DealgifyandScore"));
     hGToProcessorScore
         .done()
-        .onTrue(scoreProcessor(carriage, intake, poseManager, true, hGToProcessorScore.active().negate()));
+        .onTrue(
+            scoreProcessor(
+                carriage, intake, poseManager, true, hGToProcessorScore.active().negate()));
 
     return routine;
   }
