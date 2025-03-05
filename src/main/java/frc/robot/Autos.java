@@ -190,7 +190,7 @@ public class Autos {
                         StationHighToK.cmd(),
                         () -> (coralOnL2 + coralOnL3) % 2 == 0) // Alternate K and L
                     )
-                .withName("0"));
+                .withName("StationToScore"));
 
     StationHighToK.active()
         .and(carriage::coralHeld)
@@ -206,10 +206,10 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.active().negate())));
+                        StationHighToK.active().negate())).withName("ScoreOnK"));
 
     StationHighToK.done()
-        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()));
+        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(KToStationHigh.cmd()).withName("KToStationHigh"));
 
     StationHighToL.active()
         .and(carriage::coralHeld)
@@ -225,10 +225,10 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.active().negate())));
+                        StationHighToL.active().negate())).withName("ScoreOnL"));
 
     StationHighToL.done()
-        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()));
+        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(LToStationHigh.cmd()).withName("LToStationHigh"));
 
     return routine;
   }
