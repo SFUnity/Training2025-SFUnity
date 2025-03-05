@@ -83,9 +83,8 @@ public class Autos {
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
     chooser.addRoutine("CenterCDProcessorAlgaeL2L3", this::CenterCDProcessorAlgaeL2L3);
-    chooser.addRoutine("GHAlgaeToProcessorL1", this::GHAlgaeToProcessorL1);
-    chooser.addRoutine("FL2HGAlgae", this::FL2HGAlgae);
-    chooser.addRoutine("IL2HGAlgae", this::IL2HGAlgae);
+    chooser.addRoutine("GHAlgaeToProcessorL1", this::GHAlgaeToProcessorL1); // TODO make this L3
+    // TODO make a copy of GH... that has a wait command
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
