@@ -84,7 +84,7 @@ public class Autos {
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
     chooser.addRoutine("CenterCDProcessorAlgaeL2L3", this::CenterCDProcessorAlgaeL2L3);
-    chooser.addRoutine("GHAlgaeToProcessorL1", this::GHAlgaeToProcessorL1); // TODO make this L3
+    chooser.addRoutine("GHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3); // TODO make this L3
     // TODO make a copy of GH... that has a wait command
 
     if (!DriverStation.isFMSAttached()) {
@@ -341,9 +341,9 @@ public class Autos {
     return routine;
   }
 
-  private AutoRoutine GHAlgaeToProcessorL1() {
+  private AutoRoutine GHAlgaeToProcessorL3() {
 
-    AutoRoutine routine = factory.newRoutine("L1HGalgae");
+    AutoRoutine routine = factory.newRoutine("GHAlgaeToProcessorL3");
 
     AutoTrajectory centerWallToHG = routine.trajectory("CenterToHGAlgae");
     AutoTrajectory hGToProcessorScore = routine.trajectory("GHToProcessorScore");
@@ -352,7 +352,7 @@ public class Autos {
     centerWallToHG
         .done()
         .onTrue(
-            // Score coral on L1
+            // Score coral on L3
             elevator
                 .request(L3)
                 .andThen(
@@ -362,7 +362,7 @@ public class Autos {
                         poseManager,
                         () -> centerWallToHG.getFinalPose().get(),
                         centerWallToHG.active().negate()))
-                .withName("ScoreCoralOnL1"));
+                .withName("ScoreCoralOnL3"));
     centerWallToHG
         .done()
         .onTrue(
