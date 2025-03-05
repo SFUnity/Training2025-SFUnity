@@ -86,12 +86,12 @@ public class Autos {
     chooser.addRoutine("GHAlgaeToProcessorL1", this::GHAlgaeToProcessorL1);
     chooser.addRoutine("FL2HGAlgae", this::FL2HGAlgae);
     chooser.addRoutine("IL2HGAlgae", this::IL2HGAlgae);
-    chooser.addRoutine("StraightLine", this::StraightLine);
-    chooser.addRoutine("Spin", this::Spin);
-    chooser.addRoutine("chaos", this::chaos);
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
+      chooser.addRoutine("StraightLine", this::StraightLine);
+      chooser.addRoutine("Spin", this::Spin);
+      chooser.addRoutine("chaos", this::chaos);
 
       // SysID & non-choreo routines
       if (!isChoreoAuto) {
