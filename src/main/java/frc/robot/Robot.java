@@ -368,7 +368,9 @@ public class Robot extends LoggedRobot {
 
     // Default cmds
     if (testDrive) {
-      drive.setDefaultCommand(drive.moduleTestingCommand(driveCommandsConfig::getXInput, driveCommandsConfig::getOmegaInput));
+      drive.setDefaultCommand(
+          drive.moduleTestingCommand(
+              driveCommandsConfig::getXInput, driveCommandsConfig::getOmegaInput));
     } else {
       drive.setDefaultCommand(drive.joystickDrive());
     }

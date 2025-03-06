@@ -246,7 +246,8 @@ public class Autos {
   private AutoRoutine CenterCDProcessorAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
-    AutoTrajectory LToDealgify = routine.trajectory("LToDealgify"); // TODO make this but for C instead of L
+    AutoTrajectory LToDealgify =
+        routine.trajectory("LToDealgify"); // TODO make this but for C instead of L
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
     AutoTrajectory StationHighToK = routine.trajectory("StationLowToC");
     AutoTrajectory KToStationHigh = routine.trajectory("CToStationLow");
