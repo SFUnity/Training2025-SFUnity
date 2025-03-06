@@ -185,7 +185,7 @@ public class Carriage extends SubsystemBase {
                 .onlyIf(() -> !coralHeld()),
             () -> coralInDanger)
         .deadlineFor(
-            runEnd(
+            Commands.runEnd(
                 () -> Leds.getInstance().intakingActivated = true,
                 () -> Leds.getInstance().intakingActivated = false))
         .withName("intake coral");
