@@ -616,7 +616,17 @@ public class Robot extends LoggedRobot {
   }
 
   private Command elevatorAndCarriageTest() {
-    return none();
+    return carriage
+        .intakeCoral()
+        .asProxy()
+        .andThen(
+            elevator.request(L2),
+            elevator.enableElevator(),
+            waitSeconds(1),
+            elevator.request(L3),
+            elevator.enableElevator(),
+            waitSeconds(1),
+            carriage.placeCoral().asProxy());
   }
 
   /** This function is called periodically during test mode. */
