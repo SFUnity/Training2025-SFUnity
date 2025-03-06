@@ -604,7 +604,10 @@ public class Robot extends LoggedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    driveTest().alongWith(groundIntakeTest()).alongWith(elevatorAndCarriageTest().asProxy()).schedule();
+    driveTest()
+        .alongWith(groundIntakeTest())
+        .alongWith(elevatorAndCarriageTest().asProxy())
+        .schedule();
   }
 
   private Command driveTest() {
