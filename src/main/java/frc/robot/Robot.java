@@ -613,6 +613,10 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().cancelAll();
   }
 
+  private Command driveTest() {
+    return Commands.none();
+  }
+
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
