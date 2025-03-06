@@ -56,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -909,16 +910,16 @@ public class Drive extends SubsystemBase {
   private int moduleToTest = 0;
   public boolean allModules = false;
 
-  public Command moduleTestingCommand() {
+  public Command moduleTestingCommand(DoubleSupplier driveInput, DoubleSupplier turnInput) {
     return run(() -> {
-          double driveInput = MathUtil.applyDeadband(config.getXInput(), DEADBAND);
-          double turnInput = MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND);
+          double driveOutput = MathUtil.applyDeadband(driveInput.getAsDouble(), DEADBAND);
+          double turnOutput = MathUtil.applyDeadband(turnInput.getAsDouble(), DEADBAND);
           if (allModules) {
             for (int i = 0; i < 4; i++) {
-              modules[i].test(driveInput * 12, turnInput * 12);
+              modules[i].test(driveOutput * 12, turnOutput * 12);
             }
           } else {
-            modules[moduleToTest].test(driveInput * 12, turnInput * 12);
+            modules[moduleToTest].test(driveOutput * 12, turnOutput * 12);
           }
         })
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
