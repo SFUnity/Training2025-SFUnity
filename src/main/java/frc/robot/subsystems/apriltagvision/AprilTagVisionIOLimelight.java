@@ -12,10 +12,12 @@ import frc.robot.util.PoseManager;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.littletonrobotics.junction.Logger;
+
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private String name;
 
-  private static final double disconnectedTimeout = 0.5;
+  private static final double disconnectedTimeout = 250;
   private final Alert disconnectedAlert;
   private double lastTimestamp = 0;
 
@@ -87,7 +89,9 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     if (observation.timestampSeconds != 0) {
       lastTimestamp = observation.timestampSeconds;
     }
-    disconnectedAlert.set(Timer.getFPGATimestamp() - lastTimestamp < disconnectedTimeout);
+    double latency = (Timer.getFPGATimestamp() - lastTimestamp) / 1000; // milliseconds
+    Logger.recordOutput("Vision/" + name + "/latency", latency);
+    disconnectedAlert.set(latency > disconnectedTimeout);
 
     // dynamicCropping();
   }
