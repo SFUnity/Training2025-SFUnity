@@ -83,7 +83,6 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     inputs.avgTagArea = observation.avgTagArea;
 
     inputs.pipeline = getCurrentPipelineIndex(name);
-    inputs.ledMode = getLimelightNTDouble(name, "ledMode");
 
     // Update disconnected alert
     if (observation.timestampSeconds != 0) {
