@@ -11,7 +11,6 @@ import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.PoseManager;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
