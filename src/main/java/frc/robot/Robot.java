@@ -68,6 +68,7 @@ import frc.robot.util.VirtualSubsystem;
 import frc.robot.util.WPILOGWriter9038;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -613,7 +614,28 @@ public class Robot extends LoggedRobot {
   }
 
   private Command driveTest() {
-    return drive.moduleTestingCommand(() -> 1, () -> 1);
+    final Timer timer = new Timer();
+    final double modifier = 0.2;
+
+    final DoubleSupplier speedSupplier =
+        () -> {
+          if (timer.hasElapsed(8)) {
+            return 0;
+          }
+          double voltage = (timer.get() + 1) * modifier;
+          if (voltage > 10) {
+            return -10;
+          }
+          return voltage;
+        };
+
+    return drive
+        .moduleTestingCommand(speedSupplier, speedSupplier)
+        .beforeStarting(
+            () -> {
+              drive.allModules = true;
+              timer.restart();
+            });
   }
 
   private Command groundIntakeTest() {
