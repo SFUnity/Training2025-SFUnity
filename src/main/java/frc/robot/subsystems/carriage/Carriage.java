@@ -79,7 +79,6 @@ public class Carriage extends SubsystemBase {
   }
 
   public void updateCoralStatus() {
-
     if (!beamBreak() && !coralPassed) {
       realCoralHeld = false;
     } else if (!beamBreak() && coralPassed) {
