@@ -55,7 +55,9 @@ public class Carriage extends SubsystemBase {
     if (shouldBrake != lastShouldBrake) {
       io.setBrakeMode(shouldBrake);
       lastShouldBrake = shouldBrake;
-      realCoralHeld = shouldBrake;
+      if (DriverStation.isDisabled()) {
+        realCoralHeld = shouldBrake;
+      }
     }
 
     // Check for algae held
