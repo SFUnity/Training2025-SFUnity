@@ -46,8 +46,9 @@ public class Carriage extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    updateCoralStatus();
     Logger.processInputs("Carriage", inputs);
+
+    updateCoralStatus();
 
     // Check for brake mode
     boolean shouldBrake = !DriverStation.isDisabled() || beamBreak();
