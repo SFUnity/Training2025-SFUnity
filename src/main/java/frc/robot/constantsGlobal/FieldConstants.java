@@ -63,9 +63,9 @@ public final class FieldConstants {
   }
 
   private static final LoggedTunableNumber extraXOffsetAlgae =
-      new LoggedTunableNumber("Distances/extraXAlgae", Units.inchesToMeters(32 / 2));
+      new LoggedTunableNumber("Distances/extraXAlgae", Units.inchesToMeters(34 / 2));
   private static final LoggedTunableNumber extraXOffsetBranch =
-      new LoggedTunableNumber("Distances/extraXBranch", .75 / 2);
+      new LoggedTunableNumber("Distances/extraXBranch", .75 / 2 + .1);
   public static final LoggedTunableNumber extraYOffset =
       new LoggedTunableNumber("Distances/extraY", 0);
   public static final LoggedTunableNumber elevatorSafeExtensionDistanceMeters =
