@@ -93,7 +93,7 @@ public class Carriage extends SubsystemBase {
   @AutoLogOutput
   public boolean coralHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
-      return simHasCoral;
+      return simHasCoral || realCoralHeld;
     }
     return realCoralHeld;
   }
@@ -178,7 +178,7 @@ public class Carriage extends SubsystemBase {
     return Commands.either(
             run(() -> io.runVolts(placeSpeedVolts.get())),
             run(() -> io.runVolts(intakingSpeedVolts.get()))
-                .until(() -> realCoralHeld)
+                .until(this::coralHeld)
                 .andThen(
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
                         .until(() -> beamBreak()))
