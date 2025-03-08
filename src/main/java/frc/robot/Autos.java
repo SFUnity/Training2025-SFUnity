@@ -404,7 +404,12 @@ public class Autos {
         .done()
         .onTrue(
             scoreProcessor(
-                carriage, intake, elevator, poseManager, true, hGToProcessorScore.active().negate()));
+                carriage,
+                intake,
+                elevator,
+                poseManager,
+                true,
+                hGToProcessorScore.active().negate()));
 
     return routine;
   }
