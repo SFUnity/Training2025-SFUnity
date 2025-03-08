@@ -332,13 +332,15 @@ public class Robot extends LoggedRobot {
     if (DriverStation.isEnabled()) {
       disabledTimer.reset();
     }
-    if (RobotController.getBatteryVoltage() <= lowBatteryVoltage
-        && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
-      lowBatteryAlert.set(true);
-      Leds.getInstance().lowBatteryAlert = true;
-    } else if (RobotController.getBatteryVoltage() <= extraLowBatteryVoltage
-        && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
-      Leds.getInstance().lowBatteryAlert = true;
+    if (disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
+          double voltage = RobotController.getBatteryVoltage();
+          if (voltage <= extraLowBatteryVoltage) {
+            lowBatteryAlert.set(true);
+            Leds.getInstance().extraLowBatteryAlert = true;
+          } else if (voltage <=lowBatteryVoltage) {
+            lowBatteryAlert.set(true);
+            Leds.getInstance().lowBatteryAlert = true;
+          }
     }
 
     // Check for coralInDanger
