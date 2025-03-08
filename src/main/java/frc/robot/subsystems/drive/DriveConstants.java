@@ -101,7 +101,7 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.35);
+        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.1);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
         driveKs = 0.12926;
         driveKv = 0.83967;
