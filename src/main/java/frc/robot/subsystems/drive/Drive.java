@@ -519,6 +519,8 @@ public class Drive extends SubsystemBase {
                   (currentDistance - ffMinRadius.get()) / (ffMaxRadius.get() - ffMinRadius.get()),
                   0.0,
                   0.5);
+          Logger.recordOutput("Drive/Commands/ffOut", linearController.getSetpoint().velocity * ffScaler);
+          Logger.recordOutput("Drive/Commands/pidOut", linearController.calculate(currentDistance, 0.0));
           double driveVelocityScalar =
               linearController.getSetpoint().velocity * ffScaler
                   + linearController.calculate(currentDistance, 0.0);
