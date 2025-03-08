@@ -88,7 +88,7 @@ public final class RobotCommands {
                 either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
                     .andThen(elevator.enableElevator()),
                 either(
-                    waitUntil(elevator::atGoalHeight).andThen(carriage.highDealgify()),
+                    carriage.highDealgify(),
                     carriage.lowDealgify(),
                     highAlgae)))
         .alongWith(
