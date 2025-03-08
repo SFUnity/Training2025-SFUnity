@@ -464,6 +464,7 @@ public class Robot extends LoggedRobot {
                                 drive.headingDrive(() -> goalPose(poseManager).get().getRotation()),
                                 () -> scoreState != ScoreL1)
                             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                            .withName("AutoAlignInFullScore")
                             .asProxy(),
                         none(),
                         () -> allowAutoDrive))
