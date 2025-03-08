@@ -518,7 +518,7 @@ public class Drive extends SubsystemBase {
               MathUtil.clamp(
                   (currentDistance - ffMinRadius.get()) / (ffMaxRadius.get() - ffMinRadius.get()),
                   0.0,
-                  1.0);
+                  0.8);
           double driveVelocityScalar =
               linearController.getSetpoint().velocity * ffScaler
                   + linearController.calculate(currentDistance, 0.0);
