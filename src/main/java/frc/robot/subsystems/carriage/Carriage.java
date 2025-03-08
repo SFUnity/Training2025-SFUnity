@@ -165,8 +165,7 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command highDealgify() {
-    return run(() -> io.runVolts(highDealgifyingSpeedVolts.get()))
-        .withName("highDealgify");
+    return run(() -> io.runVolts(highDealgifyingSpeedVolts.get())).withName("highDealgify");
   }
 
   public Command lowDealgify() {
