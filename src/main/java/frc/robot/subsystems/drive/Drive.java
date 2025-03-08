@@ -104,7 +104,7 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber ffMinRadius =
       new LoggedTunableNumber("AutoAlign/ffMinRadius", 0.2);
   private static final LoggedTunableNumber ffMaxRadius =
-      new LoggedTunableNumber("AutoAlign/ffMaxRadius", 0.8);
+      new LoggedTunableNumber("AutoAlign/ffMaxRadius", 0.6);
 
   private final ProfiledPIDController thetaController;
   private final ProfiledPIDController linearController;
