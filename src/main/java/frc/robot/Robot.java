@@ -337,7 +337,7 @@ public class Robot extends LoggedRobot {
       lowBatteryAlert.set(true);
       Leds.getInstance().lowBatteryAlert = true;
     } else if (RobotController.getBatteryVoltage() <= extraLowBatteryVoltage
-    && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
+        && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
       Leds.getInstance().lowBatteryAlert = true;
     }
 
