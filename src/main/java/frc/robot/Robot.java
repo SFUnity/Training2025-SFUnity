@@ -463,6 +463,7 @@ public class Robot extends LoggedRobot {
                                             () -> scoreState == Dealgify)),
                                 drive.headingDrive(() -> goalPose(poseManager).get().getRotation()),
                                 () -> scoreState != ScoreL1)
+                            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                             .asProxy(),
                         none(),
                         () -> allowAutoDrive))
@@ -492,7 +493,6 @@ public class Robot extends LoggedRobot {
                         none(),
                         () -> dealgifyAfterPlacing))
                 .finallyDo(() -> poseManager.lockClosest = false)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                 .withName("fullScore"));
 
     // Operator controls
