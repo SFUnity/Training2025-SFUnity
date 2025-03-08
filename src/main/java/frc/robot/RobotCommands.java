@@ -99,10 +99,12 @@ public final class RobotCommands {
   public static Command scoreProcessor(
       Carriage carriage,
       Intake intake,
+      Elevator elevator,
       PoseManager poseManager,
       boolean front,
       BooleanSupplier atPose) {
     return waitUntil(atPose)
+        .andThen(elevator.request(Processor).andThen(elevator.enableElevator()))
         .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 

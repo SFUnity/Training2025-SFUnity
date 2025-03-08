@@ -437,6 +437,7 @@ public class Robot extends LoggedRobot {
                         scoreProcessor(
                             carriage,
                             intake,
+                            elevator,
                             poseManager,
                             true,
                             atGoal(drive, driveCommandsConfig)),
@@ -444,6 +445,7 @@ public class Robot extends LoggedRobot {
                         scoreProcessor(
                             carriage,
                             intake,
+                            elevator,
                             poseManager,
                             false,
                             atGoal(drive, driveCommandsConfig))),

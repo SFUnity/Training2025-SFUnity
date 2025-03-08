@@ -52,7 +52,8 @@ public class ElevatorConstants {
     L1(new LoggedTunableNumber("Elevator/L1", 8)),
     AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 20)),
     AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", L3.get())),
-    IceCream(new LoggedTunableNumber("Elevator/IceCream", 5));
+    IceCream(new LoggedTunableNumber("Elevator/IceCream", 5)),
+    Processor(new LoggedTunableNumber("Elevator/Processor", 2));
 
     ElevatorHeight(LoggedTunableNumber height) {
       this.height = height;
