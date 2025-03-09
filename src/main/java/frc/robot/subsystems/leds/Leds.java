@@ -146,6 +146,8 @@ public class Leds extends VirtualSubsystem {
       } else if (prideLeds) {
         // Pride stripes
         pattern = rainbow(255, 128);
+      } else if (coralHeld) {
+        pattern = solid(Color.kBrown);
       } else {
         // Default pattern
         pattern = teamColors();
