@@ -56,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -91,8 +92,7 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber maxLinearVelocity =
       new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", Units.feetToMeters(10));
   private static final LoggedTunableNumber maxLinearAcceleration =
-      new LoggedTunableNumber(
-          "Drive/Commands/Linear - maxAcceleration", Units.feetToMeters(50.0) * 0.4);
+      new LoggedTunableNumber("Drive/Commands/Linear - maxAcceleration", 5);
   private static final LoggedTunableNumber maxAngularVelocity =
       new LoggedTunableNumber(
           "Drive/Commands/Theta - maxVelocity", maxAngularSpeedRadiansPerSec * 0.8);
@@ -517,7 +517,11 @@ public class Drive extends SubsystemBase {
               MathUtil.clamp(
                   (currentDistance - ffMinRadius.get()) / (ffMaxRadius.get() - ffMinRadius.get()),
                   0.0,
-                  1.0);
+                  0.5);
+          Logger.recordOutput(
+              "Drive/Commands/ffOut", linearController.getSetpoint().velocity * ffScaler);
+          Logger.recordOutput(
+              "Drive/Commands/pidOut", linearController.calculate(currentDistance, 0.0));
           double driveVelocityScalar =
               linearController.getSetpoint().velocity * ffScaler
                   + linearController.calculate(currentDistance, 0.0);
@@ -568,10 +572,14 @@ public class Drive extends SubsystemBase {
             })
         .onlyWhile(
             () ->
-                MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND) == 0
+                MathUtil.applyDeadband(config.getOmegaInput(), 0.2) == 0
                     && MathUtil.applyDeadband(
-                            Math.hypot(config.getXInput(), config.getYInput()), DEADBAND)
-                        == 0)
+                            Math.hypot(config.getXInput(), config.getYInput()), 0.2)
+                        == 0
+                    && !config.povDownPressed()
+                    && !config.povUpPressed()
+                    && !config.povLeftPressed()
+                    && !config.povRightPressed())
         .withName("Full Auto Drive");
   }
 
@@ -909,16 +917,16 @@ public class Drive extends SubsystemBase {
   private int moduleToTest = 0;
   public boolean allModules = false;
 
-  public Command moduleTestingCommand() {
+  public Command moduleTestingCommand(DoubleSupplier driveInput, DoubleSupplier turnInput) {
     return run(() -> {
-          double driveInput = MathUtil.applyDeadband(config.getXInput(), DEADBAND);
-          double turnInput = MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND);
+          double driveOutput = MathUtil.applyDeadband(driveInput.getAsDouble(), DEADBAND);
+          double turnOutput = MathUtil.applyDeadband(turnInput.getAsDouble(), DEADBAND);
           if (allModules) {
             for (int i = 0; i < 4; i++) {
-              modules[i].test(driveInput * 12, turnInput * 12);
+              modules[i].test(driveOutput * 12, turnOutput * 12);
             }
           } else {
-            modules[moduleToTest].test(driveInput * 12, turnInput * 12);
+            modules[moduleToTest].test(driveOutput * 12, turnOutput * 12);
           }
         })
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)

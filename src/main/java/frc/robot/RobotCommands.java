@@ -78,7 +78,6 @@ public final class RobotCommands {
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
     BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
-    ;
     return waitUntil(
             () ->
                 !allowAutoDrive
@@ -88,10 +87,7 @@ public final class RobotCommands {
             parallel(
                 either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
                     .andThen(elevator.enableElevator()),
-                either(
-                    waitUntil(elevator::atGoalHeight).andThen(carriage.highDealgify()),
-                    carriage.lowDealgify(),
-                    highAlgae)))
+                either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
         .alongWith(
             runOnce(() -> Logger.recordOutput("Controls/HighAlgae", highAlgae.getAsBoolean())));
   }
@@ -99,10 +95,12 @@ public final class RobotCommands {
   public static Command scoreProcessor(
       Carriage carriage,
       Intake intake,
+      Elevator elevator,
       PoseManager poseManager,
       boolean front,
       BooleanSupplier atPose) {
     return waitUntil(atPose)
+        .andThen(elevator.request(Processor).andThen(elevator.enableElevator()))
         .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 

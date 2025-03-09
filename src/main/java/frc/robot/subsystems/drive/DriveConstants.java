@@ -23,7 +23,7 @@ import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = Units.feetToMeters(15.1);
+  public static final double maxSpeedMetersPerSec = Units.feetToMeters(13.0);
   public static final double maxAccelerationMetersPerSec =
       Units.feetToMeters(75.0); // This is what 6328
   public static final double odometryFrequency = 100.0; // Hz
@@ -101,7 +101,7 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.35);
+        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.1);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
         driveKs = 0.12926;
         driveKv = 0.83967;

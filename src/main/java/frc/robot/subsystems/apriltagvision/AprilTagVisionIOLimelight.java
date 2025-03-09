@@ -3,20 +3,30 @@ package frc.robot.subsystems.apriltagvision;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.*;
 import static frc.robot.util.LimelightHelpers.*;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.PoseManager;
 import java.util.HashSet;
 import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private String name;
+
+  private static final double disconnectedTimeout = 250;
+  private final Alert disconnectedAlert;
+  private double lastTimestamp = 0;
 
   private final double DEFAUlT_CROP = 0.9;
   // private final double CROP_BUFFER = 0.1;
 
   public AprilTagVisionIOLimelight(String camName) {
     name = camName;
+
+    disconnectedAlert = new Alert("No data from: " + name, AlertType.kError);
 
     resetCropping();
     setLEDMode_PipelineControl(name);
@@ -72,7 +82,14 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     inputs.avgTagArea = observation.avgTagArea;
 
     inputs.pipeline = getCurrentPipelineIndex(name);
-    inputs.ledMode = getLimelightNTDouble(name, "ledMode");
+
+    // Update disconnected alert
+    if (observation.timestampSeconds != 0) {
+      lastTimestamp = observation.timestampSeconds;
+    }
+    double latency = (Timer.getFPGATimestamp() - lastTimestamp) / 1000; // milliseconds
+    Logger.recordOutput("Vision/" + name + "/latency", latency);
+    disconnectedAlert.set(latency > disconnectedTimeout);
 
     // dynamicCropping();
   }

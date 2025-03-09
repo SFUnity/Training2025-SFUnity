@@ -31,8 +31,6 @@ public class Carriage extends SubsystemBase {
   private boolean realCoralHeld = false;
   public boolean realAlgaeHeld = false;
 
-  private static final LoggedTunableNumber highDealgifyTime =
-      new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
 
@@ -46,15 +44,18 @@ public class Carriage extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    updateCoralStatus();
     Logger.processInputs("Carriage", inputs);
+
+    updateCoralStatus();
 
     // Check for brake mode
     boolean shouldBrake = !DriverStation.isDisabled() || beamBreak();
     if (shouldBrake != lastShouldBrake) {
       io.setBrakeMode(shouldBrake);
       lastShouldBrake = shouldBrake;
-      realCoralHeld = shouldBrake;
+      if (DriverStation.isDisabled()) {
+        realCoralHeld = shouldBrake;
+      }
     }
 
     // Check for algae held
@@ -78,7 +79,6 @@ public class Carriage extends SubsystemBase {
   }
 
   public void updateCoralStatus() {
-
     if (!beamBreak() && !coralPassed) {
       realCoralHeld = false;
     } else if (!beamBreak() && coralPassed) {
@@ -93,7 +93,7 @@ public class Carriage extends SubsystemBase {
   @AutoLogOutput
   public boolean coralHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
-      return simHasCoral;
+      return simHasCoral || realCoralHeld;
     }
     return realCoralHeld;
   }
@@ -163,9 +163,7 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command highDealgify() {
-    return run(() -> io.runVolts(highDealgifyingSpeedVolts.get()))
-        .withTimeout(highDealgifyTime.get())
-        .withName("highDealgify");
+    return run(() -> io.runVolts(highDealgifyingSpeedVolts.get())).withName("highDealgify");
   }
 
   public Command lowDealgify() {
@@ -178,14 +176,14 @@ public class Carriage extends SubsystemBase {
     return Commands.either(
             run(() -> io.runVolts(placeSpeedVolts.get())),
             run(() -> io.runVolts(intakingSpeedVolts.get()))
-                .until(() -> realCoralHeld)
+                .until(this::coralHeld)
                 .andThen(
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
                         .until(() -> beamBreak()))
                 .onlyIf(() -> !coralHeld()),
             () -> coralInDanger)
         .deadlineFor(
-            runEnd(
+            Commands.runEnd(
                 () -> Leds.getInstance().intakingActivated = true,
                 () -> Leds.getInstance().intakingActivated = false))
         .withName("intake coral");

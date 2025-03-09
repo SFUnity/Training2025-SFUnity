@@ -55,6 +55,7 @@ public class Leds extends VirtualSubsystem {
   private double lastEnabledTime = 0.0;
 
   public boolean lowBatteryAlert = false;
+  public boolean extraLowBatteryAlert = false;
   private boolean estopped = false;
 
   // LED IO
@@ -128,7 +129,7 @@ public class Leds extends VirtualSubsystem {
 
     // Select LED mode
     if (estopped) {
-      pattern = solid(Color.kDarkRed);
+      pattern = solid(Color.kDarkRed).breathe(breathDuration);
     } else if (DriverStation.isDisabled()) {
 
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
@@ -138,6 +139,8 @@ public class Leds extends VirtualSubsystem {
                 .mask(
                     progressMaskLayer(
                         () -> 1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime)));
+      } else if (extraLowBatteryAlert) {
+        pattern = solid(Color.kRed);
       } else if (lowBatteryAlert) {
         pattern = solid(Color.kOrangeRed);
       } else if (prideLeds) {

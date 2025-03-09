@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static frc.robot.RobotCommands.*;
 import static frc.robot.RobotCommands.IntakeState.*;
 import static frc.robot.RobotCommands.ScoreState.*;
@@ -33,8 +34,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
@@ -68,6 +69,7 @@ import frc.robot.util.VirtualSubsystem;
 import frc.robot.util.WPILOGWriter9038;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -91,6 +93,7 @@ public class Robot extends LoggedRobot {
   // Alerts
   private static final double canErrorTimeThreshold = 0.5; // Seconds to disable alert
   private static final double lowBatteryVoltage = 11.8;
+  private static final double extraLowBatteryVoltage = 11.5;
   private static final double lowBatteryDisabledTime = 1.5;
 
   private final Timer disabledTimer = new Timer();
@@ -329,10 +332,15 @@ public class Robot extends LoggedRobot {
     if (DriverStation.isEnabled()) {
       disabledTimer.reset();
     }
-    if (RobotController.getBatteryVoltage() <= lowBatteryVoltage
-        && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
-      lowBatteryAlert.set(true);
-      Leds.getInstance().lowBatteryAlert = true;
+    if (disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
+      double voltage = RobotController.getBatteryVoltage();
+      if (voltage <= extraLowBatteryVoltage) {
+        lowBatteryAlert.set(true);
+        Leds.getInstance().extraLowBatteryAlert = true;
+      } else if (voltage <= lowBatteryVoltage) {
+        lowBatteryAlert.set(true);
+        Leds.getInstance().lowBatteryAlert = true;
+      }
     }
 
     // Check for coralInDanger
@@ -361,14 +369,16 @@ public class Robot extends LoggedRobot {
     // Setup rumble
     new Trigger(() -> intake.algaeHeld())
         .onTrue(
-            Commands.runEnd(
+            runEnd(
                     () -> driver.setRumble(RumbleType.kBothRumble, 0.5),
                     () -> driver.setRumble(RumbleType.kBothRumble, 0.0))
                 .withTimeout(.5));
 
     // Default cmds
     if (testDrive) {
-      drive.setDefaultCommand(drive.moduleTestingCommand());
+      drive.setDefaultCommand(
+          drive.moduleTestingCommand(
+              driveCommandsConfig::getXInput, driveCommandsConfig::getOmegaInput));
     } else {
       drive.setDefaultCommand(drive.joystickDrive());
     }
@@ -377,13 +387,13 @@ public class Robot extends LoggedRobot {
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
 
     // Driver controls
-    driver.rightTrigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driver.rightTrigger().onTrue(runOnce(drive::stopWithX, drive));
     if (testDrive) {
       driver.y().onTrue(drive.setModuleToTest(0));
       driver.x().onTrue(drive.setModuleToTest(1));
       driver.a().onTrue(drive.setModuleToTest(2));
       driver.b().onTrue(drive.setModuleToTest(3));
-      driver.start().onTrue(Commands.runOnce(() -> drive.allModules = !drive.allModules));
+      driver.start().onTrue(runOnce(() -> drive.allModules = !drive.allModules));
     } else {
       driver
           .y()
@@ -400,22 +410,20 @@ public class Robot extends LoggedRobot {
       driver
           .start()
           .onTrue(
-              Commands.runOnce(
+              runOnce(
                       () ->
                           poseManager.setPose(
                               new Pose2d(poseManager.getTranslation(), new Rotation2d())),
                       drive)
                   .ignoringDisable(true));
     }
-    driver
-        .back()
-        .onTrue(Commands.runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
+    driver.back().onTrue(runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
     intakeTrigger.whileTrue(fullIntake(drive, carriage, intake, elevator, poseManager));
     driver
         .leftBumper()
         .whileTrue(
-            Commands.select(
+            select(
                     Map.of(
                         LeftBranch,
                         scoreCoral(
@@ -424,7 +432,7 @@ public class Robot extends LoggedRobot {
                         elevator
                             .enableElevator()
                             .alongWith(
-                                Commands.waitUntil(
+                                waitUntil(
                                         () ->
                                             driveCommandsConfig.finishScoring()
                                                 && elevator.atGoalHeight())
@@ -436,6 +444,7 @@ public class Robot extends LoggedRobot {
                         scoreProcessor(
                             carriage,
                             intake,
+                            elevator,
                             poseManager,
                             true,
                             atGoal(drive, driveCommandsConfig)),
@@ -443,24 +452,27 @@ public class Robot extends LoggedRobot {
                         scoreProcessor(
                             carriage,
                             intake,
+                            elevator,
                             poseManager,
                             false,
                             atGoal(drive, driveCommandsConfig))),
                     () -> scoreState == RightBranch ? LeftBranch : scoreState)
                 .deadlineFor(
-                    Commands.either(
-                        Commands.either(
+                    either(
+                        either(
                                 drive
                                     .fullAutoDrive(goalPose(poseManager))
                                     .andThen(
-                                        Commands.either(
+                                        either(
                                             drive.driveIntoWall(),
-                                            Commands.none(),
+                                            none(),
                                             () -> scoreState == Dealgify)),
                                 drive.headingDrive(() -> goalPose(poseManager).get().getRotation()),
                                 () -> scoreState != ScoreL1)
+                            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                            .withName("AutoAlignInFullScore")
                             .asProxy(),
-                        Commands.none(),
+                        none(),
                         () -> allowAutoDrive))
                 .beforeStarting(
                     () -> {
@@ -469,23 +481,23 @@ public class Robot extends LoggedRobot {
                         scoreState = Dealgify;
                     })
                 .andThen(
-                    Commands.either(
+                    either(
                         dealgify(
                                 elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig))
                             .deadlineFor(
-                                Commands.either(
+                                either(
                                     drive
                                         .fullAutoDrive(goalPose(poseManager))
                                         .andThen(drive.driveIntoWall())
                                         .asProxy(),
-                                    Commands.none(),
+                                    none(),
                                     () -> allowAutoDrive))
                             .beforeStarting(
                                 () -> {
                                   scoreState = Dealgify;
                                   dealgifyAfterPlacing = false;
                                 }),
-                        Commands.none(),
+                        none(),
                         () -> dealgifyAfterPlacing))
                 .finallyDo(() -> poseManager.lockClosest = false)
                 .withName("fullScore"));
@@ -493,13 +505,11 @@ public class Robot extends LoggedRobot {
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     operator.x().onTrue(elevator.request(L2));
-    operator
-        .a()
-        .onTrue(elevator.request(L1).alongWith(Commands.runOnce(() -> scoreState = ScoreL1)));
+    operator.a().onTrue(elevator.request(L1).alongWith(runOnce(() -> scoreState = ScoreL1)));
     operator
         .b()
         .onTrue(
-            Commands.runOnce(
+            runOnce(
                 () -> {
                   scoreState = ProcessorBack;
                   if (intake.algaeHeld()) {
@@ -508,15 +518,13 @@ public class Robot extends LoggedRobot {
                     scoreState = ProcessorFront;
                   }
                 }));
-    operator.leftBumper().onTrue(Commands.runOnce(() -> scoreState = LeftBranch));
-    operator.rightBumper().onTrue(Commands.runOnce(() -> scoreState = RightBranch));
-    operator
-        .rightTrigger()
-        .onTrue(Commands.runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
+    operator.leftBumper().onTrue(runOnce(() -> scoreState = LeftBranch));
+    operator.rightBumper().onTrue(runOnce(() -> scoreState = RightBranch));
+    operator.rightTrigger().onTrue(runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
 
-    operator.povUp().onTrue(Commands.runOnce(() -> intakeState = Source));
-    operator.povRight().onTrue(Commands.runOnce(() -> intakeState = Ice_Cream));
-    operator.povDown().onTrue(Commands.runOnce(() -> intakeState = Ground));
+    operator.povUp().onTrue(runOnce(() -> intakeState = Source));
+    operator.povRight().onTrue(runOnce(() -> intakeState = Ice_Cream));
+    operator.povDown().onTrue(runOnce(() -> intakeState = Ground));
 
     operator.back().onTrue(elevator.runCurrentZeroing());
     operator.back().onTrue(intake.runCurrentZeroing());
@@ -534,11 +542,11 @@ public class Robot extends LoggedRobot {
 
     new Trigger(carriage::algaeHeld)
         .and(DriverStation::isTeleop)
-        .onTrue(Commands.runOnce(() -> scoreState = ProcessorFront));
+        .onTrue(runOnce(() -> scoreState = ProcessorFront));
 
     new Trigger(intake::algaeHeld)
         .and(DriverStation::isTeleop)
-        .onTrue(Commands.runOnce(() -> scoreState = ProcessorBack));
+        .onTrue(runOnce(() -> scoreState = ProcessorBack));
 
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
@@ -553,16 +561,14 @@ public class Robot extends LoggedRobot {
 
     // Sim fake gamepieces
     SmartDashboard.putData(
-        "Toggle Coral in Carriage",
-        Commands.runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
+        "Toggle Coral in Carriage", runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
     SmartDashboard.putData(
-        "Toggle Algae in Carriage",
-        Commands.runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
+        "Toggle Algae in Carriage", runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
     SmartDashboard.putData(
         "Toggle Beam Break in Carriage",
-        Commands.runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
+        runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
     SmartDashboard.putData(
-        "Toggle Algae in Intake", Commands.runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
+        "Toggle Algae in Intake", runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
 
     SmartDashboard.putData("Run Elevator Sysid", elevator.runSysidCmd());
   }
@@ -611,6 +617,54 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    driveTest()
+        .alongWith(groundIntakeTest())
+        .alongWith(elevatorAndCarriageTest().asProxy())
+        .schedule();
+  }
+
+  private Command driveTest() {
+    final Timer timer = new Timer();
+    final double modifier = 0.2;
+
+    final DoubleSupplier speedSupplier =
+        () -> {
+          if (timer.hasElapsed(8)) {
+            return 0;
+          }
+          double voltage = (timer.get() + 1) * modifier;
+          if (voltage > 10) {
+            return -10;
+          }
+          return voltage;
+        };
+
+    return drive
+        .moduleTestingCommand(speedSupplier, speedSupplier)
+        .beforeStarting(
+            () -> {
+              drive.allModules = true;
+              timer.restart();
+            });
+  }
+
+  private Command groundIntakeTest() {
+    return intake.intakeCmd().asProxy().andThen(waitSeconds(2), intake.poopCmd().asProxy());
+  }
+
+  private Command elevatorAndCarriageTest() {
+    return carriage
+        .intakeCoral()
+        .asProxy()
+        .andThen(
+            elevator.request(L2),
+            elevator.enableElevator(),
+            waitSeconds(1),
+            elevator.request(L3),
+            elevator.enableElevator(),
+            waitSeconds(1),
+            carriage.placeCoral().asProxy());
   }
 
   /** This function is called periodically during test mode. */
