@@ -521,7 +521,7 @@ public class Autos {
                 StationLowToD.done()));
     StationLowToD.done()
         .onTrue(
-            waitUntil(() -> carriage.coralHeld())
+            waitUntil(() -> !carriage.coralHeld())
                 .andThen(DToStationLow.cmd().alongWith(elevator.request(L3))));
     DToStationLow.done().onTrue(waitUntil(() -> carriage.coralHeld()).andThen(StationLowToE.cmd()));
 
