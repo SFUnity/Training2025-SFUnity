@@ -1,13 +1,8 @@
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.either;
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
+import static edu.wpi.first.wpilibj2.command.Commands.*;
+import static frc.robot.RobotCommands.*;
 import static frc.robot.RobotCommands.ScoreState.Dealgify;
-import static frc.robot.RobotCommands.dealgify;
-import static frc.robot.RobotCommands.scoreCoral;
-import static frc.robot.RobotCommands.scoreProcessor;
-import static frc.robot.RobotCommands.scoreState;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L2;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
@@ -82,6 +77,8 @@ public class Autos {
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
     chooser.addRoutine("CenterCDProcessorAlgaeL2L3", this::CenterCDProcessorAlgaeL2L3);
+    chooser.addRoutine("CenterCDAlgaeCDEFL3", this::CenterCDAlgaeCDEFL3);
+    // TODO make a copy of GH... that has a wait command
     chooser.addRoutine("GHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3);
 
     if (!DriverStation.isFMSAttached()) {
@@ -129,14 +126,18 @@ public class Autos {
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
-    coralOnL3 += 1;
-
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
         .onTrue(
             CenterWallToLKAlgae.resetOdometry()
                 .andThen(CenterWallToLKAlgae.cmd())
+                .alongWith(
+                    runOnce(
+                        () -> {
+                          coralOnL3 = 1;
+                          coralOnL2 = 0;
+                        }))
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWallToLKAlgae.active()
         .onTrue(
@@ -149,26 +150,20 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
+                        CenterWallToLKAlgae.active().negate()),
+                    runOnce(() -> scoreState = Dealgify),
+                    LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
+                    dealgify(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWallToLKAlgae.getFinalPose().get(),
                         CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
-    CenterWallToLKAlgae.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(LToDealgify.cmd().andThen(drive.driveIntoWall())));
     LToDealgify.done()
         .onTrue(
-            // Dealgify
-            runOnce(() -> scoreState = Dealgify)
-                .andThen(
-                    dealgify(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () -> CenterWallToLKAlgae.getFinalPose().get(),
-                            CenterWallToLKAlgae.active().negate())
-                        .asProxy(),
-                    // Start next path once algae is held
-                    KLAlgaeToStationHigh.cmd().asProxy())
+            waitUntil(carriage::algaeHeld)
+                .andThen(KLAlgaeToStationHigh.cmd().asProxy())
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
@@ -245,12 +240,10 @@ public class Autos {
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
     AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
-    AutoTrajectory StationHighToK = routine.trajectory("StationLowToC");
-    AutoTrajectory KToStationHigh = routine.trajectory("CToStationLow");
-    AutoTrajectory StationHighToL = routine.trajectory("StationLowToD");
-    AutoTrajectory LToStationHigh = routine.trajectory("DToStationLow");
-
-    coralOnL3 += 1;
+    AutoTrajectory StationHighToK = routine.trajectory("StationLowToD");
+    AutoTrajectory KToStationHigh = routine.trajectory("DToStationLow");
+    AutoTrajectory StationHighToL = routine.trajectory("StationLowToC");
+    AutoTrajectory LToStationHigh = routine.trajectory("CToStationLow");
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
@@ -258,6 +251,12 @@ public class Autos {
         .onTrue(
             CenterWallToLKAlgae.resetOdometry()
                 .andThen(CenterWallToLKAlgae.cmd())
+                .alongWith(
+                    runOnce(
+                        () -> {
+                          coralOnL3 = 1;
+                          coralOnL2 = 0;
+                        }))
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWallToLKAlgae.active()
         .onTrue(
@@ -270,26 +269,20 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
+                        CenterWallToLKAlgae.active().negate()),
+                    runOnce(() -> scoreState = Dealgify),
+                    LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
+                    dealgify(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWallToLKAlgae.getFinalPose().get(),
                         CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
-    CenterWallToLKAlgae.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(LToDealgify.cmd().andThen(drive.driveIntoWall())));
     LToDealgify.done()
         .onTrue(
-            // Dealgify
-            runOnce(() -> scoreState = Dealgify)
-                .andThen(
-                    dealgify(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () -> CenterWallToLKAlgae.getFinalPose().get(),
-                            CenterWallToLKAlgae.active().negate())
-                        .asProxy(),
-                    // Start next path once algae is held
-                    KLAlgaeToStationHigh.cmd().asProxy())
+            waitUntil(carriage::algaeHeld)
+                .andThen(KLAlgaeToStationHigh.cmd().asProxy())
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
@@ -432,6 +425,90 @@ public class Autos {
     AutoTrajectory Spin = routine.trajectory("Spin");
 
     routine.active().onTrue(Spin.resetOdometry().andThen(Spin.cmd()));
+
+    return routine;
+  }
+
+  public AutoRoutine CenterCDAlgaeCDEFL3() {
+    AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
+    AutoTrajectory CenterProcessorToCDAlgae = routine.trajectory("CenterProcessorToCDAlgae");
+    AutoTrajectory CDToStationLow = routine.trajectory("CDToStationLow");
+    AutoTrajectory StationLowToC = routine.trajectory("StationLowToC");
+    AutoTrajectory CToStationLow = routine.trajectory("CToStationLow");
+    AutoTrajectory StationLowToD = routine.trajectory("StationLowToD");
+    AutoTrajectory DToStationLow = routine.trajectory("DToStationLow");
+
+    // When the routine begins, reset odometry and start the first trajectory
+    routine
+        .active()
+        .onTrue(
+            CenterProcessorToCDAlgae.resetOdometry()
+                .andThen(CenterProcessorToCDAlgae.cmd())
+                .withName("ResetOdometryAndStartFirstTrajectory"));
+    CenterProcessorToCDAlgae.active()
+        .onTrue(
+            // Score coral on L3
+            elevator
+                .request(L3)
+                .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterProcessorToCDAlgae.getFinalPose().get(),
+                        CenterProcessorToCDAlgae.done()),
+                    runOnce(() -> scoreState = Dealgify),
+                    dealgify(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterProcessorToCDAlgae.getFinalPose().get(),
+                        CenterProcessorToCDAlgae.done()))
+                .withName("ScoreCoralOnL3"));
+    CenterProcessorToCDAlgae.done()
+        .onTrue(
+            waitUntil(() -> carriage.algaeHeld())
+                .andThen(
+                    // Start next path once algae is held
+                    CDToStationLow.cmd())
+                .withName("DealgifyThenGoToStationHigh"));
+
+    // Eject algae while driving
+    CDToStationLow.atTime("EjectAlgae1").onTrue(carriage.scoreProcessor());
+
+    // Drive back from the station to our next scoring location
+    // We're intaking coral with a trigger in Robot.java so we don't need to do it here
+    CDToStationLow.done()
+        .onTrue(
+            waitUntil(() -> carriage.coralHeld())
+                .andThen(StationLowToC.cmd().alongWith(elevator.request(L3))));
+    StationLowToC.done()
+        .onTrue(
+            scoreCoral(
+                elevator,
+                carriage,
+                poseManager,
+                () -> StationLowToC.getFinalPose().get(),
+                StationLowToC.done()));
+    StationLowToC.done()
+        .onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(CToStationLow.cmd()));
+    CToStationLow.done()
+        .onTrue(
+            waitUntil(() -> carriage.coralHeld())
+                .andThen(StationLowToD.cmd().alongWith(elevator.request(L3))));
+    StationLowToD.done()
+        .onTrue(
+            scoreCoral(
+                elevator,
+                carriage,
+                poseManager,
+                () -> StationLowToD.getFinalPose().get(),
+                StationLowToD.done()));
+    StationLowToD.done()
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(DToStationLow.cmd().alongWith(elevator.request(L3))));
+    DToStationLow.done().onTrue(waitUntil(() -> carriage.coralHeld()));
 
     return routine;
   }
