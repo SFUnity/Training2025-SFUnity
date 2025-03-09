@@ -459,22 +459,19 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterProcessorToCDAlgae.getFinalPose().get(),
+                        CenterProcessorToCDAlgae.done()),
+                    runOnce(() -> scoreState = Dealgify),
+                    dealgify(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterProcessorToCDAlgae.getFinalPose().get(),
                         CenterProcessorToCDAlgae.done()))
                 .withName("ScoreCoralOnL3"));
     CenterProcessorToCDAlgae.done()
         .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
+            waitUntil(() -> carriage.algaeHeld())
                 .andThen(
-                    // Dealgify
-                    runOnce(() -> scoreState = Dealgify),
-                    dealgify(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () -> CenterProcessorToCDAlgae.getFinalPose().get(),
-                            CenterProcessorToCDAlgae.done())
-                        .asProxy()
-                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
                     // Start next path once algae is held
                     CDToStationLow.cmd())
                 .withName("DealgifyThenGoToStationHigh"));
