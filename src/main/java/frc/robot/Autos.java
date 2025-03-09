@@ -252,14 +252,13 @@ public class Autos {
     AutoTrajectory StationHighToL = routine.trajectory("StationLowToD");
     AutoTrajectory LToStationHigh = routine.trajectory("DToStationLow");
 
-    coralOnL3 += 1;
-
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
         .onTrue(
             CenterWallToLKAlgae.resetOdometry()
                 .andThen(CenterWallToLKAlgae.cmd())
+                .alongWith(runOnce(() -> coralOnL3 = 1))
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWallToLKAlgae.active()
         .onTrue(
