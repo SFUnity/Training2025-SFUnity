@@ -276,7 +276,6 @@ public class Autos {
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
                         CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
-    CenterWallToLKAlgae.done().onTrue(waitUntil(() -> !carriage.coralHeld()).andThen());
     LToDealgify.done()
         .onTrue(
             waitUntil(carriage::algaeHeld)
