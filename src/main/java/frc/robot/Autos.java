@@ -253,7 +253,12 @@ public class Autos {
         .onTrue(
             CenterWallToLKAlgae.resetOdometry()
                 .andThen(CenterWallToLKAlgae.cmd())
-                .alongWith(runOnce(() -> {coralOnL3 = 1; coralOnL2 = 0;}))
+                .alongWith(
+                    runOnce(
+                        () -> {
+                          coralOnL3 = 1;
+                          coralOnL2 = 0;
+                        }))
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWallToLKAlgae.active()
         .onTrue(
