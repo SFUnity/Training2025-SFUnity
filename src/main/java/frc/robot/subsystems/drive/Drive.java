@@ -576,7 +576,11 @@ public class Drive extends SubsystemBase {
                 MathUtil.applyDeadband(config.getOmegaInput(), 0.2) == 0
                     && MathUtil.applyDeadband(
                             Math.hypot(config.getXInput(), config.getYInput()), 0.2)
-                        == 0)
+                        == 0
+                    && !config.povDownPressed()
+                    && !config.povUpPressed()
+                    && !config.povLeftPressed()
+                    && !config.povRightPressed())
         .withName("Full Auto Drive");
   }
 
