@@ -93,7 +93,7 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", Units.feetToMeters(10));
   private static final LoggedTunableNumber maxLinearAcceleration =
       new LoggedTunableNumber(
-          "Drive/Commands/Linear - maxAcceleration", Units.feetToMeters(50.0) * 0.4);
+          "Drive/Commands/Linear - maxAcceleration", 4.5);
   private static final LoggedTunableNumber maxAngularVelocity =
       new LoggedTunableNumber(
           "Drive/Commands/Theta - maxVelocity", maxAngularSpeedRadiansPerSec * 0.8);
