@@ -126,14 +126,18 @@ public class Autos {
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
-    coralOnL3 += 1;
-
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
         .onTrue(
             CenterWallToLKAlgae.resetOdometry()
                 .andThen(CenterWallToLKAlgae.cmd())
+                .alongWith(
+                    runOnce(
+                        () -> {
+                          coralOnL3 = 1;
+                          coralOnL2 = 0;
+                        }))
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWallToLKAlgae.active()
         .onTrue(
@@ -146,26 +150,20 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
+                        CenterWallToLKAlgae.active().negate()),
+                    runOnce(() -> scoreState = Dealgify),
+                    LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
+                    dealgify(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWallToLKAlgae.getFinalPose().get(),
                         CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
-    CenterWallToLKAlgae.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(LToDealgify.cmd().andThen(drive.driveIntoWall())));
     LToDealgify.done()
         .onTrue(
-            // Dealgify
-            runOnce(() -> scoreState = Dealgify)
-                .andThen(
-                    dealgify(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () -> CenterWallToLKAlgae.getFinalPose().get(),
-                            CenterWallToLKAlgae.active().negate())
-                        .asProxy(),
-                    // Start next path once algae is held
-                    KLAlgaeToStationHigh.cmd().asProxy())
+            waitUntil(carriage::algaeHeld)
+                .andThen(KLAlgaeToStationHigh.cmd().asProxy())
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
