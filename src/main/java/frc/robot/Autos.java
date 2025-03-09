@@ -5,11 +5,9 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import static frc.robot.RobotCommands.ScoreState.Dealgify;
 import static frc.robot.RobotCommands.dealgify;
-import static frc.robot.RobotCommands.goalPose;
 import static frc.robot.RobotCommands.scoreCoral;
 import static frc.robot.RobotCommands.scoreProcessor;
 import static frc.robot.RobotCommands.scoreState;
-import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L1;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L2;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
