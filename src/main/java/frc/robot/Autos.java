@@ -266,26 +266,21 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterWallToLKAlgae.getFinalPose().get(),
+                        CenterWallToLKAlgae.active().negate()),
+                    runOnce(() -> scoreState = Dealgify),
+                    LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
+                    dealgify(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWallToLKAlgae.getFinalPose().get(),
                         CenterWallToLKAlgae.active().negate()))
                 .withName("ScoreCoralOnL3"));
-    CenterWallToLKAlgae.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(LToDealgify.cmd().andThen(drive.driveIntoWall())));
+    CenterWallToLKAlgae.done().onTrue(waitUntil(() -> !carriage.coralHeld()).andThen());
     LToDealgify.done()
         .onTrue(
-            // Dealgify
-            runOnce(() -> scoreState = Dealgify)
-                .andThen(
-                    dealgify(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () -> CenterWallToLKAlgae.getFinalPose().get(),
-                            CenterWallToLKAlgae.active().negate())
-                        .asProxy(),
-                    // Start next path once algae is held
-                    KLAlgaeToStationHigh.cmd().asProxy())
+            waitUntil(carriage::algaeHeld)
+                .andThen(KLAlgaeToStationHigh.cmd().asProxy())
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
