@@ -450,7 +450,7 @@ public class Autos {
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterProcessorToCDAlgae.active()
         .onTrue(
-            // Score coral on L1
+            // Score coral on L3
             elevator
                 .request(L3)
                 .andThen(
@@ -460,7 +460,7 @@ public class Autos {
                         poseManager,
                         () -> CenterProcessorToCDAlgae.getFinalPose().get(),
                         CenterProcessorToCDAlgae.done()))
-                .withName("ScoreCoralOnL1"));
+                .withName("ScoreCoralOnL3"));
     CenterProcessorToCDAlgae.done()
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
