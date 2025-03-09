@@ -366,6 +366,8 @@ public class Autos {
     AutoRoutine routine = factory.newRoutine("GHAlgaeToProcessorL3");
 
     AutoTrajectory centerWallToHG = routine.trajectory("CenterToHGAlgae");
+    // TODO make the above path go to G
+    // TODO make a path from G to Dealgify
     AutoTrajectory hGToProcessorScore = routine.trajectory("GHToProcessorScore");
 
     routine.active().onTrue(centerWallToHG.resetOdometry().andThen(centerWallToHG.cmd()));
@@ -383,6 +385,7 @@ public class Autos {
                         () -> centerWallToHG.getFinalPose().get(),
                         centerWallToHG.active().negate()))
                 .withName("ScoreCoralOnL3"));
+    // TODO use path from G to Dealgify
     centerWallToHG
         .done()
         .onTrue(
