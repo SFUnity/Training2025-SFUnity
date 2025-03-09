@@ -450,7 +450,7 @@ public class Autos {
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterProcessorToCDAlgae.active()
         .onTrue(
-            // Score coral on L1
+            // Score coral on L3
             elevator
                 .request(L3)
                 .andThen(
@@ -459,22 +459,19 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> CenterProcessorToCDAlgae.getFinalPose().get(),
-                        CenterProcessorToCDAlgae.done()))
-                .withName("ScoreCoralOnL1"));
-    CenterProcessorToCDAlgae.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(
-                    // Dealgify
+                        CenterProcessorToCDAlgae.done()),
                     runOnce(() -> scoreState = Dealgify),
                     dealgify(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () -> CenterProcessorToCDAlgae.getFinalPose().get(),
-                            CenterProcessorToCDAlgae.done())
-                        .asProxy()
-                        .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterProcessorToCDAlgae.getFinalPose().get(),
+                        CenterProcessorToCDAlgae.done()))
+                .withName("ScoreCoralOnL3"));
+    CenterProcessorToCDAlgae.done()
+        .onTrue(
+            waitUntil(() -> carriage.algaeHeld())
+                .andThen(
                     // Start next path once algae is held
                     CDToStationLow.cmd())
                 .withName("DealgifyThenGoToStationHigh"));
