@@ -17,8 +17,6 @@ public interface AprilTagVisionIO {
     public double avgTagArea = 0.0;
 
     public double pipeline = 0;
-    /** 0 = pipeline control, 1 = force off, 2 = force blink, 3 = force on */
-    public double ledMode = 0;
   }
 
   /** Updates the set of loggable inputs. */

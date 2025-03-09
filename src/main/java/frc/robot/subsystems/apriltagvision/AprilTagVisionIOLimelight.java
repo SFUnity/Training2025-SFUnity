@@ -11,15 +11,16 @@ import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.PoseManager;
 import java.util.HashSet;
 import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
   private String name;
 
-  private static final double disconnectedTimeout = 0.5;
+  private static final double disconnectedTimeout = 250;
   private final Alert disconnectedAlert;
   private double lastTimestamp = 0;
 
-  private final double DEFAUlT_CROP = 1;
+  private final double DEFAUlT_CROP = 0.9;
   // private final double CROP_BUFFER = 0.1;
 
   public AprilTagVisionIOLimelight(String camName) {
@@ -81,13 +82,14 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     inputs.avgTagArea = observation.avgTagArea;
 
     inputs.pipeline = getCurrentPipelineIndex(name);
-    inputs.ledMode = getLimelightNTDouble(name, "ledMode");
 
     // Update disconnected alert
     if (observation.timestampSeconds != 0) {
       lastTimestamp = observation.timestampSeconds;
     }
-    disconnectedAlert.set(Timer.getFPGATimestamp() - lastTimestamp < disconnectedTimeout);
+    double latency = (Timer.getFPGATimestamp() - lastTimestamp) / 1000; // milliseconds
+    Logger.recordOutput("Vision/" + name + "/latency", latency);
+    disconnectedAlert.set(latency > disconnectedTimeout);
 
     // dynamicCropping();
   }

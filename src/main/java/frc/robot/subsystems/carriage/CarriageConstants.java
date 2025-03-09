@@ -15,11 +15,13 @@ public class CarriageConstants {
       new LoggedTunableNumber("Carriage/algaeCurrentThreshold", 55);
 
   public static final LoggedTunableNumber intakingSpeedVolts =
-      new LoggedTunableNumber("Carriage/intakingSpeedVolts", -5);
+      new LoggedTunableNumber("Carriage/intakingSpeedVolts", -3.5);
   public static final LoggedTunableNumber placeSpeedVolts =
       new LoggedTunableNumber("Carriage/placeSpeedVolts", -8);
+  public static final LoggedTunableNumber placeL1SpeedVolts =
+      new LoggedTunableNumber("Carriage/placeL1SpeedVolts", -6);
   public static final LoggedTunableNumber highDealgifyingSpeedVolts =
-      new LoggedTunableNumber("Carriage/highDealgifyingSpeedVolts", 5);
+      new LoggedTunableNumber("Carriage/highDealgifyingSpeedVolts", -10);
   public static final LoggedTunableNumber lowDealgifyingSpeedVolts =
       new LoggedTunableNumber("Carriage/lowDealgifyingSpeedVolts", -5);
   public static final LoggedTunableNumber processorSpeedVolts =

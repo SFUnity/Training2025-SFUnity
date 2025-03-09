@@ -100,6 +100,10 @@ public class Module {
     io.setTurnOpenLoop(0.0);
   }
 
+  public double getDriveCurrent() {
+    return inputs.driveCurrentAmps;
+  }
+
   /** Returns the current turn angle of the module. */
   public Rotation2d getAngle() {
     return inputs.turnAbsolutePosition;

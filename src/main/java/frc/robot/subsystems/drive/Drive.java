@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.constantsGlobal.Constants.Mode;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
@@ -55,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -71,6 +73,9 @@ public class Drive extends SubsystemBase {
   private final DriveCommandsConfig config;
   private static final double DEADBAND = 0.1;
 
+  private static final LoggedTunableNumber povMovementSpeed =
+      new LoggedTunableNumber("Drive/POV Movement Speed", 0.5);
+
   private static final LoggedTunableNumber linearkP =
       new LoggedTunableNumber("Drive/Commands/Linear/kP", 3.5);
   private static final LoggedTunableNumber linearkD =
@@ -82,13 +87,13 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber linearTolerance =
       new LoggedTunableNumber("Drive/Commands/Linear/tolerance", 0.05);
   private static final LoggedTunableNumber thetaToleranceDeg =
-      new LoggedTunableNumber("Drive/Commands/Theta/toleranceDeg", 1.0);
+      new LoggedTunableNumber("Drive/Commands/Theta/toleranceDeg", 2.0);
 
   private static final LoggedTunableNumber maxLinearVelocity =
-      new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", maxSpeedMetersPerSec);
+      new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", Units.feetToMeters(10));
   private static final LoggedTunableNumber maxLinearAcceleration =
       new LoggedTunableNumber(
-          "Drive/Commands/Linear - maxAcceleration", maxAccelerationMetersPerSec * 0.4);
+          "Drive/Commands/Linear - maxAcceleration", Units.feetToMeters(50.0) * 0.4);
   private static final LoggedTunableNumber maxAngularVelocity =
       new LoggedTunableNumber(
           "Drive/Commands/Theta - maxVelocity", maxAngularSpeedRadiansPerSec * 0.8);
@@ -99,7 +104,7 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber ffMinRadius =
       new LoggedTunableNumber("AutoAlign/ffMinRadius", 0.2);
   private static final LoggedTunableNumber ffMaxRadius =
-      new LoggedTunableNumber("AutoAlign/ffMaxRadius", 0.8);
+      new LoggedTunableNumber("AutoAlign/ffMaxRadius", 0.6);
 
   private final ProfiledPIDController thetaController;
   private final ProfiledPIDController linearController;
@@ -213,6 +218,7 @@ public class Drive extends SubsystemBase {
         poseManager.rawGyroRotation =
             poseManager.rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
+      Logger.recordOutput("Drive/rawGyroRotation", poseManager.rawGyroRotation);
 
       // Apply update
       poseManager.addOdometryMeasurementWithTimestamps(sampleTimestamps[i], modulePositions);
@@ -388,13 +394,13 @@ public class Drive extends SubsystemBase {
           // Convert to doubles
           double o = config.getOmegaInput();
 
-          // Check for slow mode
-          if (config.slowMode().getAsBoolean()) {
-            o *= config.slowTurnMultiplier().get();
-          }
-
           // Apply deadband
           double omega = MathUtil.applyDeadband(o, DEADBAND);
+
+          // Check for slow mode
+          if (config.slowMode().getAsBoolean()) {
+            omega *= config.slowTurnMultiplier().get();
+          }
 
           // Square values and scale to max velocity
           omega = Math.copySign(omega * omega, omega);
@@ -403,15 +409,32 @@ public class Drive extends SubsystemBase {
           // Get linear velocity
           Translation2d linearVelocity = getLinearVelocityFromJoysticks();
 
+          // Get pov movement
+          double x = 0;
+          double y = 0;
+          if (config.povDownPressed()) {
+            x = -povMovementSpeed.get();
+          } else if (config.povUpPressed()) {
+            x = povMovementSpeed.get();
+          } else if (config.povLeftPressed()) {
+            y = povMovementSpeed.get();
+          } else if (config.povRightPressed()) {
+            y = -povMovementSpeed.get();
+          }
+
           // Convert to field relative speeds & send command
-          runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX(),
-                  linearVelocity.getY(),
-                  omega,
-                  AllianceFlipUtil.shouldFlip()
-                      ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
-                      : poseManager.getRotation()));
+          if (Math.abs(x) > 0 || Math.abs(y) > 0) {
+            runVelocity(new ChassisSpeeds(x, y, omega));
+          } else {
+            runVelocity(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                    linearVelocity.getX(),
+                    linearVelocity.getY(),
+                    omega,
+                    AllianceFlipUtil.shouldFlip()
+                        ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
+                        : poseManager.getRotation()));
+          }
         })
         .withName("Joystick Drive");
   }
@@ -426,8 +449,27 @@ public class Drive extends SubsystemBase {
           updateThetaTunables();
           updateThetaConstraints();
 
-          // Get linear velocity
-          Translation2d linearVelocity = getLinearVelocityFromJoysticks();
+          // Get pov movement
+          double x = 0;
+          double y = 0;
+          if (config.povDownPressed()) {
+            x = povMovementSpeed.get();
+          } else if (config.povUpPressed()) {
+            x = -povMovementSpeed.get();
+          } else if (config.povLeftPressed()) {
+            y = povMovementSpeed.get();
+          } else if (config.povRightPressed()) {
+            y = -povMovementSpeed.get();
+          }
+
+          Translation2d linearVelocity;
+          if (Math.abs(x) > 0 || Math.abs(y) > 0) {
+            ChassisSpeeds speeds =
+                ChassisSpeeds.fromRobotRelativeSpeeds(x, y, 0, poseManager.rawGyroRotation);
+            linearVelocity = new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+          } else {
+            linearVelocity = getLinearVelocityFromJoysticks();
+          }
 
           // Convert to field relative speeds & send command
           runVelocity(
@@ -438,6 +480,8 @@ public class Drive extends SubsystemBase {
                   AllianceFlipUtil.shouldFlip()
                       ? poseManager.getRotation().plus(new Rotation2d(Math.PI))
                       : poseManager.getRotation()));
+
+          Leds.getInstance().alignedWithTarget = thetaAtGoal();
         })
         .beforeStarting(
             () -> {
@@ -446,7 +490,9 @@ public class Drive extends SubsystemBase {
         .finallyDo(
             () -> {
               stop();
+              Leds.getInstance().alignedWithTarget = false;
             })
+        .onlyWhile(() -> MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND) == 0)
         .withName("Heading Drive");
   }
 
@@ -472,7 +518,11 @@ public class Drive extends SubsystemBase {
               MathUtil.clamp(
                   (currentDistance - ffMinRadius.get()) / (ffMaxRadius.get() - ffMinRadius.get()),
                   0.0,
-                  1.0);
+                  0.5);
+          Logger.recordOutput(
+              "Drive/Commands/ffOut", linearController.getSetpoint().velocity * ffScaler);
+          Logger.recordOutput(
+              "Drive/Commands/pidOut", linearController.calculate(currentDistance, 0.0));
           double driveVelocityScalar =
               linearController.getSetpoint().velocity * ffScaler
                   + linearController.calculate(currentDistance, 0.0);
@@ -506,35 +556,47 @@ public class Drive extends SubsystemBase {
                   thetaVelocity,
                   poseManager.getRotation()));
 
-          Logger.recordOutput("Drive/Commands/CurrentDistance", currentDistance);
+          Leds.getInstance().alignedWithTarget = linearAtGoal() && thetaAtGoal();
+
+          Logger.recordOutput("Drive/Commands/Linear/currentDistance", currentDistance);
         })
         .beforeStarting(
             () -> {
               resetControllers(goalPose.get());
+              Leds.getInstance().autoAlignActivated = true;
             })
         .finallyDo(
             () -> {
               stop();
+              Leds.getInstance().alignedWithTarget = false;
+              Leds.getInstance().autoAlignActivated = false;
             })
+        .onlyWhile(
+            () ->
+                MathUtil.applyDeadband(config.getOmegaInput(), 0.2) == 0
+                    && MathUtil.applyDeadband(
+                            Math.hypot(config.getXInput(), config.getYInput()), 0.2)
+                        == 0)
         .withName("Full Auto Drive");
+  }
+
+  public Command driveIntoWall() {
+    return run(() -> setAllModuleSetpointsToSame(0.5, new Rotation2d()))
+        .until(
+            () -> {
+              int count = 0;
+              for (Module module : modules) {
+                if (module.getDriveCurrent() > 30) count += 1;
+                if (count >= 2) return true;
+              }
+              return false;
+            });
   }
 
   private Translation2d getLinearVelocityFromJoysticks() {
     // Convert to doubles
     double x = config.getXInput();
     double y = config.getYInput();
-
-    // The speed value here might need to change
-    double povMovementSpeed = 0.5;
-    if (config.povDownPressed()) {
-      x = -povMovementSpeed;
-    } else if (config.povUpPressed()) {
-      x = povMovementSpeed;
-    } else if (config.povLeftPressed()) {
-      y = povMovementSpeed;
-    } else if (config.povRightPressed()) {
-      y = -povMovementSpeed;
-    }
 
     // Check for slow mode
     if (config.slowMode().getAsBoolean()) {
@@ -611,7 +673,6 @@ public class Drive extends SubsystemBase {
                 .getX());
     linearController.reset(poseManager.getDistanceTo(goalPose), linearVelocity);
     resetThetaController();
-    Logger.recordOutput("resetControllers/linearVelocity", linearVelocity);
     lastSetpointTranslation = poseManager.getTranslation();
   }
 
@@ -853,16 +914,16 @@ public class Drive extends SubsystemBase {
   private int moduleToTest = 0;
   public boolean allModules = false;
 
-  public Command moduleTestingCommand() {
+  public Command moduleTestingCommand(DoubleSupplier driveInput, DoubleSupplier turnInput) {
     return run(() -> {
-          double driveInput = MathUtil.applyDeadband(config.getXInput(), DEADBAND);
-          double turnInput = MathUtil.applyDeadband(config.getOmegaInput(), DEADBAND);
+          double driveOutput = MathUtil.applyDeadband(driveInput.getAsDouble(), DEADBAND);
+          double turnOutput = MathUtil.applyDeadband(turnInput.getAsDouble(), DEADBAND);
           if (allModules) {
             for (int i = 0; i < 4; i++) {
-              modules[i].test(driveInput * 12, turnInput * 12);
+              modules[i].test(driveOutput * 12, turnOutput * 12);
             }
           } else {
-            modules[moduleToTest].test(driveInput * 12, turnInput * 12);
+            modules[moduleToTest].test(driveOutput * 12, turnOutput * 12);
           }
         })
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)

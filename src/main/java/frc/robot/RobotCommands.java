@@ -10,12 +10,15 @@ import static frc.robot.util.AllianceFlipUtil.apply;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.PoseManager;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -24,8 +27,7 @@ import org.littletonrobotics.junction.Logger;
 
 /** Put high level commands here */
 public final class RobotCommands {
-  public static boolean allowAutoDrive = false;
-  public static boolean allowHeadingAlign = false;
+  public static boolean allowAutoDrive = true;
   public static ScoreState scoreState = Dealgify;
   public static boolean dealgifyAfterPlacing = false;
 
@@ -41,10 +43,16 @@ public final class RobotCommands {
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
     return waitUntil(
-            () ->
-                !allowAutoDrive
-                    || poseManager.getDistanceTo(goalPose.get())
-                        < elevatorSafeExtensionDistanceMeters.get())
+            () -> {
+              boolean extra = false;
+              if (DriverStation.isTeleop()) {
+                extra = !allowAutoDrive;
+              }
+              ;
+              return extra
+                  || poseManager.getDistanceTo(goalPose.get())
+                      < elevatorSafeExtensionDistanceMeters.get();
+            })
         .andThen(
             elevator
                 .enableElevator()
@@ -54,16 +62,21 @@ public final class RobotCommands {
                             none(),
                             () -> elevator.goalHeightInches > ElevatorConstants.pastL3Height.get())
                         .andThen(
-                            waitUntil(() -> atPose.getAsBoolean() && elevator.atDesiredHeight()),
+                            waitUntil(() -> atPose.getAsBoolean() && elevator.atGoalHeight()),
                             carriage.placeCoral())));
   }
 
-  public static Command dealgify(Elevator elevator, Carriage carriage, PoseManager poseManager) {
-    return dealgify(elevator, carriage, poseManager, goalPose(poseManager));
+  public static Command dealgify(
+      Elevator elevator, Carriage carriage, PoseManager poseManager, BooleanSupplier atPose) {
+    return dealgify(elevator, carriage, poseManager, goalPose(poseManager), atPose);
   }
 
   public static Command dealgify(
-      Elevator elevator, Carriage carriage, PoseManager poseManager, Supplier<Pose2d> goalPose) {
+      Elevator elevator,
+      Carriage carriage,
+      PoseManager poseManager,
+      Supplier<Pose2d> goalPose,
+      BooleanSupplier atPose) {
     BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
     return waitUntil(
             () ->
@@ -71,24 +84,29 @@ public final class RobotCommands {
                     || poseManager.getDistanceTo(goalPose.get())
                         < elevatorSafeExtensionDistanceMeters.get())
         .andThen(
-            either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
-                .andThen(elevator.enableElevator())
-                .alongWith(either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
-        .alongWith(runOnce(() -> Logger.recordOutput("HighAlgae", highAlgae.getAsBoolean())));
+            parallel(
+                either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
+                    .andThen(elevator.enableElevator()),
+                either(carriage.highDealgify(), carriage.lowDealgify(), highAlgae)))
+        .alongWith(
+            runOnce(() -> Logger.recordOutput("Controls/HighAlgae", highAlgae.getAsBoolean())));
   }
 
   public static Command scoreProcessor(
       Carriage carriage,
       Intake intake,
+      Elevator elevator,
       PoseManager poseManager,
       boolean front,
       BooleanSupplier atPose) {
     return waitUntil(atPose)
+        .andThen(elevator.request(Processor).andThen(elevator.enableElevator()))
         .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 
-  public static BooleanSupplier atGoal(Drive drive) {
-    return () -> !allowAutoDrive || (drive.linearAtGoal() && drive.thetaAtGoal());
+  public static BooleanSupplier atGoal(Drive drive, DriveCommandsConfig driveCommandsConfig) {
+    return () ->
+        driveCommandsConfig.finishScoring() || (drive.linearAtGoal() && drive.thetaAtGoal());
   }
 
   public static Supplier<Pose2d> goalPose(PoseManager poseManager) {
@@ -109,7 +127,8 @@ public final class RobotCommands {
     RightBranch,
     Dealgify,
     ProcessorFront,
-    ProcessorBack
+    ProcessorBack,
+    ScoreL1
   }
 
   public static IntakeState intakeState = Source;
@@ -127,8 +146,8 @@ public final class RobotCommands {
                             })
                         .until(carriage::coralHeld)
                         .asProxy(),
-                    carriage.intakeCoral().asProxy(),
-                    () -> allowHeadingAlign),
+                    none(),
+                    () -> allowAutoDrive),
                 Ground,
                 intake.intakeCmd().asProxy(),
                 Ice_Cream,
@@ -136,8 +155,11 @@ public final class RobotCommands {
                     .request(IceCream)
                     .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
                     .raceWith(intake.iceCreamCmd())
+                    .withName("iceCreamIntake")
                     .asProxy()),
             () -> intakeState)
+        .beforeStarting(() -> Leds.getInstance().intakingActivated = true)
+        .finallyDo(() -> Leds.getInstance().intakingActivated = false)
         .withName("fullIntake");
   }
 

@@ -23,7 +23,7 @@ import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = Units.feetToMeters(17.1);
+  public static final double maxSpeedMetersPerSec = Units.feetToMeters(13.0);
   public static final double maxAccelerationMetersPerSec =
       Units.feetToMeters(75.0); // This is what 6328
   public static final double odometryFrequency = 100.0; // Hz
@@ -89,7 +89,7 @@ public class DriveConstants {
   public static final int driveMotorSupplyCurrentLimit = 50;
   public static final int driveMotorStatorCurrentLimit = 80;
   public static final double wheelRadiusMeters = Units.inchesToMeters(2);
-  public static final double driveMotorReduction = 5.36;
+  public static final double driveMotorReduction = 7.14; // Stupid L3-
   public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
 
   // Drive PID configuration
@@ -101,10 +101,10 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.35);
+        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.1);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = 0.129;
-        driveKv = 0.657;
+        driveKs = 0.12926;
+        driveKv = 0.83967;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
@@ -160,10 +160,12 @@ public class DriveConstants {
 
     public double getXInput() {
       return simMode ? -controller.getLeftX() : -controller.getLeftY();
+      // return controller.getLeftX();
     }
 
     public double getYInput() {
       return simMode ? controller.getLeftY() : -controller.getLeftX();
+      // return -controller.getLeftY();
     }
 
     public double getOmegaInput() {
@@ -184,6 +186,10 @@ public class DriveConstants {
 
     public boolean povRightPressed() {
       return controller.povRight().getAsBoolean();
+    }
+
+    public boolean finishScoring() {
+      return controller.leftTrigger().getAsBoolean();
     }
   }
 }

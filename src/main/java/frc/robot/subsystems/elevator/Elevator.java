@@ -21,6 +21,7 @@ import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -42,6 +43,9 @@ public class Elevator extends SubsystemBase {
   private final SysIdRoutine elevatorRoutine;
   private final PoseManager poseManager;
 
+  private BooleanSupplier algaeInCarriage;
+  private final LoggedTunableNumber algeInCarriageHeight =
+      new LoggedTunableNumber("Elevator/algeInCarriageHeight", 5);
   private final LoggedTunableNumber safeDropDist =
       new LoggedTunableNumber("Elevator/SafeDropDist", 0.3);
 
@@ -52,7 +56,7 @@ public class Elevator extends SubsystemBase {
     this.io = io;
     this.poseManager = poseManager;
 
-    pid.setTolerance(elevatorDistanceToleranceInches);
+    pid.setTolerance(elevatorPIDToleranceInches);
     // Create the SysId routine
     elevatorRoutine =
         new SysIdRoutine(
@@ -88,7 +92,11 @@ public class Elevator extends SubsystemBase {
       if (Carriage.coralInDanger) {
         pid.setGoal(L3.get());
       } else {
-        pid.setGoal(0);
+        if (algaeInCarriage.getAsBoolean()) {
+          pid.setGoal(algeInCarriageHeight.get());
+        } else {
+          pid.setGoal(0);
+        }
       }
     }
 
@@ -111,11 +119,6 @@ public class Elevator extends SubsystemBase {
   }
 
   @AutoLogOutput
-  public boolean atDesiredHeight() {
-    return pid.atSetpoint();
-  }
-
-  @AutoLogOutput
   public boolean atGoalHeight() {
     return Util.equalsWithTolerance(
         goalHeightInches, inputs.position, elevatorDistanceToleranceInches);
@@ -130,7 +133,8 @@ public class Elevator extends SubsystemBase {
     return run(() -> setHeight = true).until(this::atGoalHeight).withName("enableElevator");
   }
 
-  public Command disableElevator() {
+  public Command disableElevator(BooleanSupplier algaeInCarriage) {
+    this.algaeInCarriage = algaeInCarriage;
     return runOnce(() -> setHeight = false).withName("disableElevator");
   }
 
@@ -144,8 +148,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command runCurrentZeroing() {
-    return this.run(() -> io.runVolts(-1.0))
-        .until(() -> inputs.currentAmps > 40.0)
+    return run(() -> io.runVolts(-1.0))
+        .until(() -> inputs.currentAmps > 35.0)
+        .andThen(run(() -> io.runVolts(0)).withTimeout(0.2))
         .finallyDo(() -> io.resetEncoder(0.0));
   }
 

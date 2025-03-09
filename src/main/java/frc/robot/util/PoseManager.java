@@ -17,6 +17,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotCommands.ScoreState;
+import frc.robot.constantsGlobal.FieldConstants.CoralStation;
+import frc.robot.constantsGlobal.FieldConstants.Face;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -109,6 +111,11 @@ public class PoseManager {
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, lastModulePositions, pose);
   }
+
+  // public void setPoseForAuto(Pose2d pose) {
+  //   Pose2d actualPose = new Pose2d(pose.getTranslation(), getRotation());
+  //   poseEstimator.resetPosition(rawGyroRotation, lastModulePositions, actualPose);
+  // }
 
   @AutoLogOutput(key = "Odometry/FieldVelocity")
   public Twist2d fieldVelocity() {
@@ -214,7 +221,7 @@ public class PoseManager {
     }
   }
 
-  public double distanceToStationFace() {
+  public boolean nearStation() {
     Pose2d station =
         closestStation()
             .transformBy(new Transform2d(intakeDistanceMeters.get(), 0, Rotation2d.kZero));
@@ -222,6 +229,7 @@ public class PoseManager {
     Rotation2d stationAngle = station.getRotation();
     double hypotenuse = getDistanceTo(station);
     double angleDiff = angleToStation.minus(stationAngle).getRadians();
-    return -Math.cos(angleDiff) * hypotenuse;
+    double distance = -Math.cos(angleDiff) * hypotenuse;
+    return distance < 0.5;
   }
 }

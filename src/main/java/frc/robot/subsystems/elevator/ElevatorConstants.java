@@ -12,7 +12,8 @@ public class ElevatorConstants {
   // Profiled PID values
   public static final LoggedTunableNumber kP;
   public static final LoggedTunableNumber kD;
-  public static final double elevatorDistanceToleranceInches = 0.22;
+  public static final double elevatorDistanceToleranceInches = 0.3;
+  public static final double elevatorPIDToleranceInches = 0.05;
   public static final double maxElevatorSpeed = 41; // inches/sec
   public static final double maxElevatorAcceleration = 682.5; // inches/sec^2
   // FF values
@@ -23,7 +24,7 @@ public class ElevatorConstants {
   public static final double carrageMassKg = Units.lbsToKilograms(15);
   public static final double drumRadiusMeters = Units.inchesToMeters(1.4);
   public static final double minHeightInches = 0;
-  public static final double maxHeightInches = 23;
+  public static final double maxHeightInches = 23.1;
   public static final double gearRatio = 9;
   public static final double wheelRadius = 0.44444;
 
@@ -47,11 +48,12 @@ public class ElevatorConstants {
   /** In inches */
   public static enum ElevatorHeight {
     L3(new LoggedTunableNumber("Elevator/L3", maxHeightInches)),
-    L2(new LoggedTunableNumber("Elevator/L2", 10)),
-    L1(new LoggedTunableNumber("Elevator/L1", 0)),
-    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 18)),
+    L2(new LoggedTunableNumber("Elevator/L2", 8)),
+    L1(new LoggedTunableNumber("Elevator/L1", 8)),
+    AlgaeHigh(new LoggedTunableNumber("Elevator/AlgaeHigh", 19)),
     AlgaeLow(new LoggedTunableNumber("Elevator/AlgaeLow", L3.get())),
-    IceCream(new LoggedTunableNumber("Elevator/IceCream", 5));
+    IceCream(new LoggedTunableNumber("Elevator/IceCream", 5)),
+    Processor(new LoggedTunableNumber("Elevator/Processor", 2));
 
     ElevatorHeight(LoggedTunableNumber height) {
       this.height = height;

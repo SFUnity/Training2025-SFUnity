@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -30,7 +31,7 @@ public class Intake extends SubsystemBase {
   private boolean runningIceCream = false;
 
   private final LoggedTunableNumber spikeCurrent =
-      new LoggedTunableNumber("Intake/spikeCurrent", 10);
+      new LoggedTunableNumber("Intake/spikeCurrent", 17);
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -52,7 +53,7 @@ public class Intake extends SubsystemBase {
     // Check that the pivot is lowered and not rising
     if ((inputs.pivotAppliedVolts <= 0.5 && lowered) || runningIceCream) {
       // Check if the current is high enough to be intaking
-      if (filteredCurrent >= spikeCurrent.get()) {
+      if (filteredCurrent >= spikeCurrent.get() && !runningIceCream) {
         // check for start of intaking
         if (!startedIntaking && !hasAlgae) {
           startedIntaking = true;
@@ -69,14 +70,10 @@ public class Intake extends SubsystemBase {
         middleOfIntaking = true;
       }
       // check for massive current spike
-      if (filteredCurrent >= 40) {
+      if (filteredCurrent >= 35) {
         hasAlgae = true;
+        startedIntaking = false;
       }
-    }
-
-    // Check if the pivot is raised high current
-    if (!lowered && filteredCurrent > 20 && !runningIceCream) {
-      hasAlgae = false;
     }
 
     Logger.recordOutput("Intake/runningIceCream", runningIceCream);
@@ -86,6 +83,12 @@ public class Intake extends SubsystemBase {
     setpointVisualizer.update(Degrees.of(positionSetpoint));
     Logger.recordOutput("Intake/positionSetpoint", positionSetpoint);
     Util.logSubsystem(this, "Intake");
+
+    Leds.getInstance().intakeAlgaeHeld = algaeHeld();
+  }
+
+  public Command resetAlgaeHeld() {
+    return Commands.runOnce(() -> hasAlgae = false);
   }
 
   private void lower() {
@@ -107,7 +110,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersStopOrHold() {
-    io.runRollers(algaeHeld() ? 0.3 : 0);
+    io.runRollers(algaeHeld() ? 0.15 : 0);
   }
 
   public Command raiseAndStopOrHoldCmd() {
@@ -135,13 +138,14 @@ public class Intake extends SubsystemBase {
 
   public Command poopCmd() {
     return Commands.waitUntil(() -> filteredCurrent > 10)
-        .andThen(Commands.waitUntil(() -> filteredCurrent < 5))
-        .deadlineFor(
-            run(
-                () -> {
+        .andThen(
+            Commands.waitUntil(() -> filteredCurrent < 1), Commands.runOnce(() -> hasAlgae = false))
+        .raceWith(
+            run(() -> {
                   raise();
                   rollersOut();
-                }))
+                })
+                .until(() -> !algaeHeld()))
         .withName("poop");
   }
 
