@@ -31,8 +31,6 @@ public class Carriage extends SubsystemBase {
   private boolean realCoralHeld = false;
   public boolean realAlgaeHeld = false;
 
-  private static final LoggedTunableNumber highDealgifyTime =
-      new LoggedTunableNumber("Carriage/High Dealgaify Time", 1.0);
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
 
