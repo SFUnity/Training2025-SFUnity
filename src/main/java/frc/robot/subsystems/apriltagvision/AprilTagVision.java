@@ -99,7 +99,7 @@ public class AprilTagVision extends VirtualSubsystem {
       }
 
       // Smaller number = more trust
-      double trust = .7;
+      double trust = .03;
 
       // Scale trust based on number of tags
       if (inputs[i].tagCount < 2) {
