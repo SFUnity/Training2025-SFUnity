@@ -167,7 +167,7 @@ public class Autos {
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
-    KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.scoreProcessor());
+    KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.ejectAlgae());
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
@@ -286,7 +286,7 @@ public class Autos {
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
-    KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.scoreProcessor());
+    KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.ejectAlgae());
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
@@ -474,7 +474,7 @@ public class Autos {
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
-    CDToStationLow.atTime("EjectAlgae1").onTrue(carriage.scoreProcessor());
+    CDToStationLow.atTime("EjectAlgae1").onTrue(carriage.ejectAlgae());
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
