@@ -661,6 +661,8 @@ public class Robot extends LoggedRobot {
             elevator.request(L2),
             elevator.enableElevator(),
             waitSeconds(1),
+            elevator.disableElevator(() -> false),
+            waitSeconds(1),
             elevator.request(L3),
             elevator.enableElevator(),
             waitSeconds(1),
