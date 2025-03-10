@@ -299,7 +299,7 @@ public class Robot extends LoggedRobot {
       DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
     }
 
-    // Print auto duration
+    // Print auto duration + reset brake mode
     if (autoCommand != null) {
       if (!autoCommand.isScheduled() && !autoMessagePrinted) {
         if (DriverStation.isAutonomousEnabled()) {
@@ -312,6 +312,8 @@ public class Robot extends LoggedRobot {
         autoMessagePrinted = true;
         Leds.getInstance().autoFinished = true;
         Leds.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
+        // Set brake mode
+        drive.setBrakeMode(true);
       }
     }
 
@@ -594,7 +596,11 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    if (Timer.getFPGATimestamp() - autoStart >= 14) {
+      drive.setBrakeMode(false);
+    }
+  }
 
   /** This function is called once when teleop is enabled. */
   @Override
