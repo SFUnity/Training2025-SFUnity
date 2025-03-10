@@ -654,6 +654,7 @@ public class Robot extends LoggedRobot {
   }
 
   private Command elevatorAndCarriageTest() {
+    Timer timer = new Timer();
     return carriage
         .intakeCoral()
         .asProxy()
@@ -664,9 +665,13 @@ public class Robot extends LoggedRobot {
             elevator.disableElevator(() -> false),
             waitSeconds(1),
             elevator.request(L3),
-            elevator.enableElevator(),
-            waitSeconds(1),
-            carriage.placeCoral().asProxy());
+            scoreCoral(elevator, carriage, poseManager, () -> timer.hasElapsed(2)).beforeStarting(() -> timer.restart()).finallyDo(() -> timer.stop()).asProxy(),
+            elevator.disableElevator(() -> false),
+            waitSeconds(1.5),
+            dealgify(elevator, carriage, poseManager, () -> true).asProxy(),
+            elevator.disableElevator(() -> false),
+            waitSeconds(2.5),
+            scoreProcessor(carriage, intake, elevator, poseManager, true, () -> true).asProxy());
   }
 
   /** This function is called periodically during test mode. */
