@@ -89,8 +89,7 @@ public final class RobotCommands {
       boolean front,
       BooleanSupplier atPose) {
     return waitUntil(atPose)
-        .andThen(elevator.request(Processor).andThen(elevator.enableElevator()))
-        .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
+        .andThen(elevator.request(Processor), elevator.enableElevator(), either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 
   private static BooleanSupplier nearPose(PoseManager poseManager, Supplier<Pose2d> goalPose) {
