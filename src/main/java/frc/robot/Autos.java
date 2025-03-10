@@ -126,113 +126,7 @@ public class Autos {
     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
-    // When the routine begins, reset odometry and start the first trajectory
-    routine
-        .active()
-        .onTrue(
-            CenterWallToLKAlgae.resetOdometry()
-                .andThen(CenterWallToLKAlgae.cmd())
-                .alongWith(
-                    runOnce(
-                        () -> {
-                          coralOnL3 = 1;
-                          coralOnL2 = 0;
-                        }))
-                .withName("ResetOdometryAndStartFirstTrajectory"));
-    CenterWallToLKAlgae.active()
-        .onTrue(
-            // Score coral on L3
-            elevator
-                .request(L3)
-                .andThen(
-                    scoreCoral(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.active().negate()),
-                    runOnce(() -> scoreState = Dealgify),
-                    LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
-                    dealgify(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.active().negate()))
-                .withName("ScoreCoralOnL3"));
-    LToDealgify.done()
-        .onTrue(
-            waitUntil(carriage::algaeHeld)
-                .andThen(KLAlgaeToStationHigh.cmd().asProxy())
-                .withName("DealgifyThenGoToStationHigh"));
-
-    // Eject algae while driving
-    KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.ejectAlgae());
-
-    // Drive back from the station to our next scoring location
-    // We're intaking coral with a trigger in Robot.java so we don't need to do it here
-    KLAlgaeToStationHigh.done()
-        .or(KToStationHigh.done())
-        .or(LToStationHigh.done())
-        .onTrue(
-            waitUntil(carriage::coralHeld)
-                .andThen(
-                    either(
-                        StationHighToL.cmd(),
-                        StationHighToK.cmd(),
-                        () -> (coralOnL2 + coralOnL3) % 2 == 0) // Alternate K and L
-                    )
-                .withName("StationToScore"));
-
-    StationHighToK.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
-        .and(() -> poseManager.getDistanceTo(StationHighToK.getFinalPose().get()) < 1)
-        .onTrue(
-            either(
-                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
-                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
-                    () -> coralOnL3 >= 2)
-                .andThen(
-                    scoreCoral(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.active().negate()))
-                .withName("ScoreOnK"));
-
-    StationHighToK.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(KToStationHigh.cmd())
-                .withName("KToStationHigh"));
-
-    StationHighToL.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
-        .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
-        .onTrue(
-            either(
-                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
-                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
-                    () -> coralOnL3 >= 2)
-                .andThen(
-                    scoreCoral(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.active().negate()))
-                .withName("ScoreOnL"));
-
-    StationHighToL.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(LToStationHigh.cmd())
-                .withName("LToStationHigh"));
-
-    return routine;
+    return StandardCoralAuto(routine, CenterWallToLKAlgae, LToDealgify, KLAlgaeToStationHigh, StationHighToK, KToStationHigh, StationHighToL, LToStationHigh);
   }
 
   private AutoRoutine CenterCDProcessorAlgaeL2L3() {
@@ -245,113 +139,123 @@ public class Autos {
     AutoTrajectory StationHighToL = routine.trajectory("StationLowToC");
     AutoTrajectory LToStationHigh = routine.trajectory("CToStationLow");
 
-    // When the routine begins, reset odometry and start the first trajectory
-    routine
-        .active()
-        .onTrue(
-            CenterWallToLKAlgae.resetOdometry()
-                .andThen(CenterWallToLKAlgae.cmd())
-                .alongWith(
-                    runOnce(
-                        () -> {
-                          coralOnL3 = 1;
-                          coralOnL2 = 0;
-                        }))
-                .withName("ResetOdometryAndStartFirstTrajectory"));
-    CenterWallToLKAlgae.active()
-        .onTrue(
-            // Score coral on L3
-            elevator
-                .request(L3)
-                .andThen(
-                    scoreCoral(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.active().negate()),
-                    runOnce(() -> scoreState = Dealgify),
-                    LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
-                    dealgify(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.active().negate()))
-                .withName("ScoreCoralOnL3"));
-    LToDealgify.done()
-        .onTrue(
-            waitUntil(carriage::algaeHeld)
-                .andThen(KLAlgaeToStationHigh.cmd().asProxy())
-                .withName("DealgifyThenGoToStationHigh"));
+    return StandardCoralAuto(routine, CenterWallToLKAlgae, LToDealgify, KLAlgaeToStationHigh, StationHighToK, KToStationHigh, StationHighToL, LToStationHigh);
+  }
 
-    // Eject algae while driving
-    KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.ejectAlgae());
+  private AutoRoutine StandardCoralAuto(AutoRoutine routine, AutoTrajectory CenterWallToLKAlgae,
+  AutoTrajectory LToDealgify,
+  AutoTrajectory KLAlgaeToStationHigh,
+  AutoTrajectory StationHighToK,
+  AutoTrajectory KToStationHigh,
+  AutoTrajectory StationHighToL,
+  AutoTrajectory LToStationHigh) {
+     // When the routine begins, reset odometry and start the first trajectory
+     routine
+     .active()
+     .onTrue(
+         CenterWallToLKAlgae.resetOdometry()
+             .andThen(CenterWallToLKAlgae.cmd())
+             .alongWith(
+                 runOnce(
+                     () -> {
+                       coralOnL3 = 1;
+                       coralOnL2 = 0;
+                     }))
+             .withName("ResetOdometryAndStartFirstTrajectory"));
+ CenterWallToLKAlgae.active()
+     .onTrue(
+         // Score coral on L3
+         elevator
+             .request(L3)
+             .andThen(
+                 scoreCoral(
+                     elevator,
+                     carriage,
+                     poseManager,
+                     () -> CenterWallToLKAlgae.getFinalPose().get(),
+                     CenterWallToLKAlgae.active().negate()),
+                 runOnce(() -> scoreState = Dealgify),
+                 LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
+                 dealgify(
+                     elevator,
+                     carriage,
+                     poseManager,
+                     () -> CenterWallToLKAlgae.getFinalPose().get(),
+                     CenterWallToLKAlgae.active().negate()))
+             .withName("ScoreCoralOnL3"));
+ LToDealgify.done()
+     .onTrue(
+         waitUntil(carriage::algaeHeld)
+             .andThen(KLAlgaeToStationHigh.cmd().asProxy())
+             .withName("DealgifyThenGoToStationHigh"));
 
-    // Drive back from the station to our next scoring location
-    // We're intaking coral with a trigger in Robot.java so we don't need to do it here
-    KLAlgaeToStationHigh.done()
-        .or(KToStationHigh.done())
-        .or(LToStationHigh.done())
-        .onTrue(
-            waitUntil(carriage::coralHeld)
-                .andThen(
-                    either(
-                        StationHighToL.cmd(),
-                        StationHighToK.cmd(),
-                        () -> (coralOnL2 + coralOnL3) % 2 == 0) // Alternate K and L
-                    )
-                .withName("StationToScore"));
+ // Eject algae while driving
+ KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.ejectAlgae());
 
-    StationHighToK.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
-        .and(() -> poseManager.getDistanceTo(StationHighToK.getFinalPose().get()) < 1)
-        .onTrue(
-            either(
-                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
-                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
-                    () -> coralOnL3 >= 2)
-                .andThen(
-                    scoreCoral(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> StationHighToK.getFinalPose().get(),
-                        StationHighToK.active().negate()))
-                .withName("ScoreOnK"));
+ // Drive back from the station to our next scoring location
+ // We're intaking coral with a trigger in Robot.java so we don't need to do it here
+ KLAlgaeToStationHigh.done()
+     .or(KToStationHigh.done())
+     .or(LToStationHigh.done())
+     .onTrue(
+         waitUntil(carriage::coralHeld)
+             .andThen(
+                 either(
+                     StationHighToL.cmd(),
+                     StationHighToK.cmd(),
+                     () -> (coralOnL2 + coralOnL3) % 2 == 0) // Alternate K and L
+                 )
+             .withName("StationToScore"));
 
-    StationHighToK.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(KToStationHigh.cmd())
-                .withName("KToStationHigh"));
+ StationHighToK.active()
+     .and(carriage::coralHeld)
+     .and(carriage::beamBreak)
+     .and(() -> poseManager.getDistanceTo(StationHighToK.getFinalPose().get()) < 1)
+     .onTrue(
+         either(
+                 elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
+                 elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
+                 () -> coralOnL3 >= 2)
+             .andThen(
+                 scoreCoral(
+                     elevator,
+                     carriage,
+                     poseManager,
+                     () -> StationHighToK.getFinalPose().get(),
+                     StationHighToK.active().negate()))
+             .withName("ScoreOnK"));
 
-    StationHighToL.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
-        .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
-        .onTrue(
-            either(
-                    elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
-                    elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
-                    () -> coralOnL3 >= 2)
-                .andThen(
-                    scoreCoral(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.active().negate()))
-                .withName("ScoreOnL"));
+ StationHighToK.done()
+     .onTrue(
+         waitUntil(() -> !carriage.coralHeld())
+             .andThen(KToStationHigh.cmd())
+             .withName("KToStationHigh"));
 
-    StationHighToL.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(LToStationHigh.cmd())
-                .withName("LToStationHigh"));
+ StationHighToL.active()
+     .and(carriage::coralHeld)
+     .and(carriage::beamBreak)
+     .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
+     .onTrue(
+         either(
+                 elevator.request(L2).finallyDo(() -> coralOnL2 += 1),
+                 elevator.request(L3).finallyDo(() -> coralOnL3 += 1),
+                 () -> coralOnL3 >= 2)
+             .andThen(
+                 scoreCoral(
+                     elevator,
+                     carriage,
+                     poseManager,
+                     () -> StationHighToL.getFinalPose().get(),
+                     StationHighToL.active().negate()))
+             .withName("ScoreOnL"));
 
-    return routine;
+ StationHighToL.done()
+     .onTrue(
+         waitUntil(() -> !carriage.coralHeld())
+             .andThen(LToStationHigh.cmd())
+             .withName("LToStationHigh"));
+
+ return routine;
   }
 
   private AutoRoutine GHAlgaeToProcessorL3() {
