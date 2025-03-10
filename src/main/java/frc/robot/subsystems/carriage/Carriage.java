@@ -195,4 +195,11 @@ public class Carriage extends SubsystemBase {
         .finallyDo(() -> realAlgaeHeld = false)
         .withName("scoreProcessor");
   }
+
+  public Command ejectAlgae() {
+    return run(() -> io.runVolts(ejectSpeedVolts.get()))
+        .withTimeout(.2)
+        .finallyDo(() -> realAlgaeHeld = false)
+        .withName("ejectAlgae");
+  }
 }
