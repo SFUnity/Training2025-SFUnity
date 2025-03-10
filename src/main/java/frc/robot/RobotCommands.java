@@ -42,17 +42,7 @@ public final class RobotCommands {
       PoseManager poseManager,
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
-    return waitUntil(
-            () -> {
-              boolean extra = false;
-              if (DriverStation.isTeleop()) {
-                extra = !allowAutoDrive;
-              }
-              ;
-              return extra
-                  || poseManager.getDistanceTo(goalPose.get())
-                      < elevatorSafeExtensionDistanceMeters.get();
-            })
+    return waitUntil(nearPose(poseManager, goalPose))
         .andThen(
             elevator
                 .enableElevator()
@@ -78,11 +68,7 @@ public final class RobotCommands {
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
     BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
-    return waitUntil(
-            () ->
-                !allowAutoDrive
-                    || poseManager.getDistanceTo(goalPose.get())
-                        < elevatorSafeExtensionDistanceMeters.get())
+    return waitUntil(nearPose(poseManager, goalPose))
         .andThen(
             parallel(
                 either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
@@ -102,6 +88,20 @@ public final class RobotCommands {
     return waitUntil(atPose)
         .andThen(elevator.request(Processor).andThen(elevator.enableElevator()))
         .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
+  }
+
+  private static BooleanSupplier nearPose(PoseManager poseManager, Supplier<Pose2d> goalPose) {
+    return () -> {
+      boolean extra = false;
+      if (DriverStation.isTeleop()) {
+        extra = !allowAutoDrive;
+      } else if (DriverStation.isTest()) {
+        extra = true;
+      };
+      return extra
+          || poseManager.getDistanceTo(goalPose.get())
+              < elevatorSafeExtensionDistanceMeters.get();
+    };
   }
 
   public static BooleanSupplier atGoal(Drive drive, DriveCommandsConfig driveCommandsConfig) {
