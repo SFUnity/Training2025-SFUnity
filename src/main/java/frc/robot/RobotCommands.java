@@ -67,7 +67,10 @@ public final class RobotCommands {
       PoseManager poseManager,
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
-    BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
+    BooleanSupplier highAlgae = () -> {
+      if (DriverStation.isTest()) return false;
+      return poseManager.closestFaceHighAlgae();
+    };
     return waitUntil(nearPose(poseManager, goalPose))
         .andThen(
             parallel(
