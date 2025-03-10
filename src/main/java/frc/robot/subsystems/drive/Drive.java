@@ -377,7 +377,7 @@ public class Drive extends SubsystemBase {
     }
   }
 
-  private void setBrakeMode(boolean enable) {
+  public void setBrakeMode(boolean enable) {
     for (var module : modules) {
       module.setBrakeMode(enable);
     }
