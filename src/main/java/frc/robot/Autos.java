@@ -77,8 +77,7 @@ public class Autos {
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
     chooser.addRoutine("CenterCDProcessorAlgaeL2L3", this::CenterCDProcessorAlgaeL2L3);
-    chooser.addRoutine("CenterCDAlgaeCDEFL3", this::CenterCDAlgaeCDEFL3);
-    // TODO make a copy of GH... that has a wait command
+    chooser.addRoutine("L3Only", this::L3Only);
     chooser.addRoutine("GHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3);
 
     if (!DriverStation.isFMSAttached()) {
@@ -351,8 +350,8 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine CenterCDAlgaeCDEFL3() {
-    AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
+  public AutoRoutine L3Only() {
+    AutoRoutine routine = factory.newRoutine("L3Only");
     AutoTrajectory CenterProcessorToCDAlgae = routine.trajectory("CenterProcessorToCDAlgae");
     AutoTrajectory CDToStationLow = routine.trajectory("CDToStationLow");
     AutoTrajectory StationLowToC = routine.trajectory("StationLowToC");
