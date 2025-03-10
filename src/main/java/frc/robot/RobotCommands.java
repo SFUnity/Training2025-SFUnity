@@ -67,10 +67,11 @@ public final class RobotCommands {
       PoseManager poseManager,
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
-    BooleanSupplier highAlgae = () -> {
-      if (DriverStation.isTest()) return false;
-      return poseManager.closestFaceHighAlgae();
-    };
+    BooleanSupplier highAlgae =
+        () -> {
+          if (DriverStation.isTest()) return false;
+          return poseManager.closestFaceHighAlgae();
+        };
     return waitUntil(nearPose(poseManager, goalPose))
         .andThen(
             parallel(
@@ -89,7 +90,10 @@ public final class RobotCommands {
       boolean front,
       BooleanSupplier atPose) {
     return waitUntil(atPose)
-        .andThen(elevator.request(Processor), elevator.enableElevator(), either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
+        .andThen(
+            elevator.request(Processor),
+            elevator.enableElevator(),
+            either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
   }
 
   private static BooleanSupplier nearPose(PoseManager poseManager, Supplier<Pose2d> goalPose) {
@@ -99,10 +103,10 @@ public final class RobotCommands {
         extra = !allowAutoDrive;
       } else if (DriverStation.isTest()) {
         extra = true;
-      };
+      }
+      ;
       return extra
-          || poseManager.getDistanceTo(goalPose.get())
-              < elevatorSafeExtensionDistanceMeters.get();
+          || poseManager.getDistanceTo(goalPose.get()) < elevatorSafeExtensionDistanceMeters.get();
     };
   }
 
