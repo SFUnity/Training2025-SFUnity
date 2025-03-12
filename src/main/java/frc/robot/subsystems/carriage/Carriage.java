@@ -4,6 +4,7 @@ import static frc.robot.subsystems.carriage.CarriageConstants.*;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,6 +31,10 @@ public class Carriage extends SubsystemBase {
   private boolean coralPassed = false;
   private boolean realCoralHeld = false;
   public boolean realAlgaeHeld = false;
+
+  private final Timer beambreakTimer = new Timer();
+  private static final LoggedTunableNumber beambreakDelay =
+      new LoggedTunableNumber("Carriage/beambreakDelay", 0.3);
 
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
@@ -82,11 +87,16 @@ public class Carriage extends SubsystemBase {
     if (!beamBreak() && !coralPassed) {
       realCoralHeld = false;
     } else if (!beamBreak() && coralPassed) {
-      realCoralHeld = true;
+      if (beambreakTimer.hasElapsed(beambreakDelay.get())) {
+        realCoralHeld = true;
+      }
     } else if (beamBreak() && !coralPassed && !realCoralHeld) {
       coralPassed = true;
     } else if (beamBreak() && coralPassed && realCoralHeld) {
       coralPassed = false;
+    }
+    if (beamBreak() && coralPassed) {
+      beambreakTimer.restart();
     }
   }
 
