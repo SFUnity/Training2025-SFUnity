@@ -8,6 +8,7 @@ public class CarriageIOSim implements CarriageIO {
   @Override
   public void updateInputs(CarrageIOInputs inputs) {
     inputs.appliedVolts = appliedVolts;
+    inputs.positionRots = 100;
   }
 
   @Override
