@@ -5,7 +5,7 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 
 public class IntakeConstants {
-  public static final boolean groundAlgae = false;
+  public static boolean groundAlgae = false;
 
   public static final int rollersID = 18;
   public static final int pivotID = 15;
