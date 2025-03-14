@@ -544,7 +544,7 @@ public class Robot extends LoggedRobot {
         .and(() -> allowAutoDrive)
         .and(DriverStation::isTeleop)
         .and(() -> poseManager.getDistanceTo(goalPose(poseManager).get()) < 3.25)
-        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter)).plus(groundAlgae ? Rotation2d.kZero : Rotation2d.k180deg)));
 
     new Trigger(carriage::algaeHeld)
         .and(DriverStation::isTeleop)
