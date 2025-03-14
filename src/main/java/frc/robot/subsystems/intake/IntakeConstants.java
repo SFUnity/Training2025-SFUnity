@@ -45,7 +45,7 @@ public class IntakeConstants {
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
       rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
     }
-    
+
     switch (Constants.currentMode) {
       default:
         kP = new LoggedTunableNumber("Intake/kP", 0.028);
