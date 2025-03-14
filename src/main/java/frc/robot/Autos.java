@@ -317,7 +317,7 @@ public class Autos {
     hGToProcessorScore
         .done()
         .onTrue(
-            scoreProcessor(
+            scoreProcessorOrL1(
                 carriage,
                 intake,
                 elevator,
