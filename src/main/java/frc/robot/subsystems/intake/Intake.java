@@ -49,30 +49,32 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Intake/startedIntaking", startedIntaking);
     lowered = inputs.pivotCurrentPositionDeg >= loweredAngle.get() / 2;
 
-    // * There's a specific pattern in the current draw of the rollers that we're checking for here
-    // Check that the pivot is lowered and not rising
-    if ((inputs.pivotAppliedVolts <= 0.5 && lowered) || runningIceCream) {
-      // Check if the current is high enough to be intaking
-      if (filteredCurrent >= spikeCurrent.get() && !runningIceCream) {
-        // check for start of intaking
-        if (!startedIntaking && !hasAlgae) {
-          startedIntaking = true;
+    if (groundAlgae) { // * There's a specific pattern in the current draw of the rollers that we're
+      // checking for here
+      // Check that the pivot is lowered and not rising
+      if ((inputs.pivotAppliedVolts <= 0.5 && lowered) || runningIceCream) {
+        // Check if the current is high enough to be intaking
+        if (filteredCurrent >= spikeCurrent.get() && !runningIceCream) {
+          // check for start of intaking
+          if (!startedIntaking && !hasAlgae) {
+            startedIntaking = true;
+          }
+          // check for end of intaking
+          if (middleOfIntaking && !hasAlgae) {
+            hasAlgae = true;
+            startedIntaking = false;
+            middleOfIntaking = false;
+          }
         }
-        // check for end of intaking
-        if (middleOfIntaking && !hasAlgae) {
+        // check for dip in current
+        if (filteredCurrent < spikeCurrent.get() && startedIntaking) {
+          middleOfIntaking = true;
+        }
+        // check for massive current spike
+        if (filteredCurrent >= 35) {
           hasAlgae = true;
           startedIntaking = false;
-          middleOfIntaking = false;
         }
-      }
-      // check for dip in current
-      if (filteredCurrent < spikeCurrent.get() && startedIntaking) {
-        middleOfIntaking = true;
-      }
-      // check for massive current spike
-      if (filteredCurrent >= 35) {
-        hasAlgae = true;
-        startedIntaking = false;
       }
     }
 
