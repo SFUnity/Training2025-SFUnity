@@ -21,6 +21,7 @@ import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.leftName;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.rightName;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+import static frc.robot.subsystems.intake.IntakeConstants.groundAlgae;
 import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -507,17 +508,15 @@ public class Robot extends LoggedRobot {
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     operator.x().onTrue(elevator.request(L2));
-    operator.a().onTrue(elevator.request(L1).alongWith(runOnce(() -> scoreState = ScoreL1)));
+    operator.a().onTrue(either(elevator.request(L1), none(), () -> groundAlgae).alongWith(runOnce(() -> scoreState = ScoreL1)));
     operator
         .b()
         .onTrue(
             runOnce(
                 () -> {
-                  scoreState = ProcessorBack;
-                  if (intake.GPHeld()) {
+                  scoreState = ProcessorFront;
+                  if (intake.GPHeld() && groundAlgae) {
                     scoreState = ProcessorBack;
-                  } else if (carriage.algaeHeld()) {
-                    scoreState = ProcessorFront;
                   }
                 }));
     operator.leftBumper().onTrue(runOnce(() -> scoreState = LeftBranch));
@@ -548,7 +547,7 @@ public class Robot extends LoggedRobot {
 
     new Trigger(intake::GPHeld)
         .and(DriverStation::isTeleop)
-        .onTrue(runOnce(() -> scoreState = ProcessorBack));
+        .onTrue(runOnce(() -> scoreState = groundAlgae ? ProcessorBack : ScoreL1));
 
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
