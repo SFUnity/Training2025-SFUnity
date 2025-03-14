@@ -94,7 +94,8 @@ public final class RobotCommands {
         .andThen(
             elevator.request(Processor),
             elevator.enableElevator(),
-            either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
+            either(carriage.scoreProcessor(), intake.poopCmd(), () -> front))
+        .withName("scoreProcessor");
   }
 
   private static BooleanSupplier nearPose(PoseManager poseManager, Supplier<Pose2d> goalPose) {
