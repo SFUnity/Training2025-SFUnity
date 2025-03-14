@@ -459,7 +459,12 @@ public class Robot extends LoggedRobot {
                             poseManager,
                             false,
                             atGoal(drive, driveCommandsConfig))),
-                    () -> scoreState == RightBranch ? LeftBranch : scoreState)
+                    () -> {
+                      if (scoreState == ProcessorBack && !groundAlgae) {
+                        DriverStation.reportError("ProcessorBack can't be used with coral ground intake", false);
+                      }
+                      return scoreState == RightBranch ? LeftBranch : scoreState;
+                    })
                 .deadlineFor(
                     either(
                         either(
@@ -470,7 +475,7 @@ public class Robot extends LoggedRobot {
                                             drive.driveIntoWall(),
                                             none(),
                                             () -> scoreState == Dealgify)),
-                                drive.headingDrive(() -> goalPose(poseManager).get().getRotation()),
+                                drive.headingDrive(() -> goalPose(poseManager).get().getRotation().plus(groundAlgae ? Rotation2d.kZero : Rotation2d.k180deg)),
                                 () -> scoreState != ScoreL1)
                             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                             .withName("AutoAlignInFullScore")
