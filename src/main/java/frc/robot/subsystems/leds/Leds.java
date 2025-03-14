@@ -37,7 +37,7 @@ public class Leds extends VirtualSubsystem {
 
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
-  public boolean intakeAlgaeHeld = false;
+  public boolean intakeGPHeld = false;
   public boolean autoAlignActivated = false;
   public boolean intakingActivated = false;
 
@@ -162,7 +162,7 @@ public class Leds extends VirtualSubsystem {
     } else { // Enabled
       if (coralHeld) {
         pattern = solid(Color.kBrown);
-      } else if (intakeAlgaeHeld) {
+      } else if (intakeGPHeld) {
         pattern = solid(Color.kSeaGreen);
       } else if (carriageAlgaeHeld) {
         pattern = solid(Color.kPurple);
@@ -184,7 +184,7 @@ public class Leds extends VirtualSubsystem {
     // Logs
     Logger.recordOutput("LEDs/coralHeld", coralHeld);
     Logger.recordOutput("LEDs/carriageAlgaeHeld", carriageAlgaeHeld);
-    Logger.recordOutput("LEDs/intakeAlgaeHeld", intakeAlgaeHeld);
+    Logger.recordOutput("LEDs/intakeGPHeld", intakeGPHeld);
     Logger.recordOutput("LEDs/autoFinished", autoFinished);
     Logger.recordOutput("LEDs/lowBatteryAlert", lowBatteryAlert);
     Logger.recordOutput("LEDs/autoAlignActivated", autoAlignActivated);

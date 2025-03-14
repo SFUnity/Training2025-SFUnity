@@ -24,10 +24,10 @@ public class Intake extends SubsystemBase {
   private double filteredCurrent;
 
   private boolean lowered = false;
-  private boolean hasAlgae = false;
+  private boolean hasGP = false;
   private boolean startedIntaking = false;
   private boolean middleOfIntaking = false;
-  public static boolean simHasAlgae = false;
+  public static boolean simHasGP = false;
   private boolean runningIceCream = false;
 
   private final LoggedTunableNumber spikeCurrent =
@@ -56,12 +56,12 @@ public class Intake extends SubsystemBase {
         // Check if the current is high enough to be intaking
         if (filteredCurrent >= spikeCurrent.get() && !runningIceCream) {
           // check for start of intaking
-          if (!startedIntaking && !hasAlgae) {
+          if (!startedIntaking && !hasGP) {
             startedIntaking = true;
           }
           // check for end of intaking
-          if (middleOfIntaking && !hasAlgae) {
-            hasAlgae = true;
+          if (middleOfIntaking && !hasGP) {
+            hasGP = true;
             startedIntaking = false;
             middleOfIntaking = false;
           }
@@ -72,7 +72,7 @@ public class Intake extends SubsystemBase {
         }
         // check for massive current spike
         if (filteredCurrent >= 35) {
-          hasAlgae = true;
+          hasGP = true;
           startedIntaking = false;
         }
       }
@@ -86,11 +86,11 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Intake/positionSetpoint", positionSetpoint);
     Util.logSubsystem(this, "Intake");
 
-    Leds.getInstance().intakeAlgaeHeld = algaeHeld();
+    Leds.getInstance().intakeGPHeld = GPHeld();
   }
 
-  public Command resetAlgaeHeld() {
-    return Commands.runOnce(() -> hasAlgae = false);
+  public Command resetGPHeld() {
+    return Commands.runOnce(() -> hasGP = false);
   }
 
   private void lower() {
@@ -112,7 +112,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersStopOrHold() {
-    io.runRollers(algaeHeld() ? 0.15 : 0);
+    io.runRollers(GPHeld() ? 0.15 : 0);
   }
 
   public Command raiseAndStopOrHoldCmd() {
@@ -128,7 +128,7 @@ public class Intake extends SubsystemBase {
           lower();
           rollersIn();
         })
-        .until(this::algaeHeld)
+        .until(this::GPHeld)
         .withName("intake");
   }
 
@@ -141,13 +141,13 @@ public class Intake extends SubsystemBase {
   public Command poopCmd() {
     return Commands.waitUntil(() -> filteredCurrent > 10)
         .andThen(
-            Commands.waitUntil(() -> filteredCurrent < 1), Commands.runOnce(() -> hasAlgae = false))
+            Commands.waitUntil(() -> filteredCurrent < 1), Commands.runOnce(() -> hasGP = false))
         .raceWith(
             run(() -> {
                   raise();
                   rollersOut();
                 })
-                .until(() -> !algaeHeld()))
+                .until(() -> !GPHeld()))
         .withName("poop");
   }
 
@@ -158,15 +158,15 @@ public class Intake extends SubsystemBase {
         })
         .beforeStarting(() -> runningIceCream = true)
         .finallyDo(() -> runningIceCream = false)
-        .until(this::algaeHeld)
+        .until(this::GPHeld)
         .withName("iceCream");
   }
 
   @AutoLogOutput
-  public boolean algaeHeld() {
+  public boolean GPHeld() {
     if (Constants.currentMode == Constants.Mode.SIM) {
-      return simHasAlgae;
+      return simHasGP;
     }
-    return hasAlgae;
+    return hasGP;
   }
 }

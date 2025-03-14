@@ -369,7 +369,7 @@ public class Robot extends LoggedRobot {
     Trigger intakeTrigger = driver.rightBumper();
 
     // Setup rumble
-    new Trigger(() -> intake.algaeHeld())
+    new Trigger(() -> intake.GPHeld())
         .onTrue(
             runEnd(
                     () -> driver.setRumble(RumbleType.kBothRumble, 0.5),
@@ -479,7 +479,7 @@ public class Robot extends LoggedRobot {
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
-                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
+                      if (!intake.GPHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
                     })
                 .andThen(
@@ -514,7 +514,7 @@ public class Robot extends LoggedRobot {
             runOnce(
                 () -> {
                   scoreState = ProcessorBack;
-                  if (intake.algaeHeld()) {
+                  if (intake.GPHeld()) {
                     scoreState = ProcessorBack;
                   } else if (carriage.algaeHeld()) {
                     scoreState = ProcessorFront;
@@ -531,7 +531,7 @@ public class Robot extends LoggedRobot {
     operator.back().onTrue(elevator.runCurrentZeroing());
     operator.back().onTrue(intake.runCurrentZeroing());
 
-    operator.start().onTrue(carriage.resetHeld().alongWith(intake.resetAlgaeHeld()));
+    operator.start().onTrue(carriage.resetHeld().alongWith(intake.resetGPHeld()));
 
     // State-Based Triggers
 
@@ -546,7 +546,7 @@ public class Robot extends LoggedRobot {
         .and(DriverStation::isTeleop)
         .onTrue(runOnce(() -> scoreState = ProcessorFront));
 
-    new Trigger(intake::algaeHeld)
+    new Trigger(intake::GPHeld)
         .and(DriverStation::isTeleop)
         .onTrue(runOnce(() -> scoreState = ProcessorBack));
 
@@ -570,7 +570,7 @@ public class Robot extends LoggedRobot {
         "Toggle Beam Break in Carriage",
         runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
     SmartDashboard.putData(
-        "Toggle Algae in Intake", runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
+        "Toggle GP in Intake", runOnce(() -> Intake.simHasGP = !Intake.simHasGP));
 
     SmartDashboard.putData("Run Elevator Sysid", elevator.runSysidCmd());
   }
