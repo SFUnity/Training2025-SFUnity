@@ -14,9 +14,9 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"L.x", "val":3.706301212310791}, "y":{"exp":"L.y", "val":5.089514255523682}, "heading":{"exp":"L.heading", "val":-1.05165040496604}, "intervals":22, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"L.x", "val":3.68}, "y":{"exp":"L.y", "val":5.075163841247559}, "heading":{"exp":"L.heading", "val":-1.0708615629529097}, "intervals":22, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"3.747056007385254 m", "val":3.747056007385254}, "y":{"exp":"5.1458587646484375 m", "val":5.1458587646484375}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":24, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
-    {"x":{"exp":"KL_Algae.x", "val":3.852491855621338}, "y":{"exp":"KL_Algae.y", "val":5.125357627868652}, "heading":{"exp":"KL_Algae.heading", "val":-1.0708615629529097}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"KL_Algae.x", "val":3.827310800552368}, "y":{"exp":"KL_Algae.y", "val":5.152493476867676}, "heading":{"exp":"KL_Algae.heading", "val":-1.0708615629529097}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
