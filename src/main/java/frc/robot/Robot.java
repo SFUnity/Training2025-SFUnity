@@ -461,7 +461,8 @@ public class Robot extends LoggedRobot {
                             atGoal(drive, driveCommandsConfig))),
                     () -> {
                       if (scoreState == ProcessorBack && !groundAlgae) {
-                        DriverStation.reportError("ProcessorBack can't be used with coral ground intake", false);
+                        DriverStation.reportError(
+                            "ProcessorBack can't be used with coral ground intake", false);
                       }
                       return scoreState == RightBranch ? LeftBranch : scoreState;
                     })
@@ -475,7 +476,15 @@ public class Robot extends LoggedRobot {
                                             drive.driveIntoWall(),
                                             none(),
                                             () -> scoreState == Dealgify)),
-                                drive.headingDrive(() -> goalPose(poseManager).get().getRotation().plus(groundAlgae ? Rotation2d.kZero : Rotation2d.k180deg)),
+                                drive.headingDrive(
+                                    () ->
+                                        goalPose(poseManager)
+                                            .get()
+                                            .getRotation()
+                                            .plus(
+                                                groundAlgae
+                                                    ? Rotation2d.kZero
+                                                    : Rotation2d.k180deg)),
                                 () -> scoreState != ScoreL1)
                             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                             .withName("AutoAlignInFullScore")
@@ -513,7 +522,11 @@ public class Robot extends LoggedRobot {
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     operator.x().onTrue(elevator.request(L2));
-    operator.a().onTrue(either(elevator.request(L1), none(), () -> groundAlgae).alongWith(runOnce(() -> scoreState = ScoreL1)));
+    operator
+        .a()
+        .onTrue(
+            either(elevator.request(L1), none(), () -> groundAlgae)
+                .alongWith(runOnce(() -> scoreState = ScoreL1)));
     operator
         .b()
         .onTrue(
@@ -545,7 +558,12 @@ public class Robot extends LoggedRobot {
         .and(() -> allowAutoDrive)
         .and(DriverStation::isTeleop)
         .and(() -> poseManager.getDistanceTo(goalPose(poseManager).get()) < 3.25)
-        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter)).plus(carriage.coralHeld() ? Rotation2d.kZero : Rotation2d.k180deg)));
+        .whileTrue(
+            drive.headingDrive(
+                () ->
+                    poseManager
+                        .getHorizontalAngleTo(apply(reefCenter))
+                        .plus(carriage.coralHeld() ? Rotation2d.kZero : Rotation2d.k180deg)));
 
     new Trigger(carriage::algaeHeld)
         .and(DriverStation::isTeleop)
@@ -685,7 +703,8 @@ public class Robot extends LoggedRobot {
             dealgify(elevator, carriage, poseManager, () -> true).asProxy(),
             elevator.disableElevator(() -> false),
             waitSeconds(2.5),
-            scoreProcessorOrL1(carriage, intake, elevator, poseManager, true, () -> true).asProxy());
+            scoreProcessorOrL1(carriage, intake, elevator, poseManager, true, () -> true)
+                .asProxy());
   }
 
   /** This function is called periodically during test mode. */

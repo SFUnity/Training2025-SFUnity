@@ -314,10 +314,11 @@ public class Autos {
     HToDealgify.done()
         .onTrue(
             waitUntil(carriage::algaeHeld)
-                .andThen(Commands.waitSeconds(delayAfterAlgaeIntake.get()), GHToProcessorScore.cmd().asProxy())
+                .andThen(
+                    Commands.waitSeconds(delayAfterAlgaeIntake.get()),
+                    GHToProcessorScore.cmd().asProxy())
                 .withName("ScoreProcessor"));
-    GHToProcessorScore
-        .done()
+    GHToProcessorScore.done()
         .onTrue(
             scoreProcessorOrL1(
                 carriage,
