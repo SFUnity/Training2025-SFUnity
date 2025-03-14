@@ -83,7 +83,7 @@ public final class RobotCommands {
             runOnce(() -> Logger.recordOutput("Controls/HighAlgae", highAlgae.getAsBoolean())));
   }
 
-  public static Command scoreProcessor(
+  public static Command scoreProcessorOrL1(
       Carriage carriage,
       Intake intake,
       Elevator elevator,
@@ -92,9 +92,12 @@ public final class RobotCommands {
       BooleanSupplier atPose) {
     return waitUntil(atPose)
         .andThen(
-            elevator.request(Processor),
-            elevator.enableElevator(),
-            either(carriage.scoreProcessor(), intake.poopCmd(), () -> front))
+            either(
+                elevator
+                    .request(Processor)
+                    .andThen(elevator.enableElevator(), carriage.scoreProcessor()),
+                intake.poopCmd(),
+                () -> front))
         .withName("scoreProcessor");
   }
 

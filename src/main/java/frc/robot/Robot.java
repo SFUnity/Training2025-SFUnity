@@ -443,7 +443,7 @@ public class Robot extends LoggedRobot {
                         dealgify(
                             elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
                         ProcessorFront,
-                        scoreProcessor(
+                        scoreProcessorOrL1(
                             carriage,
                             intake,
                             elevator,
@@ -451,7 +451,7 @@ public class Robot extends LoggedRobot {
                             true,
                             atGoal(drive, driveCommandsConfig)),
                         ProcessorBack,
-                        scoreProcessor(
+                        scoreProcessorOrL1(
                             carriage,
                             intake,
                             elevator,
@@ -680,7 +680,7 @@ public class Robot extends LoggedRobot {
             dealgify(elevator, carriage, poseManager, () -> true).asProxy(),
             elevator.disableElevator(() -> false),
             waitSeconds(2.5),
-            scoreProcessor(carriage, intake, elevator, poseManager, true, () -> true).asProxy());
+            scoreProcessorOrL1(carriage, intake, elevator, poseManager, true, () -> true).asProxy());
   }
 
   /** This function is called periodically during test mode. */
