@@ -5,6 +5,7 @@ import static frc.robot.RobotCommands.IntakeState.*;
 import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+import static frc.robot.subsystems.intake.IntakeConstants.groundAlgae;
 import static frc.robot.util.AllianceFlipUtil.apply;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -160,7 +161,7 @@ public final class RobotCommands {
                 elevator
                     .request(IceCream)
                     .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
-                    .raceWith(intake.iceCreamCmd())
+                    .raceWith(either(intake.iceCreamCmd().asProxy(), idle(), () -> groundAlgae))
                     .withName("iceCreamIntake")
                     .asProxy()),
             () -> intakeState)
