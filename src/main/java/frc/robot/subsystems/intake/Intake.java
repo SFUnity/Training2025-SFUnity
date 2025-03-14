@@ -112,7 +112,8 @@ public class Intake extends SubsystemBase {
   }
 
   private void rollersStopOrHold() {
-    io.runRollers(GPHeld() ? 0.15 : 0);
+    double holdSpeed = groundAlgae ? 0.15 : 0;
+    io.runRollers(GPHeld() ? holdSpeed : 0);
   }
 
   public Command raiseAndStopOrHoldCmd() {
