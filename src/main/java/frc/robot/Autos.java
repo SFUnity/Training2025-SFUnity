@@ -279,14 +279,18 @@ public class Autos {
 
     AutoRoutine routine = factory.newRoutine("GHAlgaeToProcessorL3");
 
-    AutoTrajectory centerWallToHG = routine.trajectory("CenterToHGAlgae");
-    // TODO make the above path go to G
-    // TODO make a path from G to Dealgify
-    AutoTrajectory hGToProcessorScore = routine.trajectory("GHToProcessorScore");
+    AutoTrajectory CenterWallToHG = routine.trajectory("CenterToHGAlgae");
+    AutoTrajectory HToDealgify = routine.trajectory("HToDealgify");
+    AutoTrajectory GHToProcessorScore = routine.trajectory("GHToProcessorScore");
 
-    routine.active().onTrue(centerWallToHG.resetOdometry().andThen(centerWallToHG.cmd()));
-    centerWallToHG
-        .done()
+    // When the routine begins, reset odometry and start the first trajectory
+    routine
+        .active()
+        .onTrue(
+            CenterWallToHG.resetOdometry()
+                .andThen(CenterWallToHG.cmd())
+                .withName("ResetOdometryAndStartFirstTrajectory"));
+    CenterWallToHG.active()
         .onTrue(
             // Score coral on L3
             elevator
@@ -296,25 +300,23 @@ public class Autos {
                         elevator,
                         carriage,
                         poseManager,
-                        () -> centerWallToHG.getFinalPose().get(),
-                        centerWallToHG.active().negate()))
-                .withName("ScoreCoralOnL3"));
-    // TODO use path from G to Dealgify
-    centerWallToHG
-        .done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(
-                    // Dealgify
+                        () -> CenterWallToHG.getFinalPose().get(),
+                        CenterWallToHG.active().negate()),
                     runOnce(() -> scoreState = Dealgify),
-                    // dealgify(elevator, carriage, poseManager)
-                    //     .asProxy()
-                    //     .deadlineFor(drive.fullAutoDrive(goalPose(poseManager))),
-                    Commands.waitSeconds(delayAfterAlgaeIntake.get()),
-                    // Start next path once algae is held
-                    hGToProcessorScore.cmd())
-                .withName("DealgifyandScore"));
-    hGToProcessorScore
+                    HToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
+                    dealgify(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWallToHG.getFinalPose().get(),
+                        CenterWallToHG.active().negate()))
+                .withName("ScoreCoralOnL3"));
+    HToDealgify.done()
+        .onTrue(
+            waitUntil(carriage::algaeHeld)
+                .andThen(Commands.waitSeconds(delayAfterAlgaeIntake.get()), GHToProcessorScore.cmd().asProxy())
+                .withName("ScoreProcessor"));
+    GHToProcessorScore
         .done()
         .onTrue(
             scoreProcessorOrL1(
@@ -323,7 +325,7 @@ public class Autos {
                 elevator,
                 poseManager,
                 true,
-                hGToProcessorScore.active().negate()));
+                GHToProcessorScore.active().negate()));
 
     return routine;
   }
