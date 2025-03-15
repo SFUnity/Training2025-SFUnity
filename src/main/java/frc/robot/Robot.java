@@ -601,9 +601,17 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {}
 
+  boolean autoHasBeenSelected = false;
+
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if (DriverStation.isAutonomous() && !autoHasBeenSelected) {
+      drive.setBrakeMode(false);
+      autoHasBeenSelected = true;
+    }
+    if (!DriverStation.isAutonomous()) autoHasBeenSelected = false;
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link Autos} class. */
   @Override
@@ -618,11 +626,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    if (Timer.getFPGATimestamp() - autoStart >= 14) {
-      drive.setBrakeMode(false);
-    }
-  }
+  public void autonomousPeriodic() {}
 
   /** This function is called once when teleop is enabled. */
   @Override
