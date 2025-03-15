@@ -220,7 +220,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
         carriage = new Carriage(new CarriageIOSparkMax());
-        intake = new Intake(new IntakeIOSparkMax());
+        intake = new Intake(new IntakeIO() {}); // new IntakeIOSparkMax()
         vision =
             new AprilTagVision(
                 poseManager,
