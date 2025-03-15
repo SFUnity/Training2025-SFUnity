@@ -141,13 +141,13 @@ public class Leds extends VirtualSubsystem {
                         () -> 1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime)));
       } else if (extraLowBatteryAlert) {
         pattern = solid(Color.kRed);
+      } else if (coralHeld) {
+        pattern = solid(Color.kBrown);
       } else if (lowBatteryAlert) {
         pattern = solid(Color.kOrangeRed);
       } else if (prideLeds) {
         // Pride stripes
         pattern = rainbow(255, 128);
-      } else if (coralHeld) {
-        pattern = solid(Color.kBrown);
       } else {
         // Default pattern
         pattern = teamColors();
