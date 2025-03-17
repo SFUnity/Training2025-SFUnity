@@ -52,7 +52,7 @@ public class DriveConstants {
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = true;
   public static final boolean frontRightDriveInverted = false;
-  public static final boolean backLeftDriveInverted = true;
+  public static final boolean backLeftDriveInverted = false;
   public static final boolean backRightDriveInverted = false;
 
   public static final boolean frontLeftTurnInverted = true;
