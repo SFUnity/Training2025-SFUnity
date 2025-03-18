@@ -21,7 +21,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.AllianceFlipUtil;
-import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.AlwaysLoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -42,8 +42,10 @@ public class Autos {
 
   private int coralOnL3 = 0;
   private int coralOnL2 = 0;
-  private final LoggedTunableNumber delayAfterAlgaeIntake =
-      new LoggedTunableNumber("delayAfterAlgaeIntake", 1);
+  private final AlwaysLoggedTunableNumber delayAfterAlgaeIntake =
+      new AlwaysLoggedTunableNumber("delayAfterAlgaeIntake", 0);
+  private final AlwaysLoggedTunableNumber delayBeforeMoving =
+      new AlwaysLoggedTunableNumber("delayBeforeMoving", 3);
 
   public Autos(
       Drive drive, Carriage carriage, Elevator elevator, Intake intake, PoseManager poseManager) {
@@ -288,7 +290,7 @@ public class Autos {
         .active()
         .onTrue(
             CenterWallToHG.resetOdometry()
-                .andThen(CenterWallToHG.cmd())
+                .andThen(waitSeconds(delayBeforeMoving.get()), CenterWallToHG.cmd().asProxy())
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWallToHG.active()
         .onTrue(
