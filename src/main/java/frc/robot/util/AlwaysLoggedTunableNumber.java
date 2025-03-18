@@ -13,9 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
-/**
- * Class for a tunable number. Gets value from dashboard regardless of being in tuning mode.
- */
+/** Class for a tunable number. Gets value from dashboard regardless of being in tuning mode. */
 public class AlwaysLoggedTunableNumber {
   private static final String tableKey = "/SmartDashboard/TunableNumbers";
 
