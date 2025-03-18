@@ -433,14 +433,17 @@ public class Robot extends LoggedRobot {
                         scoreCoral(
                             elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
                         ScoreL1,
-                        elevator
-                            .enableElevator()
-                            .alongWith(
-                                waitUntil(
-                                        () ->
-                                            driveCommandsConfig.finishScoring()
-                                                && elevator.atGoalHeight())
-                                    .andThen(carriage.placeCoral())),
+                        either(
+                            elevator
+                                .enableElevator()
+                                .alongWith(
+                                    waitUntil(
+                                            () ->
+                                                driveCommandsConfig.finishScoring()
+                                                    && elevator.atGoalHeight())
+                                        .andThen(carriage.placeCoral())),
+                            intake.poopCmd(),
+                            () -> groundAlgae),
                         Dealgify,
                         dealgify(
                             elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
