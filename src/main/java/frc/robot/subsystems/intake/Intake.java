@@ -144,7 +144,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Command poopCmd() {
-    final double highCurrent = groundAlgae ? 10 : 10;
+    final double highCurrent = groundAlgae ? 10 : 5;
     final double lowCurrent = groundAlgae ? 1 : 1;
     return Commands.waitUntil(() -> filteredCurrent > highCurrent)
         .andThen(
