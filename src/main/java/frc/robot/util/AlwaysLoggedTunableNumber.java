@@ -7,7 +7,6 @@
 
 package frc.robot.util;
 
-import frc.robot.constantsGlobal.Constants;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +21,6 @@ public class AlwaysLoggedTunableNumber {
 
   private final String key;
   private boolean hasDefault = false;
-  private double defaultValue;
   private LoggedNetworkNumber dashboardNumber;
   private Map<Integer, Double> lastHasChangedValues = new HashMap<>();
 
@@ -54,10 +52,7 @@ public class AlwaysLoggedTunableNumber {
   public void initDefault(double defaultValue) {
     if (!hasDefault) {
       hasDefault = true;
-      this.defaultValue = defaultValue;
-      if (Constants.tuningMode) {
-        dashboardNumber = new LoggedNetworkNumber(key, defaultValue);
-      }
+      dashboardNumber = new LoggedNetworkNumber(key, defaultValue);
     }
   }
 
@@ -70,7 +65,7 @@ public class AlwaysLoggedTunableNumber {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return Constants.tuningMode ? dashboardNumber.get() : defaultValue;
+      return dashboardNumber.get();
     }
   }
 
