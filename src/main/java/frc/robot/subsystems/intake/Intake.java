@@ -76,6 +76,10 @@ public class Intake extends SubsystemBase {
           startedIntaking = false;
         }
       }
+    } else {
+      if (filteredCurrent > spikeCurrent.get()) {
+        hasGP = true;
+      }
     }
 
     Logger.recordOutput("Intake/runningIceCream", runningIceCream);
