@@ -77,7 +77,7 @@ public class Intake extends SubsystemBase {
         }
       }
     } else {
-      if (filteredCurrent > spikeCurrent.get()) {
+      if (filteredCurrent > spikeCurrent.get() && inputs.pivotAppliedVolts <= 0.5 && lowered) {
         hasGP = true;
       }
     }
