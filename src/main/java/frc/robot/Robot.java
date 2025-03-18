@@ -210,15 +210,20 @@ public class Robot extends LoggedRobot {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOMixed(0),
-                new ModuleIOMixed(1),
-                new ModuleIOMixed(2),
-                new ModuleIOMixed(3),
+                // new GyroIOPigeon2(),
+                // new ModuleIOMixed(0),
+                // new ModuleIOMixed(1),
+                // new ModuleIOMixed(2),
+                // new ModuleIOMixed(3),
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
-        carriage = new Carriage(new CarriageIOSparkMax());
+        elevator = new Elevator(new ElevatorIO() {}, poseManager);
+        carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {}); // new IntakeIOSparkMax()
         vision =
             new AprilTagVision(
