@@ -150,7 +150,8 @@ public class Intake extends SubsystemBase {
     return Commands.waitUntil(() -> filteredCurrent > highCurrent)
         .andThen(
             Commands.waitUntil(() -> filteredCurrent < lowCurrent),
-            Commands.runOnce(() -> hasGP = false))
+            Commands.runOnce(() -> hasGP = false),
+            run(() -> setL1()))
         .raceWith(
             run(() -> {
                   raise();
