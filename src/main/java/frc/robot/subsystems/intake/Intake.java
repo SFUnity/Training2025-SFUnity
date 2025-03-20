@@ -98,6 +98,11 @@ public class Intake extends SubsystemBase {
     io.setPivotPosition(positionSetpoint);
   }
 
+  private void setL1(){
+    positionSetpoint = l1Angle.get();
+    io.setPivotPosition(positionSetpoint);
+  }
+
   private void raise() {
     positionSetpoint = raisedAngle.get();
     io.setPivotPosition(positionSetpoint);
@@ -137,6 +142,10 @@ public class Intake extends SubsystemBase {
     return this.run(() -> io.runPivot(-1.0))
         .until(() -> inputs.pivotCurrentAmps > 30.0)
         .finallyDo(() -> io.resetEncoder(0.0));
+  }
+  public Command setPivotL1(){
+    return this.run(() -> setL1())
+    .withName("scoreL1");
   }
 
   public Command poopCmd() {

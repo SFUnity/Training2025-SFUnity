@@ -1,5 +1,7 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L1;
+
 import edu.wpi.first.math.util.Units;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
@@ -28,6 +30,7 @@ public class IntakeConstants {
 
   // In rotations
   public static final LoggedTunableNumber loweredAngle;
+  public static final LoggedTunableNumber l1Angle;
   public static final LoggedTunableNumber raisedAngle;
   // In volts
   public static final LoggedTunableNumber rollersSpeedIn;
@@ -36,11 +39,14 @@ public class IntakeConstants {
   static {
     if (groundAlgae) {
       loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 66);
+      l1Angle = new LoggedTunableNumber("Intake/L1Angle", 0);
       raisedAngle = new LoggedTunableNumber("Intake/raisedAngle", 0);
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
       rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
+
     } else {
       loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 66);
+      l1Angle = new LoggedTunableNumber("Intake/L1Angle", 0);
       raisedAngle = new LoggedTunableNumber("Intake/raisedAngle", 0);
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
       rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
