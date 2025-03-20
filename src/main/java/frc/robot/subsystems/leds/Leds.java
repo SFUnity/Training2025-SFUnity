@@ -57,7 +57,7 @@ public class Leds extends VirtualSubsystem {
   public boolean lowBatteryAlert = false;
   public boolean extraLowBatteryAlert = false;
   private boolean estopped = false;
-  public boolean coralFlood  = false;
+  public boolean coralFlood = false;
 
   // LED IO
   private final AddressableLED leds;
@@ -167,8 +167,7 @@ public class Leds extends VirtualSubsystem {
         pattern = solid(Color.kSeaGreen);
       } else if (carriageAlgaeHeld) {
         pattern = solid(Color.kPurple);
-      }
-      else if(coralFlood){
+      } else if (coralFlood) {
         blink(Color.kDarkBlue, Seconds.of(0.25));
       } else {
         // No game piece state
