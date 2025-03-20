@@ -98,7 +98,7 @@ public class Intake extends SubsystemBase {
     io.setPivotPosition(positionSetpoint);
   }
 
-  private void setL1(){
+  private void setL1() {
     positionSetpoint = l1Angle.get();
     io.setPivotPosition(positionSetpoint);
   }
@@ -150,11 +150,11 @@ public class Intake extends SubsystemBase {
     return Commands.waitUntil(() -> filteredCurrent > highCurrent)
         .andThen(
             Commands.waitUntil(() -> filteredCurrent < lowCurrent),
-            Commands.runOnce(() -> hasGP = false),
-            run(() -> setL1()))
+            Commands.runOnce(() -> hasGP = false))
         .raceWith(
+            // The - number at the end is to build in some tolerance
+            run(() -> setL1()).until(() -> inputs.pivotCurrentPositionDeg >= l1Angle.get() - .2),
             run(() -> {
-                  raise();
                   rollersOut();
                 })
                 .until(() -> !GPHeld()))
