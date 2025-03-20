@@ -27,8 +27,8 @@ public class IntakeConstants {
       new LoggedTunableNumber("Intake/algaeVoltageThreshold", .5);
 
   // In rotations
+  public static final LoggedTunableNumber l1Angle = new LoggedTunableNumber("Intake/L1Angle", 0);
   public static final LoggedTunableNumber loweredAngle;
-  public static final LoggedTunableNumber l1Angle;
   public static final LoggedTunableNumber raisedAngle;
   // In volts
   public static final LoggedTunableNumber rollersSpeedIn;
@@ -37,14 +37,11 @@ public class IntakeConstants {
   static {
     if (groundAlgae) {
       loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 66);
-      l1Angle = new LoggedTunableNumber("Intake/L1Angle", 0);
       raisedAngle = new LoggedTunableNumber("Intake/raisedAngle", 0);
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
       rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
-
     } else {
       loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 66);
-      l1Angle = new LoggedTunableNumber("Intake/L1Angle", 0);
       raisedAngle = new LoggedTunableNumber("Intake/raisedAngle", 0);
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
       rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
