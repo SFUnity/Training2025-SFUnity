@@ -1,7 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L1;
-
 import edu.wpi.first.math.util.Units;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;

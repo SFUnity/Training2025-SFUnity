@@ -143,10 +143,6 @@ public class Intake extends SubsystemBase {
         .until(() -> inputs.pivotCurrentAmps > 30.0)
         .finallyDo(() -> io.resetEncoder(0.0));
   }
-  public Command setPivotL1(){
-    return this.run(() -> setL1())
-    .withName("scoreL1");
-  }
 
   public Command poopCmd() {
     final double highCurrent = groundAlgae ? 10 : 10;
