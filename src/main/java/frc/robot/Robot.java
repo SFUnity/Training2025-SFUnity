@@ -543,6 +543,7 @@ public class Robot extends LoggedRobot {
     operator.povUp().onTrue(runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(runOnce(() -> intakeState = Ground));
+    operator.povLeft().onTrue(runOnce( () -> Leds.getInstance().coralFlood = true));
 
     operator.back().onTrue(elevator.runCurrentZeroing());
     operator.back().onTrue(intake.runCurrentZeroing());
