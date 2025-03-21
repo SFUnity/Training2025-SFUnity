@@ -157,11 +157,13 @@ public class Intake extends SubsystemBase {
             Commands.runOnce(() -> hasGP = false))
         .raceWith(
             // The - number at the end is to build in some tolerance
-            run(() -> setL1()).until(() -> inputs.pivotCurrentPositionDeg >= l1Angle.get() - .2),
-            run(() -> {
-                  rollersOut();
-                })
-                .until(() -> !GPHeld()))
+            run(() -> setL1())
+                .until(() -> inputs.pivotCurrentPositionDeg >= l1Angle.get() - .2)
+                .andThen(
+                    run(() -> {
+                          rollersOut();
+                        })
+                        .until(() -> !GPHeld())))
         .withName("poop");
   }
 

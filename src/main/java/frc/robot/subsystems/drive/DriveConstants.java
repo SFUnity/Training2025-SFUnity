@@ -51,7 +51,7 @@ public class DriveConstants {
 
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = true;
-  public static final boolean frontRightDriveInverted = true;
+  public static final boolean frontRightDriveInverted = false;
   public static final boolean backLeftDriveInverted = true;
   public static final boolean backRightDriveInverted = false;
 
@@ -69,7 +69,7 @@ public class DriveConstants {
   public static final int pigeonCanId = 20;
 
   public static final int frontLeftDriveCanId = 3;
-  public static final int frontRightDriveCanId = 4;
+  public static final int frontRightDriveCanId = 4; // It's in PDH port 1
   public static final int backLeftDriveCanId = 19;
   public static final int backRightDriveCanId = 13;
 
@@ -103,8 +103,8 @@ public class DriveConstants {
       default:
         driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.3);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = 0.0;
-        driveKv = 0.0;
+        driveKs = 0.14691;
+        driveKv = 0.74280;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
