@@ -77,7 +77,7 @@ public class Autos {
     /* Set up main choreo routines */
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
-    // chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
+    chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
     chooser.addRoutine("CenterCDAlgaeL2L3", this::CenterCDAlgaeL2L3);
     chooser.addRoutine("L3Only", this::L3Only);
     chooser.addRoutine("GHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3);
