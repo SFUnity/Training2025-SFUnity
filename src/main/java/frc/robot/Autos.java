@@ -172,16 +172,6 @@ public class Autos {
       AutoTrajectory KToStationHigh,
       AutoTrajectory StationHighToL,
       AutoTrajectory LToStationHigh) {
-    // AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
-    // AutoTrajectory CenterWToJ = routine.trajectory("CenterPToE");
-    // AutoTrajectory JToStationHigh = routine.trajectory("EToStationLow");
-    // // AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
-    // AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
-    // AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
-    // AutoTrajectory StationHighToK = routine.trajectory("StationLowToD");
-    // AutoTrajectory KToStationHigh = routine.trajectory("DToStationLow");
-    // AutoTrajectory StationHighToL = routine.trajectory("StationLowToC");
-    // AutoTrajectory LToStationHigh = routine.trajectory("CToStationLow");
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
