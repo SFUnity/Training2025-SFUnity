@@ -62,6 +62,7 @@ import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
@@ -215,11 +216,16 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(1),
                 new ModuleIOMixed(2),
                 new ModuleIOMixed(3),
+                // new GyroIO() {},
+                // new ModuleIO() {},
+                // new ModuleIO() {},
+                // new ModuleIO() {},
+                // new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
         carriage = new Carriage(new CarriageIOSparkMax());
-        intake = new Intake(new IntakeIO() {}); // new IntakeIOSparkMax()
+        intake = new Intake(new IntakeIOSparkMax());
         vision =
             new AprilTagVision(
                 poseManager,
@@ -431,14 +437,17 @@ public class Robot extends LoggedRobot {
                         scoreCoral(
                             elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
                         ScoreL1,
-                        elevator
-                            .enableElevator()
-                            .alongWith(
-                                waitUntil(
-                                        () ->
-                                            driveCommandsConfig.finishScoring()
-                                                && elevator.atGoalHeight())
-                                    .andThen(carriage.placeCoral())),
+                        either(
+                            elevator
+                                .enableElevator()
+                                .alongWith(
+                                    waitUntil(
+                                            () ->
+                                                driveCommandsConfig.finishScoring()
+                                                    && elevator.atGoalHeight())
+                                        .andThen(carriage.placeCoral())),
+                            intake.poopCmd(),
+                            () -> groundAlgae),
                         Dealgify,
                         dealgify(
                             elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),

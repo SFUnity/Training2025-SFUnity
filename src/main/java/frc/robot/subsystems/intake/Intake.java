@@ -76,6 +76,10 @@ public class Intake extends SubsystemBase {
           startedIntaking = false;
         }
       }
+    } else {
+      if (filteredCurrent > spikeCurrent.get() && inputs.pivotAppliedVolts <= 0.5 && lowered) {
+        hasGP = true;
+      }
     }
 
     Logger.recordOutput("Intake/runningIceCream", runningIceCream);
@@ -145,8 +149,8 @@ public class Intake extends SubsystemBase {
   }
 
   public Command poopCmd() {
-    final double highCurrent = groundAlgae ? 10 : 10;
-    final double lowCurrent = groundAlgae ? 1 : 1;
+    final double highCurrent = groundAlgae ? 10 : 15;
+    final double lowCurrent = groundAlgae ? 1 : 7;
     return Commands.waitUntil(() -> filteredCurrent > highCurrent)
         .andThen(
             Commands.waitUntil(() -> filteredCurrent < lowCurrent),

@@ -41,10 +41,10 @@ public class IntakeConstants {
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
       rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
     } else {
-      loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 66);
+      loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 116);
       raisedAngle = new LoggedTunableNumber("Intake/raisedAngle", 0);
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
-      rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 4);
+      rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 8);
     }
 
     switch (Constants.currentMode) {
