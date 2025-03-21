@@ -78,7 +78,7 @@ public class Autos {
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     // chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
-    chooser.addRoutine("CenterCDProcessorAlgaeL2L3", this::StandardCoralAuto);
+    chooser.addRoutine("CenterCDAlgaeL2L3", this::StandardCoralAuto);
     chooser.addRoutine("L3Only", this::L3Only);
     chooser.addRoutine("GHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3);
 
@@ -160,7 +160,7 @@ public class Autos {
   //   }
 
   private AutoRoutine StandardCoralAuto() {
-    AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
+    AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
     AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
