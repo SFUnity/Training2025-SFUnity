@@ -69,7 +69,7 @@ public final class FieldConstants {
   public static final LoggedTunableNumber extraYOffset =
       new LoggedTunableNumber("Distances/extraY", 0);
   public static final LoggedTunableNumber elevatorSafeExtensionDistanceMeters =
-      new LoggedTunableNumber("Distances/elevatorExtension", 1);
+      new LoggedTunableNumber("Distances/elevatorExtension", 2);
   public static final LoggedTunableNumber intakeDistanceMeters =
       new LoggedTunableNumber("Distances/intake", .5);
 

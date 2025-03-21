@@ -37,7 +37,7 @@ public class Leds extends VirtualSubsystem {
 
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
-  public boolean intakeAlgaeHeld = false;
+  public boolean intakeGPHeld = false;
   public boolean autoAlignActivated = false;
   public boolean intakingActivated = false;
 
@@ -57,6 +57,7 @@ public class Leds extends VirtualSubsystem {
   public boolean lowBatteryAlert = false;
   public boolean extraLowBatteryAlert = false;
   private boolean estopped = false;
+  public boolean coralFlood = false;
 
   // LED IO
   private final AddressableLED leds;
@@ -141,6 +142,8 @@ public class Leds extends VirtualSubsystem {
                         () -> 1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime)));
       } else if (extraLowBatteryAlert) {
         pattern = solid(Color.kRed);
+      } else if (coralHeld) {
+        pattern = solid(Color.kBrown);
       } else if (lowBatteryAlert) {
         pattern = solid(Color.kOrangeRed);
       } else if (prideLeds) {
@@ -160,10 +163,12 @@ public class Leds extends VirtualSubsystem {
     } else { // Enabled
       if (coralHeld) {
         pattern = solid(Color.kBrown);
-      } else if (intakeAlgaeHeld) {
+      } else if (intakeGPHeld) {
         pattern = solid(Color.kSeaGreen);
       } else if (carriageAlgaeHeld) {
         pattern = solid(Color.kPurple);
+      } else if (coralFlood) {
+        blink(Color.kDarkBlue, Seconds.of(0.25));
       } else {
         // No game piece state
         pattern = teamColors().atBrightness(Percent.of(0.5));
@@ -182,7 +187,7 @@ public class Leds extends VirtualSubsystem {
     // Logs
     Logger.recordOutput("LEDs/coralHeld", coralHeld);
     Logger.recordOutput("LEDs/carriageAlgaeHeld", carriageAlgaeHeld);
-    Logger.recordOutput("LEDs/intakeAlgaeHeld", intakeAlgaeHeld);
+    Logger.recordOutput("LEDs/intakeGPHeld", intakeGPHeld);
     Logger.recordOutput("LEDs/autoFinished", autoFinished);
     Logger.recordOutput("LEDs/lowBatteryAlert", lowBatteryAlert);
     Logger.recordOutput("LEDs/autoAlignActivated", autoAlignActivated);

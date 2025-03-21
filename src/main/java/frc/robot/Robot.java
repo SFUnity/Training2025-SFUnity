@@ -21,6 +21,7 @@ import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.leftName;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.rightName;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+import static frc.robot.subsystems.intake.IntakeConstants.groundAlgae;
 import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -215,6 +216,11 @@ public class Robot extends LoggedRobot {
                 new ModuleIOMixed(1),
                 new ModuleIOMixed(2),
                 new ModuleIOMixed(3),
+                // new GyroIO() {},
+                // new ModuleIO() {},
+                // new ModuleIO() {},
+                // new ModuleIO() {},
+                // new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
@@ -299,7 +305,7 @@ public class Robot extends LoggedRobot {
       DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
     }
 
-    // Print auto duration
+    // Print auto duration + reset brake mode
     if (autoCommand != null) {
       if (!autoCommand.isScheduled() && !autoMessagePrinted) {
         if (DriverStation.isAutonomousEnabled()) {
@@ -312,6 +318,8 @@ public class Robot extends LoggedRobot {
         autoMessagePrinted = true;
         Leds.getInstance().autoFinished = true;
         Leds.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
+        // Set brake mode
+        drive.setBrakeMode(true);
       }
     }
 
@@ -367,7 +375,7 @@ public class Robot extends LoggedRobot {
     Trigger intakeTrigger = driver.rightBumper();
 
     // Setup rumble
-    new Trigger(() -> intake.algaeHeld())
+    new Trigger(() -> intake.GPHeld())
         .onTrue(
             runEnd(
                     () -> driver.setRumble(RumbleType.kBothRumble, 0.5),
@@ -429,19 +437,22 @@ public class Robot extends LoggedRobot {
                         scoreCoral(
                             elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
                         ScoreL1,
-                        elevator
-                            .enableElevator()
-                            .alongWith(
-                                waitUntil(
-                                        () ->
-                                            driveCommandsConfig.finishScoring()
-                                                && elevator.atGoalHeight())
-                                    .andThen(carriage.placeCoral())),
+                        either(
+                            elevator
+                                .enableElevator()
+                                .alongWith(
+                                    waitUntil(
+                                            () ->
+                                                driveCommandsConfig.finishScoring()
+                                                    && elevator.atGoalHeight())
+                                        .andThen(carriage.placeCoral())),
+                            intake.poopCmd(driveCommandsConfig::finishScoring),
+                            () -> groundAlgae),
                         Dealgify,
                         dealgify(
                             elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
                         ProcessorFront,
-                        scoreProcessor(
+                        scoreProcessorOrL1(
                             carriage,
                             intake,
                             elevator,
@@ -449,14 +460,20 @@ public class Robot extends LoggedRobot {
                             true,
                             atGoal(drive, driveCommandsConfig)),
                         ProcessorBack,
-                        scoreProcessor(
+                        scoreProcessorOrL1(
                             carriage,
                             intake,
                             elevator,
                             poseManager,
                             false,
                             atGoal(drive, driveCommandsConfig))),
-                    () -> scoreState == RightBranch ? LeftBranch : scoreState)
+                    () -> {
+                      if (scoreState == ProcessorBack && !groundAlgae) {
+                        DriverStation.reportError(
+                            "ProcessorBack can't be used with coral ground intake", false);
+                      }
+                      return scoreState == RightBranch ? LeftBranch : scoreState;
+                    })
                 .deadlineFor(
                     either(
                         either(
@@ -467,7 +484,15 @@ public class Robot extends LoggedRobot {
                                             drive.driveIntoWall(),
                                             none(),
                                             () -> scoreState == Dealgify)),
-                                drive.headingDrive(() -> goalPose(poseManager).get().getRotation()),
+                                drive.headingDrive(
+                                    () ->
+                                        goalPose(poseManager)
+                                            .get()
+                                            .getRotation()
+                                            .plus(
+                                                groundAlgae
+                                                    ? Rotation2d.kZero
+                                                    : Rotation2d.k180deg)),
                                 () -> scoreState != ScoreL1)
                             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                             .withName("AutoAlignInFullScore")
@@ -477,7 +502,7 @@ public class Robot extends LoggedRobot {
                 .beforeStarting(
                     () -> {
                       poseManager.lockClosest = true;
-                      if (!intake.algaeHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
+                      if (!intake.GPHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
                     })
                 .andThen(
@@ -505,17 +530,19 @@ public class Robot extends LoggedRobot {
     // Operator controls
     operator.y().onTrue(elevator.request(L3));
     operator.x().onTrue(elevator.request(L2));
-    operator.a().onTrue(elevator.request(L1).alongWith(runOnce(() -> scoreState = ScoreL1)));
+    operator
+        .a()
+        .onTrue(
+            either(elevator.request(L1), none(), () -> groundAlgae)
+                .alongWith(runOnce(() -> scoreState = ScoreL1)));
     operator
         .b()
         .onTrue(
             runOnce(
                 () -> {
-                  scoreState = ProcessorBack;
-                  if (intake.algaeHeld()) {
+                  scoreState = ProcessorFront;
+                  if (intake.GPHeld() && groundAlgae) {
                     scoreState = ProcessorBack;
-                  } else if (carriage.algaeHeld()) {
-                    scoreState = ProcessorFront;
                   }
                 }));
     operator.leftBumper().onTrue(runOnce(() -> scoreState = LeftBranch));
@@ -525,28 +552,35 @@ public class Robot extends LoggedRobot {
     operator.povUp().onTrue(runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(runOnce(() -> intakeState = Ground));
+    operator.povLeft().onTrue(runOnce(() -> Leds.getInstance().coralFlood = true));
 
     operator.back().onTrue(elevator.runCurrentZeroing());
     operator.back().onTrue(intake.runCurrentZeroing());
 
-    operator.start().onTrue(carriage.resetHeld().alongWith(intake.resetAlgaeHeld()));
+    operator.start().onTrue(carriage.resetHeld().alongWith(intake.resetGPHeld()));
 
     // State-Based Triggers
 
     // Teleop Only
     new Trigger(carriage::coralHeld)
+        .or(() -> intake.GPHeld() && !groundAlgae)
         .and(() -> allowAutoDrive)
         .and(DriverStation::isTeleop)
         .and(() -> poseManager.getDistanceTo(goalPose(poseManager).get()) < 3.25)
-        .whileTrue(drive.headingDrive(() -> poseManager.getHorizontalAngleTo(apply(reefCenter))));
+        .whileTrue(
+            drive.headingDrive(
+                () ->
+                    poseManager
+                        .getHorizontalAngleTo(apply(reefCenter))
+                        .plus(carriage.coralHeld() ? Rotation2d.kZero : Rotation2d.k180deg)));
 
     new Trigger(carriage::algaeHeld)
         .and(DriverStation::isTeleop)
         .onTrue(runOnce(() -> scoreState = ProcessorFront));
 
-    new Trigger(intake::algaeHeld)
+    new Trigger(intake::GPHeld)
         .and(DriverStation::isTeleop)
-        .onTrue(runOnce(() -> scoreState = ProcessorBack));
+        .onTrue(runOnce(() -> scoreState = groundAlgae ? ProcessorBack : ScoreL1));
 
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
@@ -568,7 +602,7 @@ public class Robot extends LoggedRobot {
         "Toggle Beam Break in Carriage",
         runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
     SmartDashboard.putData(
-        "Toggle Algae in Intake", runOnce(() -> Intake.simHasAlgae = !Intake.simHasAlgae));
+        "Toggle GP in Intake", runOnce(() -> Intake.simHasGP = !Intake.simHasGP));
 
     SmartDashboard.putData("Run Elevator Sysid", elevator.runSysidCmd());
   }
@@ -577,9 +611,17 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {}
 
+  boolean autoHasBeenSelected = false;
+
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if (DriverStation.isAutonomous() && !autoHasBeenSelected) {
+      drive.setBrakeMode(false);
+      autoHasBeenSelected = true;
+    }
+    if (!DriverStation.isAutonomous()) autoHasBeenSelected = false;
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link Autos} class. */
   @Override
@@ -654,6 +696,7 @@ public class Robot extends LoggedRobot {
   }
 
   private Command elevatorAndCarriageTest() {
+    Timer timer = new Timer();
     return carriage
         .intakeCoral()
         .asProxy()
@@ -661,10 +704,20 @@ public class Robot extends LoggedRobot {
             elevator.request(L2),
             elevator.enableElevator(),
             waitSeconds(1),
-            elevator.request(L3),
-            elevator.enableElevator(),
+            elevator.disableElevator(() -> false),
             waitSeconds(1),
-            carriage.placeCoral().asProxy());
+            elevator.request(L3),
+            scoreCoral(elevator, carriage, poseManager, () -> timer.hasElapsed(2))
+                .beforeStarting(() -> timer.restart())
+                .finallyDo(() -> timer.stop())
+                .asProxy(),
+            elevator.disableElevator(() -> false),
+            waitSeconds(1.5),
+            dealgify(elevator, carriage, poseManager, () -> true).asProxy(),
+            elevator.disableElevator(() -> false),
+            waitSeconds(2.5),
+            scoreProcessorOrL1(carriage, intake, elevator, poseManager, true, () -> true)
+                .asProxy());
   }
 
   /** This function is called periodically during test mode. */

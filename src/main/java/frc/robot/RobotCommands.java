@@ -5,6 +5,7 @@ import static frc.robot.RobotCommands.IntakeState.*;
 import static frc.robot.RobotCommands.ScoreState.*;
 import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
+import static frc.robot.subsystems.intake.IntakeConstants.groundAlgae;
 import static frc.robot.util.AllianceFlipUtil.apply;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,17 +43,7 @@ public final class RobotCommands {
       PoseManager poseManager,
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
-    return waitUntil(
-            () -> {
-              boolean extra = false;
-              if (DriverStation.isTeleop()) {
-                extra = !allowAutoDrive;
-              }
-              ;
-              return extra
-                  || poseManager.getDistanceTo(goalPose.get())
-                      < elevatorSafeExtensionDistanceMeters.get();
-            })
+    return waitUntil(nearPose(poseManager, goalPose))
         .andThen(
             elevator
                 .enableElevator()
@@ -77,12 +68,12 @@ public final class RobotCommands {
       PoseManager poseManager,
       Supplier<Pose2d> goalPose,
       BooleanSupplier atPose) {
-    BooleanSupplier highAlgae = () -> poseManager.closestFaceHighAlgae();
-    return waitUntil(
-            () ->
-                !allowAutoDrive
-                    || poseManager.getDistanceTo(goalPose.get())
-                        < elevatorSafeExtensionDistanceMeters.get())
+    BooleanSupplier highAlgae =
+        () -> {
+          if (DriverStation.isTest()) return false;
+          return poseManager.closestFaceHighAlgae();
+        };
+    return waitUntil(nearPose(poseManager, goalPose))
         .andThen(
             parallel(
                 either(elevator.request(AlgaeHigh), elevator.request(AlgaeLow), highAlgae)
@@ -92,7 +83,7 @@ public final class RobotCommands {
             runOnce(() -> Logger.recordOutput("Controls/HighAlgae", highAlgae.getAsBoolean())));
   }
 
-  public static Command scoreProcessor(
+  public static Command scoreProcessorOrL1(
       Carriage carriage,
       Intake intake,
       Elevator elevator,
@@ -100,8 +91,28 @@ public final class RobotCommands {
       boolean front,
       BooleanSupplier atPose) {
     return waitUntil(atPose)
-        .andThen(elevator.request(Processor).andThen(elevator.enableElevator()))
-        .andThen(either(carriage.scoreProcessor(), intake.poopCmd(), () -> front));
+        .andThen(
+            either(
+                elevator
+                    .request(Processor)
+                    .andThen(elevator.enableElevator(), carriage.scoreProcessor()),
+                intake.poopCmd(),
+                () -> front))
+        .withName("scoreProcessor");
+  }
+
+  private static BooleanSupplier nearPose(PoseManager poseManager, Supplier<Pose2d> goalPose) {
+    return () -> {
+      boolean extra = false;
+      if (DriverStation.isTeleop()) {
+        extra = !allowAutoDrive;
+      } else if (DriverStation.isTest()) {
+        extra = true;
+      }
+      ;
+      return extra
+          || poseManager.getDistanceTo(goalPose.get()) < elevatorSafeExtensionDistanceMeters.get();
+    };
   }
 
   public static BooleanSupplier atGoal(Drive drive, DriveCommandsConfig driveCommandsConfig) {
@@ -154,7 +165,7 @@ public final class RobotCommands {
                 elevator
                     .request(IceCream)
                     .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
-                    .raceWith(intake.iceCreamCmd())
+                    .raceWith(either(intake.iceCreamCmd().asProxy(), idle(), () -> groundAlgae))
                     .withName("iceCreamIntake")
                     .asProxy()),
             () -> intakeState)

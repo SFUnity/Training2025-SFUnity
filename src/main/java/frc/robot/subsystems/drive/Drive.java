@@ -92,8 +92,7 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber maxLinearVelocity =
       new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", Units.feetToMeters(10));
   private static final LoggedTunableNumber maxLinearAcceleration =
-      new LoggedTunableNumber(
-          "Drive/Commands/Linear - maxAcceleration", Units.feetToMeters(50.0) * 0.4);
+      new LoggedTunableNumber("Drive/Commands/Linear - maxAcceleration", 5);
   private static final LoggedTunableNumber maxAngularVelocity =
       new LoggedTunableNumber(
           "Drive/Commands/Theta - maxVelocity", maxAngularSpeedRadiansPerSec * 0.8);
@@ -104,7 +103,7 @@ public class Drive extends SubsystemBase {
   private static final LoggedTunableNumber ffMinRadius =
       new LoggedTunableNumber("AutoAlign/ffMinRadius", 0.2);
   private static final LoggedTunableNumber ffMaxRadius =
-      new LoggedTunableNumber("AutoAlign/ffMaxRadius", 0.6);
+      new LoggedTunableNumber("AutoAlign/ffMaxRadius", 0.8);
 
   private final ProfiledPIDController thetaController;
   private final ProfiledPIDController linearController;
@@ -378,7 +377,7 @@ public class Drive extends SubsystemBase {
     }
   }
 
-  private void setBrakeMode(boolean enable) {
+  public void setBrakeMode(boolean enable) {
     for (var module : modules) {
       module.setBrakeMode(enable);
     }
@@ -576,7 +575,11 @@ public class Drive extends SubsystemBase {
                 MathUtil.applyDeadband(config.getOmegaInput(), 0.2) == 0
                     && MathUtil.applyDeadband(
                             Math.hypot(config.getXInput(), config.getYInput()), 0.2)
-                        == 0)
+                        == 0
+                    && !config.povDownPressed()
+                    && !config.povUpPressed()
+                    && !config.povLeftPressed()
+                    && !config.povRightPressed())
         .withName("Full Auto Drive");
   }
 

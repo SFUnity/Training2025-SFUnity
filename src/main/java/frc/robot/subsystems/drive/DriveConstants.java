@@ -69,18 +69,18 @@ public class DriveConstants {
   public static final int pigeonCanId = 20;
 
   public static final int frontLeftDriveCanId = 3;
+  public static final int frontRightDriveCanId = 4; // It's in PDH port 1
   public static final int backLeftDriveCanId = 19;
-  public static final int frontRightDriveCanId = 4;
   public static final int backRightDriveCanId = 13;
 
   public static final int frontLeftTurnCanId = 8;
-  public static final int backLeftTurnCanId = 13;
   public static final int frontRightTurnCanId = 6;
+  public static final int backLeftTurnCanId = 13;
   public static final int backRightTurnCanId = 17;
 
   public static final int frontLeftTurnEncoderCanId = 19;
-  public static final int backLeftTurnEncoderCanId = 18;
   public static final int frontRightTurnEncoderCanId = 4;
+  public static final int backLeftTurnEncoderCanId = 18;
   public static final int backRightTurnEncoderCanId = 5;
 
   public static final String CANBusName = "rio";
@@ -89,7 +89,7 @@ public class DriveConstants {
   public static final int driveMotorSupplyCurrentLimit = 50;
   public static final int driveMotorStatorCurrentLimit = 80;
   public static final double wheelRadiusMeters = Units.inchesToMeters(2);
-  public static final double driveMotorReduction = 7.14; // Stupid L3-
+  public static final double driveMotorReduction = 6.12;
   public static final DCMotor driveGearbox = DCMotor.getKrakenX60(1);
 
   // Drive PID configuration
@@ -101,10 +101,10 @@ public class DriveConstants {
   static {
     switch (Constants.currentMode) {
       default:
-        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.1);
+        driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.3);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = 0.12926;
-        driveKv = 0.83967;
+        driveKs = 0.14691;
+        driveKv = 0.74280;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
