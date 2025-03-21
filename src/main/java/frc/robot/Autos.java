@@ -161,7 +161,9 @@ public class Autos {
 
   private AutoRoutine StandardCoralAuto() {
     AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
-    AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
+    AutoTrajectory CenterWToJ = routine.trajectory("CenterPToE");
+    AutoTrajectory JToStationHigh = routine.trajectory("EToStationLow");
+    // AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
     AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
     AutoTrajectory StationHighToK = routine.trajectory("StationLowToD");
@@ -172,16 +174,40 @@ public class Autos {
     routine
         .active()
         .onTrue(
-            CenterWallToLKAlgae.resetOdometry()
-                .andThen(CenterWallToLKAlgae.cmd())
-                .alongWith(
-                    runOnce(
-                        () -> {
-                          coralOnL3 = 1;
-                          coralOnL2 = 0;
-                        }))
+            CenterWToJ.resetOdometry()
+                .andThen(CenterWToJ.cmd())
                 .withName("ResetOdometryAndStartFirstTrajectory"));
-    CenterWallToLKAlgae.active()
+    CenterWToJ.active()
+        .onTrue(
+            elevator
+                .request(L2)
+                .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWToJ.getFinalPose().get(),
+                        CenterWToJ.active().negate()))
+                .withName("ScoreCoralOnL3"));
+    CenterWToJ.done()
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(JToStationHigh.cmd().asProxy())
+                .withName("DealgifyThenGoToStationHigh"));
+    JToStationHigh.done()
+        .onTrue(
+            waitUntil(carriage::coralHeld)
+                .andThen(
+                    StationHighToL.cmd()
+                        .asProxy()
+                        .alongWith(
+                            runOnce(
+                                () -> {
+                                  coralOnL3 = 1;
+                                  coralOnL2 = 0;
+                                }))));
+    StationHighToL.active()
+        .and(() -> coralOnL3 <= 1)
         .onTrue(
             // Score coral on L3
             elevator
@@ -191,16 +217,16 @@ public class Autos {
                         elevator,
                         carriage,
                         poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.active().negate()),
+                        () -> StationHighToL.getFinalPose().get(),
+                        StationHighToL.active().negate()),
                     runOnce(() -> scoreState = Dealgify),
                     LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
                     dealgify(
                         elevator,
                         carriage,
                         poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.active().negate()))
+                        () -> StationHighToL.getFinalPose().get(),
+                        StationHighToL.active().negate()))
                 .withName("ScoreCoralOnL3"));
     LToDealgify.done()
         .onTrue(
