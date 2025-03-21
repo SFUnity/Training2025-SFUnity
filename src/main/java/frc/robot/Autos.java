@@ -78,7 +78,7 @@ public class Autos {
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     // chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
-    chooser.addRoutine("CenterCDAlgaeL2L3", this::StandardCoralAuto);
+    chooser.addRoutine("CenterCDAlgaeL2L3", this::CenterCDAlgaeL2L3);
     chooser.addRoutine("L3Only", this::L3Only);
     chooser.addRoutine("GHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3);
 
@@ -138,31 +138,7 @@ public class Autos {
   //         LToStationHigh);
   //   }
 
-    // private AutoRoutine CenterCDProcessorAlgaeL2L3() {
-    //     AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
-    //     AutoTrajectory CenterWToJ = routine.trajectory("CenterPToE");
-    //     AutoTrajectory JToStationHigh = routine.trajectory("EToStationLow");
-    //     // AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
-    //     AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
-    //     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
-    //     AutoTrajectory StationHighToK = routine.trajectory("StationLowToD");
-    //     AutoTrajectory KToStationHigh = routine.trajectory("DToStationLow");
-    //     AutoTrajectory StationHighToL = routine.trajectory("StationLowToC");
-    //     AutoTrajectory LToStationHigh = routine.trajectory("CToStationLow");
-
-    //   return StandardCoralAuto(
-    //       routine,
-    //       CenterWToJ,
-    //       JToStationHigh,
-    //       LToDealgify,
-    //       KLAlgaeToStationHigh,
-    //       StationHighToK,
-    //       KToStationHigh,
-    //       StationHighToL,
-    //       LToStationHigh);
-    // }
-
-  private AutoRoutine StandardCoralAuto() {
+  private AutoRoutine CenterCDAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
     AutoTrajectory CenterWToJ = routine.trajectory("CenterPToE");
     AutoTrajectory JToStationHigh = routine.trajectory("EToStationLow");
@@ -173,6 +149,39 @@ public class Autos {
     AutoTrajectory KToStationHigh = routine.trajectory("DToStationLow");
     AutoTrajectory StationHighToL = routine.trajectory("StationLowToC");
     AutoTrajectory LToStationHigh = routine.trajectory("CToStationLow");
+
+    return StandardCoralAuto(
+        routine,
+        CenterWToJ,
+        JToStationHigh,
+        LToDealgify,
+        KLAlgaeToStationHigh,
+        StationHighToK,
+        KToStationHigh,
+        StationHighToL,
+        LToStationHigh);
+  }
+
+  private AutoRoutine StandardCoralAuto(
+      AutoRoutine routine,
+      AutoTrajectory CenterWToJ,
+      AutoTrajectory JToStationHigh,
+      AutoTrajectory LToDealgify,
+      AutoTrajectory KLAlgaeToStationHigh,
+      AutoTrajectory StationHighToK,
+      AutoTrajectory KToStationHigh,
+      AutoTrajectory StationHighToL,
+      AutoTrajectory LToStationHigh) {
+    // AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
+    // AutoTrajectory CenterWToJ = routine.trajectory("CenterPToE");
+    // AutoTrajectory JToStationHigh = routine.trajectory("EToStationLow");
+    // // AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
+    // AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
+    // AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
+    // AutoTrajectory StationHighToK = routine.trajectory("StationLowToD");
+    // AutoTrajectory KToStationHigh = routine.trajectory("DToStationLow");
+    // AutoTrajectory StationHighToL = routine.trajectory("StationLowToC");
+    // AutoTrajectory LToStationHigh = routine.trajectory("CToStationLow");
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
