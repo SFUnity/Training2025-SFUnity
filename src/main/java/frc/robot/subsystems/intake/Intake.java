@@ -3,11 +3,14 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
@@ -148,7 +151,7 @@ public class Intake extends SubsystemBase {
         .finallyDo(() -> io.resetEncoder(0.0));
   }
 
-  public Command poopCmd() {
+  public Command poopCmd(BooleanSupplier shouldPlace) {
     final double highCurrent = groundAlgae ? 10 : 15;
     final double lowCurrent = groundAlgae ? 1 : 7;
     return Commands.waitUntil(() -> filteredCurrent > highCurrent)
@@ -165,6 +168,10 @@ public class Intake extends SubsystemBase {
                         })
                         .until(() -> !GPHeld())))
         .withName("poop");
+  }
+
+  public Command poopCmd() {
+    return poopCmd(() -> true);
   }
 
   public Command iceCreamCmd() {

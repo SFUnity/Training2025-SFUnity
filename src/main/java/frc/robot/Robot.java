@@ -446,7 +446,7 @@ public class Robot extends LoggedRobot {
                                                 driveCommandsConfig.finishScoring()
                                                     && elevator.atGoalHeight())
                                         .andThen(carriage.placeCoral())),
-                            intake.poopCmd(),
+                            intake.poopCmd(driveCommandsConfig::finishScoring),
                             () -> groundAlgae),
                         Dealgify,
                         dealgify(
