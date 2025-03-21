@@ -195,19 +195,9 @@ public class Autos {
                 .andThen(JToStationHigh.cmd().asProxy())
                 .withName("DealgifyThenGoToStationHigh"));
     JToStationHigh.done()
-        .onTrue(
-            waitUntil(carriage::coralHeld)
-                .andThen(
-                    StationHighToL.cmd()
-                        .asProxy()
-                        .alongWith(
-                            runOnce(
-                                () -> {
-                                  coralOnL3 = 1;
-                                  coralOnL2 = 0;
-                                }))));
+        .onTrue(waitUntil(carriage::coralHeld).andThen(StationHighToL.cmd().asProxy()));
     StationHighToL.active()
-        .and(() -> coralOnL3 <= 1)
+        .and(() -> coralOnL3 < 1)
         .onTrue(
             // Score coral on L3
             elevator
@@ -231,7 +221,15 @@ public class Autos {
     LToDealgify.done()
         .onTrue(
             waitUntil(carriage::algaeHeld)
-                .andThen(KLAlgaeToStationHigh.cmd().asProxy())
+                .andThen(
+                    KLAlgaeToStationHigh.cmd()
+                        .asProxy()
+                        .alongWith(
+                            runOnce(
+                                () -> {
+                                  coralOnL3 = 1;
+                                  coralOnL2 = 0;
+                                })))
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
@@ -279,6 +277,7 @@ public class Autos {
     StationHighToL.active()
         .and(carriage::coralHeld)
         .and(carriage::beamBreak)
+        .and(() -> coralOnL3 >= 1)
         .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
         .onTrue(
             either(
