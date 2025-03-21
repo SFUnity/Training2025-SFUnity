@@ -158,7 +158,7 @@ public class Intake extends SubsystemBase {
         .raceWith(
             // The - number at the end is to build in some tolerance
             run(() -> setL1())
-                .until(() -> inputs.pivotCurrentPositionDeg >= l1Angle.get() - .2)
+                .until(() -> inputs.pivotCurrentPositionDeg >= l1Angle.get() - .75)
                 .andThen(
                     run(() -> {
                           rollersOut();
