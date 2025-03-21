@@ -69,7 +69,7 @@ public class DriveConstants {
   public static final int pigeonCanId = 20;
 
   public static final int frontLeftDriveCanId = 3;
-  public static final int frontRightDriveCanId = 4;
+  public static final int frontRightDriveCanId = 4; // It's in PDH port 1
   public static final int backLeftDriveCanId = 19;
   public static final int backRightDriveCanId = 13;
 
