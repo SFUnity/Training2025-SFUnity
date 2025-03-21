@@ -103,8 +103,8 @@ public class DriveConstants {
       default:
         driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.3);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = 0.0;
-        driveKv = 0.0;
+        driveKs = 0.14691;
+        driveKv = 0.74280;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
