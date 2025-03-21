@@ -27,6 +27,7 @@ public class IntakeConstants {
       new LoggedTunableNumber("Intake/algaeVoltageThreshold", .5);
 
   // In rotations
+  public static final LoggedTunableNumber l1Angle = new LoggedTunableNumber("Intake/L1Angle", 0);
   public static final LoggedTunableNumber loweredAngle;
   public static final LoggedTunableNumber raisedAngle;
   // In volts
