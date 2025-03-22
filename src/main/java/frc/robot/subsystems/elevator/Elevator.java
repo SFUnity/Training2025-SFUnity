@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.RobotCommands.allowAutoDrive;
+import static frc.robot.RobotCommands.ScoreState.ProcessorBack;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.RobotCommands;
+import frc.robot.RobotCommands.ScoreState;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.LoggedTunableNumber;
@@ -79,8 +81,13 @@ public class Elevator extends SubsystemBase {
 
     updateTunables();
 
+    ScoreState scoreState = RobotCommands.scoreState;
+    if (scoreState == ProcessorBack || scoreState == ScoreState.ProcessorFront) {
+      scoreState = ScoreState.Dealgify;
+    }
+
     if (setHeight
-        || (poseManager.getDistanceTo(poseManager.closest(RobotCommands.scoreState))
+        || (poseManager.getDistanceTo(poseManager.closest(scoreState))
                 < safeDropDist.get()
             && inputs.position > 1
             && (allowAutoDrive || DriverStation.isAutonomous()))) {
