@@ -205,6 +205,7 @@ public class Autos {
         .onTrue(waitUntil(carriage::coralHeld).andThen(StationHighToL.cmd().asProxy()));
     StationHighToL.active()
         .and(() -> coralOnL3 < 1)
+        .and(carriage::beamBreak)
         .onTrue(
             // Score coral on L3
             elevator
