@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.RobotCommands;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight;
 import frc.robot.util.AllianceFlipUtil;
@@ -82,8 +81,7 @@ public class Elevator extends SubsystemBase {
     updateTunables();
 
     if (setHeight
-        || (poseManager.getDistanceTo(AllianceFlipUtil.apply(reefCenter))
-                < 1.3 + safeDropDist.get()
+        || (poseManager.getDistanceTo(AllianceFlipUtil.apply(reefCenter)) < 1.3 + safeDropDist.get()
             && inputs.position > 1
             && (allowAutoDrive || DriverStation.isAutonomous()))) {
       if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
