@@ -182,7 +182,14 @@ public class Autos {
         .active()
         .onTrue(
             CenterWToJ.resetOdometry()
-                .andThen(CenterWToJ.cmd())
+                .andThen(
+                    CenterWToJ.cmd()
+                        .alongWith(
+                            runOnce(
+                                () -> {
+                                  coralOnL3 = 0;
+                                  coralOnL2 = 0;
+                                })))
                 .withName("ResetOdometryAndStartFirstTrajectory"));
     CenterWToJ.active()
         .onTrue(
