@@ -162,7 +162,7 @@ public class Intake extends SubsystemBase {
                 .until(
                     () ->
                         inputs.pivotCurrentPositionDeg >= l1Angle.get() - .75
-                            && shouldPlace.getAsBoolean())
+                            && shouldPlace.getAsBoolean() || groundAlgae)
                 .andThen(
                     run(() -> {
                           rollersOut();
