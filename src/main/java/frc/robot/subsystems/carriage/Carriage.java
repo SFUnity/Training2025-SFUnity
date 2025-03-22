@@ -30,7 +30,7 @@ public class Carriage extends SubsystemBase {
 
   private boolean coralPassed = false;
   private boolean realCoralHeld = false;
-  public boolean realAlgaeHeld = false;
+  private boolean realAlgaeHeld = false; 
 
   private final Timer beambreakTimer = new Timer();
   private static final LoggedTunableNumber beambreakDelay =
