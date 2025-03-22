@@ -84,7 +84,7 @@ public class Elevator extends SubsystemBase {
     // TODO Log distance to reef so we can see how far away we are and when we want to lower it
 
     if (setHeight
-        || (poseManager.getDistanceTo(poseManager.closest(scoreState))
+        || (poseManager.getDistanceTo(poseManager.closest(RobotCommands.scoreState))
                 < safeDropDist.get()
             && inputs.position > 1
             && (allowAutoDrive || DriverStation.isAutonomous()))) {
