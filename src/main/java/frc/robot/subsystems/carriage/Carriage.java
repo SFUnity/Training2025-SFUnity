@@ -120,6 +120,11 @@ public class Carriage extends SubsystemBase {
     return realCoralHeld;
   }
 
+  @AutoLogOutput
+  public boolean fullCoralHeld() {
+    return fullCoralHeld;
+  }
+
   public Command resetHeld() {
     return Commands.runOnce(
         () -> {
