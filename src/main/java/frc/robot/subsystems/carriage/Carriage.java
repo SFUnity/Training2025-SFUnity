@@ -87,15 +87,15 @@ public class Carriage extends SubsystemBase {
     if (!beamBreak() && !coralPassed) {
       realCoralHeld = false;
     } else if (!beamBreak() && coralPassed) {
-      if (beambreakTimer.hasElapsed(beambreakDelay.get())) {
-        realCoralHeld = true;
-      }
+      realCoralHeld = true;
     } else if (beamBreak() && !coralPassed && !realCoralHeld) {
-      coralPassed = true;
+      if (beambreakTimer.hasElapsed(beambreakDelay.get())) {
+        coralPassed = true; 
+      }
     } else if (beamBreak() && coralPassed && realCoralHeld) {
       coralPassed = false;
     }
-    if (beamBreak() && coralPassed) {
+    if (!beamBreak() || coralPassed || realCoralHeld) {
       beambreakTimer.restart();
     }
   }

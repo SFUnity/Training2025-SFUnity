@@ -587,12 +587,6 @@ public class Robot extends LoggedRobot {
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
         .whileTrue(carriage.intakeCoral());
 
-    // Auto only
-    new Trigger(() -> poseManager.nearStation())
-        .and(() -> !carriage.algaeHeld())
-        .and(DriverStation::isAutonomous)
-        .whileTrue(carriage.intakeCoral());
-
     // Sim fake gamepieces
     SmartDashboard.putData(
         "Toggle Coral in Carriage", runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -173,6 +174,9 @@ public class Autos {
       AutoTrajectory KToStationHigh,
       AutoTrajectory StationHighToL,
       AutoTrajectory LToStationHigh) {
+
+    new Trigger(() -> poseManager.nearStation(1))
+        .whileTrue(carriage.intakeCoral());
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
