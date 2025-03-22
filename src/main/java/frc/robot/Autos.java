@@ -212,8 +212,7 @@ public class Autos {
     JToStationHigh.done()
         .onTrue(waitUntil(carriage::coralHeld).andThen(StationHighToL.cmd().asProxy()));
     StationHighToL.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
+        .and(carriage::fullCoralHeld)
         .and(() -> coralOnL3 < 1)
         .onTrue(
             // Score coral on L3
@@ -268,8 +267,7 @@ public class Autos {
                 .withName("StationToScore"));
 
     StationHighToK.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
+        .and(carriage::fullCoralHeld)
         .and(() -> poseManager.getDistanceTo(StationHighToK.getFinalPose().get()) < 1)
         .onTrue(
             either(
@@ -292,8 +290,7 @@ public class Autos {
                 .withName("KToStationHigh"));
 
     StationHighToL.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
+        .and(carriage::fullCoralHeld)
         .and(() -> coralOnL3 >= 1)
         .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
         .onTrue(
