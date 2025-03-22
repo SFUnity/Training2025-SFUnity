@@ -211,8 +211,9 @@ public class Autos {
     JToStationHigh.done()
         .onTrue(waitUntil(carriage::coralHeld).andThen(StationHighToL.cmd().asProxy()));
     StationHighToL.active()
-        .and(() -> coralOnL3 < 1)
+        .and(carriage::coralHeld)
         .and(carriage::beamBreak)
+        .and(() -> coralOnL3 < 1)
         .onTrue(
             // Score coral on L3
             elevator
