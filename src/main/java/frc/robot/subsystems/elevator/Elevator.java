@@ -81,10 +81,7 @@ public class Elevator extends SubsystemBase {
 
     updateTunables();
 
-    ScoreState scoreState = RobotCommands.scoreState;
-    if (scoreState == ProcessorBack || scoreState == ScoreState.ProcessorFront) {
-      scoreState = ScoreState.Dealgify;
-    }
+    // TODO Log distance to reef so we can see how far away we are and when we want to lower it
 
     if (setHeight
         || (poseManager.getDistanceTo(poseManager.closest(scoreState))
@@ -100,7 +97,7 @@ public class Elevator extends SubsystemBase {
       if (Carriage.coralInDanger) {
         pid.setGoal(L3.get());
       } else {
-        if (algaeInCarriage.getAsBoolean()) {
+        if (algaeInCarriage.getAsBoolean()) { // TODO add the check for distance to reef here
           pid.setGoal(algeInCarriageHeight.get());
         } else {
           pid.setGoal(0);
