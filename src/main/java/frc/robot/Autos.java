@@ -175,6 +175,7 @@ public class Autos {
       AutoTrajectory StationHighToL,
       AutoTrajectory LToStationHigh) {
 
+    // Intake when near station
     new Trigger(() -> poseManager.nearStation(1)).whileTrue(carriage.intakeCoral());
 
     // When the routine begins, reset odometry and start the first trajectory
@@ -314,6 +315,16 @@ public class Autos {
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(LToStationHigh.cmd())
                 .withName("LToStationHigh"));
+
+    // Logging
+    routine
+        .active()
+        .whileTrue(
+            run(
+                () -> {
+                  Logger.recordOutput("Drive/Choreo/CoralOnL3", coralOnL3);
+                  Logger.recordOutput("Drive/Choreo/CoralOnL2", coralOnL2);
+                }));
 
     return routine;
   }
