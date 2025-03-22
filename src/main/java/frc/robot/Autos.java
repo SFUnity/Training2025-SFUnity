@@ -175,8 +175,7 @@ public class Autos {
       AutoTrajectory StationHighToL,
       AutoTrajectory LToStationHigh) {
 
-    new Trigger(() -> poseManager.nearStation(1))
-        .whileTrue(carriage.intakeCoral());
+    new Trigger(() -> poseManager.nearStation(1)).whileTrue(carriage.intakeCoral());
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
