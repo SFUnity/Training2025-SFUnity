@@ -126,8 +126,7 @@ public class AprilTagVision extends VirtualSubsystem {
 
       // Log camera datadata
       Logger.recordOutput(
-          "Vision/" + inputs[i].name + "/TagPoses",
-          tagPoses.toArray(new Pose3d[tagPoses.size()]));
+          "Vision/" + inputs[i].name + "/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
       Logger.recordOutput(
           "Vision/" + inputs[i].name + "/RobotPoses",
           robotPoses.toArray(new Pose3d[robotPoses.size()]));
