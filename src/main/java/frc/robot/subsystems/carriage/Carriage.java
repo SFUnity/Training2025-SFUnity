@@ -81,6 +81,8 @@ public class Carriage extends SubsystemBase {
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 
     // Logging
+    Logger.recordOutput("Carriage/filteredVelocity", filteredVelocity);
+    Logger.recordOutput("Carriage/filteredStatorCurrent", filteredStatorCurrent);
     Logger.recordOutput("Carriage/coralPassed", coralPassed);
     Logger.recordOutput("Carriage/coralInDanger", coralInDanger);
 
