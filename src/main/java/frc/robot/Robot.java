@@ -266,7 +266,20 @@ public class Robot extends LoggedRobot {
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
         vision =
-            new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+            new AprilTagVision(
+                poseManager,
+                new AprilTagVisionIO() {
+                  @Override
+                  public String getName() {
+                    return leftName;
+                  }
+                },
+                new AprilTagVisionIO() {
+                  @Override
+                  public String getName() {
+                    return rightName;
+                  }
+                });
         break;
     }
 
