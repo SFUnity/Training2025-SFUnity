@@ -17,6 +17,7 @@ public interface AprilTagVisionIO {
     public double avgTagArea = 0.0;
 
     public double pipeline = 0;
+    public String name;
   }
 
   /** Updates the set of loggable inputs. */
@@ -27,8 +28,4 @@ public interface AprilTagVisionIO {
 
   /** Sets the pipeline through enum. */
   public default void setPipeline(AprilTagVisionConstants.Pipelines pipeline) {}
-
-  public default String getName() {
-    return "";
-  }
 }

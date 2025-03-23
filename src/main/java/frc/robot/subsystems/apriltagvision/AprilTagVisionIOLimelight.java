@@ -82,6 +82,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     inputs.avgTagArea = observation.avgTagArea;
 
     inputs.pipeline = getCurrentPipelineIndex(name);
+    inputs.name = name;
 
     // Update disconnected alert
     if (observation.timestampSeconds != 0) {
@@ -140,10 +141,5 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
 
   private void resetCropping() {
     setCropWindow(name, -DEFAUlT_CROP, DEFAUlT_CROP, -DEFAUlT_CROP, DEFAUlT_CROP);
-  }
-
-  @Override
-  public String getName() {
-    return name;
   }
 }
