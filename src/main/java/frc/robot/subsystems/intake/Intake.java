@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
   private boolean runningIceCream = false;
 
   private final LoggedTunableNumber spikeCurrent =
-      new LoggedTunableNumber("Intake/spikeCurrent", groundAlgae ? 9 : 17);
+      new LoggedTunableNumber("Intake/spikeCurrent", groundAlgae ? 17 : 17);
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -72,7 +72,7 @@ public class Intake extends SubsystemBase {
           middleOfIntaking = true;
         }
         // check for massive current spike
-        if (filteredCurrent >= 20) {
+        if (filteredCurrent >= 33) {
           hasGP = true;
           startedIntaking = false;
         }
