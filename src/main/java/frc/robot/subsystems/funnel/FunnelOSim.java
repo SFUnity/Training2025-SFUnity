@@ -1,5 +1,3 @@
 package frc.robot.subsystems.funnel;
 
-public class FunnelIOSim {
-
-}
+public class FunnelOSim {}
