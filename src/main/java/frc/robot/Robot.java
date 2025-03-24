@@ -266,7 +266,20 @@ public class Robot extends LoggedRobot {
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
         vision =
-            new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+            new AprilTagVision(
+                poseManager,
+                new AprilTagVisionIO() {
+                  @Override
+                  public String getName() {
+                    return leftName;
+                  }
+                },
+                new AprilTagVisionIO() {
+                  @Override
+                  public String getName() {
+                    return rightName;
+                  }
+                });
         break;
     }
 
@@ -326,6 +339,8 @@ public class Robot extends LoggedRobot {
     // Check controllers
     driverDisconnected.set(!isControllerConnected(driver));
     operatorDisconnected.set(!isControllerConnected(operator));
+    Logger.recordOutput("Controls/driverConnected", isControllerConnected(driver));
+    Logger.recordOutput("Controls/operatorConnected", isControllerConnected(operator));
 
     // Check CAN status
     var canStatus = RobotController.getCANStatus();
@@ -585,12 +600,6 @@ public class Robot extends LoggedRobot {
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .whileTrue(carriage.intakeCoral());
-
-    // Auto only
-    new Trigger(() -> poseManager.nearStation())
-        .and(() -> !carriage.algaeHeld())
-        .and(DriverStation::isAutonomous)
         .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces

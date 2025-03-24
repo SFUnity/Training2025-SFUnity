@@ -51,7 +51,7 @@ public class AprilTagVision extends VirtualSubsystem {
     // Loop over cameras
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i], poseManager);
-      Logger.processInputs("Vision/" + this.io[i].getName(), inputs[i]);
+      Logger.processInputs("Vision/" + CamName.values()[i].name, inputs[i]);
 
       // Initialize logging values
       List<Pose3d> tagPoses = new LinkedList<>();
@@ -126,16 +126,16 @@ public class AprilTagVision extends VirtualSubsystem {
 
       // Log camera datadata
       Logger.recordOutput(
-          "Vision/" + this.io[i].getName() + "/TagPoses",
+          "Vision/" + CamName.values()[i].name + "/TagPoses",
           tagPoses.toArray(new Pose3d[tagPoses.size()]));
       Logger.recordOutput(
-          "Vision/" + this.io[i].getName() + "/RobotPoses",
+          "Vision/" + CamName.values()[i].name + "/RobotPoses",
           robotPoses.toArray(new Pose3d[robotPoses.size()]));
       Logger.recordOutput(
-          "Vision/" + this.io[i].getName() + "/RobotPosesAccepted",
+          "Vision/" + CamName.values()[i].name + "/RobotPosesAccepted",
           robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
       Logger.recordOutput(
-          "Vision/" + this.io[i].getName() + "/RobotPosesRejected",
+          "Vision/" + CamName.values()[i].name + "/RobotPosesRejected",
           robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
       allTagPoses.addAll(tagPoses);
       allRobotPoses.addAll(robotPoses);

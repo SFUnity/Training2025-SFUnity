@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -77,8 +78,8 @@ public class Autos {
     /* Set up main choreo routines */
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
-    // chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
-    chooser.addRoutine("CenterCDProcessorAlgaeL2L3", this::StandardCoralAuto);
+    chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
+    chooser.addRoutine("CenterCDAlgaeL2L3", this::CenterCDAlgaeL2L3);
     chooser.addRoutine("L3Only", this::L3Only);
     chooser.addRoutine("GHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3);
 
@@ -117,71 +118,102 @@ public class Autos {
   // .active().whileTrue() =  Trigger while the trajectory is still running.
   // Routines
 
-  //   private AutoRoutine WallLKAlgaeL2L3() {
-  //     AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
-  //     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterWallToL");
-  //     AutoTrajectory LToDealgify = routine.trajectory("LToDealgify");
-  //     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("KLAlgaeToStationHigh");
-  //     AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
-  //     AutoTrajectory KToStationHigh = routine.trajectory("KToStationHigh");
-  //     AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
-  //     AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
+  private AutoRoutine WallLKAlgaeL2L3() {
+    AutoRoutine routine = factory.newRoutine("WallLKAlgaeL2L3");
+    AutoTrajectory CenterWToJ = routine.trajectory("CenterWToJ");
+    AutoTrajectory JToStationHigh = routine.trajectory("JToStationHigh");
+    AutoTrajectory LToDealgify = routine.trajectory("LToDealgify");
+    AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("KLAlgaeToStationHigh");
+    AutoTrajectory StationHighToK = routine.trajectory("StationHighToK");
+    AutoTrajectory KToStationHigh = routine.trajectory("KToStationHigh");
+    AutoTrajectory StationHighToL = routine.trajectory("StationHighToL");
+    AutoTrajectory LToStationHigh = routine.trajectory("LToStationHigh");
 
-  //     return StandardCoralAuto(
-  //         routine,
-  //         CenterWallToLKAlgae,
-  //         LToDealgify,
-  //         KLAlgaeToStationHigh,
-  //         StationHighToK,
-  //         KToStationHigh,
-  //         StationHighToL,
-  //         LToStationHigh);
-  //   }
+    return StandardCoralAuto(
+        routine,
+        CenterWToJ,
+        JToStationHigh,
+        LToDealgify,
+        KLAlgaeToStationHigh,
+        StationHighToK,
+        KToStationHigh,
+        StationHighToL,
+        LToStationHigh);
+  }
 
-  //   private AutoRoutine CenterCDProcessorAlgaeL2L3() {
-  //     AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
-  //     AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
-  //     AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
-  //     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
-  //     AutoTrajectory StationHighToK = routine.trajectory("StationLowToD");
-  //     AutoTrajectory KToStationHigh = routine.trajectory("DToStationLow");
-  //     AutoTrajectory StationHighToL = routine.trajectory("StationLowToC");
-  //     AutoTrajectory LToStationHigh = routine.trajectory("CToStationLow");
-
-  //     return StandardCoralAuto(
-  //         routine,
-  //         CenterWallToLKAlgae,
-  //         LToDealgify,
-  //         KLAlgaeToStationHigh,
-  //         StationHighToK,
-  //         KToStationHigh,
-  //         StationHighToL,
-  //         LToStationHigh);
-  //   }
-
-  private AutoRoutine StandardCoralAuto() {
-    AutoRoutine routine = factory.newRoutine("CenterCDProcessorAlgaeL2L3");
-    AutoTrajectory CenterWallToLKAlgae = routine.trajectory("CenterProcessorToCDAlgae");
+  private AutoRoutine CenterCDAlgaeL2L3() {
+    AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
+    AutoTrajectory CenterWToJ = routine.trajectory("CenterPToE");
+    AutoTrajectory JToStationHigh = routine.trajectory("EToStationLow");
     AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
     AutoTrajectory StationHighToK = routine.trajectory("StationLowToD");
     AutoTrajectory KToStationHigh = routine.trajectory("DToStationLow");
     AutoTrajectory StationHighToL = routine.trajectory("StationLowToC");
     AutoTrajectory LToStationHigh = routine.trajectory("CToStationLow");
+
+    return StandardCoralAuto(
+        routine,
+        CenterWToJ,
+        JToStationHigh,
+        LToDealgify,
+        KLAlgaeToStationHigh,
+        StationHighToK,
+        KToStationHigh,
+        StationHighToL,
+        LToStationHigh);
+  }
+
+  private AutoRoutine StandardCoralAuto(
+      AutoRoutine routine,
+      AutoTrajectory CenterWToJ,
+      AutoTrajectory JToStationHigh,
+      AutoTrajectory LToDealgify,
+      AutoTrajectory KLAlgaeToStationHigh,
+      AutoTrajectory StationHighToK,
+      AutoTrajectory KToStationHigh,
+      AutoTrajectory StationHighToL,
+      AutoTrajectory LToStationHigh) {
+
+    // Intake when near station
+    new Trigger(() -> poseManager.nearStation(1)).whileTrue(carriage.intakeCoral());
+
     // When the routine begins, reset odometry and start the first trajectory
     routine
         .active()
         .onTrue(
-            CenterWallToLKAlgae.resetOdometry()
-                .andThen(CenterWallToLKAlgae.cmd())
-                .alongWith(
-                    runOnce(
-                        () -> {
-                          coralOnL3 = 1;
-                          coralOnL2 = 0;
-                        }))
+            CenterWToJ.resetOdometry()
+                .andThen(
+                    CenterWToJ.cmd()
+                        .alongWith(
+                            runOnce(
+                                () -> {
+                                  coralOnL3 = 0;
+                                  coralOnL2 = 0;
+                                })))
                 .withName("ResetOdometryAndStartFirstTrajectory"));
-    CenterWallToLKAlgae.active()
+    CenterWToJ.active()
+        .onTrue(
+            elevator
+                .request(L2)
+                .andThen(
+                    scoreCoral(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> CenterWToJ.getFinalPose().get(),
+                        CenterWToJ.active().negate()))
+                .withName("ScoreCoralOnL3"));
+    CenterWToJ.done()
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(JToStationHigh.cmd().asProxy())
+                .withName("DealgifyThenGoToStationHigh"));
+    JToStationHigh.done()
+        .onTrue(waitUntil(carriage::coralHeld).andThen(StationHighToL.cmd().asProxy()));
+    StationHighToL.active()
+        .and(carriage::fullCoralHeld)
+        .and(() -> coralOnL3 < 1)
         .onTrue(
             // Score coral on L3
             elevator
@@ -191,21 +223,29 @@ public class Autos {
                         elevator,
                         carriage,
                         poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.active().negate()),
+                        () -> StationHighToL.getFinalPose().get(),
+                        StationHighToL.active().negate()),
                     runOnce(() -> scoreState = Dealgify),
                     LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
                     dealgify(
                         elevator,
                         carriage,
                         poseManager,
-                        () -> CenterWallToLKAlgae.getFinalPose().get(),
-                        CenterWallToLKAlgae.active().negate()))
+                        () -> StationHighToL.getFinalPose().get(),
+                        StationHighToL.active().negate()))
                 .withName("ScoreCoralOnL3"));
     LToDealgify.done()
         .onTrue(
             waitUntil(carriage::algaeHeld)
-                .andThen(KLAlgaeToStationHigh.cmd().asProxy())
+                .andThen(
+                    KLAlgaeToStationHigh.cmd()
+                        .asProxy()
+                        .alongWith(
+                            runOnce(
+                                () -> {
+                                  coralOnL3 = 1;
+                                  coralOnL2 = 0;
+                                })))
                 .withName("DealgifyThenGoToStationHigh"));
 
     // Eject algae while driving
@@ -227,8 +267,7 @@ public class Autos {
                 .withName("StationToScore"));
 
     StationHighToK.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
+        .and(carriage::fullCoralHeld)
         .and(() -> poseManager.getDistanceTo(StationHighToK.getFinalPose().get()) < 1)
         .onTrue(
             either(
@@ -251,8 +290,8 @@ public class Autos {
                 .withName("KToStationHigh"));
 
     StationHighToL.active()
-        .and(carriage::coralHeld)
-        .and(carriage::beamBreak)
+        .and(carriage::fullCoralHeld)
+        .and(() -> coralOnL3 >= 1)
         .and(() -> poseManager.getDistanceTo(StationHighToL.getFinalPose().get()) < 1)
         .onTrue(
             either(
@@ -273,6 +312,16 @@ public class Autos {
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(LToStationHigh.cmd())
                 .withName("LToStationHigh"));
+
+    // Logging
+    routine
+        .active()
+        .whileTrue(
+            run(
+                () -> {
+                  Logger.recordOutput("Drive/Choreo/CoralOnL3", coralOnL3);
+                  Logger.recordOutput("Drive/Choreo/CoralOnL2", coralOnL2);
+                }));
 
     return routine;
   }

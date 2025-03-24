@@ -221,7 +221,7 @@ public class PoseManager {
     }
   }
 
-  public boolean nearStation() {
+  public boolean nearStation(double tolerance) {
     Pose2d station =
         closestStation()
             .transformBy(new Transform2d(intakeDistanceMeters.get(), 0, Rotation2d.kZero));
@@ -231,5 +231,9 @@ public class PoseManager {
     double angleDiff = angleToStation.minus(stationAngle).getRadians();
     double distance = -Math.cos(angleDiff) * hypotenuse;
     return distance < 0.5;
+  }
+
+  public boolean nearStation() {
+    return nearStation(0.5);
   }
 }

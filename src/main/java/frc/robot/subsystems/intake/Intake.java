@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
   private boolean runningIceCream = false;
 
   private final LoggedTunableNumber spikeCurrent =
-      new LoggedTunableNumber("Intake/spikeCurrent", 17);
+      new LoggedTunableNumber("Intake/spikeCurrent", groundAlgae ? 17 : 17);
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -72,13 +72,13 @@ public class Intake extends SubsystemBase {
           middleOfIntaking = true;
         }
         // check for massive current spike
-        if (filteredCurrent >= 35) {
+        if (filteredCurrent >= 33) {
           hasGP = true;
           startedIntaking = false;
         }
       }
     } else {
-      if (filteredCurrent > spikeCurrent.get() && inputs.pivotAppliedVolts <= 0.5 && lowered) {
+      if (filteredCurrent > spikeCurrent.get() && inputs.pivotAppliedVolts <= 1.5 && lowered) {
         hasGP = true;
       }
     }
@@ -151,7 +151,7 @@ public class Intake extends SubsystemBase {
 
   public Command poopCmd(BooleanSupplier shouldPlace) {
     final double highCurrent = groundAlgae ? 10 : 15;
-    final double lowCurrent = groundAlgae ? 1 : 7;
+    final double lowCurrent = groundAlgae ? 5 : 7;
     return Commands.waitUntil(() -> filteredCurrent > highCurrent)
         .andThen(
             Commands.waitUntil(() -> filteredCurrent < lowCurrent),
@@ -162,7 +162,8 @@ public class Intake extends SubsystemBase {
                 .until(
                     () ->
                         inputs.pivotCurrentPositionDeg >= l1Angle.get() - .75
-                            && shouldPlace.getAsBoolean())
+                                && shouldPlace.getAsBoolean()
+                            || groundAlgae)
                 .andThen(
                     run(() -> {
                           rollersOut();
