@@ -56,7 +56,7 @@ public class IntakeConstants {
         kP = new LoggedTunableNumber("Intake/kP", 0.028);
         break;
       case SIM:
-        kP = new LoggedTunableNumber("Intake/simkP", 4.82);
+        kP = new LoggedTunableNumber("Intake/simkP", 0.1);
         break;
     }
   }
