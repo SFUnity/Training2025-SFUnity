@@ -50,9 +50,8 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Intake/startedIntaking", startedIntaking);
     lowered = inputs.pivotCurrentPositionDeg >= loweredAngle.get() / 2;
 
-    if (groundAlgae
-        .get()) { // * There's a specific pattern in the current draw of the rollers that we're
-      // checking for here
+    if (groundAlgae.get()) { 
+      //* There's a specific pattern in the current draw of the rollers that we're checking for here
       // Check that the pivot is lowered and not rising
       if ((inputs.pivotAppliedVolts <= 0.5 && lowered) || runningIceCream) {
         // Check if the current is high enough to be intaking
