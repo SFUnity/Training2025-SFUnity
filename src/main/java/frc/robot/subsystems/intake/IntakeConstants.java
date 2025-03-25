@@ -3,9 +3,11 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.math.util.Units;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class IntakeConstants {
-  public static boolean groundAlgae = true;
+  public static final LoggedNetworkBoolean groundAlgae =
+      new LoggedNetworkBoolean("Ground Algae", false);
 
   public static final int rollersID = 18;
   public static final int pivotID = 15;
