@@ -19,8 +19,8 @@ public class IntakeConstants {
   public static final double pivotPositionFactor = 2.9;
   public static final double rollersPositionFactor = .2;
 
-  public static final double minAngleRads = Units.degreesToRadians(18.39);
-  public static final double maxAngleRads = Units.degreesToRadians(87.39);
+  public static final double minAngleRads = Units.degreesToRadians(10);
+  public static final double maxAngleRads = Units.degreesToRadians(120);
   public static final double armLengthMeters = Units.inchesToMeters(15);
   public static final double intakePIDMinInput = 0;
   public static final double intakePIDMaxInput = 1 * 360;
@@ -37,7 +37,7 @@ public class IntakeConstants {
   public static final LoggedTunableNumber rollersSpeedOut;
 
   static {
-    if (groundAlgae) {
+    if (groundAlgae.get()) {
       loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 66);
       raisedAngle = new LoggedTunableNumber("Intake/raisedAngle", 0);
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 6);
