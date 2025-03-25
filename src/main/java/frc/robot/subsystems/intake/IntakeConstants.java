@@ -29,14 +29,27 @@ public class IntakeConstants {
       new LoggedTunableNumber("Intake/algaeVoltageThreshold", .5);
 
   // In rotations
-  public static final LoggedTunableNumber l1Angle;
-  public static final LoggedTunableNumber loweredAngle;
-  public static final LoggedTunableNumber raisedAngle;
+  public static LoggedTunableNumber l1Angle;
+  public static LoggedTunableNumber loweredAngle;
+  public static LoggedTunableNumber raisedAngle;
   // In volts
-  public static final LoggedTunableNumber rollersSpeedIn;
-  public static final LoggedTunableNumber rollersSpeedOut;
+  public static LoggedTunableNumber rollersSpeedIn;
+  public static LoggedTunableNumber rollersSpeedOut;
 
   static {
+    updateTunables();
+
+    switch (Constants.currentMode) {
+      default:
+        kP = new LoggedTunableNumber("Intake/kP", 0.028);
+        break;
+      case SIM:
+        kP = new LoggedTunableNumber("Intake/simkP", 0.1);
+        break;
+    }
+  }
+
+  public static void updateTunables() {
     if (groundAlgae.get()) {
       loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 66);
       raisedAngle = new LoggedTunableNumber("Intake/raisedAngle", 0);
@@ -49,15 +62,6 @@ public class IntakeConstants {
       rollersSpeedIn = new LoggedTunableNumber("Intake/rollerSpeedVoltsIn", 8);
       rollersSpeedOut = new LoggedTunableNumber("Intake/rollerSpeedVoltsOut", 8);
       l1Angle = new LoggedTunableNumber("Intake/L1Angle", 30);
-    }
-
-    switch (Constants.currentMode) {
-      default:
-        kP = new LoggedTunableNumber("Intake/kP", 0.028);
-        break;
-      case SIM:
-        kP = new LoggedTunableNumber("Intake/simkP", 0.1);
-        break;
     }
   }
 }

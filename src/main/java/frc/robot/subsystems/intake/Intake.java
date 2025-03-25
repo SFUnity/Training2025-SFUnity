@@ -31,6 +31,8 @@ public class Intake extends SubsystemBase {
   public static boolean simHasGP = false;
   private boolean runningIceCream = false;
 
+  private boolean lastGroundAlgae = groundAlgae.get();
+
   private final LoggedTunableNumber spikeCurrent =
       new LoggedTunableNumber("Intake/spikeCurrent", groundAlgae.get() ? 17 : 17);
 
@@ -82,6 +84,11 @@ public class Intake extends SubsystemBase {
       if (filteredCurrent > spikeCurrent.get() && inputs.pivotAppliedVolts <= 1.5 && lowered) {
         hasGP = true;
       }
+    }
+
+    if (lastGroundAlgae != groundAlgae.get()) {
+      updateTunables();
+      lastGroundAlgae = groundAlgae.get();
     }
 
     Logger.recordOutput("Intake/runningIceCream", runningIceCream);
