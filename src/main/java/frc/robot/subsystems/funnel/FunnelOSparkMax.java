@@ -9,9 +9,21 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class FunnelOSparkMax implements FunnelIO {
-    private final SparkMax rollerMotor = new SparkMax(funnelMotorID, MotorType.kBrushless);
-    private final SparkMaxConfig config = sparkConfig(inverted, funnelMotorID);
-    FunnelOSparkMax(){
-        configureSpark(rollerMotor, config, true);
-    }
+  private final SparkMax rollerMotor = new SparkMax(funnelMotorID, MotorType.kBrushless);
+  private final SparkMaxConfig config = sparkConfig(inverted, funnelMotorID);
+
+  FunnelOSparkMax() {
+    configureSpark(rollerMotor, config, true);
+  }
+
+  @Override
+  public void updateInputs(FunnelIOInputs inputs) {
+    inputs.appliedVolts = rollerMotor.getAppliedOutput() * rollerMotor.getBusVoltage();
+    inputs.currentAmps = rollerMotor.getOutputCurrent();
+  }
+
+  @Override
+  public void runVolts(double volts) {
+    rollerMotor.setVoltage(volts);
+  }
 }
