@@ -12,7 +12,7 @@ public class FunnelOSparkMax implements FunnelIO {
   private final SparkMax rollerMotor = new SparkMax(funnelMotorID, MotorType.kBrushless);
   private final SparkMaxConfig config = sparkConfig(inverted, funnelMotorID);
 
-  FunnelOSparkMax() {
+  public FunnelOSparkMax() {
     configureSpark(rollerMotor, config, true);
   }
 

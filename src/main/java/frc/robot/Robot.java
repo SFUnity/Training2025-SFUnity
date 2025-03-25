@@ -59,6 +59,10 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
+import frc.robot.subsystems.funnel.Funnel;
+import frc.robot.subsystems.funnel.FunnelIO;
+import frc.robot.subsystems.funnel.FunnelOSim;
+import frc.robot.subsystems.funnel.FunnelOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
@@ -115,6 +119,7 @@ public class Robot extends LoggedRobot {
   private final Elevator elevator;
   private final Carriage carriage;
   private final Intake intake;
+  private final Funnel funnel;
   private final AprilTagVision vision;
 
   // Non-subsystems
@@ -226,6 +231,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
+        funnel = new Funnel(new FunnelOSparkMax());
         vision =
             new AprilTagVision(
                 poseManager,
@@ -247,6 +253,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSim(), poseManager);
         carriage = new Carriage(new CarriageIOSim());
         intake = new Intake(new IntakeIOSim());
+        funnel = new Funnel(new FunnelOSim());
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
@@ -265,6 +272,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIO() {}, poseManager);
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
+        funnel = new Funnel(new FunnelIO() {});
         vision =
             new AprilTagVision(
                 poseManager,
@@ -600,7 +608,7 @@ public class Robot extends LoggedRobot {
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .whileTrue(carriage.intakeCoral());
+        .whileTrue(carriage.intakeCoral().alongWith(funnel.runRollers()));
 
     // Sim fake gamepieces
     SmartDashboard.putData(
