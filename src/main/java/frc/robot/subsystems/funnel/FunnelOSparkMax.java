@@ -4,11 +4,9 @@ import static frc.robot.subsystems.funnel.FunnelConstants.*;
 import static frc.robot.util.SparkUtil.configureSpark;
 import static frc.robot.util.SparkUtil.sparkConfig;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.google.gson.internal.bind.ReflectiveTypeAdapterFactory;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkMaxAlternateEncoder;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class FunnelOSparkMax implements FunnelIO {

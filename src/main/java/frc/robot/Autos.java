@@ -51,7 +51,12 @@ public class Autos {
       new AlwaysLoggedTunableNumber("delayBeforeMoving", 3);
 
   public Autos(
-      Drive drive, Carriage carriage, Elevator elevator, Intake intake, Funnel funnel, PoseManager poseManager) {
+      Drive drive,
+      Carriage carriage,
+      Elevator elevator,
+      Intake intake,
+      Funnel funnel,
+      PoseManager poseManager) {
     this.drive = drive;
     this.carriage = carriage;
     this.elevator = elevator;
@@ -179,7 +184,8 @@ public class Autos {
       AutoTrajectory LToStationHigh) {
 
     // Intake when near station
-    new Trigger(() -> poseManager.nearStation(1)).whileTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
+    new Trigger(() -> poseManager.nearStation(1))
+        .whileTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
 
     // When the routine begins, reset odometry and start the first trajectory
     routine

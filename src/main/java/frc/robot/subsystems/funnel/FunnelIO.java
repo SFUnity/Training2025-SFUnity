@@ -14,5 +14,5 @@ public interface FunnelIO {
 
   public default void runVolts(double volts) {}
 
-  public default void resetEncoder(){}
+  public default void resetEncoder() {}
 }
