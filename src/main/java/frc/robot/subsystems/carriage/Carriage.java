@@ -28,7 +28,7 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasAlgae = false;
   public static boolean simBeamBreak = false;
 
-  private boolean coralPassed = false;
+  public boolean coralPassed = false;
   private boolean realCoralHeld = false;
   private boolean realAlgaeHeld = false;
   private boolean fullCoralHeld = false;
