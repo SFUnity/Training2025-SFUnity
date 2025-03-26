@@ -61,7 +61,7 @@ import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.funnel.Funnel;
 import frc.robot.subsystems.funnel.FunnelIO;
-import frc.robot.subsystems.funnel.FunnelOSim;
+import frc.robot.subsystems.funnel.FunnelIOSim;
 import frc.robot.subsystems.funnel.FunnelOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
@@ -253,7 +253,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSim(), poseManager);
         carriage = new Carriage(new CarriageIOSim());
         intake = new Intake(new IntakeIOSim());
-        funnel = new Funnel(new FunnelOSim());
+        funnel = new Funnel(new FunnelIOSim());
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
