@@ -291,7 +291,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    autos = new Autos(drive, carriage, elevator, intake, poseManager);
+    autos = new Autos(drive, carriage, elevator, intake, funnel, poseManager);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -608,7 +608,7 @@ public class Robot extends LoggedRobot {
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .whileTrue(carriage.intakeCoral().alongWith(funnel.runRollers()));
+        .whileTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
 
     // Sim fake gamepieces
     SmartDashboard.putData(
