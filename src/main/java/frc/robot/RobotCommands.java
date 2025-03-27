@@ -51,7 +51,9 @@ public final class RobotCommands {
                     either(
                             waitUntil(elevator::pastL3Height).andThen(carriage.backUpForL3()),
                             none(),
-                            () -> elevator.goalHeightInches > ElevatorConstants.pastL3Height.get())
+                            () ->
+                                elevator.goalHeightInches > ElevatorConstants.pastL3Height.get()
+                                    && !Carriage.coralInDanger)
                         .andThen(
                             waitUntil(() -> atPose.getAsBoolean() && elevator.atGoalHeight()),
                             carriage.placeCoral())));
@@ -165,7 +167,8 @@ public final class RobotCommands {
                 elevator
                     .request(IceCream)
                     .andThen(elevator.enableElevator().alongWith(carriage.lowDealgify()))
-                    .raceWith(either(intake.iceCreamCmd().asProxy(), idle(), () -> groundAlgae))
+                    .raceWith(
+                        either(intake.iceCreamCmd().asProxy(), idle(), () -> groundAlgae.get()))
                     .withName("iceCreamIntake")
                     .asProxy()),
             () -> intakeState)

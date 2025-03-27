@@ -266,7 +266,20 @@ public class Robot extends LoggedRobot {
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
         vision =
-            new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+            new AprilTagVision(
+                poseManager,
+                new AprilTagVisionIO() {
+                  @Override
+                  public String getName() {
+                    return leftName;
+                  }
+                },
+                new AprilTagVisionIO() {
+                  @Override
+                  public String getName() {
+                    return rightName;
+                  }
+                });
         break;
     }
 
@@ -326,6 +339,8 @@ public class Robot extends LoggedRobot {
     // Check controllers
     driverDisconnected.set(!isControllerConnected(driver));
     operatorDisconnected.set(!isControllerConnected(operator));
+    Logger.recordOutput("Controls/driverConnected", isControllerConnected(driver));
+    Logger.recordOutput("Controls/operatorConnected", isControllerConnected(operator));
 
     // Check CAN status
     var canStatus = RobotController.getCANStatus();
@@ -447,7 +462,7 @@ public class Robot extends LoggedRobot {
                                                     && elevator.atGoalHeight())
                                         .andThen(carriage.placeCoral())),
                             intake.poopCmd(driveCommandsConfig::finishScoring),
-                            () -> groundAlgae),
+                            () -> groundAlgae.get()),
                         Dealgify,
                         dealgify(
                             elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
@@ -468,7 +483,7 @@ public class Robot extends LoggedRobot {
                             false,
                             atGoal(drive, driveCommandsConfig))),
                     () -> {
-                      if (scoreState == ProcessorBack && !groundAlgae) {
+                      if (scoreState == ProcessorBack && !groundAlgae.get()) {
                         DriverStation.reportError(
                             "ProcessorBack can't be used with coral ground intake", false);
                       }
@@ -490,7 +505,7 @@ public class Robot extends LoggedRobot {
                                             .get()
                                             .getRotation()
                                             .plus(
-                                                groundAlgae
+                                                groundAlgae.get()
                                                     ? Rotation2d.kZero
                                                     : Rotation2d.k180deg)),
                                 () -> scoreState != ScoreL1)
@@ -533,7 +548,7 @@ public class Robot extends LoggedRobot {
     operator
         .a()
         .onTrue(
-            either(elevator.request(L1), none(), () -> groundAlgae)
+            either(elevator.request(L1), none(), () -> groundAlgae.get())
                 .alongWith(runOnce(() -> scoreState = ScoreL1)));
     operator
         .b()
@@ -541,7 +556,7 @@ public class Robot extends LoggedRobot {
             runOnce(
                 () -> {
                   scoreState = ProcessorFront;
-                  if (intake.GPHeld() && groundAlgae) {
+                  if (intake.GPHeld() && groundAlgae.get()) {
                     scoreState = ProcessorBack;
                   }
                 }));
@@ -563,7 +578,7 @@ public class Robot extends LoggedRobot {
 
     // Teleop Only
     new Trigger(carriage::coralHeld)
-        .or(() -> intake.GPHeld() && !groundAlgae)
+        .or(() -> intake.GPHeld() && !groundAlgae.get())
         .and(() -> allowAutoDrive)
         .and(DriverStation::isTeleop)
         .and(() -> poseManager.getDistanceTo(goalPose(poseManager).get()) < 3.25)
@@ -580,17 +595,11 @@ public class Robot extends LoggedRobot {
 
     new Trigger(intake::GPHeld)
         .and(DriverStation::isTeleop)
-        .onTrue(runOnce(() -> scoreState = groundAlgae ? ProcessorBack : ScoreL1));
+        .onTrue(runOnce(() -> scoreState = groundAlgae.get() ? ProcessorBack : ScoreL1));
 
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .whileTrue(carriage.intakeCoral());
-
-    // Auto only
-    new Trigger(() -> poseManager.nearStation())
-        .and(() -> !carriage.algaeHeld())
-        .and(DriverStation::isAutonomous)
         .whileTrue(carriage.intakeCoral());
 
     // Sim fake gamepieces

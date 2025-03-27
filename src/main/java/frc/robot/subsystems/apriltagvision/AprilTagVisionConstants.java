@@ -33,6 +33,17 @@ public class AprilTagVisionConstants {
     rightForwardOffset, rightSideOffset, rightHeightOffset, rightRoll, rightPitch, rightYaw
   };
 
+  public static enum CamName {
+    Left(leftName),
+    Right(rightName);
+
+    public final String name;
+
+    CamName(String name) {
+      this.name = name;
+    }
+  }
+
   public static enum Pipelines {
     // TODO Add more pipelines
     HUMAN_MADE;

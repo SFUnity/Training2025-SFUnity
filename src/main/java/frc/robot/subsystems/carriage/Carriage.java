@@ -30,11 +30,15 @@ public class Carriage extends SubsystemBase {
 
   private boolean coralPassed = false;
   private boolean realCoralHeld = false;
-  public boolean realAlgaeHeld = false;
+  private boolean realAlgaeHeld = false;
+  private boolean fullCoralHeld = false;
 
   private final Timer beambreakTimer = new Timer();
   private static final LoggedTunableNumber beambreakDelay =
-      new LoggedTunableNumber("Carriage/beambreakDelay", 0.04);
+      new LoggedTunableNumber("Carriage/beambreakDelay", 0.3);
+  private final Timer fullCoralHeldTimer = new Timer();
+  private static final LoggedTunableNumber fullCoralHeldDelay =
+      new LoggedTunableNumber("Carriage/fullCoralHeldDelay", 0.35);
 
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
@@ -77,6 +81,8 @@ public class Carriage extends SubsystemBase {
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 
     // Logging
+    Logger.recordOutput("Carriage/filteredVelocity", filteredVelocity);
+    Logger.recordOutput("Carriage/filteredStatorCurrent", filteredStatorCurrent);
     Logger.recordOutput("Carriage/coralPassed", coralPassed);
     Logger.recordOutput("Carriage/coralInDanger", coralInDanger);
 
@@ -87,14 +93,22 @@ public class Carriage extends SubsystemBase {
     if (!beamBreak() && !coralPassed) {
       realCoralHeld = false;
     } else if (!beamBreak() && coralPassed) {
-      if (beambreakTimer.hasElapsed(beambreakDelay.get())) {
-        realCoralHeld = true;
-      }
+      realCoralHeld = true;
     } else if (beamBreak() && !coralPassed && !realCoralHeld) {
-      coralPassed = true;
+      if (beambreakTimer.hasElapsed(beambreakDelay.get())) {
+        coralPassed = true;
+      } 
     }
-    if (beamBreak() && coralPassed) {
+    if (!beamBreak() || coralPassed || realCoralHeld) {
       beambreakTimer.restart();
+    }
+    if (beamBreak() && realCoralHeld) {
+      if (fullCoralHeldTimer.hasElapsed(fullCoralHeldDelay.get())) {
+        fullCoralHeld = true;
+      }
+    } else {
+      fullCoralHeld = false;
+      fullCoralHeldTimer.restart();
     }
   }
 
@@ -104,6 +118,11 @@ public class Carriage extends SubsystemBase {
       return simHasCoral || realCoralHeld;
     }
     return realCoralHeld;
+  }
+
+  @AutoLogOutput
+  public boolean fullCoralHeld() {
+    return fullCoralHeld;
   }
 
   public Command resetHeld() {

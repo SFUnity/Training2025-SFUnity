@@ -10,9 +10,9 @@ public class CarriageConstants {
   public static final double positionFactor = 5;
 
   public static final LoggedTunableNumber algaeVelocityThreshold =
-      new LoggedTunableNumber("Carriage/algaeVelocityThreshold", 200);
+      new LoggedTunableNumber("Carriage/algaeVelocityThreshold", 7000);
   public static final LoggedTunableNumber algaeCurrentThreshold =
-      new LoggedTunableNumber("Carriage/algaeCurrentThreshold", 55);
+      new LoggedTunableNumber("Carriage/algaeCurrentThreshold", 50);
 
   public static final LoggedTunableNumber intakingSpeedVolts =
       new LoggedTunableNumber("Carriage/intakingSpeedVolts", -3.5);
