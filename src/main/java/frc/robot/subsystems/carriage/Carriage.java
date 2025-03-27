@@ -77,6 +77,7 @@ public class Carriage extends SubsystemBase {
     }
 
     // Leds
+    Leds.getInstance().coralHeld = coralHeld();
     Leds.getInstance().coralPassed = coralPassed;
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 
@@ -205,7 +206,8 @@ public class Carriage extends SubsystemBase {
             run(() -> io.runVolts(intakingSpeedVolts.get()))
                 .until(() -> coralPassed)
                 .andThen(
-                    run(() -> io.runVolts(-backwardsIntakeSpeedVolts.get())).until(() -> !beamBreak()),
+                    run(() -> io.runVolts(-backwardsIntakeSpeedVolts.get()))
+                        .until(() -> !beamBreak()),
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
                         .until(() -> beamBreak()))
                 .onlyIf(() -> !coralHeld()),
