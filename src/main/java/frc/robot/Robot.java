@@ -51,9 +51,7 @@ import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
@@ -62,7 +60,7 @@ import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.funnel.Funnel;
 import frc.robot.subsystems.funnel.FunnelIO;
 import frc.robot.subsystems.funnel.FunnelIOSim;
-import frc.robot.subsystems.funnel.FunnelOSparkMax;
+import frc.robot.subsystems.funnel.FunnelIOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
@@ -216,22 +214,22 @@ public class Robot extends LoggedRobot {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOMixed(0),
-                new ModuleIOMixed(1),
-                new ModuleIOMixed(2),
-                new ModuleIOMixed(3),
-                // new GyroIO() {},
-                // new ModuleIO() {},
-                // new ModuleIO() {},
-                // new ModuleIO() {},
-                // new ModuleIO() {},
+                // new GyroIOPigeon2(),
+                // new ModuleIOMixed(0),
+                // new ModuleIOMixed(1),
+                // new ModuleIOMixed(2),
+                // new ModuleIOMixed(3),
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
-        funnel = new Funnel(new FunnelOSparkMax());
+        funnel = new Funnel(new FunnelIOSparkMax());
         vision =
             new AprilTagVision(
                 poseManager,

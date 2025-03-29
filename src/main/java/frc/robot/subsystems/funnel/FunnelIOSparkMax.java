@@ -9,12 +9,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-public class FunnelOSparkMax implements FunnelIO {
+public class FunnelIOSparkMax implements FunnelIO {
   private final SparkMax rollerMotor = new SparkMax(funnelMotorID, MotorType.kBrushless);
   private final RelativeEncoder encoder = rollerMotor.getEncoder();
   private final SparkMaxConfig config = sparkConfig(inverted, funnelMotorID);
 
-  public FunnelOSparkMax() {
+  public FunnelIOSparkMax() {
     configureSpark(rollerMotor, config, true);
   }
 
