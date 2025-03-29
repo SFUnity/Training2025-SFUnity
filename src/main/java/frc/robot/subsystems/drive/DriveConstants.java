@@ -46,13 +46,13 @@ public class DriveConstants {
   // Zeroed rotation values for each module, see setup instructions
   public static final double frontLeftZeroRotation = -0.241943;
   public static final double frontRightZeroRotation = 0.042969;
-  public static final double backLeftZeroRotation = -0.014404;
+  public static final double backLeftZeroRotation = 0;
   public static final double backRightZeroRotation = 0.484375;
 
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = true;
   public static final boolean frontRightDriveInverted = false;
-  public static final boolean backLeftDriveInverted = true;
+  public static final boolean backLeftDriveInverted = false;
   public static final boolean backRightDriveInverted = false;
 
   public static final boolean frontLeftTurnInverted = true;
@@ -62,7 +62,7 @@ public class DriveConstants {
 
   public static final boolean frontLeftTurnEncoderInverted = false;
   public static final boolean frontRightTurnEncoderInverted = false;
-  public static final boolean backLeftTurnEncoderInverted = false;
+  public static final boolean backLeftTurnEncoderInverted = true;
   public static final boolean backRightTurnEncoderInverted = false;
 
   // Device CAN IDs. Based off power port on PDH
