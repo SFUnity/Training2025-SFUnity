@@ -317,10 +317,9 @@ public class Autos {
                         .raceWith(
                             startEnd(() -> moveRight = true, () -> moveRight = false)
                                 .withTimeout(.5)),
-                    parallel(LToStationHigh.cmd()
-                        .asProxy(),
-                            waitSeconds(1)
-                                .andThen(carriage.ejectAlgae().withTimeout(.4).asProxy()))));
+                    parallel(
+                        LToStationHigh.cmd().asProxy(),
+                        waitSeconds(1).andThen(carriage.ejectAlgae().withTimeout(.4).asProxy()))));
 
     // Logging
     routine
