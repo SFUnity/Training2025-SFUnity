@@ -320,7 +320,7 @@ public class Autos {
                     LToStationHigh.cmd().asProxy()));
     LToStationHigh.active()
         .and(() -> coralOnL3 == 1)
-        .onTrue(waitSeconds(1).andThen(carriage.ejectAlgae().withTimeout(.4).asProxy()));
+        .onTrue(waitSeconds(.5).andThen(carriage.ejectAlgae().withTimeout(.4).asProxy()));
 
     // Logging
     routine
