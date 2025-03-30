@@ -301,21 +301,21 @@ public class Autos {
                 .withName("ScoreOnL"));
 
     StationHighToL.done()
-        .and(() -> coralOnL3 != 1)
+        .and(() -> coralOnL3 != 0)
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(LToStationHigh.cmd())
                 .withName("LToStationHigh"));
 
     StationHighToL.done()
-        .and(() -> coralOnL3 == 1)
+        .and(() -> coralOnL3 == 0)
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(
                     carriage
                         .lowDealgify()
                         .raceWith(
-                            startEnd(() -> moveLeft = true, () -> moveLeft = false)
+                            startEnd(() -> moveRight = true, () -> moveRight = false)
                                 .withTimeout(.5)),
                     LToStationHigh.cmd()
                         .asProxy()
