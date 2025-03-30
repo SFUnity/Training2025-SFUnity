@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import frc.robot.RobotCommands.ScoreState;
 import frc.robot.constantsGlobal.FieldConstants.CoralStation;
 import frc.robot.constantsGlobal.FieldConstants.Face;
@@ -161,6 +160,7 @@ public class PoseManager {
       }
     }
 
+    lockedFace = closest;
     return closest;
 
     // Get angles
