@@ -98,7 +98,7 @@ public class Carriage extends SubsystemBase {
       if (beambreakTimer.hasElapsed(beambreakDelay.get())) {
         coralPassed = true;
       }
-    } 
+    }
     if (!beamBreak() || coralPassed || realCoralHeld) {
       beambreakTimer.restart();
     }
@@ -157,8 +157,7 @@ public class Carriage extends SubsystemBase {
               realAlgaeHeld = false;
             }
             io.runVolts(-holdSpeedVolts.get());
-          } 
-          else {
+          } else {
             io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
           }
         })
@@ -206,7 +205,8 @@ public class Carriage extends SubsystemBase {
             run(() -> io.runVolts(intakingSpeedVolts.get()))
                 .until(() -> coralPassed)
                 .andThen(
-                    run(() -> io.runVolts(-backwardsIntakeSpeedVolts.get())).until(() -> !beamBreak()),
+                    run(() -> io.runVolts(-backwardsIntakeSpeedVolts.get()))
+                        .until(() -> !beamBreak()),
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
                         .until(() -> beamBreak()))
                 .onlyIf(() -> !coralHeld()),
