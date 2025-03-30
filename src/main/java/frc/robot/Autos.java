@@ -241,8 +241,32 @@ public class Autos {
                         () -> {
                           coralOnL3 = 1;
                           coralOnL2 = 0;
-                        }))
+                        }),
+                        runOnce(() -> scoreState = Dealgify),
+                        LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
+                        dealgify(
+                            elevator,
+                            carriage,
+                            poseManager,
+                            () -> StationHighToL.getFinalPose().get(),
+                            StationHighToL.active().negate()))
                 .withName("ScoreCoralOnL3"));
+                LToDealgify.done()
+        .onTrue(
+            waitUntil(carriage::algaeHeld)
+                .andThen(
+                    KLAlgaeToStationHigh.cmd()
+                        .asProxy()
+                        .alongWith(
+                            runOnce(
+                                () -> {
+                                  coralOnL3 = 1;
+                                  coralOnL2 = 0;
+                                })))
+                .withName("DealgifyThenGoToStationHigh"));
+
+    // Eject algae while driving
+    KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.ejectAlgae());
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
@@ -301,27 +325,10 @@ public class Autos {
                 .withName("ScoreOnL"));
 
     StationHighToL.done()
-        .and(() -> coralOnL3 != 1)
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(LToStationHigh.cmd())
                 .withName("LToStationHigh"));
-
-    StationHighToL.done()
-        .and(() -> coralOnL3 == 1)
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(
-                    carriage
-                        .lowDealgify()
-                        .raceWith(
-                            startEnd(() -> moveLeft = true, () -> moveLeft = false)
-                                .withTimeout(.5)),
-                    LToStationHigh.cmd()
-                        .asProxy()
-                        .alongWith(
-                            waitSeconds(.3)
-                                .andThen(carriage.ejectAlgae().withTimeout(.4).asProxy()))));
 
     // Logging
     routine
