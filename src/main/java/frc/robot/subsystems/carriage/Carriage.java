@@ -35,7 +35,7 @@ public class Carriage extends SubsystemBase {
 
   private final Timer beambreakTimer = new Timer();
   private static final LoggedTunableNumber beambreakDelay =
-      new LoggedTunableNumber("Carriage/beambreakDelay", 0.2);
+      new LoggedTunableNumber("Carriage/beambreakDelay", 0.23);
   private final Timer fullCoralHeldTimer = new Timer();
   private static final LoggedTunableNumber fullCoralHeldDelay =
       new LoggedTunableNumber("Carriage/fullCoralHeldDelay", 0.35);
