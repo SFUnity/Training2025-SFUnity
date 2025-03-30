@@ -77,6 +77,7 @@ public class Carriage extends SubsystemBase {
     }
 
     // Leds
+    Leds.getInstance().coralHeld = coralHeld();
     Leds.getInstance().coralPassed = coralPassed;
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 

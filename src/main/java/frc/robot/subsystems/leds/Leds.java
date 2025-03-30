@@ -36,6 +36,7 @@ public class Leds extends VirtualSubsystem {
   public int loopCycleCount = 0;
 
   public boolean coralPassed = false;
+  public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
   public boolean intakeGPHeld = false;
   public boolean autoAlignActivated = false;
@@ -142,8 +143,10 @@ public class Leds extends VirtualSubsystem {
                         () -> 1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime)));
       } else if (extraLowBatteryAlert) {
         pattern = solid(Color.kRed);
-      } else if (coralPassed) {
+      } else if (coralHeld) {
         pattern = solid(Color.kBrown);
+      } else if (coralPassed) {
+        pattern = solid(Color.kOrangeRed);
       } else if (lowBatteryAlert) {
         pattern = solid(Color.kOrangeRed);
       } else if (prideLeds) {
@@ -161,12 +164,14 @@ public class Leds extends VirtualSubsystem {
                 .mask(progressMaskLayer(() -> Timer.getFPGATimestamp() - autoFinishedTime));
       }
     } else { // Enabled
-      if (coralPassed) {
+      if (coralHeld) {
         pattern = solid(Color.kBrown);
       } else if (intakeGPHeld) {
         pattern = solid(Color.kSeaGreen);
       } else if (carriageAlgaeHeld) {
         pattern = solid(Color.kPurple);
+      } else if (coralPassed) {
+        pattern = solid(Color.kOrangeRed);
       } else if (coralFlood) {
         pattern = solid(new Color(100, 0, 0));
       } else {
@@ -185,7 +190,8 @@ public class Leds extends VirtualSubsystem {
     leds.setData(buffer);
 
     // Logs
-    Logger.recordOutput("LEDs/coralHeld", coralPassed);
+    Logger.recordOutput("LEDs/coralPassed", coralPassed);
+    Logger.recordOutput("LEDs/coralHeld", coralHeld);
     Logger.recordOutput("LEDs/carriageAlgaeHeld", carriageAlgaeHeld);
     Logger.recordOutput("LEDs/intakeGPHeld", intakeGPHeld);
     Logger.recordOutput("LEDs/autoFinished", autoFinished);
