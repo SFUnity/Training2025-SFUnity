@@ -247,8 +247,14 @@ public class Autos {
                           coralOnL3 = 1;
                           coralOnL2 = 0;
                         }),
-                    carriage.lowDealgify().raceWith(startEnd(() -> moveRight = true, () -> moveRight = false).withTimeout(.5)),
-                    LToStationHigh.cmd().asProxy().alongWith(carriage.ejectAlgae().withTimeout(.4).asProxy())));
+                    carriage
+                        .lowDealgify()
+                        .raceWith(
+                            startEnd(() -> moveRight = true, () -> moveRight = false)
+                                .withTimeout(.5)),
+                    LToStationHigh.cmd()
+                        .asProxy()
+                        .alongWith(carriage.ejectAlgae().withTimeout(.4).asProxy())));
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
