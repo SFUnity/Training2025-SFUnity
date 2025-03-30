@@ -242,16 +242,16 @@ public class Autos {
                           coralOnL3 = 1;
                           coralOnL2 = 0;
                         }),
-                        runOnce(() -> scoreState = Dealgify),
-                        LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
-                        dealgify(
-                            elevator,
-                            carriage,
-                            poseManager,
-                            () -> StationHighToL.getFinalPose().get(),
-                            StationHighToL.active().negate()))
+                    runOnce(() -> scoreState = Dealgify),
+                    LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
+                    dealgify(
+                        elevator,
+                        carriage,
+                        poseManager,
+                        () -> StationHighToL.getFinalPose().get(),
+                        StationHighToL.active().negate()))
                 .withName("ScoreCoralOnL3"));
-                LToDealgify.done()
+    LToDealgify.done()
         .onTrue(
             waitUntil(carriage::algaeHeld)
                 .andThen(
