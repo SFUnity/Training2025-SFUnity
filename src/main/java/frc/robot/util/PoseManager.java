@@ -187,7 +187,7 @@ public class PoseManager {
     // Logger.recordOutput("To2ndClosestAngleDiff", to2ndClosestAngleDiff);
 
     // Find closest angle
-    
+
     // if (toClosestAngleDiff > to2ndClosestAngleDiff
     //     && (fieldVelocity().dx > 0.1 || fieldVelocity().dy > 0.1)) {
     //   lockedFace = secondClosest;
