@@ -416,6 +416,7 @@ public class Robot extends LoggedRobot {
     elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
     carriage.setDefaultCommand(carriage.stopOrHold());
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
+    funnel.setDefaultCommand(funnel.stop());
 
     // Driver controls
     driver.rightTrigger().onTrue(runOnce(drive::stopWithX, drive));
