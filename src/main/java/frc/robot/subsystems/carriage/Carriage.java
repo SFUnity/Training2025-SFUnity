@@ -155,7 +155,7 @@ public class Carriage extends SubsystemBase {
             realAlgaeHeld = false;
           }
           if (!beamBreak() && coralHeld()) {
-            io.runVolts(-holdSpeedVolts.get());
+            io.runVolts(-intakingSpeedVolts.get());
           } else {
             io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
           }
@@ -204,7 +204,7 @@ public class Carriage extends SubsystemBase {
             run(() -> io.runVolts(intakingSpeedVolts.get()))
                 .until(() -> coralPassed)
                 .andThen(
-                    run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
+                    run(() -> io.runVolts(slowIntakeSpeedVolts.get()))
                         .until(() -> !beamBreak()),
                     run(() -> io.runVolts(-intakingSpeedVolts.get())).until(() -> beamBreak()))
                 .onlyIf(() -> !coralHeld()),
