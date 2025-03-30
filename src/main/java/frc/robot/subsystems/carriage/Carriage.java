@@ -146,7 +146,7 @@ public class Carriage extends SubsystemBase {
       if (inputs.currentAmps < 5) {
         realAlgaeHeld = false;
       }
-          if (!beamBreak() && realCoralHeld) {
+          if (!beamBreak() && coralHeld()) {
             io.runVolts(-holdSpeedVolts.get());
           } else {
             io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
