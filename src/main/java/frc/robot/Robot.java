@@ -62,7 +62,7 @@ import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.funnel.Funnel;
 import frc.robot.subsystems.funnel.FunnelIO;
 import frc.robot.subsystems.funnel.FunnelIOSim;
-import frc.robot.subsystems.funnel.FunnelOSparkMax;
+import frc.robot.subsystems.funnel.FunnelIOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
@@ -231,7 +231,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
-        funnel = new Funnel(new FunnelOSparkMax());
+        funnel = new Funnel(new FunnelIOSparkMax());
         vision =
             new AprilTagVision(
                 poseManager,
@@ -416,6 +416,7 @@ public class Robot extends LoggedRobot {
     elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
     carriage.setDefaultCommand(carriage.stopOrHold());
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
+    funnel.setDefaultCommand(funnel.stop());
 
     // Driver controls
     driver.rightTrigger().onTrue(runOnce(drive::stopWithX, drive));

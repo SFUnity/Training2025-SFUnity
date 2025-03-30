@@ -23,9 +23,9 @@ import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = Units.feetToMeters(13.0);
+  public static final double maxSpeedMetersPerSec = Units.feetToMeters(10.5);
   public static final double maxAccelerationMetersPerSec =
-      Units.feetToMeters(75.0); // This is what 6328
+      Units.feetToMeters(70.0); // This is what 6328
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(20.75);
   public static final double wheelBase = trackWidth;
@@ -46,13 +46,13 @@ public class DriveConstants {
   // Zeroed rotation values for each module, see setup instructions
   public static final double frontLeftZeroRotation = -0.241943;
   public static final double frontRightZeroRotation = 0.042969;
-  public static final double backLeftZeroRotation = -0.014404;
+  public static final double backLeftZeroRotation = -0.027;
   public static final double backRightZeroRotation = 0.484375;
 
   // Motor/encoder inverted values for each module
   public static final boolean frontLeftDriveInverted = true;
   public static final boolean frontRightDriveInverted = false;
-  public static final boolean backLeftDriveInverted = true;
+  public static final boolean backLeftDriveInverted = false;
   public static final boolean backRightDriveInverted = false;
 
   public static final boolean frontLeftTurnInverted = true;
@@ -103,8 +103,8 @@ public class DriveConstants {
       default:
         driveKp = new LoggedTunableNumber("Drive/ModuleTunables/driveKp", 0.3);
         driveKd = new LoggedTunableNumber("Drive/ModuleTunables/driveKd", 0.0);
-        driveKs = 0.14691;
-        driveKv = 0.74280;
+        driveKs = 0.18753;
+        driveKv = 0.75276;
         break;
       case SIM:
         driveKp = new LoggedTunableNumber("Drive/SimModuleTunables/driveKp", 0.29);
