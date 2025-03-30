@@ -36,7 +36,7 @@ public class Carriage extends SubsystemBase {
   private final Timer beambreakTimer = new Timer();
   private static final LoggedTunableNumber beambreakDelay =
       new LoggedTunableNumber("Carriage/beambreakDelay", 0.23);
-      private final Timer coralHeldTimer = new Timer();
+  private final Timer coralHeldTimer = new Timer();
   private static final LoggedTunableNumber coralHeldDelay =
       new LoggedTunableNumber("Carriage/coralHeldDelay", 0.1);
 
@@ -149,9 +149,9 @@ public class Carriage extends SubsystemBase {
 
   public Command stopOrHold() {
     return run(() -> {
-      if (inputs.currentAmps < 5) {
-        realAlgaeHeld = false;
-      }
+          if (inputs.currentAmps < 5) {
+            realAlgaeHeld = false;
+          }
           if (!beamBreak() && coralHeld()) {
             io.runVolts(-holdSpeedVolts.get());
           } else {
