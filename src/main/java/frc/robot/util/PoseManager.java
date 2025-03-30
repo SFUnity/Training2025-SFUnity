@@ -161,27 +161,29 @@ public class PoseManager {
       }
     }
 
+    return closest;
+
     // Get angles
-    double fieldVelocityAngle =
-        Units.radiansToDegrees(Math.atan2(fieldVelocity().dy, fieldVelocity().dx));
-    double angleToClosest = getHorizontalAngleTo(apply(closest.getPose())).getDegrees();
-    double angleTo2ndClosest = getHorizontalAngleTo(apply(secondClosest.getPose())).getDegrees();
+    // double fieldVelocityAngle =
+    //     Units.radiansToDegrees(Math.atan2(fieldVelocity().dy, fieldVelocity().dx));
+    // double angleToClosest = getHorizontalAngleTo(apply(closest.getPose())).getDegrees();
+    // double angleTo2ndClosest = getHorizontalAngleTo(apply(secondClosest.getPose())).getDegrees();
 
     // Change angles from -180, 180 to 0, 360
-    if (fieldVelocityAngle < 0) fieldVelocityAngle += 360;
-    if (angleToClosest < 0) angleToClosest += 360;
-    if (angleTo2ndClosest < 0) angleTo2ndClosest += 360;
+    // if (fieldVelocityAngle < 0) fieldVelocityAngle += 360;
+    // if (angleToClosest < 0) angleToClosest += 360;
+    // if (angleTo2ndClosest < 0) angleTo2ndClosest += 360;
 
     // Logger.recordOutput("FieldVelocityAngle", fieldVelocityAngle);
     // Logger.recordOutput("AngleToClosest", angleToClosest);
     // Logger.recordOutput("AngleTo2ndClosest", angleTo2ndClosest);
 
     // Find angle differences
-    double toClosestAngleDiff = Math.abs(fieldVelocityAngle - angleToClosest);
-    double to2ndClosestAngleDiff = Math.abs(fieldVelocityAngle - angleTo2ndClosest);
+    // double toClosestAngleDiff = Math.abs(fieldVelocityAngle - angleToClosest);
+    // double to2ndClosestAngleDiff = Math.abs(fieldVelocityAngle - angleTo2ndClosest);
 
-    if (toClosestAngleDiff > 180) toClosestAngleDiff = 360 - toClosestAngleDiff;
-    if (to2ndClosestAngleDiff > 180) to2ndClosestAngleDiff = 360 - to2ndClosestAngleDiff;
+    // if (toClosestAngleDiff > 180) toClosestAngleDiff = 360 - toClosestAngleDiff;
+    // if (to2ndClosestAngleDiff > 180) to2ndClosestAngleDiff = 360 - to2ndClosestAngleDiff;
 
     // Logger.recordOutput("ToClosestAngleDiff", toClosestAngleDiff);
     // Logger.recordOutput("To2ndClosestAngleDiff", to2ndClosestAngleDiff);
@@ -196,7 +198,6 @@ public class PoseManager {
     //   lockedFace = closest;
     //   return closest;
     // }
-    return closest;
   }
 
   public Pose2d closest(ScoreState scoreState) {
