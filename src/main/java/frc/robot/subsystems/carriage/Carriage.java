@@ -154,9 +154,9 @@ public class Carriage extends SubsystemBase {
 
   public Command stopOrHold() {
     return run(() -> {
-          if (inputs.currentAmps < 5) {
-            realAlgaeHeld = false;
-          }
+          // if (inputs.currentAmps < 5) {
+          //   realAlgaeHeld = false;
+          // }
           if (!beamBreak() && coralHeld()) {
             io.runVolts(-intakingSpeedVolts.get());
           } else {
