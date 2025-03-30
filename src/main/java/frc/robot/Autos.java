@@ -233,24 +233,13 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.active().negate()))
+                        StationHighToL.active().negate()),
+                    runOnce(
+                        () -> {
+                          coralOnL3 = 1;
+                          coralOnL2 = 0;
+                        }))
                 .withName("ScoreCoralOnL3"));
-    StationHighToL.done()
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(
-                    KLAlgaeToStationHigh.cmd()
-                        .asProxy()
-                        .alongWith(
-                            runOnce(
-                                () -> {
-                                  coralOnL3 = 1;
-                                  coralOnL2 = 0;
-                                })))
-                .withName("DealgifyThenGoToStationHigh"));
-
-    // Eject algae while driving
-    KLAlgaeToStationHigh.atTime("EjectAlgae").onTrue(carriage.ejectAlgae());
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
