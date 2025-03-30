@@ -183,7 +183,9 @@ public class DriveConstants {
     }
 
     public boolean povLeftPressed() {
-      return controller.povLeft().getAsBoolean();
+      return DriverStation.isAutonomousEnabled()
+          ? Autos.moveLeft
+          : controller.povLeft().getAsBoolean();
     }
 
     public boolean povRightPressed() {

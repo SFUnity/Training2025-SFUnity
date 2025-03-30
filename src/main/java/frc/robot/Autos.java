@@ -51,6 +51,7 @@ public class Autos {
       new AlwaysLoggedTunableNumber("delayBeforeMoving", 3);
 
   public static boolean moveRight = false;
+  public static boolean moveLeft = false;
 
   public Autos(
       Drive drive,
@@ -235,26 +236,13 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.active().negate()))
-                .withName("ScoreCoralOnL3"));
-    StationHighToL.done()
-        .and(() -> coralOnL3 < 1)
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(
+                        StationHighToL.active().negate()),
                     runOnce(
                         () -> {
                           coralOnL3 = 1;
                           coralOnL2 = 0;
-                        }),
-                    carriage
-                        .lowDealgify()
-                        .raceWith(
-                            startEnd(() -> moveRight = true, () -> moveRight = false)
-                                .withTimeout(.5)),
-                    LToStationHigh.cmd()
-                        .asProxy()
-                        .alongWith(carriage.ejectAlgae().withTimeout(.4).asProxy())));
+                        }))
+                .withName("ScoreCoralOnL3"));
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
@@ -313,11 +301,27 @@ public class Autos {
                 .withName("ScoreOnL"));
 
     StationHighToL.done()
-        .and(() -> coralOnL3 > 0)
+        .and(() -> coralOnL3 != 1)
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(LToStationHigh.cmd())
                 .withName("LToStationHigh"));
+
+    StationHighToL.done()
+        .and(() -> coralOnL3 == 1)
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(
+                    carriage
+                        .lowDealgify()
+                        .raceWith(
+                            startEnd(() -> moveLeft = true, () -> moveLeft = false)
+                                .withTimeout(.5)),
+                    LToStationHigh.cmd()
+                        .asProxy()
+                        .alongWith(
+                            waitSeconds(.3)
+                                .andThen(carriage.ejectAlgae().withTimeout(.4).asProxy()))));
 
     // Logging
     routine
