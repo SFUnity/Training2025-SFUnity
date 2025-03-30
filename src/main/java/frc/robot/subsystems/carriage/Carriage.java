@@ -102,9 +102,6 @@ public class Carriage extends SubsystemBase {
         coralPassed = true;
       }
     }
-    if (!coralHeld() && beamBreak()) {
-      coralPassed = false;
-    }
     if (!beamBreak() || coralPassed || realCoralHeld) {
       beambreakTimer.restart();
     }
@@ -112,6 +109,9 @@ public class Carriage extends SubsystemBase {
       coralHeldTimer.restart();
     }
     fullCoralHeld = beamBreak() && realCoralHeld;
+    if (coralHeld() && !beamBreak()) {
+      coralPassed = false;
+    }
   }
 
   @AutoLogOutput
