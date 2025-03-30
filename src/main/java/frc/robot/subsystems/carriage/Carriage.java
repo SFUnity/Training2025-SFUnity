@@ -36,9 +36,6 @@ public class Carriage extends SubsystemBase {
   private final Timer beambreakTimer = new Timer();
   private static final LoggedTunableNumber beambreakDelay =
       new LoggedTunableNumber("Carriage/beambreakDelay", 0.23);
-  private final Timer fullCoralHeldTimer = new Timer();
-  private static final LoggedTunableNumber fullCoralHeldDelay =
-      new LoggedTunableNumber("Carriage/fullCoralHeldDelay", 0.35);
 
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
@@ -103,14 +100,7 @@ public class Carriage extends SubsystemBase {
     if (!beamBreak() || coralPassed || realCoralHeld) {
       beambreakTimer.restart();
     }
-    if (beamBreak() && realCoralHeld) {
-      if (fullCoralHeldTimer.hasElapsed(fullCoralHeldDelay.get())) {
-        fullCoralHeld = true;
-      }
-    } else {
-      fullCoralHeld = false;
-      fullCoralHeldTimer.restart();
-    }
+    fullCoralHeld = beamBreak() && realCoralHeld;
   }
 
   @AutoLogOutput
