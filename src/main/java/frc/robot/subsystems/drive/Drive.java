@@ -356,23 +356,29 @@ public class Drive extends SubsystemBase {
    * stopped moving for the specified period of time, and brake mode is enabled, disable it.
    */
   private void updateBrakeMode() {
-    if (DriverStation.isEnabled() && !brakeMode) {
+    if (DriverStation.isTeleopEnabled() && !brakeMode) {
       brakeMode = true;
       setBrakeMode(true);
       brakeModeTimer.restart();
     } else if (DriverStation.isDisabled()) {
-      boolean stillMoving = false;
-      double velocityLimit = 0.05; // In meters per second
-      ChassisSpeeds measuredChassisSpeeds = getChassisSpeeds();
-      if (Math.abs(measuredChassisSpeeds.vxMetersPerSecond) > velocityLimit
-          || Math.abs(measuredChassisSpeeds.vyMetersPerSecond) > velocityLimit) {
-        stillMoving = true;
-        brakeModeTimer.restart();
-      }
-
-      if (brakeMode && !stillMoving && brakeModeTimer.hasElapsed(BREAK_MODE_DELAY_SEC)) {
-        brakeMode = false;
-        setBrakeMode(false);
+      if (DriverStation.isTeleop()) {
+        boolean stillMoving = false;
+        double velocityLimit = 0.05; // In meters per second
+        ChassisSpeeds measuredChassisSpeeds = getChassisSpeeds();
+        if (Math.abs(measuredChassisSpeeds.vxMetersPerSecond) > velocityLimit
+            || Math.abs(measuredChassisSpeeds.vyMetersPerSecond) > velocityLimit) {
+          stillMoving = true;
+          brakeModeTimer.restart();
+        }
+        if (brakeMode && !stillMoving && brakeModeTimer.hasElapsed(BREAK_MODE_DELAY_SEC)) {
+          brakeMode = false;
+          setBrakeMode(false);
+        }
+      } else {
+        if (brakeMode) {
+          brakeMode = false;
+          setBrakeMode(false);
+        }
       }
     }
   }

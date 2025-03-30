@@ -326,7 +326,7 @@ public class Robot extends LoggedRobot {
       DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
     }
 
-    // Print auto duration + reset brake mode
+    // Print auto duration
     if (autoCommand != null) {
       if (!autoCommand.isScheduled() && !autoMessagePrinted) {
         if (DriverStation.isAutonomousEnabled()) {
@@ -339,8 +339,6 @@ public class Robot extends LoggedRobot {
         autoMessagePrinted = true;
         Leds.getInstance().autoFinished = true;
         Leds.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
-        // Set brake mode
-        drive.setBrakeMode(true);
       }
     }
 
@@ -629,17 +627,9 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {}
 
-  boolean autoHasBeenSelected = false;
-
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {
-    if (DriverStation.isAutonomous() && !autoHasBeenSelected) {
-      drive.setBrakeMode(false);
-      autoHasBeenSelected = true;
-    }
-    if (!DriverStation.isAutonomous()) autoHasBeenSelected = false;
-  }
+  public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link Autos} class. */
   @Override

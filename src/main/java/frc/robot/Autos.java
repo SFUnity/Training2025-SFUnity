@@ -50,6 +50,8 @@ public class Autos {
   private final AlwaysLoggedTunableNumber delayBeforeMoving =
       new AlwaysLoggedTunableNumber("delayBeforeMoving", 3);
 
+  public static boolean moveRight = false;
+
   public Autos(
       Drive drive,
       Carriage carriage,
@@ -233,13 +235,26 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.active().negate()),
+                        StationHighToL.active().negate()))
+                .withName("ScoreCoralOnL3"));
+    StationHighToL.done()
+        .and(() -> coralOnL3 < 1)
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(
                     runOnce(
                         () -> {
                           coralOnL3 = 1;
                           coralOnL2 = 0;
-                        }))
-                .withName("ScoreCoralOnL3"));
+                        }),
+                    carriage
+                        .lowDealgify()
+                        .raceWith(
+                            startEnd(() -> moveRight = true, () -> moveRight = false)
+                                .withTimeout(.5)),
+                    LToStationHigh.cmd()
+                        .asProxy()
+                        .alongWith(carriage.ejectAlgae().withTimeout(.4).asProxy())));
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here
@@ -298,6 +313,7 @@ public class Autos {
                 .withName("ScoreOnL"));
 
     StationHighToL.done()
+        .and(() -> coralOnL3 > 0)
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(LToStationHigh.cmd())

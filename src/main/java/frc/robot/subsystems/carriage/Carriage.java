@@ -102,6 +102,9 @@ public class Carriage extends SubsystemBase {
         coralPassed = true;
       }
     }
+    if (!coralHeld()) {
+      coralPassed = false;
+    }
     if (!beamBreak() || coralPassed || realCoralHeld) {
       beambreakTimer.restart();
     }
