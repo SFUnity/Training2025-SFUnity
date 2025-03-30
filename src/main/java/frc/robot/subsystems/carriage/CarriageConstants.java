@@ -31,5 +31,5 @@ public class CarriageConstants {
   public static final LoggedTunableNumber holdSpeedVolts =
       new LoggedTunableNumber("Carriage/holdSpeedVolts", -0.5);
   public static final LoggedTunableNumber backwardsIntakeSpeedVolts =
-      new LoggedTunableNumber("Carriage/backwardSpeedVolts", 1);
+      new LoggedTunableNumber("Carriage/backwardSpeedVolts", -1);
 }
