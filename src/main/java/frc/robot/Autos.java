@@ -237,11 +237,18 @@ public class Autos {
                         () -> StationHighToL.getFinalPose().get(),
                         StationHighToL.active().negate()))
                 .withName("ScoreCoralOnL3"));
-    StationHighToL.done().and(() -> coralOnL3 < 1).onTrue(waitUntil(() -> !carriage.coralHeld()).andThen(startEnd(() -> moveRight = true, () -> moveRight = false).withTimeout(.2), runOnce(
-        () -> {
-          coralOnL3 = 1;
-          coralOnL2 = 0;
-        }), LToStationHigh.cmd().asProxy()));
+    StationHighToL.done()
+        .and(() -> coralOnL3 < 1)
+        .onTrue(
+            waitUntil(() -> !carriage.coralHeld())
+                .andThen(
+                    startEnd(() -> moveRight = true, () -> moveRight = false).withTimeout(.2),
+                    runOnce(
+                        () -> {
+                          coralOnL3 = 1;
+                          coralOnL2 = 0;
+                        }),
+                    LToStationHigh.cmd().asProxy()));
 
     // Drive back from the station to our next scoring location
     // We're intaking coral with a trigger in Robot.java so we don't need to do it here

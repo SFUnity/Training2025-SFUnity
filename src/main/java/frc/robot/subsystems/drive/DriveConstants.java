@@ -187,7 +187,9 @@ public class DriveConstants {
     }
 
     public boolean povRightPressed() {
-      return DriverStation.isAutonomousEnabled() ? Autos.moveRight : controller.povRight().getAsBoolean();
+      return DriverStation.isAutonomousEnabled()
+          ? Autos.moveRight
+          : controller.povRight().getAsBoolean();
     }
 
     public boolean finishScoring() {
