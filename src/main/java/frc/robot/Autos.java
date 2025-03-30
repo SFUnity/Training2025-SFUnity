@@ -301,14 +301,14 @@ public class Autos {
                 .withName("ScoreOnL"));
 
     StationHighToL.done()
-        .and(() -> coralOnL3 != 2)
+        .and(() -> coralOnL3 != 1)
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(LToStationHigh.cmd())
                 .withName("LToStationHigh"));
 
     StationHighToL.done()
-        .and(() -> coralOnL3 == 2)
+        .and(() -> coralOnL3 == 1)
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(
