@@ -301,25 +301,25 @@ public class Autos {
                 .withName("ScoreOnL"));
 
     StationHighToL.done()
-        .and(() -> coralOnL3 != 2)
+        // .and(() -> coralOnL3 != 2)
         .onTrue(
             waitUntil(() -> !carriage.coralHeld())
                 .andThen(LToStationHigh.cmd())
                 .withName("LToStationHigh"));
 
-    StationHighToL.done()
-        .and(() -> coralOnL3 == 2)
-        .onTrue(
-            waitUntil(() -> !carriage.coralHeld())
-                .andThen(
-                    carriage
-                        .lowDealgify()
-                        .raceWith(
-                            startEnd(() -> moveLeft = true, () -> moveLeft = false)
-                                .withTimeout(.5)),
-                    LToStationHigh.cmd()
-                        .asProxy()
-                        .alongWith(carriage.ejectAlgae().withTimeout(.4).asProxy())));
+    // StationHighToL.done()
+    //     .and(() -> coralOnL3 == 2)
+    //     .onTrue(
+    //         waitUntil(() -> !carriage.coralHeld())
+    //             .andThen(
+    //                 carriage
+    //                     .lowDealgify()
+    //                     .raceWith(
+    //                         startEnd(() -> moveLeft = true, () -> moveLeft = false)
+    //                             .withTimeout(.5)),
+    //                 LToStationHigh.cmd()
+    //                     .asProxy()
+    //                     .alongWith(carriage.ejectAlgae().withTimeout(.4).asProxy())));
 
     // Logging
     routine
