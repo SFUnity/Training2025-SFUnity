@@ -318,9 +318,6 @@ public class Autos {
                             startEnd(() -> moveRight = true, () -> moveRight = false)
                                 .withTimeout(.5)),
                     LToStationHigh.cmd().asProxy()));
-    LToStationHigh.active()
-        .and(() -> coralOnL3 == 1)
-        .onTrue(waitSeconds(.5).andThen(carriage.ejectAlgae().withTimeout(.4).asProxy()));
 
     // Logging
     routine
