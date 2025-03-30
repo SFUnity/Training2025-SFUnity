@@ -233,19 +233,11 @@ public class Autos {
                         carriage,
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
-                        StationHighToL.active().negate()),
-                    runOnce(() -> scoreState = Dealgify),
-                    LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
-                    dealgify(
-                        elevator,
-                        carriage,
-                        poseManager,
-                        () -> StationHighToL.getFinalPose().get(),
                         StationHighToL.active().negate()))
                 .withName("ScoreCoralOnL3"));
-    LToDealgify.done()
+    StationHighToL.done()
         .onTrue(
-            waitUntil(carriage::algaeHeld)
+            waitUntil(() -> !carriage.coralHeld())
                 .andThen(
                     KLAlgaeToStationHigh.cmd()
                         .asProxy()
