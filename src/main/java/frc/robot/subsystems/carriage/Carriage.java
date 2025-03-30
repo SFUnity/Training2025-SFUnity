@@ -208,8 +208,7 @@ public class Carriage extends SubsystemBase {
                 .andThen(
                     run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
                         .until(() -> !beamBreak()),
-                    run(() -> io.runVolts(-intakingSpeedVolts.get()))
-                        .until(() -> beamBreak()))
+                    run(() -> io.runVolts(-intakingSpeedVolts.get())).until(() -> beamBreak()))
                 .onlyIf(() -> !coralHeld()),
             () -> coralInDanger)
         .deadlineFor(
