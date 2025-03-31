@@ -222,7 +222,7 @@ public class Autos {
                 .andThen(JToStationHigh.cmd().asProxy())
                 .withName("DealgifyThenGoToStationHigh"));
     JToStationHigh.done()
-        .onTrue(waitUntil(carriage::coralHeld).andThen(StationHighToL.cmd().asProxy()));
+        .onTrue(waitUntil(carriage::beamBreak).andThen(StationHighToL.cmd().asProxy()));
     StationHighToL.active()
         .and(carriage::fullCoralHeld)
         .and(() -> coralOnL3 < 1)
@@ -274,7 +274,7 @@ public class Autos {
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
         .onTrue(
-            waitUntil(carriage::coralHeld)
+            waitUntil(carriage::beamBreak)
                 .andThen(
                     either(
                         StationHighToL.cmd(),
