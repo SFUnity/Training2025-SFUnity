@@ -111,7 +111,7 @@ public class Drive extends SubsystemBase {
 
   private Timer joystickInterruptTimer = new Timer();
   private LoggedTunableNumber joystickInterruptDelay =
-      new LoggedTunableNumber("Drive/JoystickInterruptDelay", 0.5);
+      new LoggedTunableNumber("Drive/JoystickInterruptDelay", 1);
 
   // Autos
   private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 10);
