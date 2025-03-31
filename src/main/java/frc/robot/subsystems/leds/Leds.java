@@ -35,6 +35,7 @@ public class Leds extends VirtualSubsystem {
   // Robot state tracking
   public int loopCycleCount = 0;
 
+  public boolean coralPassed = false;
   public boolean coralHeld = false;
   public boolean carriageAlgaeHeld = false;
   public boolean intakeGPHeld = false;
@@ -185,6 +186,7 @@ public class Leds extends VirtualSubsystem {
     leds.setData(buffer);
 
     // Logs
+    Logger.recordOutput("LEDs/coralPassed", coralPassed);
     Logger.recordOutput("LEDs/coralHeld", coralHeld);
     Logger.recordOutput("LEDs/carriageAlgaeHeld", carriageAlgaeHeld);
     Logger.recordOutput("LEDs/intakeGPHeld", intakeGPHeld);

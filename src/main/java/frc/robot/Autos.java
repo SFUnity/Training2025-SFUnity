@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.funnel.Funnel;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.AlwaysLoggedTunableNumber;
@@ -32,6 +33,7 @@ public class Autos {
   private final Carriage carriage;
   private final Elevator elevator;
   private final Intake intake;
+  private final Funnel funnel;
   private final PoseManager poseManager;
 
   private final AutoFactory factory;
@@ -48,12 +50,21 @@ public class Autos {
   private final AlwaysLoggedTunableNumber delayBeforeMoving =
       new AlwaysLoggedTunableNumber("delayBeforeMoving", 3);
 
+  public static boolean moveRight = false;
+  public static boolean moveLeft = false;
+
   public Autos(
-      Drive drive, Carriage carriage, Elevator elevator, Intake intake, PoseManager poseManager) {
+      Drive drive,
+      Carriage carriage,
+      Elevator elevator,
+      Intake intake,
+      Funnel funnel,
+      PoseManager poseManager) {
     this.drive = drive;
     this.carriage = carriage;
     this.elevator = elevator;
     this.intake = intake;
+    this.funnel = funnel;
     this.poseManager = poseManager;
 
     factory =
@@ -79,9 +90,9 @@ public class Autos {
     chooser = new AutoChooser();
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
-    chooser.addRoutine("CenterCDAlgaeL2L3", this::CenterCDAlgaeL2L3);
+    chooser.addRoutine("ProcessorCDAlgaeL2L3", this::CenterCDAlgaeL2L3);
     chooser.addRoutine("L3Only", this::L3Only);
-    chooser.addRoutine("GHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3);
+    chooser.addRoutine("CenterGHAlgaeToProcessorL3", this::GHAlgaeToProcessorL3);
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
@@ -176,7 +187,8 @@ public class Autos {
       AutoTrajectory LToStationHigh) {
 
     // Intake when near station
-    new Trigger(() -> poseManager.nearStation(1)).whileTrue(carriage.intakeCoral());
+    new Trigger(() -> poseManager.nearStation(1))
+        .whileTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
 
     // When the routine begins, reset odometry and start the first trajectory
     routine
@@ -210,7 +222,7 @@ public class Autos {
                 .andThen(JToStationHigh.cmd().asProxy())
                 .withName("DealgifyThenGoToStationHigh"));
     JToStationHigh.done()
-        .onTrue(waitUntil(carriage::coralHeld).andThen(StationHighToL.cmd().asProxy()));
+        .onTrue(waitUntil(carriage::beamBreak).andThen(StationHighToL.cmd().asProxy()));
     StationHighToL.active()
         .and(carriage::fullCoralHeld)
         .and(() -> coralOnL3 < 1)
@@ -225,6 +237,11 @@ public class Autos {
                         poseManager,
                         () -> StationHighToL.getFinalPose().get(),
                         StationHighToL.active().negate()),
+                    runOnce(
+                        () -> {
+                          coralOnL3 = 1;
+                          coralOnL2 = 0;
+                        }),
                     runOnce(() -> scoreState = Dealgify),
                     LToDealgify.cmd().andThen(drive.driveIntoWall()).asProxy(),
                     dealgify(
@@ -257,7 +274,7 @@ public class Autos {
         .or(KToStationHigh.done())
         .or(LToStationHigh.done())
         .onTrue(
-            waitUntil(carriage::coralHeld)
+            waitUntil(carriage::beamBreak)
                 .andThen(
                     either(
                         StationHighToL.cmd(),
