@@ -570,7 +570,7 @@ public class Robot extends LoggedRobot {
     operator.leftBumper().onTrue(runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(runOnce(() -> scoreState = RightBranch));
     operator.rightTrigger().onTrue(runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
-
+    operator.leftTrigger().onTrue(RobotCommands.reIntake(funnel, carriage));
     operator.povUp().onTrue(runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(runOnce(() -> intakeState = Ground));
