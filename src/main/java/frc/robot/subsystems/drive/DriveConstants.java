@@ -17,7 +17,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Autos;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
@@ -181,11 +183,15 @@ public class DriveConstants {
     }
 
     public boolean povLeftPressed() {
-      return controller.povLeft().getAsBoolean();
+      return DriverStation.isAutonomousEnabled()
+          ? Autos.moveLeft
+          : controller.povLeft().getAsBoolean();
     }
 
     public boolean povRightPressed() {
-      return controller.povRight().getAsBoolean();
+      return DriverStation.isAutonomousEnabled()
+          ? Autos.moveRight
+          : controller.povRight().getAsBoolean();
     }
 
     public boolean finishScoring() {

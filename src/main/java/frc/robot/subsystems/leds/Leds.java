@@ -145,8 +145,6 @@ public class Leds extends VirtualSubsystem {
         pattern = solid(Color.kRed);
       } else if (coralHeld) {
         pattern = solid(Color.kBrown);
-      } else if (coralPassed) {
-        pattern = solid(Color.kOrangeRed);
       } else if (lowBatteryAlert) {
         pattern = solid(Color.kOrangeRed);
       } else if (prideLeds) {
@@ -170,8 +168,6 @@ public class Leds extends VirtualSubsystem {
         pattern = solid(Color.kSeaGreen);
       } else if (carriageAlgaeHeld) {
         pattern = solid(Color.kPurple);
-      } else if (coralPassed) {
-        pattern = solid(Color.kOrangeRed);
       } else if (coralFlood) {
         pattern = solid(new Color(100, 0, 0));
       } else {

@@ -28,17 +28,17 @@ public class Carriage extends SubsystemBase {
   public static boolean simHasAlgae = false;
   public static boolean simBeamBreak = false;
 
-  private boolean coralPassed = false;
+  public boolean coralPassed = false;
   private boolean realCoralHeld = false;
   private boolean realAlgaeHeld = false;
   private boolean fullCoralHeld = false;
 
   private final Timer beambreakTimer = new Timer();
   private static final LoggedTunableNumber beambreakDelay =
-      new LoggedTunableNumber("Carriage/beambreakDelay", 0.3);
-  private final Timer fullCoralHeldTimer = new Timer();
-  private static final LoggedTunableNumber fullCoralHeldDelay =
-      new LoggedTunableNumber("Carriage/fullCoralHeldDelay", 0.35);
+      new LoggedTunableNumber("Carriage/beambreakDelay", 0.23);
+  private final Timer coralHeldTimer = new Timer();
+  private static final LoggedTunableNumber coralHeldDelay =
+      new LoggedTunableNumber("Carriage/coralHeldDelay", 0.1);
 
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
@@ -77,7 +77,7 @@ public class Carriage extends SubsystemBase {
     }
 
     // Leds
-    Leds.getInstance().coralHeld = coralHeld();
+    Leds.getInstance().coralHeld = coralHeld() || beamBreak();
     Leds.getInstance().coralPassed = coralPassed;
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 
@@ -92,7 +92,9 @@ public class Carriage extends SubsystemBase {
 
   public void updateCoralStatus() {
     if (!beamBreak() && !coralPassed) {
-      realCoralHeld = false;
+      if (coralHeldTimer.hasElapsed(coralHeldDelay.get())) {
+        realCoralHeld = false;
+      }
     } else if (!beamBreak() && coralPassed) {
       realCoralHeld = true;
     } else if (beamBreak() && !coralPassed && !realCoralHeld) {
@@ -104,12 +106,11 @@ public class Carriage extends SubsystemBase {
       beambreakTimer.restart();
     }
     if (beamBreak() && realCoralHeld) {
-      if (fullCoralHeldTimer.hasElapsed(fullCoralHeldDelay.get())) {
-        fullCoralHeld = true;
-      }
-    } else {
-      fullCoralHeld = false;
-      fullCoralHeldTimer.restart();
+      coralHeldTimer.restart();
+    }
+    fullCoralHeld = beamBreak() && realCoralHeld;
+    if (coralHeld() && beamBreak()) {
+      coralPassed = false;
     }
   }
 
@@ -153,11 +154,11 @@ public class Carriage extends SubsystemBase {
 
   public Command stopOrHold() {
     return run(() -> {
-          if (!beamBreak() && realCoralHeld) {
-            if (inputs.currentAmps < 5) {
-              realAlgaeHeld = false;
-            }
-            io.runVolts(-holdSpeedVolts.get());
+          // if (inputs.currentAmps < 5) {
+          //   realAlgaeHeld = false;
+          // }
+          if (!beamBreak() && coralHeld()) {
+            io.runVolts(-intakingSpeedVolts.get());
           } else {
             io.runVolts(algaeHeld() ? holdSpeedVolts.get() : 0);
           }
@@ -167,7 +168,7 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command backUpForL3() {
-    return run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
+    return run(() -> io.runVolts(backupForL3SpeedVolts.get()))
         .finallyDo(() -> io.runVolts(0))
         .beforeStarting(() -> io.resetEncoder())
         .until(() -> inputs.positionRots >= backupForL3Rots.get())
@@ -206,10 +207,8 @@ public class Carriage extends SubsystemBase {
             run(() -> io.runVolts(intakingSpeedVolts.get()))
                 .until(() -> coralPassed)
                 .andThen(
-                    run(() -> io.runVolts(-backwardsIntakeSpeedVolts.get()))
-                        .until(() -> !beamBreak()),
-                    run(() -> io.runVolts(backwardsIntakeSpeedVolts.get()))
-                        .until(() -> beamBreak()))
+                    run(() -> io.runVolts(slowIntakeSpeedVolts.get())).until(() -> !beamBreak()),
+                    run(() -> io.runVolts(-intakingSpeedVolts.get())).until(() -> beamBreak()))
                 .onlyIf(() -> !coralHeld()),
             () -> coralInDanger)
         .deadlineFor(

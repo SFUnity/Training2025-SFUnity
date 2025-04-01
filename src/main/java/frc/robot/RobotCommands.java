@@ -18,6 +18,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.funnel.Funnel;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.PoseManager;
@@ -175,6 +176,14 @@ public final class RobotCommands {
         .beforeStarting(() -> Leds.getInstance().intakingActivated = true)
         .finallyDo(() -> Leds.getInstance().intakingActivated = false)
         .withName("fullIntake");
+  }
+
+  public static Command lowLevelCoralIntake(Carriage carriage, Funnel funnel) {
+    return carriage
+        .intakeCoral()
+        .until(carriage::coralHeld)
+        .alongWith(funnel.runRollers().until(() -> carriage.coralPassed))
+        .withName("lowLevelCoralIntake");
   }
 
   public static enum IntakeState {

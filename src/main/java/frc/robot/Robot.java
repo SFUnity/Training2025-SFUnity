@@ -59,6 +59,10 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
+import frc.robot.subsystems.funnel.Funnel;
+import frc.robot.subsystems.funnel.FunnelIO;
+import frc.robot.subsystems.funnel.FunnelIOSim;
+import frc.robot.subsystems.funnel.FunnelIOSparkMax;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
@@ -115,6 +119,7 @@ public class Robot extends LoggedRobot {
   private final Elevator elevator;
   private final Carriage carriage;
   private final Intake intake;
+  private final Funnel funnel;
   private final AprilTagVision vision;
 
   // Non-subsystems
@@ -226,6 +231,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
         carriage = new Carriage(new CarriageIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
+        funnel = new Funnel(new FunnelIOSparkMax());
         vision =
             new AprilTagVision(
                 poseManager,
@@ -247,6 +253,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIOSim(), poseManager);
         carriage = new Carriage(new CarriageIOSim());
         intake = new Intake(new IntakeIOSim());
+        funnel = new Funnel(new FunnelIOSim());
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
@@ -265,6 +272,7 @@ public class Robot extends LoggedRobot {
         elevator = new Elevator(new ElevatorIO() {}, poseManager);
         carriage = new Carriage(new CarriageIO() {});
         intake = new Intake(new IntakeIO() {});
+        funnel = new Funnel(new FunnelIO() {});
         vision =
             new AprilTagVision(
                 poseManager,
@@ -283,7 +291,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    autos = new Autos(drive, carriage, elevator, intake, poseManager);
+    autos = new Autos(drive, carriage, elevator, intake, funnel, poseManager);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -318,7 +326,7 @@ public class Robot extends LoggedRobot {
       DriverStation.reportError("[AdvantageKit] Failed to open output log file.", false);
     }
 
-    // Print auto duration + reset brake mode
+    // Print auto duration
     if (autoCommand != null) {
       if (!autoCommand.isScheduled() && !autoMessagePrinted) {
         if (DriverStation.isAutonomousEnabled()) {
@@ -331,8 +339,6 @@ public class Robot extends LoggedRobot {
         autoMessagePrinted = true;
         Leds.getInstance().autoFinished = true;
         Leds.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
-        // Set brake mode
-        drive.setBrakeMode(true);
       }
     }
 
@@ -408,6 +414,7 @@ public class Robot extends LoggedRobot {
     elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
     carriage.setDefaultCommand(carriage.stopOrHold());
     intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
+    funnel.setDefaultCommand(funnel.stop());
 
     // Driver controls
     driver.rightTrigger().onTrue(runOnce(drive::stopWithX, drive));
@@ -600,7 +607,7 @@ public class Robot extends LoggedRobot {
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .whileTrue(carriage.intakeCoral());
+        .whileTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
 
     // Sim fake gamepieces
     SmartDashboard.putData(
@@ -620,17 +627,9 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {}
 
-  boolean autoHasBeenSelected = false;
-
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {
-    if (DriverStation.isAutonomous() && !autoHasBeenSelected) {
-      drive.setBrakeMode(false);
-      autoHasBeenSelected = true;
-    }
-    if (!DriverStation.isAutonomous()) autoHasBeenSelected = false;
-  }
+  public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link Autos} class. */
   @Override
