@@ -34,4 +34,7 @@ public class CarriageConstants {
       new LoggedTunableNumber("Carriage/slowIntakeSpeedVolts", -1);
   public static final LoggedTunableNumber backupForL3SpeedVolts =
       new LoggedTunableNumber("Carriage/backupForL3SpeedVolts", 3);
+
+public static final LoggedTunableNumber ejectCoralTime = 
+    new LoggedTunableNumber("Carriage/ejectCoralTime", 30);
 }

@@ -42,6 +42,10 @@ public class Carriage extends SubsystemBase {
 
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
+  
+
+    
+    
 
   public static boolean coralInDanger = false;
   private boolean lastShouldBrake = false;
@@ -233,7 +237,7 @@ public class Carriage extends SubsystemBase {
   }
   public Command ejectCoral() {
     return run(() -> io.runVolts(-placeSpeedVolts.get()))
-        .withTimeout(.2)
+        .withTimeout(ejectCoralTime.get())
         .finallyDo(() -> realCoralHeld = false)
         .andThen(() -> coralPassed = false)
         .withName("ejectCoral");
