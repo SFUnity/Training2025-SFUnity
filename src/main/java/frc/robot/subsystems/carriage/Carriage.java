@@ -231,4 +231,11 @@ public class Carriage extends SubsystemBase {
         .finallyDo(() -> realAlgaeHeld = false)
         .withName("ejectAlgae");
   }
+  public Command ejectCoral() {
+    return run(() -> io.runVolts(-placeSpeedVolts.get()))
+        .withTimeout(.2)
+        .finallyDo(() -> realCoralHeld = false)
+        .andThen(() -> coralPassed = false)
+        .withName("ejectCoral");
+  }
 }
