@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.carriage.Carriage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
@@ -191,10 +190,5 @@ public final class RobotCommands {
     Source,
     Ice_Cream,
     Ground
-  }
-
-  public static Command reIntake(Funnel funnel, Carriage carriage) {
-    return Commands.deadline(carriage.ejectCoral(), funnel.eject())
-        .andThen(lowLevelCoralIntake(carriage, funnel));
   }
 }
