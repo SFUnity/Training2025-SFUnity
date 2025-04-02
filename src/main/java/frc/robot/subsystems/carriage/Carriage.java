@@ -233,10 +233,6 @@ public class Carriage extends SubsystemBase {
   }
 
   public Command ejectCoral() {
-    return run(() -> io.runVolts(-placeSpeedVolts.get()))
-        .withTimeout(ejectCoralTime.get())
-        .finallyDo(() -> realCoralHeld = false)
-        .andThen(() -> coralPassed = false)
-        .withName("ejectCoral");
+    return run(() -> io.runVolts(-placeSpeedVolts.get())).withName("ejectCoral");
   }
 }
