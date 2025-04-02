@@ -193,9 +193,8 @@ public final class RobotCommands {
     Ground
   }
 
-  public static Command reIntake(Funnel funnel, Carriage carriage){
+  public static Command reIntake(Funnel funnel, Carriage carriage) {
     return Commands.deadline(carriage.ejectCoral(), funnel.eject())
-    .andThen(lowLevelCoralIntake(carriage, funnel));
-
+        .andThen(lowLevelCoralIntake(carriage, funnel));
   }
 }

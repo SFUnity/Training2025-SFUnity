@@ -35,6 +35,6 @@ public class CarriageConstants {
   public static final LoggedTunableNumber backupForL3SpeedVolts =
       new LoggedTunableNumber("Carriage/backupForL3SpeedVolts", 3);
 
-public static final LoggedTunableNumber ejectCoralTime = 
-    new LoggedTunableNumber("Carriage/ejectCoralTime", 30);
+  public static final LoggedTunableNumber ejectCoralTime =
+      new LoggedTunableNumber("Carriage/ejectCoralTime", 30);
 }

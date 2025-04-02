@@ -25,7 +25,7 @@ public class Funnel extends SubsystemBase {
 
   public Command eject() {
     return run(() -> io.runVolts(-rollerSpeedVolts.get()))
-    .withTimeout(CarriageConstants.ejectCoralTime.get());
+        .withTimeout(CarriageConstants.ejectCoralTime.get());
   }
 
   public Command stop() {
