@@ -573,7 +573,12 @@ public class Robot extends LoggedRobot {
     operator.rightTrigger().onTrue(runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
     operator
         .leftTrigger()
-        .whileTrue(Commands.parallel(carriage.ejectCoral(), funnel.eject(), carriage.resetHeld()));
+        .whileTrue(
+            Commands.parallel(
+                carriage.ejectCoral(),
+                funnel.eject(),
+                waitSeconds(0.2).andThen(carriage.resetHeld())));
+    operator.leftTrigger().onFalse(RobotCommands.lowLevelCoralIntake(carriage, funnel));
     operator.povUp().onTrue(runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(runOnce(() -> intakeState = Ground));
