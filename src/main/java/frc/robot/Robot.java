@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
@@ -570,7 +571,14 @@ public class Robot extends LoggedRobot {
     operator.leftBumper().onTrue(runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(runOnce(() -> scoreState = RightBranch));
     operator.rightTrigger().onTrue(runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
-
+    operator
+        .leftTrigger()
+        .whileTrue(
+            Commands.parallel(
+                carriage.ejectCoral(),
+                funnel.eject(),
+                waitSeconds(0.2).andThen(carriage.resetHeld())));
+    operator.leftTrigger().onFalse(RobotCommands.lowLevelCoralIntake(carriage, funnel));
     operator.povUp().onTrue(runOnce(() -> intakeState = Source));
     operator.povRight().onTrue(runOnce(() -> intakeState = Ice_Cream));
     operator.povDown().onTrue(runOnce(() -> intakeState = Ground));

@@ -109,6 +109,10 @@ public class Drive extends SubsystemBase {
   private final ProfiledPIDController linearController;
   private Translation2d lastSetpointTranslation;
 
+  private Timer joystickInterruptTimer = new Timer();
+  private LoggedTunableNumber joystickInterruptDelay =
+      new LoggedTunableNumber("Drive/JoystickInterruptDelay", 1);
+
   // Autos
   private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 10);
   private final LoggedTunableNumber xkDAuto = new LoggedTunableNumber("Drive/Choreo/xkD", 0);
@@ -567,6 +571,7 @@ public class Drive extends SubsystemBase {
         })
         .beforeStarting(
             () -> {
+              joystickInterruptTimer.restart();
               resetControllers(goalPose.get());
               Leds.getInstance().autoAlignActivated = true;
             })
@@ -576,16 +581,7 @@ public class Drive extends SubsystemBase {
               Leds.getInstance().alignedWithTarget = false;
               Leds.getInstance().autoAlignActivated = false;
             })
-        .onlyWhile(
-            () ->
-                MathUtil.applyDeadband(config.getOmegaInput(), 0.2) == 0
-                    && MathUtil.applyDeadband(
-                            Math.hypot(config.getXInput(), config.getYInput()), 0.2)
-                        == 0
-                    && !config.povDownPressed()
-                    && !config.povUpPressed()
-                    && !config.povLeftPressed()
-                    && !config.povRightPressed())
+        .onlyWhile(this::noJoystickInput)
         .withName("Full Auto Drive");
   }
 
@@ -600,6 +596,18 @@ public class Drive extends SubsystemBase {
               }
               return false;
             });
+  }
+
+  private boolean noJoystickInput() {
+    if (!joystickInterruptTimer.hasElapsed(joystickInterruptDelay.get())) {
+      return true;
+    }
+    return MathUtil.applyDeadband(config.getOmegaInput(), 0.2) == 0
+        && MathUtil.applyDeadband(Math.hypot(config.getXInput(), config.getYInput()), 0.2) == 0
+        && !config.povDownPressed()
+        && !config.povUpPressed()
+        && !config.povLeftPressed()
+        && !config.povRightPressed();
   }
 
   private Translation2d getLinearVelocityFromJoysticks() {

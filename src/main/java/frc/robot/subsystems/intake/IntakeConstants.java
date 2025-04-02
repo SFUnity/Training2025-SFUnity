@@ -6,8 +6,9 @@ import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class IntakeConstants {
+  // ! Must not be in tuning mode for dashboard switching to work
   public static final LoggedNetworkBoolean groundAlgae =
-      new LoggedNetworkBoolean("Ground Algae", false);
+      new LoggedNetworkBoolean("Ground Algae", true);
 
   public static final int rollersID = 18;
   public static final int pivotID = 15;
