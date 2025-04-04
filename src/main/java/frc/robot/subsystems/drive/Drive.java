@@ -355,6 +355,8 @@ public class Drive extends SubsystemBase {
     return output;
   }
 
+  private boolean brakeHasBeenSet = false;
+
   /**
    * If the robot is enabled and brake mode is not enabled, enable it. If the robot is disabled, has
    * stopped moving for the specified period of time, and brake mode is enabled, disable it.
@@ -365,7 +367,11 @@ public class Drive extends SubsystemBase {
       setBrakeMode(true);
       brakeModeTimer.restart();
     } else if (DriverStation.isDisabled()) {
-      if (DriverStation.isTeleop()) {
+      if (DriverStation.isAutonomous() && !brakeHasBeenSet) {
+        setBrakeMode(false);
+        brakeHasBeenSet = true;
+        System.out.println("Brake mode set while disabled and waiting for autonomous************************");
+      } else if (DriverStation.isTeleop()) {
         boolean stillMoving = false;
         double velocityLimit = 0.05; // In meters per second
         ChassisSpeeds measuredChassisSpeeds = getChassisSpeeds();
@@ -378,11 +384,7 @@ public class Drive extends SubsystemBase {
           brakeMode = false;
           setBrakeMode(false);
         }
-      } else {
-        if (brakeMode) {
-          brakeMode = false;
-          setBrakeMode(false);
-        }
+        brakeHasBeenSet = false;
       }
     }
   }
