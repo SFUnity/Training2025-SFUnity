@@ -145,8 +145,8 @@ public class PoseManager {
           getDistanceTo(
               apply(
                   switch (scoreState) {
-                    case LeftBranch -> face.leftBranch.getPose();
-                    case RightBranch -> face.rightBranch.getPose();
+                    // case LeftBranch -> face.leftBranch.getPose();
+                    // case RightBranch -> face.rightBranch.getPose();
                     default -> face.getPose();
                   }));
       if (distance < distanceToClosest) {
