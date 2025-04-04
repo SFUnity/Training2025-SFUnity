@@ -370,7 +370,8 @@ public class Drive extends SubsystemBase {
       if (DriverStation.isAutonomous() && !brakeHasBeenSet) {
         setBrakeMode(false);
         brakeHasBeenSet = true;
-        System.out.println("Brake mode set while disabled and waiting for autonomous************************");
+        System.out.println(
+            "Brake mode set while disabled and waiting for autonomous************************");
       } else if (DriverStation.isTeleop()) {
         boolean stillMoving = false;
         double velocityLimit = 0.05; // In meters per second
