@@ -72,7 +72,8 @@ public class Carriage extends SubsystemBase {
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
     if (filteredVelocity <= algaeVelocityThreshold.get()
-        && filteredStatorCurrent >= algaeCurrentThreshold.get()) {
+        && filteredStatorCurrent >= algaeCurrentThreshold.get()
+        && !coralHeld()) {
       realAlgaeHeld = true;
     }
 
