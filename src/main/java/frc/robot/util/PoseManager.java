@@ -145,8 +145,8 @@ public class PoseManager {
           getDistanceTo(
               apply(
                   switch (scoreState) {
-                    case LeftBranch -> face.leftBranch.getPose();
-                    case RightBranch -> face.rightBranch.getPose();
+                      // case LeftBranch -> face.leftBranch.getPose();
+                      // case RightBranch -> face.rightBranch.getPose();
                     default -> face.getPose();
                   }));
       if (distance < distanceToClosest) {
@@ -203,8 +203,8 @@ public class PoseManager {
   public Pose2d closest(ScoreState scoreState) {
     Face closest = closestFace(scoreState);
     return switch (scoreState) {
-      case LeftBranch -> closest.leftBranch.getPose();
-      case RightBranch -> closest.rightBranch.getPose();
+      // case LeftBranch -> closest.leftBranch.getPose();
+      // case RightBranch -> closest.rightBranch.getPose();
       default -> closest.getPose();
     };
   }
