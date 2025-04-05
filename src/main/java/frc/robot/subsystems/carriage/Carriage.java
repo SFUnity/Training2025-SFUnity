@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
-import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.Util;
@@ -46,6 +45,7 @@ public class Carriage extends SubsystemBase {
 
   public static boolean coralInDanger = false;
   private boolean lastShouldBrake = false;
+  private boolean wantsAlgae = false;
 
   public Carriage(CarriageIO io) {
     this.io = io;
@@ -74,7 +74,7 @@ public class Carriage extends SubsystemBase {
 
     if (filteredVelocity <= algaeVelocityThreshold.get()
         && filteredStatorCurrent >= algaeCurrentThreshold.get()
-        && Elevator.wantsAlgae) {
+        && wantsAlgae) {
       realAlgaeHeld = true;
     }
 
@@ -199,6 +199,8 @@ public class Carriage extends SubsystemBase {
 
   public Command lowDealgify() {
     return run(() -> io.runVolts(lowDealgifyingSpeedVolts.get()))
+        .beforeStarting(() -> wantsAlgae = true)
+        .finallyDo(() -> wantsAlgae = false)
         .until(() -> algaeHeld())
         .withName("lowDealgify");
   }

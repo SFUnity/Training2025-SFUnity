@@ -53,7 +53,6 @@ public class Elevator extends SubsystemBase {
 
   public boolean setHeight = false;
   public double goalHeightInches = 0;
-  public static boolean wantsAlgae = false;
 
   public Elevator(ElevatorIO io, PoseManager poseManager) {
     this.io = io;
@@ -144,7 +143,6 @@ public class Elevator extends SubsystemBase {
     return runOnce(
             () -> {
               goalHeightInches = height.get();
-              wantsAlgae = height == ElevatorHeight.AlgaeLow;
               Logger.recordOutput("Elevator/RequestedHeight", height.toString());
             })
         .withName("request" + height.toString());
