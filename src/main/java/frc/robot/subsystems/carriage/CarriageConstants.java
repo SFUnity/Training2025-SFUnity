@@ -29,7 +29,7 @@ public class CarriageConstants {
   public static final LoggedTunableNumber ejectSpeedVolts =
       new LoggedTunableNumber("Carriage/ejectSpeedVolts", 10);
   public static final LoggedTunableNumber holdSpeedVolts =
-      new LoggedTunableNumber("Carriage/holdSpeedVolts", -0.5);
+      new LoggedTunableNumber("Carriage/holdSpeedVolts", -0.75);
   public static final LoggedTunableNumber slowIntakeSpeedVolts =
       new LoggedTunableNumber("Carriage/slowIntakeSpeedVolts", -1);
   public static final LoggedTunableNumber backupForL3SpeedVolts =
