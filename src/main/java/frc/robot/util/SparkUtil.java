@@ -61,7 +61,7 @@ public class SparkUtil {
     for (int i = 0; i < maxAttempts; i++) {
       var error = command.get();
       if (error == REVLibError.kOk) {
-        System.out.println("Configured spark: " + spark.getDeviceId());
+        // System.out.println("Configured spark: " + spark.getDeviceId());
         break;
       } else {
         sparkStickyFault = true;
