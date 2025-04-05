@@ -203,8 +203,8 @@ public class PoseManager {
   public Pose2d closest(ScoreState scoreState) {
     Face closest = closestFace(scoreState);
     return switch (scoreState) {
-        case LeftBranch -> closest.leftBranch.getPose();
-        case RightBranch -> closest.rightBranch.getPose();
+      case LeftBranch -> closest.leftBranch.getPose();
+      case RightBranch -> closest.rightBranch.getPose();
       default -> closest.getPose();
     };
   }
