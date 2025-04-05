@@ -528,25 +528,6 @@ public class Robot extends LoggedRobot {
                       if (!intake.GPHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
                     })
-                .andThen(
-                    either(
-                        dealgify(
-                                elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig))
-                            .deadlineFor(
-                                either(
-                                    drive
-                                        .fullAutoDrive(goalPose(poseManager))
-                                        .andThen(drive.driveIntoWall())
-                                        .asProxy(),
-                                    none(),
-                                    () -> allowAutoDrive))
-                            .beforeStarting(
-                                () -> {
-                                  scoreState = Dealgify;
-                                  dealgifyAfterPlacing = false;
-                                }),
-                        none(),
-                        () -> dealgifyAfterPlacing))
                 .finallyDo(() -> poseManager.lockClosest = false)
                 .withName("fullScore"));
 
