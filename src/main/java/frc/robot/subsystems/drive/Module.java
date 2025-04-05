@@ -37,8 +37,6 @@ public class Module {
     this.io = io;
     this.index = index;
 
-    setBrakeMode(false);
-
     driveDisconnectedAlert =
         new Alert(
             "Disconnected drive motor on module " + Integer.toString(index) + ".",

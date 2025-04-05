@@ -129,7 +129,7 @@ public class Drive extends SubsystemBase {
       new PIDController(rkPAuto.get(), 0.0, rkDAuto.get());
 
   // Auto coast mode
-  private boolean brakeMode;
+  private boolean brakeMode = false;
   private Timer brakeModeTimer = new Timer();
   private static final double BREAK_MODE_DELAY_SEC = 10.0;
 

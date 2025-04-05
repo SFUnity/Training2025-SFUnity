@@ -159,7 +159,7 @@ public class ModuleIOMixed implements ModuleIO {
 
     // Configure drive motor
     driveConfig = new TalonFXConfiguration();
-    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     driveConfig.Slot0 =
         new Slot0Configs()
             .withKP(driveKp.get())
@@ -186,6 +186,7 @@ public class ModuleIOMixed implements ModuleIO {
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
         .pidf(turnKp.get(), 0.0, 0, 0.0);
     turnConfig.signals.primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency));
+    turnConfig.idleMode(IdleMode.kCoast);
     configureSpark(turnSpark, turnConfig, true);
 
     // Configure CANCoder
