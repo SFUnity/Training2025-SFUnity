@@ -45,7 +45,9 @@ public class Carriage extends SubsystemBase {
 
   public static boolean coralInDanger = false;
   private boolean lastShouldBrake = false;
+
   private boolean wantsAlgae = false;
+  private Timer wantsAlgaeTimer = new Timer();
 
   public Carriage(CarriageIO io) {
     this.io = io;
@@ -74,8 +76,11 @@ public class Carriage extends SubsystemBase {
 
     if (filteredVelocity <= algaeVelocityThreshold.get()
         && filteredStatorCurrent >= algaeCurrentThreshold.get()
-        && wantsAlgae) {
+        && wantsAlgaeTimer.get() <= .25) {
       realAlgaeHeld = true;
+    }
+    if (wantsAlgae) {
+      wantsAlgaeTimer.restart();
     }
 
     // Leds
