@@ -418,7 +418,7 @@ public class Robot extends LoggedRobot {
     funnel.setDefaultCommand(funnel.stop());
 
     // Driver controls
-    driver.rightTrigger().onTrue(runOnce(drive::stopWithX, drive));
+    driver.rightTrigger().onTrue(runOnce(() -> Drive.nitro = true));
     if (testDrive) {
       driver.y().onTrue(drive.setModuleToTest(0));
       driver.x().onTrue(drive.setModuleToTest(1));

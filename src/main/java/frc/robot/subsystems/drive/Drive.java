@@ -113,6 +113,8 @@ public class Drive extends SubsystemBase {
   private LoggedTunableNumber joystickInterruptDelay =
       new LoggedTunableNumber("Drive/JoystickInterruptDelay", 1);
 
+  public static boolean nitro = false;
+
   // Autos
   private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 10);
   private final LoggedTunableNumber xkDAuto = new LoggedTunableNumber("Drive/Choreo/xkD", 0);
@@ -282,7 +284,7 @@ public class Drive extends SubsystemBase {
   }
 
   private void setModuleSetpoints(SwerveModuleState[] setpointStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, nitro ? nitroMaxSpeedMetersPerSec : maxSpeedMetersPerSec);
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates);
@@ -638,7 +640,7 @@ public class Drive extends SubsystemBase {
 
     // Square values and scale to max velocity
     linearMagnitude = linearMagnitude * linearMagnitude;
-    linearMagnitude *= maxSpeedMetersPerSec;
+    linearMagnitude *= nitro ? nitroMaxSpeedMetersPerSec : maxSpeedMetersPerSec;
 
     // Calcaulate new linear velocity
     Translation2d linearVelocity = new Translation2d(linearMagnitude, linearDirection);
