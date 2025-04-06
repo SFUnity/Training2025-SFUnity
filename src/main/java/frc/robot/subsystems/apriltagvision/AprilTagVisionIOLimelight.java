@@ -94,7 +94,7 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     disconnectedAlert.set(latency > disconnectedTimeout);
 
     if (Drive.nitro) {
-      LimelightHelpers.setLEDMode_ForceBlink(name);
+      LimelightHelpers.setLEDMode_ForceOn(name);
     } else {
       LimelightHelpers.setLEDMode_ForceOff(name);
     }
