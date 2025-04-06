@@ -605,6 +605,8 @@ public class Robot extends LoggedRobot {
     intakeTrigger.onFalse(
         runOnce(() -> intakeOK = false).andThen(waitSeconds(0.1), runOnce(() -> intakeOK = true)));
 
+    Logger.recordOutput("Controls/intakeOK", intakeOK);
+
     // Sim fake gamepieces
     SmartDashboard.putData(
         "Toggle Coral in Carriage", runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
