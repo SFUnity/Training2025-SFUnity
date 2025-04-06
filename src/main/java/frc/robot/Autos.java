@@ -154,7 +154,12 @@ public class Autos {
 
   private AutoRoutine CenterCDAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
-    AutoTrajectory CenterWToJ = routine.trajectory("CenterPToE");
+    AutoTrajectory CenterWToJ;
+    if (DriverStation.getAlliance().orElseGet(() -> DriverStation.Alliance.Red) == DriverStation.Alliance.Blue) {
+        CenterWToJ = routine.trajectory("BlueCenterPToE");
+    } else {
+        CenterWToJ = routine.trajectory("CenterPToE");
+    }
     AutoTrajectory JToStationHigh = routine.trajectory("EToStationLow");
     AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");
