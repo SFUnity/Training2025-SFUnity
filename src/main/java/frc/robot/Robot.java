@@ -598,7 +598,7 @@ public class Robot extends LoggedRobot {
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .whileTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
+        .onTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
 
     // Sim fake gamepieces
     SmartDashboard.putData(
