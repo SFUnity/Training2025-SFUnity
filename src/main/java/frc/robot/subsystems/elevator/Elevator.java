@@ -55,6 +55,7 @@ public class Elevator extends SubsystemBase {
   public double goalHeightInches = 0;
 
   public static boolean wantsAlgae = true;
+  public static boolean setToAlgae = true;
 
   public Elevator(ElevatorIO io, PoseManager poseManager) {
     this.io = io;
@@ -82,8 +83,10 @@ public class Elevator extends SubsystemBase {
 
     updateTunables();
 
-    if (!(goalHeightInches == AlgaeLow.get() || goalHeightInches == Processor.get()))
+    if (!(goalHeightInches == AlgaeLow.get() || goalHeightInches == Processor.get())) {
       wantsAlgae = false;
+      setToAlgae = false;
+    } else if (setToAlgae) wantsAlgae = true;
 
     if (setHeight
         || (poseManager.getDistanceTo(AllianceFlipUtil.apply(reefCenter)) < 1.3 + safeDropDist.get()
@@ -151,8 +154,10 @@ public class Elevator extends SubsystemBase {
               goalHeightInches = height.get();
               if (height == AlgaeLow || height == Processor) {
                 wantsAlgae = true;
+                setToAlgae = true;
               } else {
                 wantsAlgae = false;
+                setToAlgae = false;
               }
               Logger.recordOutput("Elevator/RequestedHeight", height.toString());
             })
