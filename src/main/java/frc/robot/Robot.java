@@ -98,7 +98,7 @@ public class Robot extends LoggedRobot {
 
   // Alerts
   private static final double canErrorTimeThreshold = 0.5; // Seconds to disable alert
-  private static final double lowBatteryVoltage = 11.8;
+  private static final double lowBatteryVoltage = 12.5;
   private static final double extraLowBatteryVoltage = 11.5;
   private static final double lowBatteryDisabledTime = 1.5;
 
