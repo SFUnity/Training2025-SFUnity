@@ -232,7 +232,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
-        carriage = new Carriage(new CarriageIOSparkMax());
+        carriage = new Carriage(new CarriageIOSparkMax(), poseManager);
         intake = new Intake(new IntakeIOSparkMax());
         funnel = new Funnel(new FunnelIOSparkMax());
         vision =
@@ -254,7 +254,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim(), poseManager);
-        carriage = new Carriage(new CarriageIOSim());
+        carriage = new Carriage(new CarriageIOSim(), poseManager);
         intake = new Intake(new IntakeIOSim());
         funnel = new Funnel(new FunnelIOSim());
         vision =
@@ -273,7 +273,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {}, poseManager);
-        carriage = new Carriage(new CarriageIO() {});
+        carriage = new Carriage(new CarriageIO() {}, poseManager);
         intake = new Intake(new IntakeIO() {});
         funnel = new Funnel(new FunnelIO() {});
         vision =

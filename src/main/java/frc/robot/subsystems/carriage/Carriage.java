@@ -12,6 +12,7 @@ import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -19,6 +20,7 @@ import org.littletonrobotics.junction.Logger;
 public class Carriage extends SubsystemBase {
   private final CarriageIO io;
   private final CarrageIOInputsAutoLogged inputs = new CarrageIOInputsAutoLogged();
+  private final PoseManager poseManager;
 
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
@@ -50,8 +52,9 @@ public class Carriage extends SubsystemBase {
   private boolean wantsAlgae = false;
   private Timer wantsAlgaeTimer = new Timer();
 
-  public Carriage(CarriageIO io) {
+  public Carriage(CarriageIO io, PoseManager poseManager) {
     this.io = io;
+    this.poseManager = poseManager;
   }
 
   @Override
@@ -86,7 +89,7 @@ public class Carriage extends SubsystemBase {
     }
 
     // Leds
-    Leds.getInstance().coralHeld = coralHeld() || beamBreak();
+    Leds.getInstance().coralHeld = coralHeld() || poseManager.nearStation() ? beamBreak() : false;
     Leds.getInstance().coralPassed = coralPassed;
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 
