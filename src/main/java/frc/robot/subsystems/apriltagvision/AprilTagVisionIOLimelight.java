@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.Pipelines;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PoseManager;
 import java.util.HashSet;
 import java.util.Set;
@@ -90,6 +92,12 @@ public class AprilTagVisionIOLimelight implements AprilTagVisionIO {
     double latency = (Timer.getFPGATimestamp() - lastTimestamp) / 1000; // milliseconds
     Logger.recordOutput("Vision/" + name + "/latency", latency);
     disconnectedAlert.set(latency > disconnectedTimeout);
+
+    if (Drive.nitro) {
+      LimelightHelpers.setLEDMode_ForceBlink(name);
+    } else {
+      LimelightHelpers.setLEDMode_ForceOff(name);
+    }
 
     // dynamicCropping();
   }
