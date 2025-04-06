@@ -600,12 +600,13 @@ public class Robot extends LoggedRobot {
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .onTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel).onlyWhile(() -> intakeOK));
+        .onTrue(
+            RobotCommands.lowLevelCoralIntake(carriage, funnel)
+                .onlyWhile(() -> intakeOK)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     intakeTrigger.onFalse(
         runOnce(() -> intakeOK = false).andThen(waitSeconds(0.1), runOnce(() -> intakeOK = true)));
-
-    Logger.recordOutput("Controls/intakeOK", intakeOK);
 
     // Sim fake gamepieces
     SmartDashboard.putData(
