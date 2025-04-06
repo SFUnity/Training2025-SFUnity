@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.RobotCommands.allowAutoDrive;
 import static frc.robot.constantsGlobal.FieldConstants.reefCenter;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
-import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -54,6 +54,8 @@ public class Elevator extends SubsystemBase {
   public boolean setHeight = false;
   public double goalHeightInches = 0;
 
+  public static boolean wantsAlgae = false;
+
   public Elevator(ElevatorIO io, PoseManager poseManager) {
     this.io = io;
     this.poseManager = poseManager;
@@ -87,6 +89,7 @@ public class Elevator extends SubsystemBase {
       if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
         pid.setGoal(L3.get());
       } else {
+        if (goalHeightInches == AlgaeLow.get() || goalHeightInches == Processor.get()) wantsAlgae = true; else wantsAlgae = false;
         pid.setGoal(goalHeightInches);
       }
     } else {
@@ -96,6 +99,7 @@ public class Elevator extends SubsystemBase {
         if (algaeInCarriage.getAsBoolean()) {
           pid.setGoal(algeInCarriageHeight.get());
         } else {
+          wantsAlgae = false;
           pid.setGoal(0);
         }
       }
