@@ -258,6 +258,7 @@ public class Drive extends SubsystemBase {
         driveKp,
         driveKd);
 
+    Logger.recordOutput("Drive/nitro", nitro);
     Util.logSubsystem(this, "Drive");
   }
 
