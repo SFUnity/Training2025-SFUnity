@@ -555,7 +555,12 @@ public class Robot extends LoggedRobot {
     operator.rightBumper().onTrue(runOnce(() -> scoreState = RightBranch));
     operator
         .rightTrigger()
-        .onTrue(carriage.ejectAlgae().asProxy().alongWith(intake.poopCmd().asProxy()));
+        .onTrue(
+            carriage
+                .ejectAlgae()
+                .asProxy()
+                .alongWith(intake.poopCmd().asProxy())
+                .andThen(carriage.resetHeld().alongWith(intake.resetGPHeld())));
     operator
         .leftTrigger()
         .whileTrue(

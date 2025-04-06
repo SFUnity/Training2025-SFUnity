@@ -82,7 +82,8 @@ public class Elevator extends SubsystemBase {
 
     updateTunables();
 
-    if (!(goalHeightInches == AlgaeLow.get() || goalHeightInches == Processor.get())) wantsAlgae = false;
+    if (!(goalHeightInches == AlgaeLow.get() || goalHeightInches == Processor.get()))
+      wantsAlgae = false;
 
     if (setHeight
         || (poseManager.getDistanceTo(AllianceFlipUtil.apply(reefCenter)) < 1.3 + safeDropDist.get()
