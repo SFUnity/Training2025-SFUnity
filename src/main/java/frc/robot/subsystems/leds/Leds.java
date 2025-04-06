@@ -174,7 +174,7 @@ public class Leds extends VirtualSubsystem {
       } else {
         // No game piece state
         if (Drive.nitro) {
-          blink(Color.kOrange, Seconds.of(0.1));
+          blink(Color.kOrange, Seconds.of(0.2));
         } else {
           pattern = teamColors().atBrightness(Percent.of(0.5));
         }
