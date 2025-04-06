@@ -89,7 +89,9 @@ public class Elevator extends SubsystemBase {
       if (Carriage.coralInDanger && goalHeightInches < pastL3Height.get()) {
         pid.setGoal(L3.get());
       } else {
-        if (goalHeightInches == AlgaeLow.get() || goalHeightInches == Processor.get()) wantsAlgae = true; else wantsAlgae = false;
+        if (goalHeightInches == AlgaeLow.get() || goalHeightInches == Processor.get())
+          wantsAlgae = true;
+        else wantsAlgae = false;
         pid.setGoal(goalHeightInches);
       }
     } else {
