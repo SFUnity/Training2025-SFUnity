@@ -146,6 +146,8 @@ public class Robot extends LoggedRobot {
 
   private BooleanSupplier loggingOutputAvailable = () -> true;
 
+  private boolean intakeOK = true;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -598,7 +600,9 @@ public class Robot extends LoggedRobot {
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .onTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
+        .onTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel).onlyWhile(() -> intakeOK));
+
+    intakeTrigger.onFalse(runOnce(() -> intakeOK = false).andThen(waitSeconds(0.1), runOnce(() -> intakeOK = true)));
 
     // Sim fake gamepieces
     SmartDashboard.putData(
