@@ -91,7 +91,9 @@ public class SparkUtil {
         () ->
             spark.configure(
                 config,
-                ResetMode.kResetSafeParameters,
+                persistParameters
+                    ? ResetMode.kResetSafeParameters
+                    : ResetMode.kNoResetSafeParameters,
                 persistParameters
                     ? PersistMode.kPersistParameters
                     : PersistMode.kNoPersistParameters));
