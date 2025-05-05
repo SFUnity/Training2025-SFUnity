@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.VirtualSubsystem;
 import java.util.Map;
 import java.util.Optional;
@@ -172,7 +173,11 @@ public class Leds extends VirtualSubsystem {
         pattern = solid(new Color(100, 0, 0));
       } else {
         // No game piece state
-        pattern = teamColors().atBrightness(Percent.of(0.5));
+        if (Drive.nitro) {
+          blink(Color.kOrange, Seconds.of(0.2));
+        } else {
+          pattern = teamColors().atBrightness(Percent.of(0.5));
+        }
       }
       if (autoAlignActivated) {
         blink(Color.kLimeGreen, Seconds.of(0.25));

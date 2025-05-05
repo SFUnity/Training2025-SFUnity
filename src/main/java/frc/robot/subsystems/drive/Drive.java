@@ -90,9 +90,9 @@ public class Drive extends SubsystemBase {
       new LoggedTunableNumber("Drive/Commands/Theta/toleranceDeg", 2.0);
 
   private static final LoggedTunableNumber maxLinearVelocity =
-      new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", Units.feetToMeters(10));
+      new LoggedTunableNumber("Drive/Commands/Linear - maxVelocity", Units.feetToMeters(7));
   private static final LoggedTunableNumber maxLinearAcceleration =
-      new LoggedTunableNumber("Drive/Commands/Linear - maxAcceleration", 1.2);
+      new LoggedTunableNumber("Drive/Commands/Linear - maxAcceleration", 1);
   private static final LoggedTunableNumber maxAngularVelocity =
       new LoggedTunableNumber(
           "Drive/Commands/Theta - maxVelocity", maxAngularSpeedRadiansPerSec * 0.8);
@@ -113,6 +113,8 @@ public class Drive extends SubsystemBase {
   private LoggedTunableNumber joystickInterruptDelay =
       new LoggedTunableNumber("Drive/JoystickInterruptDelay", 1);
 
+  public static boolean nitro = false;
+
   // Autos
   private final LoggedTunableNumber xkPAuto = new LoggedTunableNumber("Drive/Choreo/xkP", 10);
   private final LoggedTunableNumber xkDAuto = new LoggedTunableNumber("Drive/Choreo/xkD", 0);
@@ -129,7 +131,7 @@ public class Drive extends SubsystemBase {
       new PIDController(rkPAuto.get(), 0.0, rkDAuto.get());
 
   // Auto coast mode
-  private boolean brakeMode;
+  private boolean brakeMode = false;
   private Timer brakeModeTimer = new Timer();
   private static final double BREAK_MODE_DELAY_SEC = 10.0;
 
@@ -256,6 +258,7 @@ public class Drive extends SubsystemBase {
         driveKp,
         driveKd);
 
+    Logger.recordOutput("Drive/nitro", nitro);
     Util.logSubsystem(this, "Drive");
   }
 
@@ -282,7 +285,8 @@ public class Drive extends SubsystemBase {
   }
 
   private void setModuleSetpoints(SwerveModuleState[] setpointStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        setpointStates, nitro ? nitroMaxSpeedMetersPerSec : maxSpeedMetersPerSec);
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates);
@@ -355,6 +359,9 @@ public class Drive extends SubsystemBase {
     return output;
   }
 
+  private boolean brakeHasBeenSet = false;
+  private Timer setBrakeTimer = new Timer();
+
   /**
    * If the robot is enabled and brake mode is not enabled, enable it. If the robot is disabled, has
    * stopped moving for the specified period of time, and brake mode is enabled, disable it.
@@ -365,7 +372,17 @@ public class Drive extends SubsystemBase {
       setBrakeMode(true);
       brakeModeTimer.restart();
     } else if (DriverStation.isDisabled()) {
-      if (DriverStation.isTeleop()) {
+      if (!setBrakeTimer.isRunning()) {
+        setBrakeTimer.start();
+      }
+      if (DriverStation.isAutonomous() && !brakeHasBeenSet) {
+        if (setBrakeTimer.hasElapsed(3)) {
+          setBrakeMode(false);
+          brakeHasBeenSet = true;
+          System.out.println(
+              "Brake mode set while disabled and waiting for autonomous************************");
+        }
+      } else if (DriverStation.isTeleop()) {
         boolean stillMoving = false;
         double velocityLimit = 0.05; // In meters per second
         ChassisSpeeds measuredChassisSpeeds = getChassisSpeeds();
@@ -378,11 +395,8 @@ public class Drive extends SubsystemBase {
           brakeMode = false;
           setBrakeMode(false);
         }
-      } else {
-        if (brakeMode) {
-          brakeMode = false;
-          setBrakeMode(false);
-        }
+        brakeHasBeenSet = false;
+        setBrakeTimer.reset();
       }
     }
   }
@@ -628,7 +642,7 @@ public class Drive extends SubsystemBase {
 
     // Square values and scale to max velocity
     linearMagnitude = linearMagnitude * linearMagnitude;
-    linearMagnitude *= maxSpeedMetersPerSec;
+    linearMagnitude *= nitro ? nitroMaxSpeedMetersPerSec : maxSpeedMetersPerSec;
 
     // Calcaulate new linear velocity
     Translation2d linearVelocity = new Translation2d(linearMagnitude, linearDirection);

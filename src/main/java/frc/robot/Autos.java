@@ -6,14 +6,12 @@ import static frc.robot.RobotCommands.ScoreState.Dealgify;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L2;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
 
-import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -24,6 +22,7 @@ import frc.robot.subsystems.funnel.Funnel;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.AlwaysLoggedTunableNumber;
+import frc.robot.util.LoggedAutoChooser;
 import frc.robot.util.PoseManager;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -37,7 +36,7 @@ public class Autos {
   private final PoseManager poseManager;
 
   private final AutoFactory factory;
-  private final AutoChooser chooser;
+  private final LoggedAutoChooser chooser;
 
   private final LoggedDashboardChooser<Command> nonChoreoChooser =
       new LoggedDashboardChooser<Command>("Non-Choreo Chooser");
@@ -87,7 +86,7 @@ public class Autos {
             });
 
     /* Set up main choreo routines */
-    chooser = new AutoChooser();
+    chooser = new LoggedAutoChooser("ChoreoChooser");
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
     chooser.addRoutine("WallLKAlgaeL2L3", this::WallLKAlgaeL2L3);
     chooser.addRoutine("ProcessorCDAlgaeL2L3", this::CenterCDAlgaeL2L3);
@@ -112,8 +111,6 @@ public class Autos {
             "Drive Simple FF Characterization", drive.feedforwardCharacterization());
       }
     }
-
-    SmartDashboard.putData("Choreo Chooser", chooser);
   }
 
   /**
@@ -154,7 +151,13 @@ public class Autos {
 
   private AutoRoutine CenterCDAlgaeL2L3() {
     AutoRoutine routine = factory.newRoutine("CenterCDAlgaeL2L3");
-    AutoTrajectory CenterWToJ = routine.trajectory("CenterPToE");
+    AutoTrajectory CenterWToJ;
+    if (DriverStation.getAlliance().orElseGet(() -> DriverStation.Alliance.Red)
+        == DriverStation.Alliance.Blue) {
+      CenterWToJ = routine.trajectory("BlueCenterPToE");
+    } else {
+      CenterWToJ = routine.trajectory("CenterPToE");
+    }
     AutoTrajectory JToStationHigh = routine.trajectory("EToStationLow");
     AutoTrajectory LToDealgify = routine.trajectory("CToDealgify");
     AutoTrajectory KLAlgaeToStationHigh = routine.trajectory("CDToStationLow");

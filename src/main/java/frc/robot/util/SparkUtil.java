@@ -61,6 +61,7 @@ public class SparkUtil {
     for (int i = 0; i < maxAttempts; i++) {
       var error = command.get();
       if (error == REVLibError.kOk) {
+        // System.out.println("Configured spark: " + spark.getDeviceId());
         break;
       } else {
         sparkStickyFault = true;
@@ -90,7 +91,9 @@ public class SparkUtil {
         () ->
             spark.configure(
                 config,
-                ResetMode.kResetSafeParameters,
+                persistParameters
+                    ? ResetMode.kResetSafeParameters
+                    : ResetMode.kNoResetSafeParameters,
                 persistParameters
                     ? PersistMode.kPersistParameters
                     : PersistMode.kNoPersistParameters));

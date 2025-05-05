@@ -9,8 +9,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.PoseManager;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -18,6 +20,7 @@ import org.littletonrobotics.junction.Logger;
 public class Carriage extends SubsystemBase {
   private final CarriageIO io;
   private final CarrageIOInputsAutoLogged inputs = new CarrageIOInputsAutoLogged();
+  private final PoseManager poseManager;
 
   private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
@@ -35,10 +38,10 @@ public class Carriage extends SubsystemBase {
 
   private final Timer beambreakTimer = new Timer();
   private static final LoggedTunableNumber beambreakDelay =
-      new LoggedTunableNumber("Carriage/beambreakDelay", 0.23);
+      new LoggedTunableNumber("Carriage/beambreakDelay", 0.18);
   private final Timer coralHeldTimer = new Timer();
   private static final LoggedTunableNumber coralHeldDelay =
-      new LoggedTunableNumber("Carriage/coralHeldDelay", 0.1);
+      new LoggedTunableNumber("Carriage/coralHeldDelay", 0.3);
 
   private static final LoggedTunableNumber backupForL3Rots =
       new LoggedTunableNumber("Carriage/Backup for L3 Rots", 15);
@@ -46,8 +49,12 @@ public class Carriage extends SubsystemBase {
   public static boolean coralInDanger = false;
   private boolean lastShouldBrake = false;
 
-  public Carriage(CarriageIO io) {
+  private boolean wantsAlgae = false;
+  private Timer wantsAlgaeTimer = new Timer();
+
+  public Carriage(CarriageIO io, PoseManager poseManager) {
     this.io = io;
+    this.poseManager = poseManager;
   }
 
   @Override
@@ -72,12 +79,17 @@ public class Carriage extends SubsystemBase {
     filteredStatorCurrent = currentFilter.calculate(inputs.currentAmps);
 
     if (filteredVelocity <= algaeVelocityThreshold.get()
-        && filteredStatorCurrent >= algaeCurrentThreshold.get()) {
+        && filteredStatorCurrent >= algaeCurrentThreshold.get()
+        && wantsAlgaeTimer.get() <= .25
+        && Elevator.wantsAlgae) {
       realAlgaeHeld = true;
+    }
+    if (wantsAlgae) {
+      wantsAlgaeTimer.restart();
     }
 
     // Leds
-    Leds.getInstance().coralHeld = coralHeld() || beamBreak();
+    Leds.getInstance().coralHeld = coralHeld() || poseManager.nearStation() ? beamBreak() : false;
     Leds.getInstance().coralPassed = coralPassed;
     Leds.getInstance().carriageAlgaeHeld = algaeHeld();
 
@@ -197,6 +209,8 @@ public class Carriage extends SubsystemBase {
 
   public Command lowDealgify() {
     return run(() -> io.runVolts(lowDealgifyingSpeedVolts.get()))
+        .beforeStarting(() -> wantsAlgae = true)
+        .finallyDo(() -> wantsAlgae = false)
         .until(() -> algaeHeld())
         .withName("lowDealgify");
   }

@@ -98,7 +98,7 @@ public class Robot extends LoggedRobot {
 
   // Alerts
   private static final double canErrorTimeThreshold = 0.5; // Seconds to disable alert
-  private static final double lowBatteryVoltage = 11.8;
+  private static final double lowBatteryVoltage = 12.5;
   private static final double extraLowBatteryVoltage = 11.5;
   private static final double lowBatteryDisabledTime = 1.5;
 
@@ -145,6 +145,8 @@ public class Robot extends LoggedRobot {
       new DriveCommandsConfig(driver, () -> slowMode, slowDriveMultiplier, slowTurnMultiplier);
 
   private BooleanSupplier loggingOutputAvailable = () -> true;
+
+  private boolean intakeOK = true;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -230,7 +232,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
-        carriage = new Carriage(new CarriageIOSparkMax());
+        carriage = new Carriage(new CarriageIOSparkMax(), poseManager);
         intake = new Intake(new IntakeIOSparkMax());
         funnel = new Funnel(new FunnelIOSparkMax());
         vision =
@@ -252,7 +254,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIOSim(), poseManager);
-        carriage = new Carriage(new CarriageIOSim());
+        carriage = new Carriage(new CarriageIOSim(), poseManager);
         intake = new Intake(new IntakeIOSim());
         funnel = new Funnel(new FunnelIOSim());
         vision =
@@ -271,7 +273,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 driveCommandsConfig);
         elevator = new Elevator(new ElevatorIO() {}, poseManager);
-        carriage = new Carriage(new CarriageIO() {});
+        carriage = new Carriage(new CarriageIO() {}, poseManager);
         intake = new Intake(new IntakeIO() {});
         funnel = new Funnel(new FunnelIO() {});
         vision =
@@ -418,7 +420,7 @@ public class Robot extends LoggedRobot {
     funnel.setDefaultCommand(funnel.stop());
 
     // Driver controls
-    driver.rightTrigger().onTrue(runOnce(drive::stopWithX, drive));
+    driver.rightTrigger().onTrue(runOnce(() -> Drive.nitro = !Drive.nitro));
     if (testDrive) {
       driver.y().onTrue(drive.setModuleToTest(0));
       driver.x().onTrue(drive.setModuleToTest(1));
@@ -528,25 +530,6 @@ public class Robot extends LoggedRobot {
                       if (!intake.GPHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
                         scoreState = Dealgify;
                     })
-                .andThen(
-                    either(
-                        dealgify(
-                                elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig))
-                            .deadlineFor(
-                                either(
-                                    drive
-                                        .fullAutoDrive(goalPose(poseManager))
-                                        .andThen(drive.driveIntoWall())
-                                        .asProxy(),
-                                    none(),
-                                    () -> allowAutoDrive))
-                            .beforeStarting(
-                                () -> {
-                                  scoreState = Dealgify;
-                                  dealgifyAfterPlacing = false;
-                                }),
-                        none(),
-                        () -> dealgifyAfterPlacing))
                 .finallyDo(() -> poseManager.lockClosest = false)
                 .withName("fullScore"));
 
@@ -570,7 +553,14 @@ public class Robot extends LoggedRobot {
                 }));
     operator.leftBumper().onTrue(runOnce(() -> scoreState = LeftBranch));
     operator.rightBumper().onTrue(runOnce(() -> scoreState = RightBranch));
-    operator.rightTrigger().onTrue(runOnce(() -> dealgifyAfterPlacing = !dealgifyAfterPlacing));
+    operator
+        .rightTrigger()
+        .onTrue(
+            carriage
+                .ejectAlgae()
+                .asProxy()
+                .alongWith(intake.poopCmd().asProxy())
+                .andThen(carriage.resetHeld().alongWith(intake.resetGPHeld())));
     operator
         .leftTrigger()
         .whileTrue(
@@ -615,7 +605,13 @@ public class Robot extends LoggedRobot {
     intakeTrigger
         .or(() -> poseManager.nearStation() && allowAutoDrive)
         .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .whileTrue(RobotCommands.lowLevelCoralIntake(carriage, funnel));
+        .onTrue(
+            RobotCommands.lowLevelCoralIntake(carriage, funnel)
+                .onlyWhile(() -> intakeOK)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
+    intakeTrigger.onFalse(
+        runOnce(() -> intakeOK = false).andThen(waitSeconds(0.1), runOnce(() -> intakeOK = true)));
 
     // Sim fake gamepieces
     SmartDashboard.putData(

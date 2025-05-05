@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.RobotCommands.allowAutoDrive;
 import static frc.robot.constantsGlobal.FieldConstants.reefCenter;
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
-import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.L3;
+import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -53,6 +53,10 @@ public class Elevator extends SubsystemBase {
 
   public boolean setHeight = false;
   public double goalHeightInches = 0;
+  private ElevatorHeight goalHeight = L2;
+
+  public static boolean wantsAlgae = true;
+  public static boolean setToAlgae = true;
 
   public Elevator(ElevatorIO io, PoseManager poseManager) {
     this.io = io;
@@ -80,6 +84,9 @@ public class Elevator extends SubsystemBase {
 
     updateTunables();
 
+    if (goalHeight == AlgaeLow || goalHeight == Processor) wantsAlgae = true;
+    else wantsAlgae = false;
+
     if (setHeight
         || (poseManager.getDistanceTo(AllianceFlipUtil.apply(reefCenter)) < 1.3 + safeDropDist.get()
             && inputs.position > 1
@@ -96,6 +103,7 @@ public class Elevator extends SubsystemBase {
         if (algaeInCarriage.getAsBoolean()) {
           pid.setGoal(algeInCarriageHeight.get());
         } else {
+          wantsAlgae = false;
           pid.setGoal(0);
         }
       }
@@ -143,6 +151,7 @@ public class Elevator extends SubsystemBase {
     return runOnce(
             () -> {
               goalHeightInches = height.get();
+              goalHeight = height;
               Logger.recordOutput("Elevator/RequestedHeight", height.toString());
             })
         .withName("request" + height.toString());

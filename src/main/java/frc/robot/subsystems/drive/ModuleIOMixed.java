@@ -60,7 +60,6 @@ import java.util.function.DoubleSupplier;
  */
 public class ModuleIOMixed implements ModuleIO {
   // Module specific constants
-  private final Rotation2d zeroRotation = new Rotation2d();
   private final boolean driveInverted;
   private final boolean turnInverted;
   private final boolean turnEncoderInverted;
@@ -159,7 +158,7 @@ public class ModuleIOMixed implements ModuleIO {
 
     // Configure drive motor
     driveConfig = new TalonFXConfiguration();
-    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     driveConfig.Slot0 =
         new Slot0Configs()
             .withKP(driveKp.get())
@@ -186,6 +185,7 @@ public class ModuleIOMixed implements ModuleIO {
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
         .pidf(turnKp.get(), 0.0, 0, 0.0);
     turnConfig.signals.primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency));
+    turnConfig.idleMode(IdleMode.kCoast);
     configureSpark(turnSpark, turnConfig, true);
 
     // Configure CANCoder
@@ -250,7 +250,7 @@ public class ModuleIOMixed implements ModuleIO {
     ifOk(
         turnSpark,
         turnEncoder::getPosition,
-        (value) -> inputs.turnPosition = new Rotation2d(value).minus(zeroRotation));
+        (value) -> inputs.turnPosition = new Rotation2d(value));
     ifOk(turnSpark, turnEncoder::getVelocity, (value) -> inputs.turnVelocityRadPerSec = value);
     ifOk(
         turnSpark,
@@ -270,7 +270,7 @@ public class ModuleIOMixed implements ModuleIO {
             .toArray();
     inputs.odometryTurnPositions =
         turnPositionQueue.stream()
-            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
+            .map((Double value) -> new Rotation2d(value))
             .toArray(Rotation2d[]::new);
     timestampQueue.clear();
     drivePositionQueue.clear();
@@ -297,7 +297,7 @@ public class ModuleIOMixed implements ModuleIO {
   public void setTurnPosition(Rotation2d rotation) {
     double setpoint =
         MathUtil.inputModulus(
-            rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
+            rotation.getRadians(), turnPIDMinInput, turnPIDMaxInput);
     turnController.setReference(setpoint, ControlType.kPosition);
   }
 
