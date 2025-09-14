@@ -26,9 +26,7 @@ public class Autos {
   public static boolean moveRight = false;
   public static boolean moveLeft = false;
 
-  public Autos(
-      Drive drive,
-      PoseManager poseManager) {
+  public Autos(Drive drive, PoseManager poseManager) {
     this.drive = drive;
     this.poseManager = poseManager;
 
@@ -57,7 +55,7 @@ public class Autos {
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
-      
+
       // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
 
       // SysID & non-choreo routines

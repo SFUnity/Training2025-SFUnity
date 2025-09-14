@@ -15,14 +15,8 @@ package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static frc.robot.RobotCommands.*;
-import static frc.robot.RobotCommands.IntakeState.*;
-import static frc.robot.RobotCommands.ScoreState.*;
-import static frc.robot.constantsGlobal.FieldConstants.*;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.leftName;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.rightName;
-import static frc.robot.subsystems.elevator.ElevatorConstants.ElevatorHeight.*;
-import static frc.robot.subsystems.intake.IntakeConstants.groundAlgae;
-import static frc.robot.util.AllianceFlipUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,25 +24,16 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.apriltagvision.AprilTagVision;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIO;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIOLimelight;
-import frc.robot.subsystems.carriage.Carriage;
-import frc.robot.subsystems.carriage.CarriageIO;
-import frc.robot.subsystems.carriage.CarriageIOSim;
-import frc.robot.subsystems.carriage.CarriageIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants.DriveCommandsConfig;
 import frc.robot.subsystems.drive.GyroIO;
@@ -56,24 +41,11 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
-import frc.robot.subsystems.funnel.Funnel;
-import frc.robot.subsystems.funnel.FunnelIO;
-import frc.robot.subsystems.funnel.FunnelIOSim;
-import frc.robot.subsystems.funnel.FunnelIOSparkMax;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeIOSim;
-import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
 import frc.robot.util.WPILOGWriter9038;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -117,10 +89,6 @@ public class Robot extends LoggedRobot {
 
   // Subsystems
   private final Drive drive;
-  private final Elevator elevator;
-  private final Carriage carriage;
-  private final Intake intake;
-  private final Funnel funnel;
   private final AprilTagVision vision;
 
   // Non-subsystems
@@ -145,8 +113,6 @@ public class Robot extends LoggedRobot {
       new DriveCommandsConfig(driver, () -> slowMode, slowDriveMultiplier, slowTurnMultiplier);
 
   private BooleanSupplier loggingOutputAvailable = () -> true;
-
-  private boolean intakeOK = true;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -231,10 +197,6 @@ public class Robot extends LoggedRobot {
                 // new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSparkMax(), poseManager);
-        carriage = new Carriage(new CarriageIOSparkMax(), poseManager);
-        intake = new Intake(new IntakeIOSparkMax());
-        funnel = new Funnel(new FunnelIOSparkMax());
         vision =
             new AprilTagVision(
                 poseManager,
@@ -253,10 +215,6 @@ public class Robot extends LoggedRobot {
                 new ModuleIOSim(),
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIOSim(), poseManager);
-        carriage = new Carriage(new CarriageIOSim(), poseManager);
-        intake = new Intake(new IntakeIOSim());
-        funnel = new Funnel(new FunnelIOSim());
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
@@ -272,10 +230,6 @@ public class Robot extends LoggedRobot {
                 new ModuleIO() {},
                 poseManager,
                 driveCommandsConfig);
-        elevator = new Elevator(new ElevatorIO() {}, poseManager);
-        carriage = new Carriage(new CarriageIO() {}, poseManager);
-        intake = new Intake(new IntakeIO() {});
-        funnel = new Funnel(new FunnelIO() {});
         vision =
             new AprilTagVision(
                 poseManager,
@@ -294,7 +248,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    autos = new Autos(drive, carriage, elevator, intake, funnel, poseManager);
+    autos = new Autos(drive, poseManager);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -375,9 +329,6 @@ public class Robot extends LoggedRobot {
       }
     }
 
-    // Check for coralInDanger
-    Carriage.coralInDanger = elevator.pastL3Height() && carriage.coralHeld();
-
     // Logs
     Logger.recordOutput("Controls/intakeState", intakeState.toString());
     Logger.recordOutput("Controls/scoreState", scoreState.toString());
@@ -396,15 +347,6 @@ public class Robot extends LoggedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     boolean testDrive = false;
-    Trigger intakeTrigger = driver.rightBumper();
-
-    // Setup rumble
-    new Trigger(() -> intake.GPHeld())
-        .onTrue(
-            runEnd(
-                    () -> driver.setRumble(RumbleType.kBothRumble, 0.5),
-                    () -> driver.setRumble(RumbleType.kBothRumble, 0.0))
-                .withTimeout(.5));
 
     // Default cmds
     if (testDrive) {
@@ -414,10 +356,6 @@ public class Robot extends LoggedRobot {
     } else {
       drive.setDefaultCommand(drive.joystickDrive());
     }
-    elevator.setDefaultCommand(elevator.disableElevator(carriage::algaeHeld));
-    carriage.setDefaultCommand(carriage.stopOrHold());
-    intake.setDefaultCommand(intake.raiseAndStopOrHoldCmd());
-    funnel.setDefaultCommand(funnel.stop());
 
     // Driver controls
     driver.rightTrigger().onTrue(runOnce(() -> Drive.nitro = !Drive.nitro));
@@ -452,179 +390,9 @@ public class Robot extends LoggedRobot {
     }
     driver.back().onTrue(runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
-    intakeTrigger.whileTrue(fullIntake(drive, carriage, intake, elevator, poseManager));
-    driver
-        .leftBumper()
-        .whileTrue(
-            select(
-                    Map.of(
-                        LeftBranch,
-                        scoreCoral(
-                            elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
-                        ScoreL1,
-                        either(
-                            elevator
-                                .enableElevator()
-                                .alongWith(
-                                    waitUntil(
-                                            () ->
-                                                driveCommandsConfig.finishScoring()
-                                                    && elevator.atGoalHeight())
-                                        .andThen(carriage.placeCoral())),
-                            intake.poopCmd(driveCommandsConfig::finishScoring),
-                            () -> groundAlgae.get()),
-                        Dealgify,
-                        dealgify(
-                            elevator, carriage, poseManager, atGoal(drive, driveCommandsConfig)),
-                        ProcessorFront,
-                        scoreProcessorOrL1(
-                            carriage,
-                            intake,
-                            elevator,
-                            poseManager,
-                            true,
-                            atGoal(drive, driveCommandsConfig)),
-                        ProcessorBack,
-                        scoreProcessorOrL1(
-                            carriage,
-                            intake,
-                            elevator,
-                            poseManager,
-                            false,
-                            atGoal(drive, driveCommandsConfig))),
-                    () -> {
-                      if (scoreState == ProcessorBack && !groundAlgae.get()) {
-                        DriverStation.reportError(
-                            "ProcessorBack can't be used with coral ground intake", false);
-                      }
-                      return scoreState == RightBranch ? LeftBranch : scoreState;
-                    })
-                .deadlineFor(
-                    either(
-                        either(
-                                drive
-                                    .fullAutoDrive(goalPose(poseManager))
-                                    .andThen(
-                                        either(
-                                            drive.driveIntoWall(),
-                                            none(),
-                                            () -> scoreState == Dealgify)),
-                                drive.headingDrive(
-                                    () ->
-                                        goalPose(poseManager)
-                                            .get()
-                                            .getRotation()
-                                            .plus(
-                                                groundAlgae.get()
-                                                    ? Rotation2d.kZero
-                                                    : Rotation2d.k180deg)),
-                                () -> scoreState != ScoreL1)
-                            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                            .withName("AutoAlignInFullScore")
-                            .asProxy(),
-                        none(),
-                        () -> allowAutoDrive))
-                .beforeStarting(
-                    () -> {
-                      poseManager.lockClosest = true;
-                      if (!intake.GPHeld() && !carriage.algaeHeld() && !carriage.coralHeld())
-                        scoreState = Dealgify;
-                    })
-                .finallyDo(() -> poseManager.lockClosest = false)
-                .withName("fullScore"));
-
     // Operator controls
-    operator.y().onTrue(elevator.request(L3));
-    operator.x().onTrue(elevator.request(L2));
-    operator
-        .a()
-        .onTrue(
-            either(elevator.request(L1), none(), () -> groundAlgae.get())
-                .alongWith(runOnce(() -> scoreState = ScoreL1)));
-    operator
-        .b()
-        .onTrue(
-            runOnce(
-                () -> {
-                  scoreState = ProcessorFront;
-                  if (intake.GPHeld() && groundAlgae.get()) {
-                    scoreState = ProcessorBack;
-                  }
-                }));
-    operator.leftBumper().onTrue(runOnce(() -> scoreState = LeftBranch));
-    operator.rightBumper().onTrue(runOnce(() -> scoreState = RightBranch));
-    operator
-        .rightTrigger()
-        .onTrue(
-            carriage
-                .ejectAlgae()
-                .asProxy()
-                .alongWith(intake.poopCmd().asProxy())
-                .andThen(carriage.resetHeld().alongWith(intake.resetGPHeld())));
-    operator
-        .leftTrigger()
-        .whileTrue(
-            Commands.parallel(
-                carriage.ejectCoral(),
-                funnel.eject(),
-                waitSeconds(0.2).andThen(carriage.resetHeld())));
-    operator.leftTrigger().onFalse(RobotCommands.lowLevelCoralIntake(carriage, funnel));
-    operator.povUp().onTrue(runOnce(() -> intakeState = Source));
-    operator.povRight().onTrue(runOnce(() -> intakeState = Ice_Cream));
-    operator.povDown().onTrue(runOnce(() -> intakeState = Ground));
-    operator.povLeft().onTrue(runOnce(() -> Leds.getInstance().coralFlood = true));
-
-    operator.back().onTrue(elevator.runCurrentZeroing());
-    operator.back().onTrue(intake.runCurrentZeroing());
-
-    operator.start().onTrue(carriage.resetHeld().alongWith(intake.resetGPHeld()));
 
     // State-Based Triggers
-
-    // Teleop Only
-    new Trigger(carriage::coralHeld)
-        .or(() -> intake.GPHeld() && !groundAlgae.get())
-        .and(() -> allowAutoDrive)
-        .and(DriverStation::isTeleop)
-        .and(() -> poseManager.getDistanceTo(goalPose(poseManager).get()) < 3.25)
-        .whileTrue(
-            drive.headingDrive(
-                () ->
-                    poseManager
-                        .getHorizontalAngleTo(apply(reefCenter))
-                        .plus(carriage.coralHeld() ? Rotation2d.kZero : Rotation2d.k180deg)));
-
-    new Trigger(carriage::algaeHeld)
-        .and(DriverStation::isTeleop)
-        .onTrue(runOnce(() -> scoreState = ProcessorFront));
-
-    new Trigger(intake::GPHeld)
-        .and(DriverStation::isTeleop)
-        .onTrue(runOnce(() -> scoreState = groundAlgae.get() ? ProcessorBack : ScoreL1));
-
-    intakeTrigger
-        .or(() -> poseManager.nearStation() && allowAutoDrive)
-        .and(() -> intakeState == Source && DriverStation.isTeleop() && !carriage.algaeHeld())
-        .onTrue(
-            RobotCommands.lowLevelCoralIntake(carriage, funnel)
-                .onlyWhile(() -> intakeOK)
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-
-    intakeTrigger.onFalse(
-        runOnce(() -> intakeOK = false).andThen(waitSeconds(0.1), runOnce(() -> intakeOK = true)));
-
-    // Sim fake gamepieces
-    SmartDashboard.putData(
-        "Toggle Coral in Carriage", runOnce(() -> Carriage.simHasCoral = !Carriage.simHasCoral));
-    SmartDashboard.putData(
-        "Toggle Algae in Carriage", runOnce(() -> Carriage.simHasAlgae = !Carriage.simHasAlgae));
-    SmartDashboard.putData(
-        "Toggle Beam Break in Carriage",
-        runOnce(() -> Carriage.simBeamBreak = !Carriage.simBeamBreak));
-    SmartDashboard.putData(
-        "Toggle GP in Intake", runOnce(() -> Intake.simHasGP = !Intake.simHasGP));
-
-    SmartDashboard.putData("Run Elevator Sysid", elevator.runSysidCmd());
   }
 
   /** This function is called once when the robot is disabled. */
@@ -672,10 +440,7 @@ public class Robot extends LoggedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    driveTest()
-        .alongWith(groundIntakeTest())
-        .alongWith(elevatorAndCarriageTest().asProxy())
-        .schedule();
+    driveTest().schedule();
   }
 
   private Command driveTest() {
@@ -701,35 +466,6 @@ public class Robot extends LoggedRobot {
               drive.allModules = true;
               timer.restart();
             });
-  }
-
-  private Command groundIntakeTest() {
-    return intake.intakeCmd().asProxy().andThen(waitSeconds(2), intake.poopCmd().asProxy());
-  }
-
-  private Command elevatorAndCarriageTest() {
-    Timer timer = new Timer();
-    return carriage
-        .intakeCoral()
-        .asProxy()
-        .andThen(
-            elevator.request(L2),
-            elevator.enableElevator(),
-            waitSeconds(1),
-            elevator.disableElevator(() -> false),
-            waitSeconds(1),
-            elevator.request(L3),
-            scoreCoral(elevator, carriage, poseManager, () -> timer.hasElapsed(2))
-                .beforeStarting(() -> timer.restart())
-                .finallyDo(() -> timer.stop())
-                .asProxy(),
-            elevator.disableElevator(() -> false),
-            waitSeconds(1.5),
-            dealgify(elevator, carriage, poseManager, () -> true).asProxy(),
-            elevator.disableElevator(() -> false),
-            waitSeconds(2.5),
-            scoreProcessorOrL1(carriage, intake, elevator, poseManager, true, () -> true)
-                .asProxy());
   }
 
   /** This function is called periodically during test mode. */
