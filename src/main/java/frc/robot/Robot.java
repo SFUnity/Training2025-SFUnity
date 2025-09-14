@@ -14,7 +14,6 @@
 package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
-import static frc.robot.RobotCommands.*;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.leftName;
 import static frc.robot.subsystems.apriltagvision.AprilTagVisionConstants.rightName;
 
@@ -328,13 +327,6 @@ public class Robot extends LoggedRobot {
         Leds.getInstance().lowBatteryAlert = true;
       }
     }
-
-    // Logs
-    Logger.recordOutput("Controls/intakeState", intakeState.toString());
-    Logger.recordOutput("Controls/scoreState", scoreState.toString());
-    Logger.recordOutput("Controls/dealgifyAfterPlacing", dealgifyAfterPlacing);
-    Logger.recordOutput("Controls/allowAutoDrive", allowAutoDrive);
-    Logger.recordOutput("Controls/goalPose", goalPose(poseManager).get());
   }
 
   private boolean isControllerConnected(CommandXboxController controller) {
@@ -388,7 +380,6 @@ public class Robot extends LoggedRobot {
                       drive)
                   .ignoringDisable(true));
     }
-    driver.back().onTrue(runOnce(() -> allowAutoDrive = !allowAutoDrive).ignoringDisable(true));
 
     // Operator controls
 
