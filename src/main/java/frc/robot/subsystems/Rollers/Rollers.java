@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Rollers extends SubsystemBase {
   private final rollersio io;
-  private final rollersioInputsAutoLogged inputs = new rollersioInputsAutoLogged();
+  private final RollersioInputsAutoLogged inputs = new RollersioInputsAutoLogged();
 
   public Rollers(rollersio io) {
     this.io = io;
@@ -16,7 +16,12 @@ public class Rollers extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
-  public Command command() {
-    return run(() -> method());
+  public Command intake() {
+    return run(() -> io.runVolts(6.0));
   }
+
+  public Command stop() {
+    return run(() -> io.runVolts(6.0));
+  }
+  
 }
