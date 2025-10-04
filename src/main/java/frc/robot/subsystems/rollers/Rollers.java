@@ -1,6 +1,7 @@
 package frc.robot.subsystems.rollers;
 
-public class Rollers 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Rollers extends SubsystemBase {
     private final RollersIO io;
@@ -16,7 +17,10 @@ public class Rollers extends SubsystemBase {
     }
 
     public Command command() {
-        return run(() -> io.runVolts());
+        return run(() -> io.runVolts(0));
+    }
+    public Command eject() {
+        return run(() -> io.runVolts(-6.7));
     }
     }
 
