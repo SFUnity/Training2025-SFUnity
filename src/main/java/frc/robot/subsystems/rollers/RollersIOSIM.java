@@ -1,17 +1,17 @@
 package frc.robot.subsystems.rollers;
 
 public class RollersIOSim implements RollersIO {
-    private double appliedVolts = 0.0;
+  private double appliedVolts = 0.0;
 
-    public RollersIOSim() {}
+  public RollersIOSim() {}
 
-    @Override
-    public void updateInputs(RollersIOInputs inputs) {
-        inputs.voltage = appliedVolts;
-    }
-       
-    @Override
-    public void runVolts(double volts) {
-        appliedVolts = volts;
-    }
+  @Override
+  public void updateInputs(RollersIOInputs inputs) {
+    inputs.voltage = appliedVolts;
+  }
+
+  @Override
+  public void runVolts(double volts) {
+    appliedVolts = volts;
+  }
 }
