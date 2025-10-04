@@ -16,7 +16,4 @@ public interface rollersio {
     public default void updateInputs (RollersioInputs inputs) {}
 
     public default void runVolts (double volts) {}
-
-    
-    
 }
