@@ -346,7 +346,7 @@ public class Robot extends LoggedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     boolean testDrive = false;
-
+    driver.a().whileTrue(rollers.intake());
     // Default cmds
     if (testDrive) {
       drive.setDefaultCommand(
