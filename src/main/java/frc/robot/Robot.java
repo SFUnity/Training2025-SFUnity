@@ -122,6 +122,7 @@ public class Robot extends LoggedRobot {
   private final Intake intake;
   private final Funnel funnel;
   private final AprilTagVision vision;
+  private final rollers rollers;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -240,6 +241,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 new AprilTagVisionIOLimelight(leftName),
                 new AprilTagVisionIOLimelight(rightName));
+        rollers = new rollers(new rollersiosim());
         break;
 
       case SIM:
@@ -259,6 +261,7 @@ public class Robot extends LoggedRobot {
         funnel = new Funnel(new FunnelIOSim());
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+        rollers = new rollers(new rollersiosim());
         break;
 
       default:
@@ -291,6 +294,7 @@ public class Robot extends LoggedRobot {
                     return rightName;
                   }
                 });
+        rollers = new rollers(new Rollersio() {});
         break;
     }
 
