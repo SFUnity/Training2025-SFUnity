@@ -352,6 +352,9 @@ public class Robot extends LoggedRobot {
   private void configureButtonBindings() {
     boolean testDrive = false;
 
+
+    driver.a().whileTrue(rollers.intake());
+    
     // Default cmds
     if (testDrive) {
       drive.setDefaultCommand(
