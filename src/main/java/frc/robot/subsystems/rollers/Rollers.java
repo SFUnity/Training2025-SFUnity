@@ -16,7 +16,11 @@ public class Rollers extends SubsystemBase {
         io.updateInputs(inputs);
     }
 
+    public Command intake() {
+        return run(() -> io.runVolts(6.0));
+    }
+
     public Command command() {
-        return run(() -> io.runVolts(10));
+        return run(() -> io.runVolts(0.0));
     }
 }
