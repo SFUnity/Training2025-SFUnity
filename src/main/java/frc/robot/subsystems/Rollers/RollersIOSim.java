@@ -6,7 +6,7 @@ public class RollersIOSim implements RollersIO{
     public RollersIOSim() {}
 
     @Override
-    public void UpdateInputs(RollersIOInputs inputs) {
+    public void updateInputs(RollersIOInputs inputs) {
         inputs.voltage = appliedVolts;
     }
 
