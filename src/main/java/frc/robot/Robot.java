@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
+import frc.robot.subsystems.Rollers.Rollers;
+import frc.robot.subsystems.Rollers.RollersIOSim;
 import frc.robot.subsystems.apriltagvision.AprilTagVision;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIO;
 import frc.robot.subsystems.apriltagvision.AprilTagVisionIOLimelight;
@@ -89,6 +91,7 @@ public class Robot extends LoggedRobot {
   // Subsystems
   private final Drive drive;
   private final AprilTagVision vision;
+  private final Rollers rollers;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -201,6 +204,9 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 new AprilTagVisionIOLimelight(leftName),
                 new AprilTagVisionIOLimelight(rightName));
+        rollers = 
+            new Rollers(
+              new RollersIOSim());
         break;
 
       case SIM:
@@ -216,6 +222,9 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+        rollers = 
+          new Rollers(
+            new RollersIOSim());
         break;
 
       default:
@@ -244,6 +253,9 @@ public class Robot extends LoggedRobot {
                     return rightName;
                   }
                 });
+        rollers = 
+          new Rollers(
+             new RollersIOSim() {});
         break;
     }
 
