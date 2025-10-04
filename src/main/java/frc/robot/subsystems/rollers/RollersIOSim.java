@@ -9,4 +9,9 @@ public class RollersIOSim implements RollersIO{
     public void updateInputs(RollersIOInputs inputs) {
         inputs.voltage = appliedVolts;
     }
+
+    @Override
+    public void runVolts(double volts){
+        appliedVolts = volts;
+    }
 }
