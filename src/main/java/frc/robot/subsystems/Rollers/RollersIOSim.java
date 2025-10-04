@@ -15,5 +15,4 @@ public class RollersIOSim implements RollersIO{
         appliedVolts = volts;
     }
 
-
 }
