@@ -11,6 +11,6 @@ public interface RollersIO {
     }
 
     public default void updateInputs(RollersIOIinputs inputs) {}
-    
+
     public default void runVolts(double volts) {}
 }
