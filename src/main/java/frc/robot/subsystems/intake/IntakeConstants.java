@@ -9,7 +9,9 @@ public class IntakeConstants {
   public static final double maxAngleRads = Units.degreesToRadians(135);
   public static final double intakeLengthMeters = Units.inchesToMeters(15);
   public static final LoggedTunableNumber kP;
-
+  public static LoggedTunableNumber loweredAngle;
+  public static LoggedTunableNumber raisedAngle;
+  public static LoggedTunableNumber inVoltage;
 
   static {
     updateTunables();
@@ -24,7 +26,9 @@ public class IntakeConstants {
     }
   }
 
-
   public static void updateTunables() {
+    loweredAngle = new LoggedTunableNumber("Intake/loweredAngle", 125);
+    raisedAngle = new LoggedTunableNumber("Intake/raisedAngle", 0);
+    inVoltage = new LoggedTunableNumber("Intake/inVoltage", 6);
   }
 }

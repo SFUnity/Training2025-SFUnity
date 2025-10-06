@@ -11,6 +11,8 @@ public interface IntakeIO {
 
     public double rollerCurrent = 0.0;
     public double rollerVoltage = 0.0;
+
+    public boolean beambreak = false;
   }
 
   default void updateInputs(IntakeIOInputs inputs) {}

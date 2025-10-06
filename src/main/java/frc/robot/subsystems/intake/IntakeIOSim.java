@@ -18,34 +18,38 @@ public class IntakeIOSim implements IntakeIO {
           maxAngleRads,
           false,
           minAngleRads);
-    private final PIDController pid;
-    private double pivotVolts = 0.0;
-    private double rollersVolts = 0.0;
+  private final PIDController pid;
+  private double pivotVolts = 0.0;
+  private double rollersVolts = 0.0;
 
-    public IntakeIOSim(){
-        pid = new PIDController(kP.get(), 0.0, 0.0);
-        sim.setState(minAngleRads, 0.0);
-    }
+  public IntakeIOSim() {
+    pid = new PIDController(kP.get(), 0.0, 0.0);
+    sim.setState(minAngleRads, 0.0);
+  }
 
-    @Override
-    public void updateInputs(IntakeIOInputs inputs){
-        sim.update(0.02);
-        inputs.pivotPositionRads = sim.getAngleRads() - minAngleRads;
-        inputs.pivotVoltage = pivotVolts;
-        inputs.pivotCurrent = sim.getCurrentDrawAmps();
-        inputs.rollerVoltage = rollersVolts;
-    }
-    @Override
-    public void runRollers(double volts){
-        rollersVolts = volts;
-    }
-    @Override
-    public void runPivot(double volts){
-        sim.setInputVoltage(volts);
-    }
-    @Override
-    public void setPivotPosition(double setPointRads){
-        pivotVolts = MathUtil.clamp(pid.calculate(sim.getAngleRads() - minAngleRads, setPointRads), -12, 12);
-        runPivot(pivotVolts);
-    }
+  @Override
+  public void updateInputs(IntakeIOInputs inputs) {
+    sim.update(0.02);
+    inputs.pivotPositionRads = sim.getAngleRads() - minAngleRads;
+    inputs.pivotVoltage = pivotVolts;
+    inputs.pivotCurrent = sim.getCurrentDrawAmps();
+    inputs.rollerVoltage = rollersVolts;
+  }
+
+  @Override
+  public void runRollers(double volts) {
+    rollersVolts = volts;
+  }
+
+  @Override
+  public void runPivot(double volts) {
+    sim.setInputVoltage(volts);
+  }
+
+  @Override
+  public void setPivotPosition(double setPointRads) {
+    pivotVolts =
+        MathUtil.clamp(pid.calculate(sim.getAngleRads() - minAngleRads, setPointRads), -12, 12);
+    runPivot(pivotVolts);
+  }
 }
