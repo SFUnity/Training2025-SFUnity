@@ -2,6 +2,7 @@ package frc.robot.subsystems.intake;
 
 import static frc.robot.subsystems.intake.IntakeConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -33,5 +34,18 @@ public class IntakeIOSim implements IntakeIO {
         inputs.pivotVoltage = pivotVolts;
         inputs.pivotCurrent = sim.getCurrentDrawAmps();
         inputs.rollerVoltage = rollersVolts;
-    }  
+    }
+    @Override
+    public void runRollers(double volts){
+        rollersVolts = volts;
+    }
+    @Override
+    public void runPivot(double volts){
+        sim.setInputVoltage(volts);
+    }
+    @Override
+    public void setPivotPosition(double setPointRads){
+        pivotVolts = MathUtil.clamp(pid.calculate(sim.getAngleRads() - minAngleRads, setPointRads), -12, 12);
+        runPivot(pivotVolts);
+    }
 }
