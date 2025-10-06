@@ -33,7 +33,7 @@ public class IntakeVisualizer {
     intake =
         new LoggedMechanismLigament2d(
             "Intake",
-            armLengthMeters,
+            intakeLengthMeters,
             Units.radiansToDegrees(maxAngleRads),
             8,
             new Color8Bit(color));

@@ -7,7 +7,7 @@ import frc.robot.util.LoggedTunableNumber;
 public class IntakeConstants {
   public static final double minAngleRads = Units.degreesToRadians(10);
   public static final double maxAngleRads = Units.degreesToRadians(135);
-  public static final double armLengthMeters = Units.inchesToMeters(15);
+  public static final double intakeLengthMeters = Units.inchesToMeters(15);
   public static final LoggedTunableNumber kP;
 
 
