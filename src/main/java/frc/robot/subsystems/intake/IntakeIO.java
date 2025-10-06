@@ -3,17 +3,17 @@ package frc.robot.subsystems.intake;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
-    @AutoLog
-    public static class IntakeIOInputs {
-        public double pivotCurrent = 0.0;
-        public double pivotVoltage = 0.0;
-        public double pivotPositionRads = 0.0;
+  @AutoLog
+  public static class IntakeIOInputs {
+    public double pivotCurrent = 0.0;
+    public double pivotVoltage = 0.0;
+    public double pivotPositionRads = 0.0;
 
-        public double rollerCurrent = 0.0;
-        public double rollerVoltage = 0.0;
-    }
-    
-    default void updateInputs(IntakeIOInputs inputs) {}
+    public double rollerCurrent = 0.0;
+    public double rollerVoltage = 0.0;
+  }
+
+  default void updateInputs(IntakeIOInputs inputs) {}
 
   default void runRollers(double volts) {}
 
@@ -22,5 +22,4 @@ public interface IntakeIO {
   default void setPivotPosition(double setpointDeg) {}
 
   default void resetEncoder(double position) {}
-
 }
