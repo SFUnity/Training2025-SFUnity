@@ -13,7 +13,7 @@ public class IntakeIOSim implements IntakeIO {
           DCMotor.getKrakenX60(1),
           50,
           0.5,
-          armLengthMeters,
+          intakeLengthMeters,
           minAngleRads,
           maxAngleRads,
           false,
