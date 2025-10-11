@@ -204,9 +204,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 new AprilTagVisionIOLimelight(leftName),
                 new AprilTagVisionIOLimelight(rightName));
-        rollers = 
-            new Rollers(
-              new RollersIOSim());
+        rollers = new Rollers(new RollersIOSim());
         break;
 
       case SIM:
@@ -222,9 +220,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
-        rollers = 
-          new Rollers(
-            new RollersIOSim());
+        rollers = new Rollers(new RollersIOSim());
         break;
 
       default:
@@ -253,9 +249,7 @@ public class Robot extends LoggedRobot {
                     return rightName;
                   }
                 });
-        rollers = 
-          new Rollers(
-             new RollersIOSim() {});
+        rollers = new Rollers(new RollersIOSim() {});
         break;
     }
 
@@ -348,15 +342,12 @@ public class Robot extends LoggedRobot {
   }
 
   // Consider moving to its own file if/when it gets big
-  /** Use this method to define your button->command mappings. */
-
-
   private void configureButtonBindings() {
     boolean testDrive = false;
 
     driver.a().whileTrue(rollers.intake());
     driver.b().whileTrue(rollers.eject().withTimeout(1).andThen(rollers.intake()));
-    driver.c().whileTrue(rollers.eject());
+    driver.x().whileTrue(rollers.eject());
     // Default cmds
     if (testDrive) {
       drive.setDefaultCommand(
@@ -365,6 +356,8 @@ public class Robot extends LoggedRobot {
     } else {
       drive.setDefaultCommand(drive.joystickDrive());
     }
+
+    rollers.setDefaultCommand(rollers.stop());
 
     // Driver controls
     driver.rightTrigger().onTrue(runOnce(() -> Drive.nitro = !Drive.nitro));
