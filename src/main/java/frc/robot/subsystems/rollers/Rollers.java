@@ -2,6 +2,7 @@ package frc.robot.subsystems.rollers;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Rollers extends SubsystemBase {
   private final RollersIO io;
@@ -28,5 +29,4 @@ public class Rollers extends SubsystemBase {
   public Command eject() {
     return run(() -> io.runVolts(-6.0));
   }
-
 }
