@@ -43,6 +43,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.RollersIO;
+import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -220,6 +221,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+        rollers = new Rollers(new RollersIOSim());
         break;
 
       default:
@@ -344,6 +346,10 @@ public class Robot extends LoggedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     boolean testDrive = false;
+
+    driver.a().whileTrue(rollers.intake());
+    driver.b().whileTrue(rollers.eject().withTimeout(1).andThen(rollers.intake()));
+    driver.x().whileTrue(rollers.eject());
 
     // Default cmds
     if (testDrive) {
