@@ -14,6 +14,7 @@ public class Rollers extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs("Rollers", inputs);
   }
 
   public Command intake() {
