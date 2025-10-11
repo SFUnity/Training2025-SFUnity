@@ -349,11 +349,14 @@ public class Robot extends LoggedRobot {
 
   // Consider moving to its own file if/when it gets big
   /** Use this method to define your button->command mappings. */
+
+
   private void configureButtonBindings() {
     boolean testDrive = false;
 
-    driver.a().whileFalse(rollers.eject());
-
+    driver.a().whileTrue(rollers.intake());
+    driver.b().whileTrue(rollers.eject().withTimeout(1).andThen(rollers.intake()));
+    driver.c().whileTrue(rollers.eject());
     // Default cmds
     if (testDrive) {
       drive.setDefaultCommand(
