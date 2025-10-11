@@ -30,7 +30,7 @@ public class Rollers extends SubsystemBase {
   public Command stop() {
     return run(() -> io.runVolts(0.0));
   }
-  
+
   public Command intakeAtHalfSpeed() {
     return run(() -> io.runVolts(3.0));
   }
