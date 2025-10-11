@@ -206,8 +206,7 @@ public class Robot extends LoggedRobot {
                 new AprilTagVisionIOLimelight(leftName),
                 new AprilTagVisionIOLimelight(rightName));
 
-        rollers = 
-            new Rollers(new RollersIOSim() {});
+        rollers = new Rollers(new RollersIOSim() {});
         break;
 
       case SIM:
@@ -223,9 +222,8 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
-        
-        rollers = 
-            new Rollers(new RollersIOSim() {});
+
+        rollers = new Rollers(new RollersIOSim() {});
         break;
 
       default:
@@ -254,9 +252,8 @@ public class Robot extends LoggedRobot {
                     return rightName;
                   }
                 });
-       rollers = 
-            new Rollers(new RollersIO() {});
-       break;
+        rollers = new Rollers(new RollersIO() {});
+        break;
     }
 
     autos = new Autos(drive, poseManager);
@@ -351,7 +348,6 @@ public class Robot extends LoggedRobot {
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
     boolean testDrive = false;
-
 
     driver.a().whileTrue(rollers.intake());
     driver.b().whileTrue(rollers.eject().withTimeout(1).andThen(waitSeconds(1), rollers.intake()));
