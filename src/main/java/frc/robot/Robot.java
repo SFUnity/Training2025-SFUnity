@@ -221,7 +221,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
-            rollers = new Rollers(new RollersIOSim());
+        rollers = new Rollers(new RollersIOSim());
         break;
 
       default:
@@ -250,7 +250,7 @@ public class Robot extends LoggedRobot {
                     return rightName;
                   }
                 });
-        rollers = new Rollers(new RollersIO() {});        
+        rollers = new Rollers(new RollersIO() {});
         break;
     }
 
@@ -347,6 +347,8 @@ public class Robot extends LoggedRobot {
   private void configureButtonBindings() {
     boolean testDrive = false;
     driver.a().whileTrue(rollers.intake());
+    driver.b().whileTrue(rollers.eject().withTimeout(1).andThen(waitSeconds(1), rollers.intake()));
+    driver.x().whileTrue(rollers.eject());
     // Default cmds
     if (testDrive) {
       drive.setDefaultCommand(
