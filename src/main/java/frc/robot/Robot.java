@@ -205,7 +205,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 new AprilTagVisionIOLimelight(leftName),
                 new AprilTagVisionIOLimelight(rightName));
-        rollers = new Rollers(new RollersIOSim());
+        rollers = new Rollers(new RollersIOSim() {});
         break;
 
       case SIM:
@@ -221,6 +221,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+            rollers = new Rollers(new RollersIOSim() {});
         break;
 
       default:
