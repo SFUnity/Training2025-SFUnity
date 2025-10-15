@@ -354,6 +354,7 @@ public class Robot extends LoggedRobot {
     driver.a().whileTrue(rollers.intake(5));
     driver.x().whileTrue(rollers.eject(5));
     driver.b().onTrue(rollers.eject(10).withTimeout(1));
+    driver.y().whileTrue(rollers.eject(10).withTimeout(1).andThen(rollers.intake(1)));
 
     // Default cmds
     if (testDrive) {
