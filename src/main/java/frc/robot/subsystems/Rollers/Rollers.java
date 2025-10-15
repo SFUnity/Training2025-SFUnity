@@ -19,23 +19,15 @@ public class Rollers extends SubsystemBase {
     Logger.processInputs("Rollers", inputs);
   }
 
-  public Command intake() {
-    return run(() -> io.runVolts(6.0));
+  public Command intake (double volts) {
+    return run(() -> io.runVolts((volts)));
   }
-
-  public Command eject() {
-    return run(() -> io.runVolts(-6.0));
+ 
+  public Command eject (double volts) {
+    return run(() -> io.runVolts((-volts)));
   }
 
   public Command stop() {
     return run(() -> io.runVolts(0.0));
-  }
-
-  public Command intakeAtHalfSpeed() {
-    return run(() -> io.runVolts(3.0));
-  }
-
-  public Command ejectAtHalfSpeed() {
-    return run(() -> io.runVolts(-3.0));
   }
 }

@@ -351,10 +351,9 @@ public class Robot extends LoggedRobot {
 
     will relplace these with new bindings*/
 
-    driver.a().whileTrue(rollers.intakeAtHalfSpeed());
-    driver.x().whileTrue(rollers.ejectAtHalfSpeed());
-    driver.b().onTrue(rollers.eject().withTimeout(1));
-
+    driver.a().whileTrue(rollers.intake(5));
+    driver.x().whileTrue(rollers.eject(5));
+    driver.b().onTrue(rollers.eject(10).withTimeout(1));
 
     // Default cmds
     if (testDrive) {
