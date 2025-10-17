@@ -359,6 +359,7 @@ public class Robot extends LoggedRobot {
     } else {
       drive.setDefaultCommand(drive.joystickDrive());
     }
+    rollers.setDefaultCommand(rollers.stop());
 
     // Driver controls
     driver.rightTrigger().onTrue(runOnce(() -> Drive.nitro = !Drive.nitro));
