@@ -8,6 +8,7 @@ public interface RollersIO {
   public static class RollersIOInputs {
     public double current = 0.0;
     public double voltage = 0.0;
+    public double opositeVoltage = 0.0;
     public double positionRad = 0.0;
   }
 
