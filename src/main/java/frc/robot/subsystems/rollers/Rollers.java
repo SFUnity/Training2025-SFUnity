@@ -2,6 +2,8 @@ package frc.robot.subsystems.rollers;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import java.util.logging.Logger;
+import org.littletonrobotics.junction.Logger;
 
 public class Rollers extends SubsystemBase {
   private final RollersIO io;
@@ -14,6 +16,7 @@ public class Rollers extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs("Rollers/Inputs", inputs);
   }
 
   public Command intake() {

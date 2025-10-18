@@ -92,12 +92,13 @@ public class Autos {
     AutoRoutine routine = factory.newRoutine("taxi");
 
     // Load the routine's trajectories
-    AutoTrajectory driveToMiddle = routine.trajectory("Straight Path"); // change straight path with whatever ur path is named
+    AutoTrajectory driveToMiddle =
+        routine.trajectory("Straight Path"); // change straight path with whatever ur path is named
 
     Trigger autoDone = driveToMiddle.done();
     // When the routine begins, reset odometry and start the first trajectory (1)
     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-    routine.observe(autoDone).onTrue(rollers.eject());
+    routine.observe(autoDone).onTrue(rollers.eject().withTimeout(1));
 
     return routine;
   }
