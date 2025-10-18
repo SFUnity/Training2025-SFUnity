@@ -57,7 +57,7 @@ public class Autos {
 
     /* Set up main choreo routines */
     chooser = new LoggedAutoChooser("ChoreoChooser");
-    // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
+    chooser.addRoutine("Example Auto Routine", this::pickupAndScoreAuto);
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
@@ -86,7 +86,7 @@ public class Autos {
   public Command getAutonomousCommand() {
     return isChoreoAuto ? chooser.selectedCommandScheduler() : nonChoreoChooser.get();
   }
-  public AutoRoutine pickupAndScoreAuto() {
+  private AutoRoutine pickupAndScoreAuto() {
     AutoRoutine routine = factory.newRoutine("taxi");
 
     // Load the routine's trajectories
