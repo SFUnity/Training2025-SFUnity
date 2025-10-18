@@ -97,6 +97,11 @@ public class Autos {
     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     driveToMiddle.done().onTrue(rollers.eject(10).withTimeout(1));
 
+    
+      AutoTrajectory driveToFeadingStation = routine.trajectory("Feading Station Path");
+      routine.active().onTrue(Commands.sequence(driveToFeadingStation.resetOdometry(), driveToFeadingStation.cmd()));
+
     return routine;
   }
+
 }
