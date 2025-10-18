@@ -1,15 +1,21 @@
 package frc.robot;
 
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedAutoChooser;
 import frc.robot.util.PoseManager;
+
+import java.lang.invoke.ClassSpecializer.Factory;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -82,5 +88,23 @@ public class Autos {
    */
   public Command getAutonomousCommand() {
     return isChoreoAuto ? chooser.selectedCommandScheduler() : nonChoreoChooser.get();
+  }
+    public AutoRoutine pickupAndScoreAuto() {
+    AutoRoutine routine = factory.newRoutine("taxi");
+
+    // Load the routine's trajectories
+    AutoTrajectory driveToMiddle = routine.trajectory("driveToMiddle");
+
+    // When the routine begins, reset odometry and start the first trajectory (1)
+    routine.active().onTrue(
+        Commands.sequence(
+            driveToMiddle.resetOdometry(),
+            driveToMiddle.cmd()
+        )
+    );
+
+    return routine;
+    
+
   }
 }
