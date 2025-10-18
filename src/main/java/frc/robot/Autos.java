@@ -88,22 +88,15 @@ public class Autos {
     return isChoreoAuto ? chooser.selectedCommandScheduler() : nonChoreoChooser.get();
   }
 
-public AutoRoutine pickupAndScoreAuto() {
+  public AutoRoutine pickupAndScoreAuto() {
     AutoRoutine routine = factory.newRoutine("taxi");
 
     // Load the routine's trajectories
     AutoTrajectory driveToMiddle = routine.trajectory("Straight Line");
 
     // When the routine begins, reset odometry and start the first trajectory (1)
-    routine.active().onTrue(
-        Commands.sequence(
-            driveToMiddle.resetOdometry(),
-            driveToMiddle.cmd()
-        )
-    );
+    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     return routine;
-}
-
-
+  }
 }
