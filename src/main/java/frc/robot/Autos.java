@@ -56,7 +56,9 @@ public class Autos {
 
     /* Set up main choreo routines */
     chooser = new LoggedAutoChooser("ChoreoChooser");
-    chooser.addRoutine("Example Auto Routine", this::pickupAndScoreAuto); // equivalent to () -> this.pickupAndScoreAuto()
+    chooser.addRoutine(
+        "Example Auto Routine",
+        this::pickupAndScoreAuto); // equivalent to () -> this.pickupAndScoreAuto()
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
