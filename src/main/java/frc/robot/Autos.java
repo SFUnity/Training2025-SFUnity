@@ -6,6 +6,7 @@ import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedAutoChooser;
 import frc.robot.util.PoseManager;
@@ -14,6 +15,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class Autos {
   private final Drive drive;
+  private final Rollers rollers;
   private final PoseManager poseManager;
 
   private final AutoFactory factory;
@@ -26,8 +28,9 @@ public class Autos {
   public static boolean moveRight = false;
   public static boolean moveLeft = false;
 
-  public Autos(Drive drive, PoseManager poseManager) {
+  public Autos(Drive drive, Rollers rollers, PoseManager poseManager) {
     this.drive = drive;
+    this.rollers = rollers;
     this.poseManager = poseManager;
 
     factory =
