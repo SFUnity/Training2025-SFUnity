@@ -93,12 +93,7 @@ public class Autos {
     AutoTrajectory driveToMiddle = routine.trajectory("Start Path");
 
     // When the routine begins, reset odometry and start the first trajectory (1)
-    routine.active().onTrue(
-        Commands.sequence(
-            driveToMiddle.resetOdometry(),
-            driveToMiddle.cmd()
-        )
-    );
+    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(),driveToMiddle.cmd()));
 
     return routine;
   }
