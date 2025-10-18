@@ -8,6 +8,7 @@ import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.util.AllianceFlipUtil;
@@ -57,7 +58,7 @@ public class Autos {
 
     /* Set up main choreo routines */
     chooser = new LoggedAutoChooser("ChoreoChooser");
-    // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
+    chooser.addRoutine("Example Auto Routine", this::pickupAndScoreAuto);
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
@@ -91,15 +92,12 @@ public class Autos {
     AutoRoutine routine = factory.newRoutine("taxi");
 
     // Load the routine's trajectories
-    AutoTrajectory driveToMiddle = routine.trajectory("Straight Path");
+    AutoTrajectory driveToMiddle = routine.trajectory("Straight Path"); // change straight path with whatever ur path is named
 
+    Trigger autoDone = driveToMiddle.done();
     // When the routine begins, reset odometry and start the first trajectory (1)
-    routine.active().onTrue(
-        Commands.sequence(
-            driveToMiddle.resetOdometry(),
-            driveToMiddle.cmd()
-        )
-    );
+    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+    routine.observe(autoDone).onTrue(rollers.eject());
 
     return routine;
   }
