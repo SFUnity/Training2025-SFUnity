@@ -14,8 +14,6 @@ import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedAutoChooser;
 import frc.robot.util.PoseManager;
 
-import java.lang.invoke.ClassSpecializer.Factory;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -60,6 +58,7 @@ public class Autos {
 
     /* Set up main choreo routines */
     chooser = new LoggedAutoChooser("ChoreoChooser");
+    chooser.addRoutine("Example Auto Routine", this::pickupAndScoreAuto);
     // chooser.addRoutine("Example Auto Routine", this::exampleAutoRoutine);
 
     if (!DriverStation.isFMSAttached()) {
