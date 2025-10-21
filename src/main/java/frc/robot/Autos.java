@@ -116,7 +116,19 @@ public class Autos {
                 .withTimeout(0.5)
                 .andThen(Commands.sequence((driveToNewCoral.cmd()))));
 
-    driveToNewCoral.done().onTrue(rollers.eject(10).withTimeout(1));
+    driveToNewCoral
+        .done()
+        .onTrue(
+            rollers
+            .eject(10)
+            .withTimeout(1)
+            .andThen(
+                Commands.sequence(null)
+            )
+    
+    
+    
+    );
 
     return routine;
   }
