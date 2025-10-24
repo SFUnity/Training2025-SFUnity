@@ -58,6 +58,7 @@ public class Autos {
     /* Set up main choreo routines */
     chooser = new LoggedAutoChooser("ChoreoChooser");
     chooser.addRoutine("Example Auto Routine", this::pickupAndScoreAuto);
+    chooser.addRoutine("Example Auto Routine", this::intakeFromFeederAuto);
 
     if (!DriverStation.isFMSAttached()) {
       // Set up test choreo routines
@@ -97,6 +98,20 @@ public class Autos {
     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     driveToMiddle.done().onTrue(rollers.eject().withTimeout(1));
+
+    return routine;
+  }
+
+  private AutoRoutine intakeFromFeederAuto() {
+    AutoRoutine routine = factory.newRoutine("taxi");
+
+    // Load the routine's trajectories
+    AutoTrajectory driveToFeeder = routine.trajectory("Feeder Path");
+
+    // When the routine begins, reset odometry and start the first trajectory (1)
+    routine.active().onTrue(Commands.sequence(driveToFeeder.resetOdometry(), driveToFeeder.cmd()));
+
+    driveToFeeder.done().onTrue(rollers.intake().withTimeout(3));
 
     return routine;
   }
