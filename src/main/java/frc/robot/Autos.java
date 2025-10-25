@@ -107,11 +107,13 @@ public class Autos {
 
     // Load the routine's trajectories
     AutoTrajectory driveToFeeder = routine.trajectory("Feeder Intake");
+    AutoTrajectory driveToReef = routine.trajectory("Reef Branch");
 
     // When the routine begins, reset odometry and start the first trajectory (1)
     routine.active().onTrue(Commands.sequence(driveToFeeder.resetOdometry(), driveToFeeder.cmd()));
 
     driveToFeeder.done().onTrue(rollers.intake().withTimeout(3));
+    driveToReef.done().onTrue(rollers.eject().withTimeout(3));
 
     return routine;
   }
