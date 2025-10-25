@@ -221,7 +221,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
-            rollers = new Rollers(new RollersIOSim());
+        rollers = new Rollers(new RollersIOSim());
         break;
 
       default:
@@ -250,7 +250,7 @@ public class Robot extends LoggedRobot {
                     return rightName;
                   }
                 });
-                rollers = new Rollers(new RollersIO() {});
+        rollers = new Rollers(new RollersIO() {});
         break;
     }
 
