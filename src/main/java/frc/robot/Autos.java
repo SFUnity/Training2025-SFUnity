@@ -111,9 +111,14 @@ public class Autos {
     AutoTrajectory driveToReef = routine.trajectory("Reef Branch");
 
     // When the routine begins, reset odometry and start the first trajectory (1)
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-    routine.active().onTrue(Commands.sequence(driveToFeeder.resetOdometry(), driveToFeeder.cmd()));
-    routine.active().onTrue(Commands.sequence(driveToReef.resetOdometry(), driveToReef.cmd()));
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                driveToMiddle.resetOdometry(),
+                driveToMiddle.cmd(),
+                driveToFeeder.cmd(),
+                driveToReef.cmd()));
 
     driveToMiddle.done().onTrue(rollers.eject().withTimeout(1));
     driveToFeeder.done().onTrue(rollers.intake().withTimeout(3));
