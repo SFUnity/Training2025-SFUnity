@@ -1,5 +1,5 @@
 {
- "name":"Straight Path",
+ "name":"straightPath",
  "version":1,
  "snapshot":{
   "waypoints":[
@@ -13,8 +13,8 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"7.14589786529541 m", "val":7.14589786529541}, "y":{"exp":"4.180566787719727 m", "val":4.180566787719727}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":30, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"5.909364223480225 m", "val":5.909364223480225}, "y":{"exp":"3.7683889865875244 m", "val":3.768388986587525}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"7.119377136230469 m", "val":7.119377136230469}, "y":{"exp":"4.200910568237305 m", "val":4.200910568237305}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":30, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"5.338274955749512 m", "val":5.338274955749512}, "y":{"exp":"2.6950697898864746 m", "val":2.6950697898864746}, "heading":{"exp":"2.2142971999943324 rad", "val":2.2142971999943324}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
