@@ -1,15 +1,15 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.intake;
+
+import static frc.robot.subsystems.intake.IntakeConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import org.littletonrobotics.junction.Logger;
+public class Intake extends SubsystemBase {
+  private final IntakeIO io;
+  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-public class Rollers extends SubsystemBase {
-  private final RollersIO io;
-  private final RollersIOInputsAutoLogged inputs = new RollersIOInputsAutoLogged();
-
-  public Rollers(RollersIO io) {
+  public Intake(IntakeIO io) {
     this.io = io;
   }
 
@@ -23,7 +23,7 @@ public class Rollers extends SubsystemBase {
   }
 
   public Command intake() {
-    return run(() -> io.runVolts(6.0));
+    return run(() -> io.runVolts(IntakeSpeedVolts));
   }
 
   public Command eject() {

@@ -40,10 +40,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.leds.Leds;
-import frc.robot.subsystems.rollers.Rollers;
-import frc.robot.subsystems.rollers.RollersIO;
-import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -92,7 +92,7 @@ public class Robot extends LoggedRobot {
   // Subsystems
   private final Drive drive;
   private final AprilTagVision vision;
-  private final Rollers rollers;
+  private final Intake rollers;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -205,7 +205,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 new AprilTagVisionIOLimelight(leftName),
                 new AprilTagVisionIOLimelight(rightName));
-        rollers = new Rollers(new RollersIOSim());
+        rollers = new Intake(new IntakeIOSim());
         break;
 
       case SIM:
@@ -221,7 +221,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
-        rollers = new Rollers(new RollersIOSim());
+        rollers = new Intake(new IntakeIOSim());
         break;
 
       default:
@@ -250,7 +250,7 @@ public class Robot extends LoggedRobot {
                     return rightName;
                   }
                 });
-        rollers = new Rollers(new RollersIO() {});
+        rollers = new Intake(new IntakeIO() {});
         break;
     }
 
