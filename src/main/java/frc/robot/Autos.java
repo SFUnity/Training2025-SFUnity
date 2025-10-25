@@ -106,13 +106,15 @@ public class Autos {
     AutoRoutine routine = factory.newRoutine("taxi");
 
     // Load the routine's trajectories
-    
+    AutoTrajectory driveToMiddle = routine.trajectory("Start Path");
     AutoTrajectory driveToFeeder = routine.trajectory("Feeder Intake");
     AutoTrajectory driveToReef = routine.trajectory("Reef Branch");
 
     // When the routine begins, reset odometry and start the first trajectory (1)
+    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     routine.active().onTrue(Commands.sequence(driveToFeeder.resetOdometry(), driveToFeeder.cmd()));
 
+    driveToMiddle.done().onTrue(rollers.eject().withTimeout(1));
     driveToFeeder.done().onTrue(rollers.intake().withTimeout(3));
     driveToReef.done().onTrue(rollers.eject().withTimeout(3));
 
