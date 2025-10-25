@@ -94,6 +94,7 @@ public class Autos {
     AutoTrajectory driveToMiddle = routine.trajectory("Starting Path");
     AutoTrajectory driveToFeadingStation = routine.trajectory("Feading Station Path");
     AutoTrajectory driveToNewCoral = routine.trajectory("Place New Coral Path");
+    AutoTrajectory driveToFeedingStationTwo = routine.trajectory("Back To Feading Station Path");
 
     // When the routine begins, reset odometry and start the first trajectory (1)
     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
@@ -111,24 +112,17 @@ public class Autos {
     driveToFeadingStation
         .done()
         .onTrue(
-            rollers
-                .intake(10)
-                .withTimeout(0.5)
-                .andThen(Commands.sequence((driveToNewCoral.cmd()))));
+            rollers.intake(10).withTimeout(1).andThen(Commands.sequence((driveToNewCoral.cmd()))));
 
     driveToNewCoral
         .done()
         .onTrue(
             rollers
-            .eject(10)
-            .withTimeout(1)
-            .andThen(
-                Commands.sequence(null)
-            )
-    
-    
-    
-    );
+                .eject(10)
+                .withTimeout(1)
+                .andThen(Commands.sequence((driveToFeedingStationTwo.cmd()))));
+
+    driveToFeedingStationTwo.done().onTrue(rollers.intake(10).withTimeout(1));
 
     return routine;
   }

@@ -13,8 +13,6 @@ public interface RollersIO {
     public double bottomCurrent = 0.0;
     public double bottomVoltage = 0.0;
     public double bottomPositionRad = 0.0;
-
-
   }
 
   public default void updateInputs(RollersIOInputs inputs) {}
