@@ -254,7 +254,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    autos = new Autos(drive, poseManager);
+    autos = new Autos(drive, poseManager, rollers);
 
     // Configure the button bindings
     configureButtonBindings();

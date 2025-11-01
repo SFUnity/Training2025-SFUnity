@@ -1,11 +1,15 @@
 package frc.robot;
 
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LoggedAutoChooser;
 import frc.robot.util.PoseManager;
@@ -15,6 +19,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class Autos {
   private final Drive drive;
   private final PoseManager poseManager;
+  private final Rollers rollers;
 
   private final AutoFactory factory;
   private final LoggedAutoChooser chooser;
@@ -26,9 +31,10 @@ public class Autos {
   public static boolean moveRight = false;
   public static boolean moveLeft = false;
 
-  public Autos(Drive drive, PoseManager poseManager) {
+  public Autos(Drive drive, PoseManager poseManager, Rollers rollers) {
     this.drive = drive;
     this.poseManager = poseManager;
+    this.rollers = rollers;
 
     factory =
         new AutoFactory(
@@ -79,5 +85,13 @@ public class Autos {
    */
   public Command getAutonomousCommand() {
     return isChoreoAuto ? chooser.selectedCommandScheduler() : nonChoreoChooser.get();
+  }
+
+  public AutoRoutine driveToAlgae() {
+    AutoRoutine routine = factory.newRoutine("taxi");
+
+    AutoTrajectory trajectory = routine.trajectory("Middle to Middle Algae");
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+    return routine;
   }
 }
