@@ -7,7 +7,10 @@ public class RollersIOSim implements RollersIO {
 
   @Override
   public void updateInputs(RollersIOInputs inputs) {
-    inputs.volts = appliedVolts;
+    inputs.topVolts = appliedVolts;
+    inputs.bottomVolts = -appliedVolts;
+
+  
   }
 
   @Override
