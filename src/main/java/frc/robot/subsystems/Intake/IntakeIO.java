@@ -7,13 +7,19 @@ import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 public interface IntakeIO {
     
     @AutoLog
-    public static class RollersIOInputs {
-        public double current = 0.0;
-        public double voltage = 0.0;
-        public double positionRad = 0.0;
+    public static class IntakeIOInputs {
+        public double rollerCurrent = 0.0;
+        public double rollerVoltage = 0.0;
+        public double rollerPositionRad = 0.0;
+
+        public double pivotCurrent = 0.0;
+        public double pivotVoltage = 0.0;
+        public double pivotPositionRad = 0.0;
     }
 
-    public default void updateInputs(RollersIOInputs inputs) {}
+    public default void updateInputs(IntakeIOInputs inputs) {}
 
-    public default void runVolts(RollersIOInputs inputs) {}
+    public default void ruRollerVolts(IntakeIOInputs inputs) {}
+
+    public default void runPivotVolts(IntakeIOInputs inputs) {}
 }
