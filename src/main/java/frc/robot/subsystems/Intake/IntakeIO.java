@@ -19,7 +19,11 @@ public interface IntakeIO {
 
     public default void updateInputs(IntakeIOInputs inputs) {}
 
-    public default void ruRollerVolts(IntakeIOInputs inputs) {}
+    public default void ruRollerVolts(double volts) {}
 
-    public default void runPivotVolts(IntakeIOInputs inputs) {}
+    public default void runPivotVolts(double volts) {}
+
+    public default void setPivotPosition(double setPoinPosition) {}
+
+    public default void resetEncoder(double position) {}
 }
