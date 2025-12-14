@@ -18,15 +18,23 @@ public class Intake extends SubsystemBase {
     io.updateInput(inputs);
   }
 
-  public Command command() {
-    return run(() -> io.runVolts(0.0));
-  }
-
   public Command intake() {
-    return run(() -> io.runVolts(IntakeSpeedVolts));
+    return run(
+        () -> {
+          io.setPivotPosition(loweredPositionDegrees);
+          io.runRollers(IntakeSpeedVolts);
+        });
   }
 
   public Command eject() {
-    return run(() -> io.runVolts(-6.0));
+    return run(() -> io.runRollers(ejectVolts));
+  }
+
+  public Command stow() {
+    return run(
+        () -> {
+          io.setPivotPosition(0);
+          io.runRollers(0);
+        });
   }
 }

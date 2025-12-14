@@ -41,7 +41,7 @@ public class IntakeIOSim implements IntakeIO {
 
   @Override
   public void updateInput(IntakeIOInputs inputs) {
-    inputs.voltage = appliedVolts;
+    inputs.rollerVoltage = appliedVolts;
     sim.update(Constants.loopPeriodSecs);
 
     inputs.pivotCurrentPositionDeg = getAngleDeg();

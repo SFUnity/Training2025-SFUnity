@@ -14,4 +14,6 @@ public class IntakeConstants {
   public static final double high = 12.0;
   public static final LoggedTunableNumber kP = new LoggedTunableNumber("Intake/kP", 0);
   public static final LoggedTunableNumber kD = new LoggedTunableNumber("Intake/kD", 0);
+  public static final double loweredPositionDegrees = 2;
+  public static final double ejectVolts = -6.0;
 }
