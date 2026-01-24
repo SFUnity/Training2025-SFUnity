@@ -221,6 +221,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+        rollers = new Rollers(new RollersIOSim() {});
         break;
 
       default:
@@ -253,7 +254,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    autos = new Autos(drive, poseManager);
+    autos = new Autos(drive, rollers, poseManager);
 
     // Configure the button bindings
     configureButtonBindings();
