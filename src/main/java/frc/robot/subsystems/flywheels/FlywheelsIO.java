@@ -2,15 +2,16 @@ package frc.robot.subsystems.flywheels;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public class FlywheelsIO {
+public interface FlywheelsIO {
  
     @AutoLog
-    public static class RollersIOInputs {
-        public double volts = 0.0;
-
+    public static class FlywheelsIOInputs {
+        public double flywheelVoltsTop = 0.0;
+        public double flywheelVoltsBottom = 0.0;
     }
 
-    public default void UpdateInputs(FlywheelsIOInputs inputs) { }
+    public default void updateInputs(FlywheelsIOInputs inputs) {}
 
-    public default void RunVolts(int volts) {}
+    public default void runFlywheelVoltsTop(int volts) {}
+    public default void runFlywheelVoltsBottom(int volts) {}
 }
