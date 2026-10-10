@@ -16,5 +16,3 @@ public class RollersIOSim implements RollersIO {
      }
 
 }
-
-//wifies and katie b would be so proud 
