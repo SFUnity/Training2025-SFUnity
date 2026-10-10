@@ -1,5 +1,18 @@
 package frc.robot.subsystems.rollers;
 
-public class RollersIO {
-    
+import org.littletonrobotics.junction.AutoLog;
+
+public interface RollersIO {
+
+    @AutoLog
+    public static class RollersIOinputs {
+        public double speed = 0.0;
+    }
+
+    public default void UpdateInputs(RollersIOinputs inputs) {
+
+    }
+
+    public default void RunVolts() {}
+
 }
