@@ -6,12 +6,10 @@ public interface RollersIO {
 
     @AutoLog
     public static class RollersIOinputs {
-        public double speed = 0.0;
+        public double volts = 0.0;
     }
 
-    public default void UpdateInputs(RollersIOinputs inputs) {
-
-    }
+    public default void UpdateInputs(RollersIOinputs inputs) {}
 
     public default void RunVolts() {}
 
