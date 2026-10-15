@@ -5,14 +5,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Flywheels {
 
 public class Flywheels extends SubsystemBase {
+
     private final FlywheelsIO io;
     private final FlywheelsIOInputsAutoLogged inputs = new FlywheelsIOInputsAutoLogged();
 
     public Flywheels(FlywheelsIO flywheelsIO) {
-        this.io = flywheelsIO;
+        this.io = flywheelsIO; //i dont think this is working either :'c
     }
 
-    @Override
+    @Overide //why is this different colors????????
     public void periodic() {
         io.UpdateInputs(inputs);
     }
