@@ -1,6 +1,7 @@
 package frc.robot;
 
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -80,4 +81,20 @@ public class Autos {
   public Command getAutonomousCommand() {
     return isChoreoAuto ? chooser.selectedCommandScheduler() : nonChoreoChooser.get();
   }
+
+
+
+
+
+
+public AutoRoutine SIXseven(){
+  AutoRoutine routine = factory.newRoutine("SIXseven");
+  AutoTrajectory SIXseven = routine.trajectory("SIXseven");
+  routine.active().onTrue(Commands.sequence(SIXseven.resetOdometry(), SIXseven.cmd()));
+  SIXseven.done()
+    .onTrue(RobotCommands.readyThenShoot(shooter, kicker, spindexer).withTimeout(10));
+  return routine;  
+}
+
+
 }
