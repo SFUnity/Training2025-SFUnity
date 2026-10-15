@@ -6,14 +6,16 @@ public class rollersIOSim implements rollersIO {
     public rollersIOSim() {}
 
     @Override
-    public void updateInputs(RollerIOInputs inputs) 
+    public void updateInputs(RollerIOInputs inputs) {
         inputs.volts = appliedVolts;
 
+    }
 
-
-
-
-
+    @Override
+    public void runVolts(int volts) {
+        appliedVolts = volts;
+    }
+    
 
 }
     
