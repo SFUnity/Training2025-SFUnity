@@ -6,6 +6,10 @@ public class RollersIOSim implements RollersIO {
     private double rollerStatorCurrent = 0.0;
     private double rollerSupplyCurrent = 0.0;
 
+    public RollersIOSim() {
+        
+    }
+
     @Override
     public void updateInputs(RollersIOInputs inputs) {
         inputs.rollerSpeed = this.rollerSpeed;
