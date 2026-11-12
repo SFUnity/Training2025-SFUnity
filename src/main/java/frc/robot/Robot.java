@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.RobotCommands;
 import frc.robot.constantsGlobal.BuildConstants;
 import frc.robot.constantsGlobal.Constants;
 import frc.robot.subsystems.apriltagvision.AprilTagVision;
@@ -42,6 +43,8 @@ import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.subsystems.rollers.RollersIO;
+import frc.robot.subsystems.rollers.RollersIOSim;
 import frc.robot.subsystems.rollers.RollersIOTalonFX;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
@@ -91,6 +94,7 @@ public class Robot extends LoggedRobot {
   // Subsystems
   private final Drive drive;
   private final AprilTagVision vision;
+  private final Rollers rollers;
 
   // Non-subsystems
   private final PoseManager poseManager = new PoseManager();
@@ -123,7 +127,6 @@ public class Robot extends LoggedRobot {
   public Robot() {
     super();
 
-    final Rollers rollers;
 
     Leds.getInstance();
 
@@ -155,7 +158,6 @@ public class Robot extends LoggedRobot {
         Logger.addDataReceiver(logWriter);
         Logger.addDataReceiver(new NT4Publisher());
         Logger.registerURCL(URCL.startExternal()); // Enables REV CAN logging !!! not replayable !!!
-        rollers = new Rollers(new RollersIOTalonFX());
         break;
 
       case SIM:
@@ -206,6 +208,7 @@ public class Robot extends LoggedRobot {
                 poseManager,
                 new AprilTagVisionIOLimelight(leftName),
                 new AprilTagVisionIOLimelight(rightName));
+        rollers = new Rollers(new RollersIOTalonFX());
         break;
 
       case SIM:
@@ -221,6 +224,7 @@ public class Robot extends LoggedRobot {
                 driveCommandsConfig);
         vision =
             new AprilTagVision(poseManager, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
+            rollers = new Rollers(new RollersIOSim());
         break;
 
       default:
@@ -249,6 +253,7 @@ public class Robot extends LoggedRobot {
                     return rightName;
                   }
                 });
+        rollers = new Rollers(new RollersIO() {});
         break;
     }
 
@@ -355,7 +360,11 @@ public class Robot extends LoggedRobot {
     }
 
     // Driver controls
-    driver.rightTrigger().onTrue(runOnce(() -> Drive.nitro = !Drive.nitro));
+    driver.rightTrigger().onTrue(RobotCommands.intake(rollers));
+    driver.rightTrigger().onFalse(RobotCommands.stopIntake(rollers));
+
+        driver.leftTrigger().onTrue(RobotCommands.outtake(rollers));
+    driver.leftTrigger().onFalse(RobotCommands.stopIntake(rollers));
     if (testDrive) {
       driver.y().onTrue(drive.setModuleToTest(0));
       driver.x().onTrue(drive.setModuleToTest(1));
