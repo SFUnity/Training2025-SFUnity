@@ -41,6 +41,8 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMixed;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.leds.Leds;
+import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.subsystems.rollers.RollersIOTalonFX;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.PoseManager;
 import frc.robot.util.VirtualSubsystem;
@@ -121,6 +123,8 @@ public class Robot extends LoggedRobot {
   public Robot() {
     super();
 
+    final Rollers rollers;
+
     Leds.getInstance();
 
     // Record metadata
@@ -151,6 +155,7 @@ public class Robot extends LoggedRobot {
         Logger.addDataReceiver(logWriter);
         Logger.addDataReceiver(new NT4Publisher());
         Logger.registerURCL(URCL.startExternal()); // Enables REV CAN logging !!! not replayable !!!
+        rollers = new Rollers(new RollersIOTalonFX());
         break;
 
       case SIM:
